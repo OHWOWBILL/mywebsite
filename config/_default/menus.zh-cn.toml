@@ -1,0 +1,39 @@
+# -- Main Menu --
+
+[[main]]
+  name = "潜蛟阁"
+  pageRef = "/"
+  weight = 10
+
+[[main]]
+  name = "阁主何人"
+  pageRef = "about"
+  weight = 20
+
+[[main]]
+  name = "万法归一"
+  pageRef = "posts"
+  weight = 30
+
+[[main]]
+  name = "寻物"
+  pageRef = "tags"
+  weight = 40
+
+[[main]]
+  identifier = "github"
+  pre = "github"
+  url = "https://github.com/ohwowbill"
+  weight = 100
+
+# -- Footer Menu --
+
+[[footer]]
+  name = "标签"
+  pageRef = "tags"
+  weight = 10
+
+[[footer]]
+  name = "分类"
+  pageRef = "categories"
+  weight = 20
