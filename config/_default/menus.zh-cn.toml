@@ -16,6 +16,11 @@
   weight = 30
 
 [[main]]
+  name = "去处"
+  pageRef = "links"
+  weight = 35
+
+[[main]]
   name = "寻物"
   pageRef = "tags"
   weight = 40
