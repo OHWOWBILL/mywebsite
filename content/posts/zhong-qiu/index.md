@@ -13,3 +13,15 @@ categories: ["随笔"]
 Happy Moon Festival.
 
 （来年は何処にいるかな）
+
+![](/img/moon1.jpg)
+
+![](/img/moon2.jpg)
+
+![](/img/moon3.jpg)
+
+![](/img/moon4.jpg)
+
+![](/img/moon5.jpg)
+
+![](/img/moon6.jpg)

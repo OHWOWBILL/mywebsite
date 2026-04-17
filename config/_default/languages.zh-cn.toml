@@ -13,7 +13,8 @@ title = "潜蛟子 · ohwowbill"
 [params.author]
   name = "潜蛟子 ohwowbill"
   headline = "只手攀南斗，翻身倚北辰"
-  bio = "昂首天外望，无我这般人。（ようこそ、日本語対応あり）"
+  bio = "昂首天外望，无我这般人。"
+  image = "https://github.com/ohwowbill.png"
   links = [
     { instagram = "https://www.instagram.com/ohwowbill" },
   ]
