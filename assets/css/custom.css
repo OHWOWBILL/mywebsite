@@ -1,0 +1,76 @@
+/* ==============================
+   潜蛟阁 · 自定义样式
+   ============================== */
+
+/* 标题发光 - 金色脉冲 */
+@keyframes goldenGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 6px rgba(212, 170, 50, 0.4),
+      0 0 14px rgba(212, 170, 50, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 14px rgba(212, 170, 50, 0.8),
+      0 0 30px rgba(212, 170, 50, 0.4),
+      0 0 55px rgba(212, 170, 50, 0.15);
+  }
+}
+
+/* 文章标题发光 - 幽蓝 */
+@keyframes blueGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 6px rgba(100, 180, 255, 0.3),
+      0 0 14px rgba(100, 180, 255, 0.15);
+  }
+  50% {
+    text-shadow:
+      0 0 14px rgba(100, 180, 255, 0.65),
+      0 0 30px rgba(100, 180, 255, 0.3),
+      0 0 46px rgba(100, 180, 255, 0.1);
+  }
+}
+
+/* 首页 profile 名字 */
+h1 {
+  animation: goldenGlow 3.5s ease-in-out infinite;
+}
+
+/* 文章内各级标题 */
+.prose h1,
+.prose h2 {
+  animation: blueGlow 4s ease-in-out infinite;
+}
+
+.prose h3 {
+  animation: blueGlow 5s ease-in-out infinite;
+}
+
+/* 分隔线改为卦象装饰 */
+.prose hr {
+  border: none;
+  text-align: center;
+  overflow: visible;
+  height: 1.2em;
+  margin: 2em auto;
+}
+
+.prose hr::after {
+  content: '☰  ☷  ☳  ☵  ☶  ☲  ☴  ☱';
+  display: inline-block;
+  letter-spacing: 0.4em;
+  font-size: 0.9em;
+  opacity: 0.3;
+}
+
+/* 链接悬停微发光 */
+a:hover {
+  text-shadow: 0 0 10px rgba(212, 170, 50, 0.45);
+  transition: text-shadow 0.3s ease;
+}
+
+/* 导航栏链接悬停 */
+nav a:hover {
+  text-shadow: 0 0 12px rgba(212, 170, 50, 0.6);
+}

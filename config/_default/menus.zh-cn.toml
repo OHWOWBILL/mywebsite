@@ -21,8 +21,8 @@
   weight = 40
 
 [[main]]
-  name = "术数工具"
-  url = "https://meihuatool.vercel.app/"
+  name = "法宝"
+  pageRef = "tools"
   weight = 50
 
 [[main]]

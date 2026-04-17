@@ -1,0 +1,44 @@
+{{ define "main" }}
+<div style="
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 65vh;
+  text-align: center;
+  padding: 3rem 2rem;
+  letter-spacing: 0.1em;
+">
+  <div style="font-size: 5rem; margin-bottom: 1.5rem; opacity: 0.25; line-height: 1;">☵</div>
+
+  <h1 style="
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    letter-spacing: 0.3em;
+    text-shadow: 0 0 20px rgba(212,170,50,0.5), 0 0 40px rgba(212,170,50,0.2);
+  ">此路不通</h1>
+
+  <p style="font-size: 1.15rem; opacity: 0.55; margin: 0 0 0.5rem; letter-spacing: 0.2em;">
+    此卦无解，请另起一卦
+  </p>
+
+  <p style="font-size: 0.8rem; opacity: 0.28; margin: 0 0 3rem; letter-spacing: 0.25em;">
+    404 &nbsp;·&nbsp; 命途未定
+  </p>
+
+  <a href="/"
+    style="
+      border: 1px solid currentColor;
+      padding: 0.65rem 2.2rem;
+      letter-spacing: 0.25em;
+      font-size: 0.9rem;
+      opacity: 0.65;
+      text-decoration: none;
+      transition: opacity 0.3s, text-shadow 0.3s;
+    "
+    onmouseover="this.style.opacity='1'; this.style.textShadow='0 0 12px rgba(212,170,50,0.6)'"
+    onmouseout="this.style.opacity='0.65'; this.style.textShadow='none'"
+  >归去来兮</a>
+</div>
+{{ end }}
