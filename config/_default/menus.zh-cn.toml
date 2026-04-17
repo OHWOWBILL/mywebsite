@@ -21,9 +21,14 @@
   weight = 40
 
 [[main]]
-  identifier = "github"
-  pre = "github"
-  url = "https://github.com/ohwowbill"
+  name = "术数工具"
+  url = "https://meihuatool.vercel.app/"
+  weight = 50
+
+[[main]]
+  identifier = "instagram"
+  pre = "instagram"
+  url = "https://www.instagram.com/ohwowbill"
   weight = 100
 
 # -- Footer Menu --
