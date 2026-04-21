@@ -22,7 +22,7 @@ showTableOfContents: true
 - **排盘速查** — 输入卦名，即时显示六爻爻位
 - **十二长生** — 天干 × 地支对照，一目了然
 
-**[→ 开启此宝](https://meihuatool.vercel.app/)**
+**[→ 开启此宝](https://ohwowbill.com/meihua)**
 
 ---
 
