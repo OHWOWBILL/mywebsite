@@ -1,0 +1,610 @@
+/* ========== ohwowbill · 潜蛟子 · 玄学名片 ========== */
+
+:root {
+  /* ink palette — deep night gold */
+  --ink-0: #08070b;
+  --ink-1: #0e0c14;
+  --ink-2: #15121d;
+  --ink-3: #1f1a2a;
+  --gold-0: #f4e4b8;
+  --gold-1: #d4af37;
+  --gold-2: #b8932c;
+  --gold-3: #8a6c1d;
+  --gold-glow: rgba(212, 175, 55, 0.55);
+  --rune: rgba(244, 228, 184, 0.72);
+  --rune-dim: rgba(244, 228, 184, 0.28);
+  --rune-faint: rgba(244, 228, 184, 0.10);
+  --vermillion: #c44536;
+
+  /* metaphysical density (0..1) — controlled by tweaks */
+  --density: 1;
+  --animate: 1;
+
+  /* type */
+  --serif: "Cormorant Garamond", "Cormorant", "EB Garamond", serif;
+  --display: "Cinzel", "Cormorant Garamond", serif;
+  --hanzi: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* light mode override */
+:root.is-light {
+  --ink-0: #ece4d3;
+  --ink-1: #e2d8c2;
+  --ink-2: #d6cab1;
+  --ink-3: #c8baa0;
+  --gold-0: #2a1f0a;
+  --gold-1: #6b4e1a;
+  --gold-2: #4a3712;
+  --gold-3: #2e2208;
+  --gold-glow: rgba(107, 78, 26, 0.45);
+  --rune: rgba(42, 31, 10, 0.85);
+  --rune-dim: rgba(42, 31, 10, 0.35);
+  --rune-faint: rgba(42, 31, 10, 0.12);
+}
+
+/* hue shift via theme color */
+:root.theme-violet {
+  --gold-0: #efe2ff;
+  --gold-1: #b89dd9;
+  --gold-2: #8e74b3;
+  --gold-3: #5c4380;
+  --gold-glow: rgba(184, 157, 217, 0.55);
+  --rune: rgba(239, 226, 255, 0.72);
+  --rune-dim: rgba(239, 226, 255, 0.28);
+  --rune-faint: rgba(239, 226, 255, 0.10);
+}
+:root.theme-jade {
+  --gold-0: #e6f0d8;
+  --gold-1: #a8b87a;
+  --gold-2: #7e9050;
+  --gold-3: #4a5a2e;
+  --gold-glow: rgba(168, 184, 122, 0.55);
+  --rune: rgba(230, 240, 216, 0.72);
+  --rune-dim: rgba(230, 240, 216, 0.28);
+  --rune-faint: rgba(230, 240, 216, 0.10);
+}
+:root.theme-vermillion {
+  --gold-0: #ffe0c2;
+  --gold-1: #d97550;
+  --gold-2: #a8542f;
+  --gold-3: #6b3315;
+  --gold-glow: rgba(217, 117, 80, 0.55);
+  --rune: rgba(255, 224, 194, 0.72);
+  --rune-dim: rgba(255, 224, 194, 0.30);
+  --rune-faint: rgba(255, 224, 194, 0.10);
+}
+
+/* ============ base ============ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--ink-0);
+  color: var(--gold-0);
+  font-family: var(--serif);
+  font-weight: 400;
+  overflow-x: hidden;
+  cursor: default;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  font-variant-emoji: text;
+}
+
+/* Force text presentation on symbol/emoji-default codepoints across the page —
+   we want monochrome gold glyphs, never the OS color emoji. */
+.compass text,
+.rune-floater,
+.rune-trail,
+.divider-glyph,
+.talisman .glyph,
+.footer-line .sep,
+.curtain .sigil-load::after {
+  font-variant-emoji: text;
+  font-family: "Noto Sans Symbols 2", "Noto Sans Symbols", "Symbola",
+               var(--display), serif;
+}
+.compass .hanzi,
+.talisman .label-zh,
+.sigil .name-zh,
+.sigil .name-zi,
+.side .zh {
+  font-family: var(--hanzi) !important;
+}
+
+/* paper grain on top of ink */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at 50% 40%, transparent 0%, var(--ink-0) 78%),
+    radial-gradient(ellipse at 20% 80%, rgba(212,175,55,0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 20%, rgba(212,175,55,0.05) 0%, transparent 35%);
+  mix-blend-mode: screen;
+}
+body::after {
+  content: "";
+  position: fixed; inset: -50%;
+  pointer-events: none;
+  z-index: 2;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.9  0 0 0 0 0.78  0 0 0 0 0.42  0 0 0 0.13 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>");
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+:root.is-light body::after { opacity: 0.18; mix-blend-mode: multiply; }
+
+/* ============ stage ============ */
+.stage {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  z-index: 3;
+  padding: 32px;
+}
+
+/* ============ cursor light & rune trail ============ */
+.cursor-glow {
+  position: fixed;
+  width: 380px; height: 380px;
+  left: 0; top: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-glow) 0%, transparent 60%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 4;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  transition: opacity .4s;
+}
+:root.is-light .cursor-glow { mix-blend-mode: multiply; opacity: 0.35; }
+
+.rune-trail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 5;
+  font-family: var(--display);
+  color: var(--gold-1);
+  font-size: 18px;
+  text-shadow: 0 0 12px var(--gold-glow);
+  transform: translate(-50%, -50%);
+  user-select: none;
+  will-change: opacity, transform;
+  animation: rune-fade 1.6s ease-out forwards;
+}
+@keyframes rune-fade {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6) rotate(0deg); }
+  20%  { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-50%, -110%) scale(1.4) rotate(40deg); }
+}
+
+/* ============ corner ornaments ============ */
+.corner {
+  position: fixed;
+  width: 220px; height: 220px;
+  z-index: 3;
+  pointer-events: none;
+  color: var(--gold-2);
+  opacity: calc(0.55 * var(--density));
+}
+.corner.tl { top: 18px; left: 18px; }
+.corner.tr { top: 18px; right: 18px; transform: scaleX(-1); }
+.corner.bl { bottom: 18px; left: 18px; transform: scaleY(-1); }
+.corner.br { bottom: 18px; right: 18px; transform: scale(-1, -1); }
+
+.frame-edge {
+  position: fixed;
+  inset: 24px;
+  border: 1px solid var(--rune-faint);
+  z-index: 3;
+  pointer-events: none;
+  opacity: var(--density);
+}
+.frame-edge::before, .frame-edge::after {
+  content: ""; position: absolute; inset: 6px;
+  border: 1px solid var(--rune-faint);
+}
+.frame-edge::after { inset: 12px; border-color: var(--rune-faint); opacity: 0.6; }
+
+/* edge ticks — like a sundial */
+.edge-ticks {
+  position: fixed;
+  inset: 24px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: calc(0.7 * var(--density));
+}
+
+/* ============ content frame ============ */
+.card {
+  position: relative;
+  width: min(1200px, 96vw);
+  display: grid;
+  grid-template-columns: 1fr min(46vh, 540px) 1fr;
+  grid-template-rows: auto;
+  gap: 24px;
+  align-items: center;
+  z-index: 6;
+}
+
+@media (max-width: 760px) {
+  .card { grid-template-columns: 1fr; gap: 12px; }
+  .card .left, .card .right { order: 2; align-items: center; text-align: center; }
+  .card .center { order: 1; }
+}
+
+/* ============ center compass ============ */
+.center {
+  position: relative;
+  width: min(46vh, 540px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+}
+@media (max-width: 760px) {
+  .center { width: min(86vw, 460px); }
+}
+
+.compass {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 24px var(--gold-glow));
+}
+
+.compass .ring { transform-origin: center; transform-box: fill-box; }
+.compass .ring-1 { animation: spin 240s linear infinite; }
+.compass .ring-2 { animation: spin-rev 180s linear infinite; }
+.compass .ring-3 { animation: spin 120s linear infinite; }
+.compass .ring-4 { animation: spin-rev 80s linear infinite; }
+.compass .ring-5 { animation: spin 360s linear infinite; }
+
+:root[data-animate="0"] .compass .ring { animation: none !important; }
+
+@keyframes spin     { to { transform: rotate(360deg); } }
+@keyframes spin-rev { to { transform: rotate(-360deg); } }
+
+.compass text {
+  font-family: var(--display);
+  font-size: 8px;
+  fill: var(--gold-1);
+  letter-spacing: 0.12em;
+}
+.compass .hanzi { font-family: var(--hanzi); font-size: 14px; fill: var(--gold-0); font-weight: 500; }
+.compass .glyph-lg { fill: var(--gold-0); font-size: 22px; font-family: var(--display); }
+.compass circle.hairline { fill: none; stroke: var(--gold-3); stroke-width: 0.5; }
+.compass circle.line { fill: none; stroke: var(--gold-2); stroke-width: 0.8; }
+.compass circle.dim { fill: none; stroke: var(--rune-dim); stroke-width: 0.4; stroke-dasharray: 2 3; }
+.compass line.tick { stroke: var(--gold-2); stroke-width: 0.6; }
+.compass line.tick-fine { stroke: var(--rune-dim); stroke-width: 0.4; }
+.compass path.fill { fill: var(--gold-1); }
+.compass path.stroke { fill: none; stroke: var(--gold-1); stroke-width: 1; }
+
+/* center sigil — name monogram */
+.sigil {
+  position: relative;
+  z-index: 2;
+  width: 180px; height: 180px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.sigil .ohw {
+  font-family: var(--display);
+  font-size: 14px;
+  letter-spacing: 0.32em;
+  color: var(--gold-1);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  text-shadow: 0 0 8px var(--gold-glow);
+}
+.sigil .name-zh {
+  font-family: var(--hanzi);
+  font-size: 38px;
+  font-weight: 600;
+  color: var(--gold-0);
+  letter-spacing: 0.15em;
+  line-height: 1;
+  text-shadow: 0 0 16px var(--gold-glow);
+}
+.sigil .name-zi {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--hanzi);
+  font-size: 14px;
+  color: var(--gold-1);
+  letter-spacing: 0.4em;
+  padding: 4px 10px 4px 14px;
+  border: 1px solid var(--gold-2);
+  background: rgba(212, 175, 55, 0.04);
+}
+.sigil .tag {
+  margin-top: 14px;
+  font-family: var(--display);
+  font-size: 9px;
+  letter-spacing: 0.45em;
+  color: var(--gold-2);
+  text-transform: uppercase;
+}
+
+/* ============ left + right side panels ============ */
+.side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.side.left { align-items: flex-end; text-align: right; }
+.side.right { align-items: flex-start; text-align: left; }
+
+.side .label {
+  font-family: var(--display);
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--gold-2);
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px;
+}
+.side .label::before, .side .label::after {
+  content: ""; height: 1px; width: 28px; background: var(--gold-3);
+}
+.side.left .label::after { display: none; }
+.side.right .label::before { display: none; }
+
+.side .lat {
+  font-family: var(--display);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  color: var(--gold-1);
+  text-transform: uppercase;
+  font-style: italic;
+}
+.side .zh {
+  font-family: var(--hanzi);
+  font-size: 14px;
+  color: var(--gold-0);
+  letter-spacing: 0.2em;
+  line-height: 1.7;
+}
+.side .verse {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--rune);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  max-width: 280px;
+}
+
+.divider-glyph {
+  font-family: var(--display);
+  font-size: 14px;
+  color: var(--gold-2);
+  letter-spacing: 1em;
+  padding-left: 1em;
+}
+
+/* coordinate stamp */
+.stamp-coord {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--rune-dim);
+  letter-spacing: 0.18em;
+  line-height: 1.6;
+}
+
+/* ============ social talismans ============ */
+.talismans {
+  margin-top: clamp(20px, 4vh, 48px);
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 7;
+  position: relative;
+}
+@media (max-width: 760px) {
+  .talismans { margin-top: 24px; gap: 10px; }
+}
+
+.talisman {
+  position: relative;
+  width: 84px; height: 104px;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  color: var(--gold-1);
+  cursor: pointer;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), color .3s;
+  background: linear-gradient(180deg, rgba(212,175,55,0.06), rgba(212,175,55,0.01));
+  clip-path: polygon(50% 0%, 100% 16%, 100% 84%, 50% 100%, 0% 84%, 0% 16%);
+  border: 0;
+}
+.talisman::before {
+  /* hex border drawn with svg backdrop */
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, transparent, rgba(212,175,55,0.04));
+}
+.talisman .frame {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  color: var(--gold-2);
+  transition: color .3s, filter .3s;
+}
+.talisman .frame svg { width: 100%; height: 100%; display: block; }
+
+.talisman .glyph {
+  font-family: var(--display);
+  font-size: 26px;
+  color: var(--gold-0);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 0 transparent;
+  transition: text-shadow .35s, transform .35s;
+  z-index: 2;
+  position: relative;
+  line-height: 1;
+}
+.talisman .label-en {
+  position: absolute;
+  bottom: 10px;
+  font-family: var(--display);
+  font-size: 7.5px;
+  letter-spacing: 0.32em;
+  color: var(--gold-2);
+  text-transform: uppercase;
+  z-index: 2;
+}
+.talisman .label-zh {
+  position: absolute;
+  top: 14px;
+  font-family: var(--hanzi);
+  font-size: 9px;
+  color: var(--gold-2);
+  letter-spacing: 0.35em;
+  z-index: 2;
+}
+
+.talisman:hover {
+  transform: translateY(-6px);
+  color: var(--gold-0);
+}
+.talisman:hover .glyph {
+  text-shadow:
+    0 0 8px var(--gold-glow),
+    0 0 24px var(--gold-glow),
+    0 0 48px var(--gold-glow);
+  transform: scale(1.06);
+}
+.talisman:hover .frame {
+  color: var(--gold-0);
+  filter: drop-shadow(0 0 8px var(--gold-glow));
+}
+.talisman:hover .label-en,
+.talisman:hover .label-zh { color: var(--gold-1); }
+
+/* wechat: no direct link, show name on hover */
+.talisman.is-wechat .wx-pop {
+  position: absolute;
+  bottom: -34px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 5px 12px;
+  background: var(--ink-2);
+  border: 1px solid var(--gold-3);
+  color: var(--gold-0);
+  font-family: var(--hanzi);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  z-index: 10;
+  box-shadow: 0 0 24px var(--gold-glow);
+}
+.talisman.is-wechat:hover .wx-pop {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* footer line */
+.footer-line {
+  position: relative;
+  z-index: 6;
+  margin-top: clamp(20px, 4vh, 48px);
+  text-align: center;
+  font-family: var(--display);
+  font-size: 9px;
+  letter-spacing: 0.55em;
+  color: var(--gold-3);
+  text-transform: uppercase;
+}
+.footer-line .sep {
+  display: inline-block;
+  margin: 0 14px;
+  color: var(--gold-2);
+}
+
+/* ============ floating runes layer ============ */
+.runes-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: calc(0.42 * var(--density));
+}
+.rune-floater {
+  position: absolute;
+  font-family: var(--display);
+  color: var(--gold-2);
+  user-select: none;
+  text-shadow: 0 0 12px var(--gold-glow);
+  animation: float-drift 18s ease-in-out infinite;
+}
+:root[data-animate="0"] .rune-floater { animation: none !important; }
+@keyframes float-drift {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.55; }
+  50%      { transform: translateY(-22px) rotate(8deg); opacity: 0.85; }
+}
+
+/* constellation lines */
+.constellation {
+  position: fixed; inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: calc(0.55 * var(--density));
+}
+
+/* density controls visibility of nicer-to-have layers */
+[data-density-mode="minimal"] .runes-bg,
+[data-density-mode="minimal"] .constellation,
+[data-density-mode="minimal"] .corner,
+[data-density-mode="minimal"] .edge-ticks { opacity: 0.1; }
+
+/* tweaks panel host slot */
+#tweaks-root { position: fixed; z-index: 999; }
+
+/* loading curtain */
+.curtain {
+  position: fixed; inset: 0;
+  background: var(--ink-0);
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  animation: curtain-out 1.6s ease-out forwards;
+  animation-delay: 1.4s;
+}
+.curtain .sigil-load {
+  width: 80px; height: 80px;
+  border: 1px solid var(--gold-2);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  position: relative;
+  animation: sigil-spin 1.8s ease-out;
+}
+.curtain .sigil-load::before {
+  content: ""; position: absolute; inset: 6px;
+  border: 1px solid var(--gold-3);
+  border-radius: 50%;
+}
+.curtain .sigil-load::after {
+  content: "✷"; font-family: var(--display); font-size: 22px;
+  color: var(--gold-1);
+  text-shadow: 0 0 12px var(--gold-glow);
+}
+@keyframes sigil-spin {
+  from { transform: rotate(-180deg) scale(0.4); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+@keyframes curtain-out {
+  to { opacity: 0; visibility: hidden; }
+}
+:root[data-animate="0"] .curtain { animation: none; opacity: 0; visibility: hidden; }
