@@ -24,8 +24,7 @@ const TALISMANS = [
     glyph: "墨",        // 墨笔/blog
     labelEn: "GRIMOIRE",
     labelZh: "博客",
-    href: "https://ohwowbill.com",
-    target: "_blank",
+    href: "/posts/",
     rune: "✶",
   },
   {
@@ -54,6 +53,22 @@ const TALISMANS = [
     href: "https://youtube.com/channel/UCrlefr8uy8jfDxBfY0jKeyg",
     target: "_blank",
     rune: "▲",
+  },
+  {
+    key: "meihua",
+    glyph: "卦",        // 梅花易数
+    labelEn: "DIVINER",
+    labelZh: "梅花",
+    href: "/meihua/",
+    rune: "☰",
+  },
+  {
+    key: "yanzhi",
+    glyph: "谚",        // 閩吳谚文
+    labelEn: "PHONOLOGY",
+    labelZh: "谚文",
+    href: "/yanzhi/",
+    rune: "문",
   },
 ];
 
