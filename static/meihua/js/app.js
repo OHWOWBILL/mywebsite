@@ -52,7 +52,7 @@
   let yiData = {};
   const state = {}; // state[type] = { upper: trigram, lower: trigram, hexagram: ... }
 
-  fetch('yi_ching.json').then(r => r.ok ? r.json() : {}).then(d => { yiData = d || {}; }).catch(() => { yiData = {}; });
+  fetch('data/yi_ching.json').then(r => r.ok ? r.json() : {}).then(d => { yiData = d || {}; }).catch(() => { yiData = {}; });
 
   // 根据上下卦查找六十四卦
   function findHexagram(upper, lower) {
