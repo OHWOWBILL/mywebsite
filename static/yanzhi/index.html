@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>閩吳谚文 · 私人音位字母表</title>
+<title>閩吳谚文 · 第二版 · 多語子集字母表</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700&family=Noto+Serif+SC:wght@300;400;600;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
     --gold: #9c7a3b;
     --rule: #847054;
     --muted: #6e5e44;
+    --wu: #2e4a6b;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -67,6 +68,15 @@
     color: var(--ink);
     margin-bottom: 12px;
     text-indent: 0.25em;
+  }
+
+  .edition {
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    margin-bottom: 12px;
   }
 
   .subtitle {
@@ -119,6 +129,8 @@
     height: 2px;
     background: var(--seal);
   }
+  h2.wu::before { background: var(--wu); }
+  h2.universal::before { background: var(--jade); }
 
   h3 {
     font-family: "Noto Serif SC", serif;
@@ -128,6 +140,7 @@
     margin: 32px 0 16px;
     color: var(--jade);
   }
+  h3.wu { color: var(--wu); }
 
   /* Prose */
   p { margin-bottom: 18px; }
@@ -155,10 +168,12 @@
   .letter-grid.cols-5 { grid-template-columns: 140px repeat(5, 1fr); }
   .letter-grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
   .letter-grid.cols-7 { grid-template-columns: repeat(7, 1fr); }
+  .letter-grid.cols-8 { grid-template-columns: repeat(8, 1fr); }
 
   .family-label {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
     font-family: "Noto Serif SC", serif;
     font-size: 14px;
     font-weight: 600;
@@ -167,6 +182,7 @@
     padding: 12px 16px 12px 0;
     border-right: 1px solid var(--rule);
   }
+  .family-label.wu { color: var(--wu); }
 
   .family-label small {
     display: block;
@@ -232,6 +248,7 @@
     letter-spacing: 0.05em;
     margin-bottom: 2px;
   }
+  .cell.wu .romaji { color: var(--wu); }
 
   .cell .ipa {
     font-family: "EB Garamond", serif;
@@ -248,15 +265,34 @@
     letter-spacing: 0.1em;
   }
 
-  .cell.reserved .glyph { color: var(--muted); opacity: 0.6; }
-  .cell.reserved::after {
-    content: "預";
+  .cell.new::after {
+    content: "新";
     position: absolute;
     top: 6px;
     right: 6px;
     font-size: 10px;
-    color: var(--gold);
+    color: var(--seal);
     font-family: "Noto Serif SC", serif;
+  }
+
+  /* Dot-letter: CSS-rendered underdot for extension consonants */
+  /* Avoids U+0323 (combining dot below) which most Hangul fonts ignore. */
+  .dot-letter {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.18em;
+  }
+  .dot-letter::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0.02em;
+    width: 0.14em;
+    height: 0.14em;
+    background: currentColor;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
   }
 
   /* Rules boxes */
@@ -343,6 +379,69 @@
     color: var(--muted);
   }
 
+  /* Language tags */
+  .lang-tag {
+    display: inline-block;
+    font-family: "Noto Serif SC", serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.2em;
+    vertical-align: middle;
+  }
+  .lang-tag.min { background: rgba(139, 36, 24, 0.12); color: var(--seal); }
+  .lang-tag.wu  { background: rgba(46, 74, 107, 0.12); color: var(--wu); }
+  .lang-tag.both { background: rgba(58, 90, 62, 0.12); color: var(--jade); }
+
+  .syl .corner-tag {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    font-family: "Noto Serif SC", serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .syl.min .corner-tag { background: rgba(139, 36, 24, 0.12); color: var(--seal); }
+  .syl.wu  .corner-tag { background: rgba(46, 74, 107, 0.12); color: var(--wu); }
+
+  /* Comparison table */
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-family: "Noto Serif SC", serif;
+    font-size: 14px;
+  }
+  table.compare th,
+  table.compare td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    vertical-align: middle;
+  }
+  table.compare th {
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink);
+    letter-spacing: 0.1em;
+    font-size: 13px;
+  }
+  table.compare .glyph-cell {
+    font-family: "Noto Serif KR", serif;
+    font-size: 28px;
+    font-weight: 500;
+    text-align: center;
+    width: 80px;
+    color: var(--ink);
+  }
+  table.compare .min-val { color: var(--seal); font-style: italic; font-family: "EB Garamond", serif; font-size: 15px; }
+  table.compare .wu-val  { color: var(--wu);   font-style: italic; font-family: "EB Garamond", serif; font-size: 15px; }
+  table.compare .note-cell { font-size: 12px; color: var(--muted); font-style: italic; }
+  table.compare tr:hover { background: rgba(156, 122, 59, 0.06); }
+
   /* Quiz section */
   .quiz-item {
     background: rgba(255, 255, 255, 0.4);
@@ -350,9 +449,9 @@
     padding: 20px 24px;
     margin-bottom: 16px;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto auto 1fr auto;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
   }
 
   .quiz-item .prompt {
@@ -437,6 +536,15 @@
     letter-spacing: 0.2em;
     margin-bottom: 8px;
   }
+  nav.toc .toc-group {
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    margin: 12px 0 4px;
+    padding-left: 0;
+  }
   @media (max-width: 1300px) {
     nav.toc { display: none; }
   }
@@ -458,7 +566,7 @@
     letter-spacing: 1em;
   }
 
-  /* Expansions note */
+  /* Notes */
   .note {
     background: rgba(139, 36, 24, 0.04);
     border: 1px solid rgba(139, 36, 24, 0.15);
@@ -472,63 +580,212 @@
     font-style: normal;
     color: var(--seal);
   }
+  .note.wu {
+    background: rgba(46, 74, 107, 0.04);
+    border-color: rgba(46, 74, 107, 0.18);
+  }
+  .note.wu strong { color: var(--wu); }
+
+  /* Subset banner */
+  .subset-banner {
+    background: linear-gradient(to right, rgba(139, 36, 24, 0.08), transparent);
+    border-left: 4px solid var(--seal);
+    padding: 16px 20px;
+    margin: 20px 0 28px;
+    font-family: "Noto Serif SC", serif;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+  }
+  .subset-banner.wu {
+    background: linear-gradient(to right, rgba(46, 74, 107, 0.08), transparent);
+    border-left-color: var(--wu);
+  }
+  .subset-banner .label {
+    font-weight: 700;
+    color: var(--seal);
+    letter-spacing: 0.2em;
+    font-size: 13px;
+    margin-right: 12px;
+  }
+  .subset-banner.wu .label { color: var(--wu); }
+
+  /* Cross-comparison demo */
+  .cross-demo {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 0;
+    margin: 24px 0;
+    border: 1px solid var(--rule);
+  }
+  .cross-demo > div {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+  }
+  .cross-demo > div:nth-child(3n) { border-right: none; }
+  .cross-demo > div:nth-last-child(-n+3) { border-bottom: none; }
+  .cross-demo .head {
+    background: rgba(0,0,0,0.04);
+    font-weight: 600;
+    font-family: "Noto Serif SC", serif;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-align: center;
+  }
+  .cross-demo .hanzi {
+    font-family: "Noto Serif SC", serif;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .cross-demo .reading {
+    font-family: "Noto Serif KR", serif;
+    font-size: 22px;
+    text-align: center;
+  }
+  .cross-demo .reading small {
+    display: block;
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
 </style>
 </head>
 <body>
 
 <nav class="toc">
   <div class="toc-label">目 錄</div>
-  <a href="#principle">體例</a>
-  <a href="#initials">聲母</a>
-  <a href="#vowels">元音</a>
-  <a href="#finals">韻尾</a>
-  <a href="#tones">聲調</a>
-  <a href="#compose">組字</a>
+  <a href="#principle">通用原則</a>
+  <a href="#framework">通用框架</a>
+  <div class="toc-group">— 子集 —</div>
+  <a href="#min">臺語子集</a>
+  <a href="#wu">蘇州子集</a>
+  <div class="toc-group">— 共用 —</div>
+  <a href="#compose">組字之法</a>
   <a href="#drill">練習</a>
+  <a href="#appendix">附錄</a>
 </nav>
 
 <div class="page">
 
   <header class="masthead">
     <h1 class="book-title">閩吳谚文</h1>
+    <div class="edition">EDITIO ALTERA · MMXXVI</div>
     <div class="subtitle">A Hangul-Based Script for Min, Wu &amp; Other Sinitic Tongues</div>
-    <div class="credit">臺語 · 吳語 · 巴盟 · 私人音位字母表</div>
+    <div class="credit">臺語 · 蘇州話 · 私人音位字母表</div>
   </header>
 
-  <!-- PRINCIPLE -->
+  <p class="lede">
+    此版重整為「通用框架 + 兩語子集」三層結構。原版以臺語為主、蘇州話留位；今將兩者並列為對等子集，皆建於同一套通用音位骨架之上。後若添上海、溫州、福州諸腔，亦不過再添子集，無需改動底層。
+  </p>
+
+  <!-- CHAPTER I: PRINCIPLES -->
   <section class="chapter" id="principle">
     <div class="chapter-number">Chapter I</div>
-    <h2>體例 · 設計原則</h2>
+    <h2 class="universal">通用原則</h2>
 
     <div class="rule-box">
       <ol>
-        <li><strong>零自造字形</strong>。凡聲母元音韻尾，盡用現行韓文字母。</li>
-        <li><strong>緊音即濁音</strong>。韓文緊音位 ㄲ ㄸ ㅃ ㅆ ㅉ 重新定義為漢語之濁聲母 g d b z dz。</li>
-        <li><strong>ㅇ 即 ŋ</strong>。聲母位韻尾位一律讀為軟顎鼻音。零聲母不著字，元音獨成方塊。</li>
-        <li><strong>鼻化著 ~</strong>。元音需鼻化者，音節後加波浪號。</li>
+        <li><strong>零自造字形</strong>。凡聲母元音韻尾，盡用現行（含古）韓文字母；至多以下加附號（如下加點）為之區別。</li>
+        <li><strong>緊音即濁音</strong>。韓文緊音位 ㄲ ㄸ ㅃ ㅆ ㅉ 重新定義為漢語之濁聲母 g d b z dz。雙字母＝濁化，此為通用規則。</li>
+        <li><strong>ㅇ 即 ŋ</strong>。聲母位、韻尾位一律讀為軟顎鼻音。零聲母不著字，元音獨成方塊。</li>
+        <li><strong>下加點即擴充</strong>。某子集需新增之聲母（如蘇州 f v ɦ，巴盟卷舌組），於既有字母下加一點以為之，避免造字。</li>
         <li><strong>聲調以數字</strong>。上標阿拉伯數字 1–8 記八聲本調，變調不記。</li>
         <li><strong>入聲韻尾同形於聲母</strong>。ㅂ ㄷ ㄱ 居方塊之下即為 -p -t -k 入聲，ㅎ 則為喉塞 -ʔ。</li>
+        <li><strong>子集分立</strong>。各語各持其聲母、元音、韻尾、聲調之表。同一字母在不同子集可有不同音值（如 ㅐ 於臺為 ai、於蘇為 ɛ），讀寫時須先聲明語別。</li>
       </ol>
     </div>
 
     <p>
-      六則之中，第二、第三則最為關鍵。韓文緊音（硬音）本非漢語之濁音，然二者在視覺字形上已有現成之分別（單字母 vs 雙疊字母），挪用其形以表漢語之清濁對立，省去自造符號之煩。
+      七則之中，二、三、四、七為本版骨幹。第二、三則承自初版；第四則為本版新增之擴充機制；第七則為本版結構上之核心宣告——<em>同字異讀，因語而異</em>。
     </p>
+
     <p>
-      至於 <span class="ko-inline">ㅇ</span> 之重新定義，亦有深意：韓文中 <span class="ko-inline">ㅇ</span> 本為同字異音（聲母位零聲母，韻尾位 ŋ）。今將聲母位亦讀為 ŋ，去其歧義而得統一。零聲母之字既不必著符，反而視覺更清。
+      何以採子集而非疊加？蓋臺、蘇二語雖同屬南方漢語，元音系統與韻尾系統之差異甚大：臺語有 -p -t -k -m 諸古韻尾、有鼻化元音；蘇州則無此諸般，反多 y ø ɛ 三圓不圓之精細區分。若強合為一表，必處處須記「此於臺如何、於蘇如何」；不如分立兩表，各得其全。
     </p>
   </section>
 
-  <!-- INITIALS -->
-  <section class="chapter" id="initials">
+  <!-- CHAPTER II: UNIVERSAL FRAMEWORK -->
+  <section class="chapter" id="framework">
     <div class="chapter-number">Chapter II</div>
-    <h2>聲母 · 十九位</h2>
+    <h2 class="universal">通用框架 · 音節骨架</h2>
 
     <p>
-      聲母凡十九，按發音部位分為五族：唇、齒齦塞、齒齦擦、軟顎、喉。每族內以清不送氣、清送氣、濁、鼻、邊擦五種方式排列，如下表。
+      任何漢語音節，於本系統中皆解為下列五位之填空：
     </p>
 
-    <!-- Labial family -->
+    <div class="rule-box">
+      <p style="font-family: 'Noto Serif SC', serif; font-size: 16px; letter-spacing: 0.1em; margin-bottom: 0;">
+        <strong>聲調</strong> · [ <strong>聲母</strong> + <strong>介音</strong> + <strong>主元音</strong> + <strong>韻尾</strong> ]<sub style="color: var(--muted);">方塊</sub> + ~<sub style="color: var(--muted);">可選鼻化</sub>
+      </p>
+    </div>
+
+    <h3 class="universal">字母倉庫</h3>
+    <p>
+      本系統所動用之韓文字母，可分為三類：
+    </p>
+
+    <ul style="padding-left: 24px; margin-bottom: 20px;">
+      <li style="margin-bottom: 10px;"><strong>現代基礎字母（19+21）</strong>：聲母 ㅂㅍㅁㄷㅌㄴㄹㅈㅊㅅㄱㅋㅇㅎ 等 19 個，元音 ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ 等 21 個。皆主力。</li>
+      <li style="margin-bottom: 10px;"><strong>緊音重疊字母（5）</strong>：ㄲ ㄸ ㅃ ㅆ ㅉ。原為韓語緊音，本系統重新定義為漢語濁聲母 g d b z dz。</li>
+      <li style="margin-bottom: 10px;"><strong>下加點擴充字母</strong>：於基礎字母下方加一小點為記，用以表本系統未及之輔音。如 <span class="ko-inline dot-letter">ㅍ</span> = f、<span class="ko-inline dot-letter">ㅂ</span> = v、<span class="ko-inline dot-letter">ㅎ</span> = ɦ、<span class="ko-inline dot-letter">ㅈ</span> <span class="ko-inline dot-letter">ㅊ</span> <span class="ko-inline dot-letter">ㅅ</span> = 卷舌組（巴盟用）。此實現以 CSS 渲染此點，避開字體不支援組合附號之疑；於純文字場合可改以 U+0323 組合下點或他法為之。此擴充機制可無限延伸而不傷骨幹。</li>
+    </ul>
+
+    <h3 class="universal">通用聲調 · 1–8</h3>
+    <p>
+      漢語各方言聲調數目不一，然中古「平上去入 × 陰陽」之框架共通。本系統一律以上標阿拉伯數字 1–8 表本調：
+    </p>
+
+    <div class="letter-grid cols-8" style="grid-template-columns: repeat(8, 1fr);">
+      <div class="cell"><div class="glyph" style="font-size: 24px;">1</div><div class="romaji">陰平</div></div>
+      <div class="cell"><div class="glyph" style="font-size: 24px;">2</div><div class="romaji">陰上</div></div>
+      <div class="cell"><div class="glyph" style="font-size: 24px;">3</div><div class="romaji">陰去</div></div>
+      <div class="cell"><div class="glyph" style="font-size: 24px;">4</div><div class="romaji">陰入</div></div>
+      <div class="cell"><div class="glyph" style="font-size: 24px;">5</div><div class="romaji">陽平</div></div>
+      <div class="cell"><div class="glyph" style="font-size: 24px;">6</div><div class="romaji">陽上</div></div>
+      <div class="cell"><div class="glyph" style="font-size: 24px;">7</div><div class="romaji">陽去</div></div>
+      <div class="cell"><div class="glyph" style="font-size: 24px;">8</div><div class="romaji">陽入</div></div>
+    </div>
+
+    <p>
+      實際調值與某調是否合併（如多數方言之陽上→陽去合流）由各子集分別規定。書寫時用數字而不用調值，便於跨方言對勘。
+    </p>
+
+    <h3 class="universal">通用韻尾倉庫</h3>
+    <p>
+      所有可能之韻尾收於下表。各子集按需子用其中若干：
+    </p>
+
+    <div class="letter-grid cols-7">
+      <div class="cell"><div class="glyph">ㅁ</div><div class="romaji">-m</div><div class="ipa">/m/</div><div class="hint">鼻</div></div>
+      <div class="cell"><div class="glyph">ㄴ</div><div class="romaji">-n</div><div class="ipa">/n/</div><div class="hint">鼻</div></div>
+      <div class="cell"><div class="glyph">ㅇ</div><div class="romaji">-ng</div><div class="ipa">/ŋ/</div><div class="hint">鼻</div></div>
+      <div class="cell"><div class="glyph">ㅂ</div><div class="romaji">-p</div><div class="ipa">/p̚/</div><div class="hint">入</div></div>
+      <div class="cell"><div class="glyph">ㄷ</div><div class="romaji">-t</div><div class="ipa">/t̚/</div><div class="hint">入</div></div>
+      <div class="cell"><div class="glyph">ㄱ</div><div class="romaji">-k</div><div class="ipa">/k̚/</div><div class="hint">入</div></div>
+      <div class="cell"><div class="glyph">ㅎ</div><div class="romaji">-ʔ</div><div class="ipa">/ʔ/</div><div class="hint">喉塞</div></div>
+    </div>
+
+    <div class="note">
+      <strong>按。</strong>臺語盡用七位；蘇州僅用 <span class="ko-inline">ㄴ ㅇ ㅎ</span> 三位（其餘已歸並）。將來若添粵語子集，則全部七位可能皆動用。
+    </div>
+  </section>
+
+  <!-- CHAPTER III: MIN SUBSET -->
+  <section class="chapter" id="min">
+    <div class="chapter-number">Chapter III</div>
+    <h2>臺語子集 · 閩南優勢腔</h2>
+
+    <div class="subset-banner">
+      <span class="label">語 別</span>
+      臺灣閩南語（漳泉混合）。鼻化元音、四種入聲韻尾、七實用聲調。
+    </div>
+
+    <h3>聲母 · 十九位</h3>
+
     <div class="letter-grid cols-5">
       <div class="manner-header">清</div>
       <div class="manner-header">送氣</div>
@@ -541,7 +798,7 @@
       <div class="family-label">唇音<small>Labial</small></div>
       <div class="cell"><div class="glyph">ㅂ</div><div class="romaji">p</div><div class="ipa">/p/</div><div class="hint">巴</div></div>
       <div class="cell"><div class="glyph">ㅍ</div><div class="romaji">pʰ</div><div class="ipa">/pʰ/</div><div class="hint">葩</div></div>
-      <div class="cell"><div class="glyph">ㅃ</div><div class="romaji">b</div><div class="ipa">/b/</div><div class="hint">尾 (閩)</div></div>
+      <div class="cell"><div class="glyph">ㅃ</div><div class="romaji">b</div><div class="ipa">/b/</div><div class="hint">尾</div></div>
       <div class="cell"><div class="glyph">ㅁ</div><div class="romaji">m</div><div class="ipa">/m/</div><div class="hint">媽</div></div>
       <div class="cell empty"></div>
     </div>
@@ -550,7 +807,7 @@
       <div class="family-label">齒齦塞<small>Alveolar stop</small></div>
       <div class="cell"><div class="glyph">ㄷ</div><div class="romaji">t</div><div class="ipa">/t/</div><div class="hint">打</div></div>
       <div class="cell"><div class="glyph">ㅌ</div><div class="romaji">tʰ</div><div class="ipa">/tʰ/</div><div class="hint">他</div></div>
-      <div class="cell reserved"><div class="glyph">ㄸ</div><div class="romaji">d</div><div class="ipa">/d/</div><div class="hint">沪語用</div></div>
+      <div class="cell empty"></div>
       <div class="cell"><div class="glyph">ㄴ</div><div class="romaji">n</div><div class="ipa">/n/</div><div class="hint">那</div></div>
       <div class="cell"><div class="glyph">ㄹ</div><div class="romaji">l</div><div class="ipa">/l/</div><div class="hint">拉</div></div>
     </div>
@@ -559,7 +816,7 @@
       <div class="family-label">齒齦擦<small>Sibilant</small></div>
       <div class="cell"><div class="glyph">ㅈ</div><div class="romaji">ts</div><div class="ipa">/ts/</div><div class="hint">資</div></div>
       <div class="cell"><div class="glyph">ㅊ</div><div class="romaji">tsʰ</div><div class="ipa">/tsʰ/</div><div class="hint">雌</div></div>
-      <div class="cell"><div class="glyph">ㅉ</div><div class="romaji">dz</div><div class="ipa">/dz/</div><div class="hint">閩 j</div></div>
+      <div class="cell"><div class="glyph">ㅉ</div><div class="romaji">j (dz)</div><div class="ipa">/dz/</div><div class="hint">日</div></div>
       <div class="cell empty"></div>
       <div class="cell"><div class="glyph">ㅅ</div><div class="romaji">s</div><div class="ipa">/s/</div><div class="hint">絲</div></div>
     </div>
@@ -568,17 +825,8 @@
       <div class="family-label">軟顎<small>Velar</small></div>
       <div class="cell"><div class="glyph">ㄱ</div><div class="romaji">k</div><div class="ipa">/k/</div><div class="hint">歌</div></div>
       <div class="cell"><div class="glyph">ㅋ</div><div class="romaji">kʰ</div><div class="ipa">/kʰ/</div><div class="hint">科</div></div>
-      <div class="cell"><div class="glyph">ㄲ</div><div class="romaji">g</div><div class="ipa">/g/</div><div class="hint">鵝 (閩)</div></div>
+      <div class="cell"><div class="glyph">ㄲ</div><div class="romaji">g</div><div class="ipa">/g/</div><div class="hint">鵝</div></div>
       <div class="cell"><div class="glyph">ㅇ</div><div class="romaji">ng</div><div class="ipa">/ŋ/</div><div class="hint">我</div></div>
-      <div class="cell empty"></div>
-    </div>
-
-    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
-      <div class="family-label">齒擦（濁）<small>Sibilant (voiced)</small></div>
-      <div class="cell reserved"><div class="glyph">ㅆ</div><div class="romaji">z</div><div class="ipa">/z/</div><div class="hint">沪語用</div></div>
-      <div class="cell empty"></div>
-      <div class="cell empty"></div>
-      <div class="cell empty"></div>
       <div class="cell empty"></div>
     </div>
 
@@ -591,19 +839,7 @@
       <div class="cell empty"></div>
     </div>
 
-    <div class="note">
-      <strong>註。</strong>标有"預"者為預留給沪語之字母；台語不用。巴盟話之卷舌 zh ch sh r 目前以下加一點之形式臨時表之（<span class="ko-inline">ㅈ̣ ㅊ̣ ㅅ̣</span>），待後議。
-    </div>
-  </section>
-
-  <!-- VOWELS -->
-  <section class="chapter" id="vowels">
-    <div class="chapter-number">Chapter III</div>
-    <h2>元音 · 六位</h2>
-
-    <p>
-      主元音凡六，皆借韓文既有。其中 <span class="ko-inline">ㅡ</span> 對應台語之 o（開口較窄，類似土耳其 ı），<span class="ko-inline">ㅗ</span> 對應台羅所記 oo（開口較大）。<span class="ko-inline">ㅓ</span> 位空出，預留沪語 ø。
-    </p>
+    <h3>元音 · 六位 + 介音</h3>
 
     <div class="letter-grid cols-6">
       <div class="cell"><div class="glyph">ㅏ</div><div class="romaji">a</div><div class="ipa">/a/</div><div class="hint">阿</div></div>
@@ -614,42 +850,9 @@
       <div class="cell"><div class="glyph">ㅜ</div><div class="romaji">u</div><div class="ipa">/u/</div><div class="hint">龜</div></div>
     </div>
 
-    <h3>介音與複合韻</h3>
-    <p>
-      介音 i- 及 u- 所構之複合韻，盡用谚文既有之組合符號。
-    </p>
+    <p style="font-size: 14px; color: var(--muted);">複合元音借韓文既有組合：<span class="ko-inline">ㅑ</span> ia · <span class="ko-inline">ㅘ</span> ua · <span class="ko-inline">ㅛ</span> iɔ · <span class="ko-inline">ㅟ</span> ui · <span class="ko-inline">ㅐ</span> ai · <span class="ko-inline">ㅙ</span> uai · <span class="ko-inline">ㅞ</span> ue。</p>
 
-    <div class="letter-grid cols-7">
-      <div class="cell"><div class="glyph">ㅑ</div><div class="romaji">ia</div><div class="ipa">/ia/</div></div>
-      <div class="cell"><div class="glyph">ㅘ</div><div class="romaji">ua</div><div class="ipa">/ua/</div></div>
-      <div class="cell"><div class="glyph">ㅞ</div><div class="romaji">ue</div><div class="ipa">/ue/</div></div>
-      <div class="cell"><div class="glyph">ㅛ</div><div class="romaji">iɔ</div><div class="ipa">/iɔ/</div></div>
-      <div class="cell"><div class="glyph">ㅟ</div><div class="romaji">ui</div><div class="ipa">/ui/</div></div>
-      <div class="cell"><div class="glyph">ㅐ</div><div class="romaji">ai</div><div class="ipa">/ai/</div></div>
-      <div class="cell"><div class="glyph">ㅙ</div><div class="romaji">uai</div><div class="ipa">/uai/</div></div>
-    </div>
-
-    <h3>鼻化</h3>
-    <p>
-      台語元音可鼻化，記號為音節右後方之波浪號 <strong>~</strong>。鼻化波浪號不佔方塊位置，獨立於方塊之外。
-    </p>
-
-    <div class="syl-demo">
-      <div class="syl"><div class="block">사~<span class="tone">1</span></div><div class="hanzi">三 (文)</div><div class="tl">san¹ → sã</div></div>
-      <div class="syl"><div class="block">기~<span class="tone">1</span></div><div class="hanzi">驚</div><div class="tl">kiann¹ → kĩã</div></div>
-      <div class="syl"><div class="block">오~<span class="tone">2</span></div><div class="hanzi">好</div><div class="tl">honn² → hɔ̃</div></div>
-    </div>
-  </section>
-
-  <!-- FINALS -->
-  <section class="chapter" id="finals">
-    <div class="chapter-number">Chapter IV</div>
-    <h2>韻尾 · 七位</h2>
-
-    <p>
-      韻尾不另造字，直接借用聲母字母之形置於方塊之下。鼻韻尾 <span class="ko-inline">ㅁ ㄴ ㅇ</span> 與入聲塞尾 <span class="ko-inline">ㅂ ㄷ ㄱ</span> 同部位成對，極便記憶。喉塞入聲用 <span class="ko-inline">ㅎ</span>。
-    </p>
-
+    <h3>韻尾 · 七位皆用</h3>
     <div class="letter-grid cols-7">
       <div class="cell"><div class="glyph">ㅁ</div><div class="romaji">-m</div><div class="ipa">/m/</div><div class="hint">鼻</div></div>
       <div class="cell"><div class="glyph">ㄴ</div><div class="romaji">-n</div><div class="ipa">/n/</div><div class="hint">鼻</div></div>
@@ -659,135 +862,458 @@
       <div class="cell"><div class="glyph">ㄱ</div><div class="romaji">-k</div><div class="ipa">/k̚/</div><div class="hint">入</div></div>
       <div class="cell"><div class="glyph">ㅎ</div><div class="romaji">-ʔ</div><div class="ipa">/ʔ/</div><div class="hint">喉塞</div></div>
     </div>
-  </section>
 
-  <!-- TONES -->
-  <section class="chapter" id="tones">
-    <div class="chapter-number">Chapter V</div>
-    <h2>聲調 · 八調</h2>
-
+    <h3>鼻化</h3>
     <p>
-      台語本調八位，調號以阿拉伯數字上標記之，置於方塊右上。變調不記（與台羅、白話字傳統相同）。第六調（陽上）於優勢腔已併入第七調，故實用上為七調。
+      鼻化元音記號為音節右後方之波浪號 <strong>~</strong>，獨立於方塊之外。
     </p>
 
-    <div class="letter-grid cols-7">
-      <div class="cell"><div class="glyph" style="font-size: 32px;">1</div><div class="romaji">陰平</div><div class="ipa">55</div></div>
-      <div class="cell"><div class="glyph" style="font-size: 32px;">2</div><div class="romaji">陰上</div><div class="ipa">51</div></div>
-      <div class="cell"><div class="glyph" style="font-size: 32px;">3</div><div class="romaji">陰去</div><div class="ipa">21</div></div>
-      <div class="cell"><div class="glyph" style="font-size: 32px;">4</div><div class="romaji">陰入</div><div class="ipa">促</div></div>
-      <div class="cell"><div class="glyph" style="font-size: 32px;">5</div><div class="romaji">陽平</div><div class="ipa">25</div></div>
-      <div class="cell"><div class="glyph" style="font-size: 32px;">7</div><div class="romaji">陽去</div><div class="ipa">33</div></div>
-      <div class="cell"><div class="glyph" style="font-size: 32px;">8</div><div class="romaji">陽入</div><div class="ipa">促</div></div>
+    <h3>聲調 · 八調本位（陽上多併入陽去）</h3>
+    <p style="font-size: 13px; color: var(--muted);">
+      1陰平 55 · 2陰上 51 · 3陰去 21 · 4陰入 促 · 5陽平 25 · 7陽去 33 · 8陽入 促
+    </p>
+
+    <h3>示範</h3>
+    <div class="syl-demo">
+      <div class="syl min"><span class="corner-tag">閩</span><div class="block">심<span class="tone">1</span></div><div class="hanzi">心</div><div class="tl">sim¹</div></div>
+      <div class="syl min"><span class="corner-tag">閩</span><div class="block">신<span class="tone">5</span></div><div class="hanzi">神</div><div class="tl">sin⁵</div></div>
+      <div class="syl min"><span class="corner-tag">閩</span><div class="block">단<span class="tone">1</span></div><div class="hanzi">丹</div><div class="tl">tan¹</div></div>
+      <div class="syl min"><span class="corner-tag">閩</span><div class="block">군<span class="tone">1</span></div><div class="hanzi">君</div><div class="tl">kun¹</div></div>
+      <div class="syl min"><span class="corner-tag">閩</span><div class="block">오<span class="tone">2</span></div><div class="hanzi">我</div><div class="tl">ngóo²</div></div>
+      <div class="syl min"><span class="corner-tag">閩</span><div class="block">학<span class="tone">8</span></div><div class="hanzi">學</div><div class="tl">ha̍k⁸</div></div>
     </div>
   </section>
 
-  <!-- COMPOSITION -->
+  <!-- CHAPTER IV: WU/SUZHOU SUBSET -->
+  <section class="chapter" id="wu">
+    <div class="chapter-number">Chapter IV</div>
+    <h2 class="wu">蘇州子集 · 太湖片吳語</h2>
+
+    <div class="subset-banner wu">
+      <span class="label">語 別</span>
+      蘇州話（太湖片吳語西部）。無鼻化元音、入聲僅喉塞、聲母有清濁兼齒唇音、元音多圓不圓對立。
+    </div>
+
+    <h3 class="wu">聲母 · 二十七位</h3>
+    <p>
+      蘇州話聲母較臺語多三類：齒唇擦音 <span class="ko-inline"><span class="dot-letter">ㅍ</span></span>/<span class="ko-inline"><span class="dot-letter">ㅂ</span></span>（清濁對）、濁喉擦音 <span class="ko-inline"><span class="dot-letter">ㅎ</span></span>、以及完整之濁塞濁擦系列（ㄸ ㅆ 正式啟用）。其顎化系列（tɕ tɕʰ dʑ ɕ ʑ ȵ）視為同位異音，於 i/y 之前自動由齒齦組讀為齶化組，不另立字母。
+    </p>
+
+    <div class="letter-grid cols-5">
+      <div class="manner-header">清</div>
+      <div class="manner-header">送氣</div>
+      <div class="manner-header">濁</div>
+      <div class="manner-header">鼻</div>
+      <div class="manner-header">邊·擦</div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label wu">唇音<small>Labial</small></div>
+      <div class="cell wu"><div class="glyph">ㅂ</div><div class="romaji">p</div><div class="ipa">/p/</div><div class="hint">布</div></div>
+      <div class="cell wu"><div class="glyph">ㅍ</div><div class="romaji">pʰ</div><div class="ipa">/pʰ/</div><div class="hint">譜</div></div>
+      <div class="cell wu"><div class="glyph">ㅃ</div><div class="romaji">b</div><div class="ipa">/b/</div><div class="hint">步</div></div>
+      <div class="cell wu"><div class="glyph">ㅁ</div><div class="romaji">m</div><div class="ipa">/m/</div><div class="hint">姆</div></div>
+      <div class="cell empty"></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label wu">齒唇<small>Labio-dental</small></div>
+      <div class="cell wu new"><div class="glyph"><span class="dot-letter">ㅍ</span></div><div class="romaji">f</div><div class="ipa">/f/</div><div class="hint">夫</div></div>
+      <div class="cell empty"></div>
+      <div class="cell wu new"><div class="glyph"><span class="dot-letter">ㅂ</span></div><div class="romaji">v</div><div class="ipa">/v/</div><div class="hint">扶</div></div>
+      <div class="cell empty"></div>
+      <div class="cell empty"></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label wu">齒齦塞<small>Alveolar stop</small></div>
+      <div class="cell wu"><div class="glyph">ㄷ</div><div class="romaji">t</div><div class="ipa">/t/</div><div class="hint">多</div></div>
+      <div class="cell wu"><div class="glyph">ㅌ</div><div class="romaji">tʰ</div><div class="ipa">/tʰ/</div><div class="hint">拖</div></div>
+      <div class="cell wu"><div class="glyph">ㄸ</div><div class="romaji">d</div><div class="ipa">/d/</div><div class="hint">大</div></div>
+      <div class="cell wu"><div class="glyph">ㄴ</div><div class="romaji">n</div><div class="ipa">/n/</div><div class="hint">拿</div></div>
+      <div class="cell wu"><div class="glyph">ㄹ</div><div class="romaji">l</div><div class="ipa">/l/</div><div class="hint">來</div></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label wu">齒齦擦<small>Sibilant</small></div>
+      <div class="cell wu"><div class="glyph">ㅈ</div><div class="romaji">ts</div><div class="ipa">/ts/</div><div class="hint">早</div></div>
+      <div class="cell wu"><div class="glyph">ㅊ</div><div class="romaji">tsʰ</div><div class="ipa">/tsʰ/</div><div class="hint">草</div></div>
+      <div class="cell wu"><div class="glyph">ㅉ</div><div class="romaji">dz</div><div class="ipa">/dz/</div><div class="hint">坐</div></div>
+      <div class="cell wu"><div class="glyph">ㅅ</div><div class="romaji">s</div><div class="ipa">/s/</div><div class="hint">蘇</div></div>
+      <div class="cell wu"><div class="glyph">ㅆ</div><div class="romaji">z</div><div class="ipa">/z/</div><div class="hint">時</div></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label wu">軟顎<small>Velar</small></div>
+      <div class="cell wu"><div class="glyph">ㄱ</div><div class="romaji">k</div><div class="ipa">/k/</div><div class="hint">姑</div></div>
+      <div class="cell wu"><div class="glyph">ㅋ</div><div class="romaji">kʰ</div><div class="ipa">/kʰ/</div><div class="hint">枯</div></div>
+      <div class="cell wu"><div class="glyph">ㄲ</div><div class="romaji">g</div><div class="ipa">/g/</div><div class="hint">渠</div></div>
+      <div class="cell wu"><div class="glyph">ㅇ</div><div class="romaji">ng</div><div class="ipa">/ŋ/</div><div class="hint">五</div></div>
+      <div class="cell empty"></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label wu">喉<small>Laryngeal</small></div>
+      <div class="cell wu"><div class="glyph">ㅎ</div><div class="romaji">h</div><div class="ipa">/h/</div><div class="hint">花</div></div>
+      <div class="cell empty"></div>
+      <div class="cell wu new"><div class="glyph"><span class="dot-letter">ㅎ</span></div><div class="romaji">ɦ</div><div class="ipa">/ɦ/</div><div class="hint">河</div></div>
+      <div class="cell empty"></div>
+      <div class="cell empty"></div>
+    </div>
+
+    <div class="note wu">
+      <strong>顎化規則。</strong>蘇州 ts ʣ s z（即 ㅈ ㅉ ㅅ ㅆ）於 i/y 前自動讀為 tɕ dʑ ɕ ʑ；k kʰ g 於 i/y 前讀為 tɕ tɕʰ dʑ；n 於 i/y 前讀為 ȵ。寫法不變，讀者按位自動轉。例：<span class="ko-inline">기</span> 讀 tɕi（基），<span class="ko-inline">시</span> 讀 ɕi（西），<span class="ko-inline">니</span> 讀 ȵi（你）。此規則韓語本有，順理成章。
+    </div>
+
+    <h3 class="wu">元音 · 九位（重音值）</h3>
+    <p>
+      蘇州元音系統較臺語複雜：圓不圓三對（i/y/u、e/ø/ɤ、ɛ/ɔ/a 略對應），無鼻化。原版預留之 <span class="ko-inline">ㅓ</span>、<span class="ko-inline">ㅡ</span> 此處正式承擔新音值；原為複合元音之 <span class="ko-inline">ㅐ</span>、<span class="ko-inline">ㅟ</span> 於本子集重新解為單元音。
+    </p>
+
+    <div class="letter-grid cols-5">
+      <div class="cell wu"><div class="glyph">ㅏ</div><div class="romaji">a</div><div class="ipa">/a/</div><div class="hint">家</div></div>
+      <div class="cell wu"><div class="glyph">ㅐ</div><div class="romaji">ɛ</div><div class="ipa">/ɛ/</div><div class="hint">街</div></div>
+      <div class="cell wu"><div class="glyph">ㅔ</div><div class="romaji">e</div><div class="ipa">/e/</div><div class="hint">皮</div></div>
+      <div class="cell wu"><div class="glyph">ㅣ</div><div class="romaji">i</div><div class="ipa">/i/</div><div class="hint">衣</div></div>
+      <div class="cell wu"><div class="glyph">ㅟ</div><div class="romaji">y</div><div class="ipa">/y/</div><div class="hint">魚</div></div>
+    </div>
+
+    <div class="letter-grid cols-5">
+      <div class="cell wu"><div class="glyph">ㅗ</div><div class="romaji">ɔ</div><div class="ipa">/ɔ/</div><div class="hint">包</div></div>
+      <div class="cell wu"><div class="glyph">ㅓ</div><div class="romaji">ø</div><div class="ipa">/ø/</div><div class="hint">短</div></div>
+      <div class="cell wu"><div class="glyph">ㅡ</div><div class="romaji">ɤ / ɿ ʮ</div><div class="ipa">/ɤ ɿ ʮ/</div><div class="hint">哥 / 思</div></div>
+      <div class="cell wu"><div class="glyph">ㅜ</div><div class="romaji">u</div><div class="ipa">/u/</div><div class="hint">夫</div></div>
+      <div class="cell empty"></div>
+    </div>
+
+    <div class="note wu">
+      <strong>舌尖元音之處理。</strong><span class="ko-inline">ㅡ</span> 於齒齦擦音（ㅅ ㅆ ㅈ ㅊ ㅉ）之後自動讀為舌尖元音 ɿ（清後）或 ʮ（濁後）；於他處讀為 ɤ。故 <span class="ko-inline">스</span> = sɿ（思）、<span class="ko-inline">쓰</span> = zʮ（時）、<span class="ko-inline">그</span> = kɤ（哥）。<br>
+      <strong>關於 ㅢ。</strong>韓文 <span class="ko-inline">ㅢ</span> 之形可借用於蘇州 i+ɤ 滑音之罕見組合，目前留作備用。
+    </div>
+
+    <h3 class="wu">介音與複合韻</h3>
+    <p style="font-size: 14px; color: var(--muted);">
+      蘇州複合韻較臺語少。常用者：<span class="ko-inline">ㅑ</span> ia · <span class="ko-inline">ㅘ</span> ua · <span class="ko-inline">ㅝ</span> uø · <span class="ko-inline">ㅙ</span> uɛ · <span class="ko-inline">ㅛ</span> iɔ。
+    </p>
+
+    <h3 class="wu">韻尾 · 三位（其餘四位已歸並）</h3>
+    <div class="letter-grid cols-7">
+      <div class="cell empty"><div class="glyph">ㅁ</div><div class="romaji">-m</div><div class="hint">→ -n</div></div>
+      <div class="cell wu"><div class="glyph">ㄴ</div><div class="romaji">-n</div><div class="ipa">/n/</div><div class="hint">前鼻</div></div>
+      <div class="cell wu"><div class="glyph">ㅇ</div><div class="romaji">-ŋ</div><div class="ipa">/ŋ/</div><div class="hint">後鼻</div></div>
+      <div class="cell empty"><div class="glyph">ㅂ</div><div class="romaji">-p</div><div class="hint">→ -ʔ</div></div>
+      <div class="cell empty"><div class="glyph">ㄷ</div><div class="romaji">-t</div><div class="hint">→ -ʔ</div></div>
+      <div class="cell empty"><div class="glyph">ㄱ</div><div class="romaji">-k</div><div class="hint">→ -ʔ</div></div>
+      <div class="cell wu"><div class="glyph">ㅎ</div><div class="romaji">-ʔ</div><div class="ipa">/ʔ/</div><div class="hint">喉塞</div></div>
+    </div>
+    <p>
+      中古 -m 全歸 -n（如 三 sɛn¹）；-p -t -k 全歸 -ʔ（如 一 iɪʔ⁴、國 koʔ⁴、學 ɦoʔ⁸）。淡色四位即臺語有而本子集不用之韻尾。
+    </p>
+
+    <h3 class="wu">聲調 · 七實用調</h3>
+    <p style="font-size: 13px; color: var(--muted);">
+      1陰平 44 · 2陰上 52 · 3陰去 412 · 4陰入 4ʔ · 5陽平 24 · 7陽去 31（陽上 6 已併此）· 8陽入 23ʔ
+    </p>
+
+    <h3 class="wu">示範</h3>
+    <div class="syl-demo">
+      <div class="syl wu"><span class="corner-tag">蘇</span><div class="block">스<span class="tone">1</span></div><div class="hanzi">蘇</div><div class="tl">sɿ¹</div></div>
+      <div class="syl wu"><span class="corner-tag">蘇</span><div class="block">외<span class="tone">7</span></div><div class="hanzi">我</div><div class="tl">ŋøy⁷</div></div>
+      <div class="syl wu"><span class="corner-tag">蘇</span><div class="block"><span class="dot-letter">ㅍ</span>옹<span class="tone">1</span></div><div class="hanzi">風</div><div class="tl">foŋ¹</div></div>
+      <div class="syl wu"><span class="corner-tag">蘇</span><div class="block"><span class="dot-letter">ㅂ</span>앙<span class="tone">5</span></div><div class="hanzi">房</div><div class="tl">vɑŋ⁵</div></div>
+      <div class="syl wu"><span class="corner-tag">蘇</span><div class="block"><span class="dot-letter">ㅎ</span>옥<span class="tone">8</span></div><div class="hanzi">學</div><div class="tl">ɦoʔ⁸</div></div>
+      <div class="syl wu"><span class="corner-tag">蘇</span><div class="block">곡<span class="tone">4</span></div><div class="hanzi">國</div><div class="tl">koʔ⁴</div></div>
+      <div class="syl wu"><span class="corner-tag">蘇</span><div class="block">기<span class="tone">1</span></div><div class="hanzi">基</div><div class="tl">tɕi¹ ← ki</div></div>
+      <div class="syl wu"><span class="corner-tag">蘇</span><div class="block">새<span class="tone">1</span></div><div class="hanzi">三</div><div class="tl">sɛ¹</div></div>
+    </div>
+
+    <div class="note wu">
+      <strong>音節性鼻音。</strong>蘇州 五 ŋ̩、魚 ŋ̩ 等單鼻音節，寫作 <span class="ko-inline">응</span>（ㅇ + ㅡ）。即「以 ㅡ 為虛元音之 ŋ」。<br>
+      <strong>"我"之寫法。</strong>蘇州我 /ŋøy/，左 ㅇ 為 ŋ，右 ㅚ 或 ㅓ + ㅣ 之組合表 øy 滑音。例中暫寫 <span class="ko-inline">외</span>，採韓文 ㅚ 古音 /ø/ 之精神。
+    </div>
+  </section>
+
+  <!-- CHAPTER V: COMPOSITION -->
   <section class="chapter" id="compose">
-    <div class="chapter-number">Chapter VI</div>
-    <h2>組字 · 方塊之法</h2>
+    <div class="chapter-number">Chapter V</div>
+    <h2 class="universal">組字 · 方塊之法（兩語共用）</h2>
 
     <p>
-      方塊組字沿用谚文之法。聲母在左，元音在右或在下。複合元音依谚文既有寫法。韻尾置於底。聲調寫於方塊右上外。
+      方塊組字沿韓文之法：聲母在左，元音在右或在下，韻尾置於底，聲調寫於方塊右上外。下加點屬於聲母之一部分，與聲母共佔左位。
     </p>
 
     <p>
-      絕大多數台語音節一方塊可成。然 iong 韻（如"中 tiong"之韻）因谚文預編碼無此組合，須拆為兩方塊 <span class="ko-inline">됴ㅇ</span>——此為系統已知之讓步，可接受。
+      臺語絕大多數音節一方塊可成；蘇州亦然，且因無 iong 之類複合，反而更乾淨。然臺語 iong 韻（如「中 tiong」之韻）因 Hangul Syllables 區無此預編碼，須拆為兩方塊 <span class="ko-inline">됴ㅇ</span>——此為系統已知讓步。
     </p>
 
     <div class="divider-ornament">❋ ❋ ❋</div>
 
-    <h3>示範 · 六字</h3>
-    <div class="syl-demo">
-      <div class="syl"><div class="block">심<span class="tone">1</span></div><div class="hanzi">心</div><div class="tl">sim¹</div></div>
-      <div class="syl"><div class="block">신<span class="tone">5</span></div><div class="hanzi">神</div><div class="tl">sin⁵</div></div>
-      <div class="syl"><div class="block">단<span class="tone">1</span></div><div class="hanzi">丹</div><div class="tl">tan¹</div></div>
-      <div class="syl"><div class="block">군<span class="tone">1</span></div><div class="hanzi">君</div><div class="tl">kun¹</div></div>
-      <div class="syl"><div class="block">오<span class="tone">2</span></div><div class="hanzi">我</div><div class="tl">ngóo²</div></div>
-      <div class="syl"><div class="block">학<span class="tone">8</span></div><div class="hanzi">學</div><div class="tl">ha̍k⁸</div></div>
+    <h3 class="universal">同字異讀 · 一文兩語對照</h3>
+    <p>
+      以下六字，同一漢字於兩子集之寫法並列，可見系統之「同字母不同語不同音」之精神。
+    </p>
+
+    <div class="cross-demo">
+      <div class="head">漢字</div>
+      <div class="head" style="color: var(--seal);">臺語</div>
+      <div class="head" style="color: var(--wu);">蘇州</div>
+
+      <div class="hanzi">我</div>
+      <div class="reading">오<small>ngóo² · 阴上</small></div>
+      <div class="reading">외<small>ŋøy⁷ · 阳去</small></div>
+
+      <div class="hanzi">學</div>
+      <div class="reading">학<small>ha̍k⁸ · 阳入</small></div>
+      <div class="reading"><span class="dot-letter">ㅎ</span>옥<small>ɦoʔ⁸ · 阳入</small></div>
+
+      <div class="hanzi">時</div>
+      <div class="reading">시<small>sî⁵ · 阳平</small></div>
+      <div class="reading">쓰<small>zʮ⁵ · 阳平</small></div>
+
+      <div class="hanzi">魚</div>
+      <div class="reading">히<small>hî⁵ · 阳平</small></div>
+      <div class="reading">ㅇㅟ<small>ŋy⁵ · 阳平</small></div>
+
+      <div class="hanzi">三</div>
+      <div class="reading">사~<small>sann¹ · 鼻化</small></div>
+      <div class="reading">새<small>sɛ¹ · 無鼻化</small></div>
+
+      <div class="hanzi">飛</div>
+      <div class="reading">붸<small>pue¹</small></div>
+      <div class="reading"><span class="dot-letter">ㅍ</span>이<small>fi¹</small></div>
     </div>
 
     <div class="note">
-      <strong>按。</strong>"我 ngóo²"之寫 <span class="ko-inline">오²</span>，其左列 <span class="ko-inline">ㅇ</span> 乃真聲母 ng，右列 <span class="ko-inline">ㅗ</span> 為 ɔɔ 韻。本系統之 <span class="ko-inline">ㅇ=ng</span> 設計於此可見其巧：一字無歧，掃視即讀。
+      <strong>按。</strong>觀之可見：同一漢字、同一系統，因子集而異其形音。臺「我」單方塊 <span class="ko-inline">오</span>，蘇「我」亦單方塊 <span class="ko-inline">외</span>；二者皆無歧義，皆遵 ㅇ=ŋ 之通則。子集分立而骨架同，此乃本版設計之核心收穫。
     </div>
   </section>
 
-  <!-- DRILL -->
+  <!-- CHAPTER VI: DRILL -->
   <section class="chapter" id="drill">
-    <div class="chapter-number">Chapter VII</div>
-    <h2>練習 · 反向識讀</h2>
+    <div class="chapter-number">Chapter VI</div>
+    <h2>練習 · 反向識讀（雙語混排）</h2>
 
     <p>
-      下列十題，見谚文而寫台羅。點擊"示"字以檢驗之。此練習所重者非記憶，乃識讀之速度。熟則一字不過眼半秒。
+      下列十二題，前六臺語、後六蘇州，皆見谚文而寫拼音與漢字。題首小籤標 <span class="lang-tag min">閩</span> 或 <span class="lang-tag wu">蘇</span> 以示子集。點擊「示」字檢驗。
     </p>
 
     <div id="quiz">
       <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag min">閩</span>
         <div class="prompt">심<sup style="color:var(--seal);font-size:12px;">1</sup></div>
         <div class="question">此字讀何音？意何字？</div>
         <button class="reveal">示</button>
         <div class="answer">sim¹ · 心</div>
       </div>
       <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag min">閩</span>
         <div class="prompt">학<sup style="color:var(--seal);font-size:12px;">8</sup></div>
         <div class="question">此字讀何音？意何字？</div>
         <button class="reveal">示</button>
         <div class="answer">ha̍k⁸ · 學</div>
       </div>
       <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag min">閩</span>
         <div class="prompt">뽀<sup style="color:var(--seal);font-size:12px;">2</sup></div>
         <div class="question">濁聲母當如何辨？</div>
         <button class="reveal">示</button>
-        <div class="answer">bóo² · 某 (閩南"老婆")</div>
+        <div class="answer">bóo² · 某（閩南「老婆」）</div>
       </div>
       <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag min">閩</span>
         <div class="prompt">오<sup style="color:var(--seal);font-size:12px;">2</sup></div>
         <div class="question">左列 ㅇ 當作何音？</div>
         <button class="reveal">示</button>
         <div class="answer">ngóo² · 我</div>
       </div>
       <div class="quiz-item" onclick="this.classList.toggle('revealed')">
-        <div class="prompt">칟<sup style="color:var(--seal);font-size:12px;">4</sup></div>
-        <div class="question">底 ㄷ 為入聲何音？</div>
-        <button class="reveal">示</button>
-        <div class="answer">tshit⁴ · 七</div>
-      </div>
-      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
-        <div class="prompt">그<sup style="color:var(--seal);font-size:12px;">1</sup></div>
-        <div class="question">ㅡ 當作台語何元音？</div>
-        <button class="reveal">示</button>
-        <div class="answer">ko¹ · 高</div>
-      </div>
-      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag min">閩</span>
         <div class="prompt">됴ㅇ<sup style="color:var(--seal);font-size:12px;">1</sup></div>
         <div class="question">兩方塊一音節，當拼何？</div>
         <button class="reveal">示</button>
         <div class="answer">tiong¹ · 中</div>
       </div>
       <div class="quiz-item" onclick="this.classList.toggle('revealed')">
-        <div class="prompt">꽌<sup style="color:var(--seal);font-size:12px;">5</sup></div>
-        <div class="question">ㄲ 為何音？</div>
-        <button class="reveal">示</button>
-        <div class="answer">guân⁵ · 元</div>
-      </div>
-      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
-        <div class="prompt">쭈<sup style="color:var(--seal);font-size:12px;">5</sup></div>
-        <div class="question">ㅉ 為何音？</div>
-        <button class="reveal">示</button>
-        <div class="answer">jû⁵ · 如</div>
-      </div>
-      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag min">閩</span>
         <div class="prompt">햔<sup style="color:var(--seal);font-size:12px;">2</sup></div>
         <div class="question">介音 ㅣ 與 ㅏ 合，讀何？</div>
         <button class="reveal">示</button>
         <div class="answer">hián² · 顯</div>
       </div>
+
+      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag wu">蘇</span>
+        <div class="prompt">스<sup style="color:var(--wu);font-size:12px;">1</sup></div>
+        <div class="question">ㅡ 於 ㅅ 後讀何？</div>
+        <button class="reveal">示</button>
+        <div class="answer">sɿ¹ · 蘇（舌尖元音）</div>
+      </div>
+      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag wu">蘇</span>
+        <div class="prompt">기<sup style="color:var(--wu);font-size:12px;">1</sup></div>
+        <div class="question">ㄱ 於 ㅣ 前讀何？</div>
+        <button class="reveal">示</button>
+        <div class="answer">tɕi¹ · 基（自動齶化）</div>
+      </div>
+      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag wu">蘇</span>
+        <div class="prompt"><span class="dot-letter">ㅍ</span>옹<sup style="color:var(--wu);font-size:12px;">1</sup></div>
+        <div class="question">下加點之 ㅍ 讀何？</div>
+        <button class="reveal">示</button>
+        <div class="answer">foŋ¹ · 風</div>
+      </div>
+      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag wu">蘇</span>
+        <div class="prompt">새<sup style="color:var(--wu);font-size:12px;">1</sup></div>
+        <div class="question">ㅐ 於本子集讀何？</div>
+        <button class="reveal">示</button>
+        <div class="answer">sɛ¹ · 三（古 -m 已歸 -n，且 a → ɛ）</div>
+      </div>
+      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag wu">蘇</span>
+        <div class="prompt"><span class="dot-letter">ㅎ</span>옥<sup style="color:var(--wu);font-size:12px;">8</sup></div>
+        <div class="question">下加點之 ㅎ 與底 ㄱ 各何？</div>
+        <button class="reveal">示</button>
+        <div class="answer">ɦoʔ⁸ · 學（ㄱ 於底位於蘇州讀為 ʔ）</div>
+      </div>
+      <div class="quiz-item" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag wu">蘇</span>
+        <div class="prompt">응<sup style="color:var(--wu);font-size:12px;">3</sup></div>
+        <div class="question">無聲母之單方塊，何讀？</div>
+        <button class="reveal">示</button>
+        <div class="answer">ŋ̩³ · 五（音節性鼻音）</div>
+      </div>
     </div>
+  </section>
+
+  <!-- APPENDIX -->
+  <section class="chapter" id="appendix">
+    <div class="chapter-number">Appendix</div>
+    <h2 class="universal">附錄 · 字母多義對照表</h2>
+
+    <p>
+      凡同一字母於兩子集音值不同者，列於下表。讀寫之際須先聲明子集，免於誤讀。
+    </p>
+
+    <table class="compare">
+      <thead>
+        <tr>
+          <th>字母</th>
+          <th>臺語</th>
+          <th>蘇州</th>
+          <th>說明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="glyph-cell">ㅐ</td>
+          <td class="min-val">ai（複合韻）</td>
+          <td class="wu-val">ɛ（單元音）</td>
+          <td class="note-cell">合於漢語史 ai → ɛ 之變</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">ㅟ</td>
+          <td class="min-val">ui（複合韻）</td>
+          <td class="wu-val">y（單圓元音）</td>
+          <td class="note-cell">韓文 ㅟ 中古音值即 /y/</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">ㅡ</td>
+          <td class="min-val">o（後央不圓）</td>
+          <td class="wu-val">ɤ；齒擦後讀 ɿ/ʮ</td>
+          <td class="note-cell">概念皆「非前非圓」，環境決定具體</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">ㅓ</td>
+          <td class="min-val">（未用）</td>
+          <td class="wu-val">ø</td>
+          <td class="note-cell">本版正式啟用</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">ㄸ</td>
+          <td class="min-val">（未用）</td>
+          <td class="wu-val">d</td>
+          <td class="note-cell">本版正式啟用</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">ㅆ</td>
+          <td class="min-val">（未用）</td>
+          <td class="wu-val">z</td>
+          <td class="note-cell">本版正式啟用</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><span class="dot-letter">ㅍ</span></td>
+          <td class="min-val">（無此音）</td>
+          <td class="wu-val">f</td>
+          <td class="note-cell">下加點擴充字</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><span class="dot-letter">ㅂ</span></td>
+          <td class="min-val">（無此音）</td>
+          <td class="wu-val">v</td>
+          <td class="note-cell">下加點擴充字</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><span class="dot-letter">ㅎ</span></td>
+          <td class="min-val">（無此音）</td>
+          <td class="wu-val">ɦ</td>
+          <td class="note-cell">下加點擴充字</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">ㅁ</td>
+          <td class="min-val">m / -m（聲母與韻尾）</td>
+          <td class="wu-val">m（僅聲母）</td>
+          <td class="note-cell">蘇州 -m 已歸 -n</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">ㅂ ㄷ ㄱ（在底）</td>
+          <td class="min-val">-p -t -k 入聲</td>
+          <td class="wu-val">（一律不出現）</td>
+          <td class="note-cell">蘇州入聲僅 -ʔ</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">ㅈ ㅊ ㅅ（前 i/y）</td>
+          <td class="min-val">ts tsʰ s（同一般位置）</td>
+          <td class="wu-val">tɕ tɕʰ ɕ（自動齶化）</td>
+          <td class="note-cell">蘇州顎化為同位異音</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">調 6</td>
+          <td class="min-val">（陽上，已併陽去）</td>
+          <td class="wu-val">（陽上，已併陽去）</td>
+          <td class="note-cell">兩語皆不實用</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>使用之道。</strong>建議於每篇文件首註明「此篇用 X 子集」。需混用者，每段段首以小籤 <span class="lang-tag min">閩</span> <span class="lang-tag wu">蘇</span> 標識；單字混用者，於字旁加小字註亦可。
+    </div>
+
+    <div class="divider-ornament">❋ ❋ ❋</div>
+
+    <h3 class="universal">向後可擴 · 未盡之語</h3>
+    <p>
+      本框架之下尚可繼續加入：
+    </p>
+    <ul style="padding-left: 24px; margin-bottom: 20px; font-size: 14px; color: var(--muted);">
+      <li style="margin-bottom: 8px;"><strong>上海話</strong>：與蘇州子集九成共用，差別主要在聲調系統（上海七調已簡化為兩級陰陽），可視為蘇州子集之變體。</li>
+      <li style="margin-bottom: 8px;"><strong>溫州話</strong>：保留更多濁聲母、更多元音、複雜變調，需擴充新元音字（或可借 <span class="ko-inline">ㅑ ㅕ ㅛ ㅠ</span> 之餘位）。</li>
+      <li style="margin-bottom: 8px;"><strong>福州話</strong>：聲母類化、元音變讀為其特色，框架可承之，但須註明「連讀類化規則」於子集首。</li>
+      <li style="margin-bottom: 8px;"><strong>巴盟話 / 西北官話</strong>：需卷舌組（ㅈ̣ ㅊ̣ ㅅ̣），下加點機制已備。</li>
+      <li style="margin-bottom: 8px;"><strong>粵語</strong>：可全用通用韻尾倉庫七位（-p -t -k -m -n -ŋ -ʔ 皆有），九調可全部啟用 1–9（需加調 9 位）。</li>
+    </ul>
+    <p>
+      凡新增之語，重在三事：定其聲母表、定其元音重音值、定其韻尾子集。骨架不動。
+    </p>
   </section>
 
   <footer>
     閩 吳 谚 文
     <span class="divider">·</span>
-    私 用 字 母 表
+    第 二 版
+    <span class="divider">·</span>
+    多 語 子 集 字 母 表
   </footer>
 </div>
 
