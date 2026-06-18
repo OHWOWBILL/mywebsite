@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>閩吳淮谚文 · 第三版 · 三語子集</title>
+<title>閩吳淮泰谚文 · 第四版 · 四語子集</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700&family=Noto+Serif+SC:wght@300;400;600;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -20,6 +20,7 @@
     --muted: #6e5e44;
     --wu: #2e4a6b;
     --huai: #7a4e2a;
+    --tai: #4a6b3a;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -129,6 +130,7 @@
   }
   h2.wu::before { background: var(--wu); }
   h2.huai::before { background: var(--huai); }
+  h2.tai::before { background: var(--tai); }
   h2.universal::before { background: var(--jade); }
 
   h3 {
@@ -141,6 +143,7 @@
   }
   h3.wu { color: var(--wu); }
   h3.huai { color: var(--huai); }
+  h3.tai { color: var(--tai); }
 
   p { margin-bottom: 18px; }
 
@@ -182,6 +185,7 @@
   }
   .family-label.wu { color: var(--wu); }
   .family-label.huai { color: var(--huai); }
+  .family-label.tai { color: var(--tai); }
 
   .family-label small {
     display: block;
@@ -249,6 +253,7 @@
   }
   .cell.wu .romaji { color: var(--wu); }
   .cell.huai .romaji { color: var(--huai); }
+  .cell.tai .romaji { color: var(--tai); }
 
   .cell .ipa {
     font-family: "EB Garamond", serif;
@@ -365,6 +370,7 @@
   }
   .syl.wu .tone { color: var(--wu); }
   .syl.huai .tone { color: var(--huai); }
+  .syl.tai .tone { color: var(--tai); }
 
   .syl .hanzi {
     font-family: "Noto Serif SC", serif;
@@ -396,6 +402,7 @@
   .lang-tag.min  { background: rgba(139, 36, 24, 0.12); color: var(--seal); }
   .lang-tag.wu   { background: rgba(46, 74, 107, 0.12); color: var(--wu); }
   .lang-tag.huai { background: rgba(122, 78, 42, 0.14); color: var(--huai); }
+  .lang-tag.tai  { background: rgba(74, 107, 58, 0.14); color: var(--tai); }
   .lang-tag.both { background: rgba(58, 90, 62, 0.12); color: var(--jade); }
 
   .syl .corner-tag {
@@ -411,6 +418,7 @@
   .syl.min  .corner-tag { background: rgba(139, 36, 24, 0.12); color: var(--seal); }
   .syl.wu   .corner-tag { background: rgba(46, 74, 107, 0.12); color: var(--wu); }
   .syl.huai .corner-tag { background: rgba(122, 78, 42, 0.14); color: var(--huai); }
+  .syl.tai  .corner-tag { background: rgba(74, 107, 58, 0.14); color: var(--tai); }
 
   table.compare {
     width: 100%;
@@ -444,6 +452,7 @@
   table.compare .min-val  { color: var(--seal); font-style: italic; font-family: "EB Garamond", serif; font-size: 14px; }
   table.compare .wu-val   { color: var(--wu);   font-style: italic; font-family: "EB Garamond", serif; font-size: 14px; }
   table.compare .huai-val { color: var(--huai); font-style: italic; font-family: "EB Garamond", serif; font-size: 14px; }
+  table.compare .tai-val  { color: var(--tai);  font-style: italic; font-family: "EB Garamond", serif; font-size: 14px; }
   table.compare .note-cell { font-size: 12px; color: var(--muted); font-style: italic; }
   table.compare tr:hover { background: rgba(156, 122, 59, 0.06); }
 
@@ -476,6 +485,7 @@
   }
   table.tone-table.wu .pitch   { color: var(--wu); }
   table.tone-table.huai .pitch { color: var(--huai); }
+  table.tone-table.tai .pitch  { color: var(--tai); }
   table.tone-table .hist {
     font-family: "Noto Serif SC", serif;
     font-size: 12px;
@@ -509,6 +519,7 @@
   .quiz-item.min  .prompt .t { color: var(--seal); }
   .quiz-item.wu   .prompt .t { color: var(--wu); }
   .quiz-item.huai .prompt .t { color: var(--huai); }
+  .quiz-item.tai  .prompt .t { color: var(--tai); }
 
   .quiz-item .question {
     font-family: "Noto Serif SC", serif;
@@ -634,6 +645,11 @@
     border-color: rgba(122, 78, 42, 0.2);
   }
   .note.huai strong { color: var(--huai); }
+  .note.tai {
+    background: rgba(74, 107, 58, 0.05);
+    border-color: rgba(74, 107, 58, 0.2);
+  }
+  .note.tai strong { color: var(--tai); }
 
   .subset-banner {
     background: linear-gradient(to right, rgba(139, 36, 24, 0.08), transparent);
@@ -652,6 +668,10 @@
     background: linear-gradient(to right, rgba(122, 78, 42, 0.1), transparent);
     border-left-color: var(--huai);
   }
+  .subset-banner.tai {
+    background: linear-gradient(to right, rgba(74, 107, 58, 0.1), transparent);
+    border-left-color: var(--tai);
+  }
   .subset-banner .label {
     font-weight: 700;
     color: var(--seal);
@@ -661,21 +681,22 @@
   }
   .subset-banner.wu   .label { color: var(--wu); }
   .subset-banner.huai .label { color: var(--huai); }
+  .subset-banner.tai  .label { color: var(--tai); }
 
   .cross-demo {
     display: grid;
-    grid-template-columns: 70px 1fr 1fr 1fr;
+    grid-template-columns: 60px 1fr 1fr 1fr 1fr;
     gap: 0;
     margin: 24px 0;
     border: 1px solid var(--rule);
   }
   .cross-demo > div {
-    padding: 12px 14px;
+    padding: 10px 10px;
     border-bottom: 1px solid var(--rule);
     border-right: 1px solid var(--rule);
   }
-  .cross-demo > div:nth-child(4n) { border-right: none; }
-  .cross-demo > div:nth-last-child(-n+4) { border-bottom: none; }
+  .cross-demo > div:nth-child(5n) { border-right: none; }
+  .cross-demo > div:nth-last-child(-n+5) { border-bottom: none; }
   .cross-demo .head {
     background: rgba(0,0,0,0.04);
     font-weight: 600;
@@ -753,6 +774,7 @@
   <a href="#min">臺語子集</a>
   <a href="#wu">蘇州子集</a>
   <a href="#huai">淮安子集</a>
+  <a href="#tai">泰州子集</a>
   <div class="toc-group">— 共用 —</div>
   <a href="#compose">組字之法</a>
   <a href="#drill">練習</a>
@@ -762,14 +784,14 @@
 <div class="page">
 
   <header class="masthead">
-    <h1 class="book-title">閩吳淮谚文</h1>
-    <div class="edition">EDITIO TERTIA · MMXXVI</div>
-    <div class="subtitle">A Hangul-Based Script for Min, Wu, Jianghuai &amp; Other Sinitic Tongues</div>
-    <div class="credit">臺語 · 蘇州話 · 淮安話 · 私人音位字母表</div>
+    <h1 class="book-title">閩吳淮泰谚文</h1>
+    <div class="edition">EDITIO QUARTA · MMXXVI</div>
+    <div class="subtitle">A Hangul-Based Script for Min, Wu, Jianghuai, Tongtai &amp; Other Sinitic Tongues</div>
+    <div class="credit">臺語 · 蘇州話 · 淮安話 · 泰州話 · 私人音位字母表</div>
   </header>
 
   <p class="lede">
-    第三版加入淮安子集，並廢棄前版之「八聲調號 1–8」，改採五度標記法直記調值。三子集各持其聲母、元音、韻尾、聲調表，皆建於同一通用骨架之上。若再添上海、福州、巴盟諸腔，亦不過再加子集，骨架不動。
+    第四版加入泰州子集（江淮官話通泰片）。泰州話介於吳語與官話之間，保留部分濁擦音 f/v、s/z 之對立，無濁塞，留入聲與鼻化元音，龈齶聲母自由獨立——此特徵正可考驗本系統「同一字母庫，多語子集分立」之伸縮性。骨架仍不動。
   </p>
 
   <!-- CHAPTER I: PRINCIPLES -->
@@ -814,8 +836,8 @@
 
     <ul style="padding-left: 24px; margin-bottom: 20px;">
       <li style="margin-bottom: 10px;"><strong>現代基礎字母（19+21）</strong>：聲母 ㅂㅍㅁㄷㅌㄴㄹㅈㅊㅅㄱㅋㅇㅎ 等 19 個，元音 ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ 等 21 個。皆主力。</li>
-      <li style="margin-bottom: 10px;"><strong>緊音重疊字母（5）</strong>：ㄲ ㄸ ㅃ ㅆ ㅉ。原為韓語緊音，本系統重新定義為漢語濁聲母 g d b z dz。蘇州子集全部啟用；臺語僅 ㅃ ㄲ ㅉ；淮安官話系無濁音，五位全部淡色不用。</li>
-      <li style="margin-bottom: 10px;"><strong>下加點擴充字母</strong>：於基礎字母下方加一小點為記，用以表本系統未及之輔音。當前已用者：<span class="ko-inline dot-letter">ㅍ</span> = f（蘇、淮）、<span class="ko-inline dot-letter">ㅂ</span> = v（蘇）、<span class="ko-inline dot-letter">ㅎ</span> = ɦ（蘇）、<span class="ko-inline dot-letter">ㄹ</span> = ɻ（淮，日母字）。預留待用：<span class="ko-inline dot-letter">ㅈ</span> <span class="ko-inline dot-letter">ㅊ</span> <span class="ko-inline dot-letter">ㅅ</span> = 卷舌組（巴盟）。此機制可無限延伸而不傷骨幹。</li>
+      <li style="margin-bottom: 10px;"><strong>緊音重疊字母（5）</strong>：ㄲ ㄸ ㅃ ㅆ ㅉ。原為韓語緊音，本系統重新定義為漢語濁聲母 g d b z dz。蘇州子集全部啟用；臺語僅 ㅃ ㄲ ㅉ；泰州僅 ㅆ（z）；淮安官話系無濁音，五位全部淡色不用。</li>
+      <li style="margin-bottom: 10px;"><strong>下加點擴充字母</strong>：於基礎字母下方加一小點為記，用以表本系統未及之輔音。當前已用者：<span class="ko-inline dot-letter">ㅍ</span> = f（蘇、淮、泰）、<span class="ko-inline dot-letter">ㅂ</span> = v（蘇、泰）、<span class="ko-inline dot-letter">ㅎ</span> = ɦ（蘇）、<span class="ko-inline dot-letter">ㄹ</span> = ɻ（淮，日母字）。預留待用：<span class="ko-inline dot-letter">ㅈ</span> <span class="ko-inline dot-letter">ㅊ</span> <span class="ko-inline dot-letter">ㅅ</span> = 卷舌組（巴盟）。此機制可無限延伸而不傷骨幹。</li>
     </ul>
 
     <h3 class="universal">通用聲調 · 五度標記法</h3>
@@ -859,7 +881,7 @@
     </div>
 
     <p style="font-size: 13px; color: var(--muted);">
-      臺語盡用七位；蘇州僅用 <span class="ko-inline">ㄴ ㅇ ㅎ</span>；淮安亦僅用三位，另加 ~ 鼻化標記表 19–24 號韻。
+      臺語盡用七位；蘇州僅用 <span class="ko-inline">ㄴ ㅇ ㅎ</span>；淮安、泰州皆用此三位加 ~ 鼻化標記。
     </p>
   </section>
 
@@ -1336,10 +1358,228 @@
     </div>
   </section>
 
-  <!-- CHAPTER VI: COMPOSITION -->
-  <section class="chapter" id="compose">
+  <!-- CHAPTER VI: TAIZHOU SUBSET (NEW) -->
+  <section class="chapter" id="tai">
     <div class="chapter-number">Chapter VI</div>
-    <h2 class="universal">組字 · 方塊之法（三語共用）</h2>
+    <h2 class="tai">泰州子集 · 江淮官話通泰片</h2>
+
+    <div class="subset-banner tai">
+      <span class="label">語 別</span>
+      泰州話（江蘇中部，江淮官話通泰片）。部分濁擦音保留（f/v、s/z）、無濁塞、入聲僅喉塞、保留鼻化元音、龈齶聲母獨立記入、七調本位。
+    </div>
+
+    <p>
+      泰州話介於吳語與官話之間：保留部分濁擦音（v、z），但無完整濁塞系列；保留入聲韻尾 -ʔ 與鼻化元音 ~ ，且鼻韻尾 -n -ŋ 區分清晰，遂為本系統中第一個四種韻尾全用之子集。下表據網上某「泰州話音系」圖整理，惟邊音 l 一位原圖未列，按通行分析補入。
+    </p>
+
+    <h3 class="tai">聲母 · 二十位</h3>
+
+    <div class="letter-grid cols-5">
+      <div class="manner-header">清</div>
+      <div class="manner-header">送氣</div>
+      <div class="manner-header">鼻</div>
+      <div class="manner-header">清擦</div>
+      <div class="manner-header">濁擦·邊</div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label tai">唇音<small>Labial</small></div>
+      <div class="cell tai"><div class="glyph">ㅂ</div><div class="romaji">p</div><div class="ipa">/p/</div><div class="hint">巴</div></div>
+      <div class="cell tai"><div class="glyph">ㅍ</div><div class="romaji">pʰ</div><div class="ipa">/pʰ/</div><div class="hint">怕</div></div>
+      <div class="cell tai"><div class="glyph">ㅁ</div><div class="romaji">m</div><div class="ipa">/m/</div><div class="hint">媽</div></div>
+      <div class="cell tai"><div class="glyph"><span class="dot-letter">ㅍ</span></div><div class="romaji">f</div><div class="ipa">/f/</div><div class="hint">飛</div></div>
+      <div class="cell tai"><div class="glyph"><span class="dot-letter">ㅂ</span></div><div class="romaji">v</div><div class="ipa">/v/</div><div class="hint">扶 房</div></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label tai">齒齦塞<small>Alveolar</small></div>
+      <div class="cell tai"><div class="glyph">ㄷ</div><div class="romaji">t</div><div class="ipa">/t/</div><div class="hint">多</div></div>
+      <div class="cell tai"><div class="glyph">ㅌ</div><div class="romaji">tʰ</div><div class="ipa">/tʰ/</div><div class="hint">他</div></div>
+      <div class="cell tai"><div class="glyph">ㄴ</div><div class="romaji">n</div><div class="ipa">/n/</div><div class="hint">拿</div></div>
+      <div class="cell empty"></div>
+      <div class="cell tai"><div class="glyph">ㄹ</div><div class="romaji">l</div><div class="ipa">/l/</div><div class="hint">老 (補入)</div></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label tai">齒齦擦<small>Sibilant</small></div>
+      <div class="cell tai"><div class="glyph">ㅈ</div><div class="romaji">ts</div><div class="ipa">/ts/</div><div class="hint">資</div></div>
+      <div class="cell tai"><div class="glyph">ㅊ</div><div class="romaji">tsʰ</div><div class="ipa">/tsʰ/</div><div class="hint">雌</div></div>
+      <div class="cell empty"></div>
+      <div class="cell tai"><div class="glyph">ㅅ</div><div class="romaji">s</div><div class="ipa">/s/</div><div class="hint">絲</div></div>
+      <div class="cell tai"><div class="glyph">ㅆ</div><div class="romaji">z</div><div class="ipa">/z/</div><div class="hint">時 是</div></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label tai">龈齶<small>Palatal</small></div>
+      <div class="cell tai"><div class="glyph">ㅈ+ㅣ</div><div class="romaji">tɕ</div><div class="ipa">/tɕ/</div><div class="hint">基 (自動)</div></div>
+      <div class="cell tai"><div class="glyph">ㅊ+ㅣ</div><div class="romaji">tɕʰ</div><div class="ipa">/tɕʰ/</div><div class="hint">欺</div></div>
+      <div class="cell empty"></div>
+      <div class="cell tai"><div class="glyph">ㅅ+ㅣ</div><div class="romaji">ɕ</div><div class="ipa">/ɕ/</div><div class="hint">西</div></div>
+      <div class="cell empty"></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label tai">軟顎<small>Velar</small></div>
+      <div class="cell tai"><div class="glyph">ㄱ</div><div class="romaji">k</div><div class="ipa">/k/</div><div class="hint">歌</div></div>
+      <div class="cell tai"><div class="glyph">ㅋ</div><div class="romaji">kʰ</div><div class="ipa">/kʰ/</div><div class="hint">科</div></div>
+      <div class="cell empty"></div>
+      <div class="cell tai"><div class="glyph">ㅎ</div><div class="romaji">x</div><div class="ipa">/x/</div><div class="hint">花</div></div>
+      <div class="cell empty"></div>
+    </div>
+
+    <div class="letter-grid cols-5" style="grid-template-columns: 140px repeat(5, 1fr);">
+      <div class="family-label tai">零聲母<small>Zero</small></div>
+      <div class="cell tai"><div class="glyph">∅</div><div class="romaji">—</div><div class="ipa">/∅/</div><div class="hint">安 哀</div></div>
+      <div class="cell empty"></div>
+      <div class="cell empty"></div>
+      <div class="cell empty"></div>
+      <div class="cell empty"></div>
+    </div>
+
+    <div class="note tai">
+      <strong>泰州話聲母諸特點。</strong><br>
+      <strong>① 部分濁擦音保留</strong>：f/v（飛 vs 房）與 s/z（思 vs 時）兩對皆有，相當於吳語濁系列之殘留。然濁塞 b/d/g/dz 已盡清化，故 <span class="ko-inline">ㅃ ㄸ ㄲ ㅉ</span> 在本子集淡色不用。<br>
+      <strong>② 龈齶聲母獨立記錄</strong>：泰州話之 tɕ tɕʰ ɕ 於原音系表中與 ts tsʰ s 並列為獨立音位，但分布互補（僅出現於 i/y 前）。本系統仍採「ㅈㅊㅅ + ㅣ/ㅟ 自動齶化」之記法，與蘇州、淮安一致。<br>
+      <strong>③ 邊音 l 補入</strong>：原圖無 l 一行，按通行分析補入「齒齦塞 · 邊音」位，與臺、蘇、淮共用 <span class="ko-inline">ㄹ</span>。<br>
+      <strong>④ 無卷舌</strong>：泰州城內話無 ɻ，故 <span class="ko-inline dot-letter">ㄹ</span> 在本子集不用。日母字（人 染 入）併入 z 系列，寫作 <span class="ko-inline">ㅆ</span>+元音。
+    </div>
+
+    <h3 class="tai">元音 · 七位（核心）</h3>
+
+    <p>
+      泰州主元音系統可化簡為七位核心元音：<span class="ko-inline">ㅏ ㅐ ㅗ ㅡ ㅜ ㅟ ㅣ</span>，<span class="ko-inline">ㅓ</span> 不用。<span class="ko-inline">ㅗ</span> 之音值與蘇州一致為 /ɔ/（不同於淮安之 /ʊ/）。<span class="ko-inline">ㅡ</span> 為多功能元音：兼任 ɤ（4 號 ɤɯ 之主元音）、ə（11 號 ən 之主元音）、ɿ（齒擦後 1 號舌尖元音）。原 6 號 ɚ（兒化色彩）罕用，以字尾 <span class="ko-inline">ㄹ</span> 表卷舌色彩。
+    </p>
+
+    <div class="letter-grid cols-4">
+      <div class="cell tai"><div class="glyph">ㅏ</div><div class="romaji">a</div><div class="ipa">/a · æ/</div><div class="hint">巴·八（入聲偏 æ）</div></div>
+      <div class="cell tai"><div class="glyph">ㅐ</div><div class="romaji">ɛ</div><div class="ipa">/ɛ/</div><div class="hint">街 (2 號)</div></div>
+      <div class="cell tai"><div class="glyph">ㅣ</div><div class="romaji">i</div><div class="ipa">/i/</div><div class="hint">衣 (6 號)</div></div>
+      <div class="cell tai"><div class="glyph">ㅟ</div><div class="romaji">y</div><div class="ipa">/y/</div><div class="hint">魚 (5 號)</div></div>
+    </div>
+
+    <div class="letter-grid cols-4">
+      <div class="cell tai"><div class="glyph">ㅗ</div><div class="romaji">ɔ</div><div class="ipa">/ɔ/</div><div class="hint">高 (3 號)</div></div>
+      <div class="cell tai"><div class="glyph">ㅜ</div><div class="romaji">u (~ʊ)</div><div class="ipa">/u ~ ʊ/</div><div class="hint">烏·多 (5/6 合)</div></div>
+      <div class="cell tai"><div class="glyph">ㅡ</div><div class="romaji">ɤ / ə / ɿ</div><div class="ipa">/ɤ · ə · ɿ/</div><div class="hint">沟·门·思</div></div>
+      <div class="cell empty"><div class="glyph">ㅓ</div><div class="romaji">—</div><div class="hint">未用</div></div>
+    </div>
+
+    <h3 class="tai">介音與複合韻</h3>
+
+    <p>
+      四呼之分（開齊合撮）對應谚文之四類醫音組合：開口呼純元音，齊齒呼用 <span class="ko-inline">ㅑ ㅖ ㅛ ㅕ</span> 等 i- 開頭組合，合口呼用 <span class="ko-inline">ㅘ ㅙ ㅝ</span> 等 u- 開頭組合，撮口呼用 <span class="ko-inline">ㅠ ㅟ</span> 等 y- 開頭組合。
+    </p>
+
+    <div class="letter-grid cols-7">
+      <div class="cell tai"><div class="glyph">ㅑ</div><div class="romaji">ia</div><div class="ipa">/ia/</div></div>
+      <div class="cell tai"><div class="glyph">ㅖ</div><div class="romaji">iɛ</div><div class="ipa">/iɛ/</div></div>
+      <div class="cell tai"><div class="glyph">ㅛ</div><div class="romaji">iɔ</div><div class="ipa">/iɔ/</div></div>
+      <div class="cell tai"><div class="glyph">ㅕ</div><div class="romaji">iə</div><div class="ipa">/iə · iɤ/</div></div>
+      <div class="cell tai"><div class="glyph">ㅘ</div><div class="romaji">ua</div><div class="ipa">/ua/</div></div>
+      <div class="cell tai"><div class="glyph">ㅙ</div><div class="romaji">uɛ</div><div class="ipa">/uɛ/</div></div>
+      <div class="cell tai"><div class="glyph">ㅢ</div><div class="romaji">ui</div><div class="ipa">/ui/</div></div>
+    </div>
+
+    <div class="note tai">
+      <strong>關於 ㅟ 與 ㅢ。</strong>泰州 5 號 韻母為單元音 /y/，6 號 為 /i/，<strong>合口呼 ui 為複合韻</strong>（兩者皆音位）。本子集以 <span class="ko-inline">ㅟ</span> 表 /y/、以 <span class="ko-inline">ㅢ</span> 表 /ui/，免於混淆——此為泰州子集特用之分工，臺·蘇·淮無此分。<br>
+      <strong>4 號滑音 ɤɯ。</strong>原表 4 號韻母為帶 -ɯ 滑音之 /ɤɯ/，本系統視為 <span class="ko-inline">ㅡ</span> 之單寫，滑尾不顯。如需精確記之，可寫 <span class="ko-inline">ㅡㅜ</span> 二字母。
+    </div>
+
+    <h3 class="tai">韻尾 · 四位全用 + 鼻化</h3>
+
+    <p>
+      泰州子集為本系統中第一個四種韻尾全用之子集：<span class="ko-inline">ㄴ</span>-n、<span class="ko-inline">ㅇ</span>-ŋ、<span class="ko-inline">ㅎ</span>-ʔ 三位入方塊底，鼻化 ~ 後置於方塊外。中古 -m -p -t -k 已全消（並入 -n / -ʔ）。
+    </p>
+
+    <div class="letter-grid cols-7">
+      <div class="cell empty"><div class="glyph">ㅁ</div><div class="romaji">-m</div><div class="hint">→ -n</div></div>
+      <div class="cell tai"><div class="glyph">ㄴ</div><div class="romaji">-n</div><div class="ipa">/n/</div><div class="hint">深臻摄</div></div>
+      <div class="cell tai"><div class="glyph">ㅇ</div><div class="romaji">-ŋ</div><div class="ipa">/ŋ/</div><div class="hint">宕通梗摄</div></div>
+      <div class="cell empty"><div class="glyph">ㅂ</div><div class="romaji">-p</div><div class="hint">→ -ʔ</div></div>
+      <div class="cell empty"><div class="glyph">ㄷ</div><div class="romaji">-t</div><div class="hint">→ -ʔ</div></div>
+      <div class="cell empty"><div class="glyph">ㄱ</div><div class="romaji">-k</div><div class="hint">→ -ʔ</div></div>
+      <div class="cell tai"><div class="glyph">ㅎ</div><div class="romaji">-ʔ</div><div class="ipa">/ʔ/</div><div class="hint">入聲</div></div>
+    </div>
+
+    <p style="font-size: 14px;">
+      <strong>鼻化韻</strong>：泰州表中 ɛ̃ ʊ̃ ĩ 等鼻化元音以右後 ~ 標記之，與臺、淮共用此符。例：三 sɛ̃²¹ → <span class="ko-inline">새~</span>、本 pʊ̃²¹³ → <span class="ko-inline">부~</span>。
+    </p>
+
+    <h3 class="tai">聲調 · 七調（五度標記）</h3>
+
+    <p>
+      泰州話因濁聲母部分殘留，仍保留陰陽分調之痕跡（不同於淮安已全合並為 5 調）。本子集採七調分析；惟陽上多數已併入陽去，實用上可視為六調。下列調值為常見引用，各家分析略有出入。
+    </p>
+
+    <table class="tone-table tai" style="max-width: 640px;">
+      <thead>
+        <tr>
+          <th style="width: 25%;">類</th>
+          <th style="width: 25%;">五度調值</th>
+          <th>歷史來源 / 備註</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>陰平</td><td class="pitch">21</td><td class="hist">古陰平。低降。</td></tr>
+        <tr><td>陽平</td><td class="pitch">35</td><td class="hist">古陽平。中升。</td></tr>
+        <tr><td>上聲</td><td class="pitch">213</td><td class="hist">古陰上＋陽上少數。低凹。</td></tr>
+        <tr><td>陰去</td><td class="pitch">55</td><td class="hist">古陰去。高平。</td></tr>
+        <tr><td>陽去</td><td class="pitch">31</td><td class="hist">古陽去＋陽上多數。低降。</td></tr>
+        <tr><td>陰入</td><td class="pitch">4</td><td class="hist">古陰入。配韻尾 ㅎ。短高。</td></tr>
+        <tr><td>陽入</td><td class="pitch">2</td><td class="hist">古陽入。配韻尾 ㅎ。短低。</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="tai">示範</h3>
+    <div class="syl-demo">
+      <div class="syl tai"><span class="corner-tag">泰</span><div class="block">즈<span class="tone">21</span></div><div class="hanzi">資</div><div class="tl">tsɿ²¹</div></div>
+      <div class="syl tai"><span class="corner-tag">泰</span><div class="block">쓰<span class="tone">35</span></div><div class="hanzi">時</div><div class="tl">zɿ³⁵</div></div>
+      <div class="syl tai"><span class="corner-tag">泰</span><div class="block"><span class="dot-letter">ㅂ</span>앙<span class="tone">35</span></div><div class="hanzi">房</div><div class="tl">vaŋ³⁵</div></div>
+      <div class="syl tai"><span class="corner-tag">泰</span><div class="block">고<span class="tone">21</span></div><div class="hanzi">高</div><div class="tl">kɔ²¹</div></div>
+      <div class="syl tai"><span class="corner-tag">泰</span><div class="block">위<span class="tone">35</span></div><div class="hanzi">魚</div><div class="tl">y³⁵</div></div>
+      <div class="syl tai"><span class="corner-tag">泰</span><div class="block">새<span class="tone">21</span><span style="font-size:0.6em;color:var(--tai);">~</span></div><div class="hanzi">三</div><div class="tl">sɛ̃²¹</div></div>
+      <div class="syl tai"><span class="corner-tag">泰</span><div class="block">앟<span class="tone">4</span></div><div class="hanzi">鴨</div><div class="tl">aʔ⁴</div></div>
+      <div class="syl tai"><span class="corner-tag">泰</span><div class="block">지<span class="tone">21</span></div><div class="hanzi">基</div><div class="tl">tɕi²¹ ← ki/tsi</div></div>
+    </div>
+
+    <h3 class="tai">音位覆蓋核對</h3>
+
+    <p>
+      下列為原音系表 19 聲母與主要韻類於本系統之對應。確保每一原表所列之音皆有谚文寫法可循。
+    </p>
+
+    <table class="wenbai">
+      <thead>
+        <tr>
+          <th style="width:18%;">類</th>
+          <th style="width:42%;">音位（IPA）</th>
+          <th>谚文對應</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>聲母</td><td>p · pʰ · m · f · v</td><td><span class="ko">ㅂ ㅍ ㅁ <span class="dot-letter">ㅍ</span> <span class="dot-letter">ㅂ</span></span></td></tr>
+        <tr><td></td><td>t · tʰ · n · l</td><td><span class="ko">ㄷ ㅌ ㄴ ㄹ</span>（l 補入）</td></tr>
+        <tr><td></td><td>ts · tsʰ · s · z</td><td><span class="ko">ㅈ ㅊ ㅅ ㅆ</span></td></tr>
+        <tr><td></td><td>tɕ · tɕʰ · ɕ</td><td><span class="ko">ㅈ ㅊ ㅅ</span> + ㅣ/ㅟ（自動）</td></tr>
+        <tr><td></td><td>k · kʰ · x</td><td><span class="ko">ㄱ ㅋ ㅎ</span></td></tr>
+        <tr><td></td><td>零聲母</td><td>不寫聲母，元音獨成方塊</td></tr>
+        <tr><td>主元音</td><td>a · ɛ · ɔ · ɤ(ɯ) · ʊ(u) · y · ɿ · i · ə · ɚ</td><td><span class="ko">ㅏ ㅐ ㅗ ㅡ ㅜ ㅟ ㅡ ㅣ ㅡ</span>（ɚ 用字尾 ㄹ）</td></tr>
+        <tr><td>介音</td><td>i- · u- · y-</td><td>谚文複合元音 <span class="ko">ㅑㅖㅛㅕ · ㅘㅙㅢ · ㅠ</span></td></tr>
+        <tr><td>韻尾</td><td>-n · -ŋ · -ʔ · ~</td><td><span class="ko">ㄴ ㅇ ㅎ</span>·後加 ~</td></tr>
+        <tr><td>聲調</td><td>陰平 21 · 陽平 35 · 上 213 · 陰去 55 · 陽去 31 · 陰入 4 · 陽入 2</td><td>上標阿拉伯數字直記</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note tai">
+      <strong>已知讓步。</strong>4 號韻 ɤɯ 之 -ɯ 滑尾不顯（按 ㅡ 單寫）；6 號 ɚ 兒化色彩以 ㄹ 後綴近似（與淮安一致）；ʊ vs u 之鬆緊對立不顯（合寫 ㅜ）。如需精細區分，可逐處下加註解。
+    </div>
+
+  </section>
+
+  <!-- CHAPTER VII: COMPOSITION -->
+  <section class="chapter" id="compose">
+    <div class="chapter-number">Chapter VII</div>
+    <h2 class="universal">組字 · 方塊之法（四語共用）</h2>
 
     <p>
       方塊組字沿韓文之法：聲母在左，元音在右或在下，韻尾置於底，調值寫於方塊右側。下加點屬聲母之一部分，與聲母共佔左位。鼻化波浪號獨立於方塊之外。
@@ -1347,9 +1587,9 @@
 
     <div class="divider-ornament">❋ ❋ ❋</div>
 
-    <h3 class="universal">同字異讀 · 一文三語對照</h3>
+    <h3 class="universal">同字異讀 · 一文四語對照</h3>
     <p>
-      下列七字，同一漢字於三子集之寫法並列。可見系統之「同字母不同語不同音」之精神：字形不變，子集標籤決定其讀法。
+      下列七字，同一漢字於四子集之寫法並列。可見系統之「同字母不同語不同音」之精神：字形不變，子集標籤決定其讀法。
     </p>
 
     <div class="cross-demo">
@@ -1357,55 +1597,63 @@
       <div class="head" style="color: var(--seal);">臺語</div>
       <div class="head" style="color: var(--wu);">蘇州</div>
       <div class="head" style="color: var(--huai);">淮安</div>
+      <div class="head" style="color: var(--tai);">泰州</div>
 
       <div class="hanzi">我</div>
       <div class="reading">오<span class="tone-pitch">51</span><small>ngóo⁵¹ · 陰上</small></div>
       <div class="reading">외<span class="tone-pitch">31</span><small>ŋøy³¹ · 陽去</small></div>
       <div class="reading">응<span class="tone-pitch">212</span><small>ŋ̩²¹² · 上聲</small></div>
+      <div class="reading">오<span class="tone-pitch">213</span><small>o²¹³ · 上聲</small></div>
 
       <div class="hanzi">學</div>
       <div class="reading">학<span class="tone-pitch">4</span><small>ha̍k⁴ · 陽入</small></div>
       <div class="reading"><span class="dot-letter">ㅎ</span>옥<span class="tone-pitch">23</span><small>ɦoʔ²³ · 陽入</small></div>
       <div class="reading">셔ㅎ<span class="tone-pitch">5</span><small>ɕiəʔ⁵ · 入聲</small></div>
+      <div class="reading">옿<span class="tone-pitch">2</span><small>xoʔ² · 陽入</small></div>
 
       <div class="hanzi">人</div>
       <div class="reading">린<span class="tone-pitch">25</span><small>lîn²⁵ · 陽平</small></div>
       <div class="reading">닌<span class="tone-pitch">24</span><small>ȵin²⁴ · 陽平</small></div>
       <div class="reading"><span class="dot-letter">ㄹ</span>언<span class="tone-pitch">24</span><small>ɻən²⁴ · 陽平</small></div>
+      <div class="reading">쓴<span class="tone-pitch">35</span><small>zən³⁵ · 陽平</small></div>
 
       <div class="hanzi">魚</div>
       <div class="reading">히<span class="tone-pitch">25</span><small>hî²⁵ · 陽平</small></div>
       <div class="reading">ㅇㅟ<span class="tone-pitch">24</span><small>ŋy²⁴ · 陽平</small></div>
       <div class="reading">위<span class="tone-pitch">24</span><small>y²⁴ · 陽平</small></div>
+      <div class="reading">위<span class="tone-pitch">35</span><small>y³⁵ · 陽平</small></div>
 
       <div class="hanzi">三</div>
       <div class="reading">사<span class="tone-pitch">55</span>~<small>sann⁵⁵ · 鼻化</small></div>
       <div class="reading">새<span class="tone-pitch">44</span><small>sɛ⁴⁴ · 無鼻化</small></div>
       <div class="reading">새<span class="tone-pitch">42</span>~<small>sãɛ⁴² · 鼻化</small></div>
+      <div class="reading">새<span class="tone-pitch">21</span>~<small>sɛ̃²¹ · 鼻化</small></div>
 
       <div class="hanzi">飛</div>
       <div class="reading">붸<span class="tone-pitch">55</span><small>pue⁵⁵ · 陰平</small></div>
       <div class="reading"><span class="dot-letter">ㅍ</span>이<span class="tone-pitch">44</span><small>fi⁴⁴ · 陰平</small></div>
       <div class="reading"><span class="dot-letter">ㅍ</span>에<span class="tone-pitch">42</span><small>feɪ⁴² · 陰平</small></div>
+      <div class="reading"><span class="dot-letter">ㅍ</span>이<span class="tone-pitch">21</span><small>fi²¹ · 陰平</small></div>
 
       <div class="hanzi">高</div>
       <div class="reading">고<span class="tone-pitch">55</span><small>ko⁵⁵ · ㅗ=o</small></div>
       <div class="reading">곤<span class="tone-pitch">44</span><small>kɤ⁴⁴ · ㅡ=ɤ</small></div>
       <div class="reading">거<span class="tone-pitch">42</span><small>kɔ⁴² · ㅓ=ɔ</small></div>
+      <div class="reading">고<span class="tone-pitch">21</span><small>kɔ²¹ · ㅗ=ɔ</small></div>
     </div>
 
     <div class="note">
-      <strong>按。</strong>觀之可見：同一漢字，三子集字形或同或異，皆無歧義。「人」字三語皆作 [ɻ/l/n]+ən 之變體，但聲母字形不同（ㄹ/ㄴ/<span class="dot-letter">ㄹ</span>）；「高」字三語皆作 k+後元音之單方塊，但元音字形隨子集而變（ㅗ/ㅡ/ㅓ）。子集之骨架同，而音值之配置各異，此即本系統「一形多義、語別判讀」之核心。
+      <strong>按。</strong>觀之可見：同一漢字，四子集字形或同或異，皆無歧義。「人」字四語皆作流音／擦音+ən 之變體，但聲母字形不同（ㄹ/ㄴ/<span class="dot-letter">ㄹ</span>/ㅆ）；「高」字四語皆作 k+後元音之單方塊，元音字形隨子集而變（ㅗ/ㅡ/ㅓ/ㅗ），音值卻各異。子集之骨架同，而音值配置各殊，此即本系統「一形多義、語別判讀」之核心。
     </div>
   </section>
 
-  <!-- CHAPTER VII: DRILL -->
+  <!-- CHAPTER VIII: DRILL -->
   <section class="chapter" id="drill">
-    <div class="chapter-number">Chapter VII</div>
-    <h2>練習 · 反向識讀（三語混排）</h2>
+    <div class="chapter-number">Chapter VIII</div>
+    <h2>練習 · 反向識讀（四語混排）</h2>
 
     <p>
-      下列十二題，臺四、蘇四、淮四，皆見谚文而寫拼音與漢字。題首小籤標 <span class="lang-tag min">閩</span>、<span class="lang-tag wu">蘇</span> 或 <span class="lang-tag huai">淮</span> 以示子集。點擊「示」字檢驗。
+      下列十六題，臺四、蘇四、淮四、泰四，皆見谚文而寫拼音與漢字。題首小籤標 <span class="lang-tag min">閩</span>、<span class="lang-tag wu">蘇</span>、<span class="lang-tag huai">淮</span> 或 <span class="lang-tag tai">泰</span> 以示子集。點擊「示」字檢驗。
     </p>
 
     <div id="quiz">
@@ -1495,6 +1743,35 @@
         <button class="reveal">示</button>
         <div class="answer">ɐʔ⁵ · 鴨（入聲，韻尾 ㅎ 表 ʔ；調 5 為高短）</div>
       </div>
+
+      <div class="quiz-item tai" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag tai">泰</span>
+        <div class="prompt">쓰<span class="t">35</span></div>
+        <div class="question">ㅆ 在泰州表何聲？此字意何？</div>
+        <button class="reveal">示</button>
+        <div class="answer">zɿ³⁵ · 時（ㅆ=z 為泰州保留之濁擦音）</div>
+      </div>
+      <div class="quiz-item tai" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag tai">泰</span>
+        <div class="prompt"><span class="dot-letter">ㅂ</span>앙<span class="t">35</span></div>
+        <div class="question">下加點之 ㅂ 在泰州何音？</div>
+        <button class="reveal">示</button>
+        <div class="answer">vaŋ³⁵ · 房（ㅂ̇=v，與蘇州共享此擴展字母）</div>
+      </div>
+      <div class="quiz-item tai" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag tai">泰</span>
+        <div class="prompt">위<span class="t">35</span></div>
+        <div class="question">ㅟ 在泰州單念何音？</div>
+        <button class="reveal">示</button>
+        <div class="answer">y³⁵ · 魚（ㅟ=y 單元音；同蘇州、淮安）</div>
+      </div>
+      <div class="quiz-item tai" onclick="this.classList.toggle('revealed')">
+        <span class="lang-tag tai">泰</span>
+        <div class="prompt">앟<span class="t">4</span></div>
+        <div class="question">同字形與淮安「鴨」異於何？</div>
+        <button class="reveal">示</button>
+        <div class="answer">aʔ⁴ · 鴨（字形相同；泰州調 4 為陰入，淮安調 5 為入聲）</div>
+      </div>
     </div>
   </section>
 
@@ -1504,7 +1781,7 @@
     <h2 class="universal">附錄 · 字母多義對照表</h2>
 
     <p>
-      凡同一字母於三子集音值不同者，列於下表。讀寫之際須先聲明子集，免於誤讀。
+      凡同一字母於四子集音值不同者，列於下表。讀寫之際須先聲明子集，免於誤讀。
     </p>
 
     <table class="compare">
@@ -1514,6 +1791,7 @@
           <th>臺語</th>
           <th>蘇州</th>
           <th>淮安</th>
+          <th>泰州</th>
           <th>說明</th>
         </tr>
       </thead>
@@ -1523,6 +1801,7 @@
           <td class="min-val">ai（複合）</td>
           <td class="wu-val">ɛ</td>
           <td class="huai-val">ɛ</td>
+          <td class="tai-val">ɛ（同蘇·淮）</td>
           <td class="note-cell">合 ai → ɛ 之音變方向</td>
         </tr>
         <tr>
@@ -1530,6 +1809,7 @@
           <td class="min-val">ui（複合）</td>
           <td class="wu-val">y</td>
           <td class="huai-val">y</td>
+          <td class="tai-val">y（同蘇·淮）</td>
           <td class="note-cell">韓文 ㅟ 中古即 /y/</td>
         </tr>
         <tr>
@@ -1537,6 +1817,7 @@
           <td class="min-val">o（ə/ɤ）</td>
           <td class="wu-val">ɤ；齒擦後 ɿ/ʮ</td>
           <td class="huai-val">ə；齒擦後 ɿ</td>
+          <td class="tai-val">ɤ/ə/ɿ（多功能）</td>
           <td class="note-cell">皆「非前非圓」一系</td>
         </tr>
         <tr>
@@ -1544,20 +1825,23 @@
           <td class="min-val">ɔ</td>
           <td class="wu-val">ɔ</td>
           <td class="huai-val"><strong>ʊ</strong></td>
-          <td class="note-cell">淮安 5 號韻（多·婆）</td>
+          <td class="tai-val">ɔ（同蘇）</td>
+          <td class="note-cell">淮安獨採 ʊ，餘子集皆 ɔ</td>
         </tr>
         <tr>
           <td class="glyph-cell">ㅓ</td>
           <td class="min-val">（未用）</td>
           <td class="wu-val">ø</td>
           <td class="huai-val"><strong>ɔ</strong></td>
-          <td class="note-cell">兩子集音值不同，依語別讀</td>
+          <td class="tai-val">（未用）</td>
+          <td class="note-cell">蘇·淮音值不同，泰州留空</td>
         </tr>
         <tr>
           <td class="glyph-cell">ㄹ</td>
           <td class="min-val">l</td>
           <td class="wu-val">l</td>
           <td class="huai-val">l ~ n（n/l 不分）</td>
+          <td class="tai-val">l</td>
           <td class="note-cell">淮安 ㄴ 不作聲母</td>
         </tr>
         <tr>
@@ -1565,76 +1849,86 @@
           <td class="min-val">（無此音）</td>
           <td class="wu-val">（無此音）</td>
           <td class="huai-val"><strong>ɻ</strong>（日母）</td>
-          <td class="note-cell">本版新增下加點字母</td>
+          <td class="tai-val">（無此音）</td>
+          <td class="note-cell">淮安專用；泰州日母字歸 z</td>
         </tr>
         <tr>
           <td class="glyph-cell"><span class="dot-letter">ㅍ</span></td>
           <td class="min-val">（無此音）</td>
           <td class="wu-val">f</td>
           <td class="huai-val">f</td>
-          <td class="note-cell">下加點擴充</td>
+          <td class="tai-val">f</td>
+          <td class="note-cell">蘇·淮·泰共用，下加點擴充</td>
         </tr>
         <tr>
           <td class="glyph-cell"><span class="dot-letter">ㅂ</span></td>
           <td class="min-val">（無此音）</td>
           <td class="wu-val">v</td>
           <td class="huai-val">（無此音）</td>
-          <td class="note-cell">下加點擴充</td>
+          <td class="tai-val"><strong>v</strong></td>
+          <td class="note-cell">蘇·泰共用（重要），下加點擴充</td>
         </tr>
         <tr>
           <td class="glyph-cell"><span class="dot-letter">ㅎ</span></td>
           <td class="min-val">（無此音）</td>
           <td class="wu-val">ɦ</td>
           <td class="huai-val">（無此音）</td>
-          <td class="note-cell">下加點擴充</td>
+          <td class="tai-val">（無此音）</td>
+          <td class="note-cell">僅蘇州用，下加點擴充</td>
         </tr>
         <tr>
           <td class="glyph-cell">ㄸ ㅃ ㄲ ㅉ ㅆ</td>
           <td class="min-val">部分（b g j）</td>
           <td class="wu-val">全用（濁系列）</td>
           <td class="huai-val">全淡（無濁）</td>
-          <td class="note-cell">官話系無濁音對立</td>
+          <td class="tai-val">僅 ㅆ=z 用</td>
+          <td class="note-cell">泰州部分濁擦保留（z），其餘淡</td>
         </tr>
         <tr>
           <td class="glyph-cell">ㅁ（韻尾位）</td>
           <td class="min-val">-m</td>
           <td class="wu-val">→ -n</td>
           <td class="huai-val">→ -n / 鼻化</td>
-          <td class="note-cell">蘇·淮 -m 已歸並</td>
+          <td class="tai-val">→ -n / 鼻化</td>
+          <td class="note-cell">蘇·淮·泰 -m 已歸並</td>
         </tr>
         <tr>
           <td class="glyph-cell">ㅂ ㄷ ㄱ（底位）</td>
           <td class="min-val">-p -t -k</td>
           <td class="wu-val">→ -ʔ</td>
           <td class="huai-val">→ -ʔ</td>
-          <td class="note-cell">蘇·淮入聲僅 -ʔ</td>
+          <td class="tai-val">→ -ʔ</td>
+          <td class="note-cell">蘇·淮·泰入聲僅 -ʔ</td>
         </tr>
         <tr>
           <td class="glyph-cell">~（後置）</td>
           <td class="min-val">鼻化</td>
           <td class="wu-val">（無此音）</td>
           <td class="huai-val">鼻化（19–24 號韻）</td>
-          <td class="note-cell">臺·淮共用此符</td>
+          <td class="tai-val">鼻化（ɛ̃ ʊ̃ ĩ 等）</td>
+          <td class="note-cell">臺·淮·泰共用此符；蘇州無</td>
         </tr>
         <tr>
           <td class="glyph-cell">ㅈ ㅊ ㅅ（前 i/y）</td>
           <td class="min-val">ts tsʰ s</td>
           <td class="wu-val">tɕ tɕʰ ɕ（自動）</td>
           <td class="huai-val">tɕ tɕʰ ɕ（自動）</td>
-          <td class="note-cell">蘇·淮齶化為同位異音</td>
+          <td class="tai-val">tɕ tɕʰ ɕ（自動）</td>
+          <td class="note-cell">蘇·淮·泰皆齶化</td>
         </tr>
         <tr>
           <td class="glyph-cell">ㄱ ㅋ ㅎ（前 i/y）</td>
           <td class="min-val">k kʰ h</td>
           <td class="wu-val">tɕ tɕʰ ɕ（自動）</td>
           <td class="huai-val">tɕ tɕʰ ɕ（自動，不分尖團）</td>
-          <td class="note-cell">淮安「見組精組合流」</td>
+          <td class="tai-val">tɕ tɕʰ ɕ（自動，不分尖團）</td>
+          <td class="note-cell">淮·泰「見組精組合流」</td>
         </tr>
       </tbody>
     </table>
 
     <div class="note">
-      <strong>使用之道。</strong>每篇文件首註明「此篇用 X 子集」。需混用者，每段段首以小籤 <span class="lang-tag min">閩</span> <span class="lang-tag wu">蘇</span> <span class="lang-tag huai">淮</span> 標識；單字混用者於字旁加小字註亦可。
+      <strong>使用之道。</strong>每篇文件首註明「此篇用 X 子集」。需混用者，每段段首以小籤 <span class="lang-tag min">閩</span> <span class="lang-tag wu">蘇</span> <span class="lang-tag huai">淮</span> <span class="lang-tag tai">泰</span> 標識；單字混用者於字旁加小字註亦可。
     </div>
 
     <div class="divider-ornament">❋ ❋ ❋</div>
@@ -1642,7 +1936,7 @@
     <h3 class="universal">向後可擴 · 未盡之語</h3>
     <ul style="padding-left: 24px; margin-bottom: 20px; font-size: 14px; color: var(--muted);">
       <li style="margin-bottom: 8px;"><strong>上海話</strong>：與蘇州九成共用，聲調系統簡化（已歸為兩級陰陽），可視為蘇州之變體。</li>
-      <li style="margin-bottom: 8px;"><strong>揚州話</strong>：與淮安同屬江淮官話洪巢片，骨架可全套照搬，僅調值不同（陰平 21、上聲 42 等）。</li>
+      <li style="margin-bottom: 8px;"><strong>揚州話</strong>：與淮安同屬江淮官話洪巢片，骨架可全套照搬，僅調值不同（陰平 21、上聲 42 等）。較之泰州則更近淮安一些（無濁擦音保留）。</li>
       <li style="margin-bottom: 8px;"><strong>溫州話</strong>：濁聲母更豐、元音更多、複雜變調，需擴展新元音字。</li>
       <li style="margin-bottom: 8px;"><strong>福州話</strong>：聲母類化、元音變讀，需在子集首註明「連讀類化規則」。</li>
       <li style="margin-bottom: 8px;"><strong>巴盟話 / 西北官話</strong>：需卷舌組 <span class="dot-letter">ㅈ</span> <span class="dot-letter">ㅊ</span> <span class="dot-letter">ㅅ</span>，下加點機制已備。</li>
@@ -1654,11 +1948,11 @@
   </section>
 
   <footer>
-    閩 吳 淮 谚 文
+    閩 吳 淮 泰 谚 文
     <span class="divider">·</span>
-    第 三 版
+    第 四 版
     <span class="divider">·</span>
-    三 語 子 集 字 母 表
+    四 語 子 集 字 母 表
   </footer>
 </div>
 
