@@ -92,6 +92,7 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; }
 .kind-badge { padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; border: 1px solid var(--border); }
 .kind-badge.multi { background: rgba(89,194,255,0.10); border-color: var(--accent2); color: var(--accent2); }
 .kind-badge.excluded { background: rgba(242,109,120,0.10); border-color: var(--err); color: var(--err); }
+.kind-badge.warn { background: rgba(224,175,104,0.10); border-color: #e0af68; color: #e0af68; }
 .question-panel { background: var(--card); border: 1px solid var(--border); padding: 20px 24px; border-radius: 8px; min-height: 400px; }
 .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; color: var(--dim); flex-wrap: wrap; gap: 8px; }
 .q-header .concepts { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -104,6 +105,7 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; }
 .choice.selected { border-color: var(--accent2); background: rgba(89, 194, 255, 0.1); }
 .choice.correct { border-color: var(--ok); background: rgba(127, 217, 98, 0.15); }
 .choice.incorrect { border-color: var(--err); background: rgba(242, 109, 120, 0.15); }
+.choice.maybe { border-color: #e0af68; border-style: dashed; background: rgba(224,175,104,0.10); }
 .choice-num { display: inline-block; width: 24px; color: var(--accent); font-weight: 600; }
 .actions { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .actions button { padding: 10px 16px; min-height: 44px; }
@@ -842,22 +844,30 @@ function renderQuestion() {
   const filterChip = renderFilterChip();
 
   // --- 答案类型 badge / 正解表示 / 进度标记 ---
-  const kind = ansKind(rec), set = ansSet(rec), your = yourArr(ans);
+  const kind = ansKind(rec), need = ansCount(rec), your = yourArr(ans);
   const srcBadge = rec.answer_source === 'mhlw'
     ? ' · <span title="厚生労働省 正答値表で裏付け済み" style="color:var(--ok)">✓厚労省</span>' : '';
+  const picking = need > 1 && your.length && your.length < need ? ` — 選択中 ${your.length}/${need}` : '';
   let kindBadge = '';
   if (kind === 'excluded') {
     kindBadge = `<div class="kind-badge excluded">⊘ この問題は<b>採点除外</b>です（厚労省 発表）。正誤判定は行いません。</div>`;
+  } else if (kind === 'incomplete') {
+    kindBadge = `<div class="kind-badge warn">⚠️ <b>${need}つ選べ</b>の問題ですが、第45〜53回は厚労省が正答値表を公表していないため、<b>解答データが不完全</b>です（記録は1つのみ）。正誤判定は行いません。</div>`;
+  } else if (kind === 'unknown') {
+    kindBadge = `<div class="kind-badge warn">⚠️ 解答データがありません。正誤判定は行いません。</div>`;
   } else if (kind === 'multi') {
-    const picked = your.length;
-    kindBadge = `<div class="kind-badge multi">✌️ <b>${set.length}つ選べ</b>${picked && picked < set.length ? ` — 選択中 ${picked}/${set.length}` : ''}</div>`;
+    kindBadge = `<div class="kind-badge multi">✌️ <b>${need}つ選べ</b>${picking}</div>`;
   } else if (kind === 'multi_correct') {
-    kindBadge = `<div class="kind-badge multi">⚖️ <b>複数正解</b>の問題（${set.join('・')} のいずれも正解）</div>`;
+    const detail = need > 1
+      ? `${correctChoices(rec).join('・')} から${need}つ、どの組み合わせでも正解`
+      : `${correctChoices(rec).join('・')} のいずれも正解`;
+    kindBadge = `<div class="kind-badge multi">⚖️ <b>複数正解</b>の問題（${detail}）${picking}</div>`;
   }
-  const answerLine = kind === 'excluded'
-    ? '⊘ 採点除外（正解なし）'
-    : `✓ 正解: ${set.join('・') || '?'}`;
-  const progressMark = (!ans || kind === 'excluded') ? ''
+  const answerLine = kind === 'excluded' ? '⊘ 採点除外（正解なし）'
+    : kind === 'unknown' ? '？ 解答データなし'
+    : kind === 'incomplete' ? `⚠️ 参考（二次情報・不完全）: ${answerText(rec)} — 本来 ${need} つ`
+    : `✓ 正解: ${answerText(rec)}`;
+  const progressMark = (!ans || NO_GRADE.has(kind)) ? ''
     : ans.partial ? ' · <span style="color:var(--accent)">選択中</span>'
     : ans.correct ? ' · <span style="color:var(--ok)">已对</span>'
                   : ' · <span style="color:var(--err)">已错</span>';
@@ -877,7 +887,7 @@ function renderQuestion() {
         ${ans ? `<button id="resetBtn">重置答案</button>` : ''}
       </div>
       ${DRILL.showAnswer ? `<div class="explain">
-        <div style="color:var(--ok);font-weight:600;margin-bottom:8px;">${answerLine}</div>
+        <div style="color:${NO_GRADE.has(kind) ? '#e0af68' : 'var(--ok)'};font-weight:600;margin-bottom:8px;">${answerLine}</div>
         ${renderMd(rec.explain_md)}
       </div>` : ''}
       <div class="pagination">
@@ -929,14 +939,35 @@ function renderFilterChip() {
 }
 
 // --- 答案模型（厚労省 正答値表ベース）---
-// answer_kind: single | multi(2つ選べ) | multi_correct(複数正解) | excluded(採点除外)
-function ansSet(rec) {
-  if (Array.isArray(rec.answer_set) && rec.answer_set.length) return rec.answer_set;
+// answer_sets: 許容される解答集合の一覧。1要素 = 1つの正解パターン。
+//   single        [["3"]]                         3 のみ
+//   multi         [["3","5"]]                     2つ選べ、組は1通り
+//   multi_correct [["3"],["4"]]                   3 でも 4 でも正解（出題瑕疵）
+//   multi_correct [["2","3"],["2","5"],["3","5"]] 2,3,5 から2つ、どの組でも正解
+//   excluded      []                              採点除外
+//   incomplete    [["1"]]                         「Nつ選べ」だが一次資料なし → 判定しない
+// answer_count: 選ぶべき個数。集合をフラット化してはならない（CLAUDE.md §10.11）
+const NO_GRADE = new Set(['excluded', 'incomplete', 'unknown']);
+
+function ansSets(rec) {
+  if (Array.isArray(rec.answer_sets) && rec.answer_sets.length) return rec.answer_sets;
   const a = (rec.answer || '').trim();
-  return a ? [a] : [];
+  return a ? [[a]] : [];
+}
+function ansCount(rec) {
+  if (Number.isInteger(rec.answer_count)) return rec.answer_count;
+  const s = ansSets(rec);
+  return s.length ? s[0].length : 1;
 }
 function ansKind(rec) {
   return rec.answer_kind || (rec.answer ? 'single' : 'unknown');
+}
+function correctChoices(rec) {            // 表示・ハイライト用：正解になりうる選択肢の和集合
+  return [...new Set(ansSets(rec).flat())];
+}
+function answerText(rec) {
+  const sets = ansSets(rec);
+  return sets.length ? sets.map(s => s.join('・')).join(' / ') : '?';
 }
 function yourArr(ans) {
   if (!ans) return [];
@@ -947,35 +978,49 @@ function sameSet(a, b) {
   const s = new Set(b);
   return a.every(x => s.has(x));
 }
+function matchesAny(cur, sets) {
+  return sets.some(s => sameSet(cur, s));
+}
 
 function pickAnswer(rec, id, c) {
   const kind = ansKind(rec);
-  const set = ansSet(rec);
-  if (kind === 'excluded') return;          // 採点除外題は正誤判定しない
+  if (NO_GRADE.has(kind)) return;         // 採点除外 / 解答データ不完全 → 正誤判定しない
 
-  if (kind === 'multi') {                   // 「2つ選べ」→ 選び切るまで判定を保留
-    let cur = yourArr(STATE.answered[id]);
+  const sets = ansSets(rec), need = ansCount(rec);
+  const prev = STATE.answered[id];
+  let cur = yourArr(prev);
+  if (need <= 1) {
+    cur = [c];
+  } else if (prev && !prev.partial && !cur.includes(c)) {
+    cur = [c];                            // 確定済みの状態で別の肢を押した → 選び直し
+  } else {                                // 「Nつ選べ」→ 選び切るまで判定を保留
     cur = cur.includes(c) ? cur.filter(x => x !== c) : [...cur, c];
-    const done = cur.length >= set.length;
-    if (!cur.length) { delete STATE.answered[id]; }
-    else STATE.answered[id] = { your: cur, correct: done && sameSet(cur, set), ts: Date.now(), partial: !done };
-    persist();
-    if (done) DRILL.showAnswer = true;
-    renderQuestion();
-    return;
   }
-  // single / multi_correct: 1つ選べば確定（multi_correct はどれでも正解集合に入れば可）
-  STATE.answered[id] = { your: [c], correct: set.includes(c), ts: Date.now() };
-  persist(); DRILL.showAnswer = true; renderQuestion();
+  if (!cur.length) { delete STATE.answered[id]; persist(); renderQuestion(); return; }
+
+  const done = cur.length >= need;
+  STATE.answered[id] = { your: cur, correct: done && matchesAny(cur, sets), ts: Date.now(), partial: !done };
+  persist();
+  if (done) DRILL.showAnswer = true;
+  renderQuestion();
 }
 
 function markChoices(rec, ans) {
-  const set = ansSet(rec), your = yourArr(ans), kind = ansKind(rec);
+  const kind = ansKind(rec), your = yourArr(ans);
+  const hits = correctChoices(rec);
   $$('.choice').forEach(el => {
     const c = el.dataset.c;
-    if (kind === 'excluded') { if (your.includes(c)) el.classList.add('selected'); return; }
+    if (kind === 'excluded' || kind === 'unknown') {
+      if (your.includes(c)) el.classList.add('selected');
+      return;
+    }
+    if (kind === 'incomplete') {           // 記録されている1つだけ「参考」として点線表示
+      if (DRILL.showAnswer && hits.includes(c)) el.classList.add('maybe');
+      else if (your.includes(c)) el.classList.add('selected');
+      return;
+    }
     if (DRILL.showAnswer) {
-      if (set.includes(c)) el.classList.add('correct');
+      if (hits.includes(c)) el.classList.add('correct');
       else if (your.includes(c)) el.classList.add('incorrect');
     } else if (your.includes(c)) el.classList.add('selected');
   });
