@@ -2,3 +2,7 @@
 .hugo_build.lock
 public/
 resources/_gen/
+
+# 生日礼物暂存目录 —— 已独立为 OHWOWBILL/gift 仓库，
+# 自带 .git 会被误认作 submodule 而中断 CI checkout
+birthday_deploy/
