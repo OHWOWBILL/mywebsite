@@ -89,6 +89,9 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; }
 .filter-chip .chip-part { background: var(--card); border: 1px solid var(--border); padding: 3px 8px; border-radius: 3px; color: var(--accent); font-size: 11px; }
 .filter-chip .chip-count { color: var(--dim); font-variant-numeric: tabular-nums; font-size: 12px; margin: 0 6px; white-space: nowrap; }
 .filter-chip button { padding: 4px 10px; font-size: 11px; }
+.kind-badge { padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; border: 1px solid var(--border); }
+.kind-badge.multi { background: rgba(89,194,255,0.10); border-color: var(--accent2); color: var(--accent2); }
+.kind-badge.excluded { background: rgba(242,109,120,0.10); border-color: var(--err); color: var(--err); }
 .question-panel { background: var(--card); border: 1px solid var(--border); padding: 20px 24px; border-radius: 8px; min-height: 400px; }
 .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; color: var(--dim); flex-wrap: wrap; gap: 8px; }
 .q-header .concepts { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -838,13 +841,35 @@ function renderQuestion() {
 
   const filterChip = renderFilterChip();
 
+  // --- 答案类型 badge / 正解表示 / 进度标记 ---
+  const kind = ansKind(rec), set = ansSet(rec), your = yourArr(ans);
+  const srcBadge = rec.answer_source === 'mhlw'
+    ? ' · <span title="厚生労働省 正答値表で裏付け済み" style="color:var(--ok)">✓厚労省</span>' : '';
+  let kindBadge = '';
+  if (kind === 'excluded') {
+    kindBadge = `<div class="kind-badge excluded">⊘ この問題は<b>採点除外</b>です（厚労省 発表）。正誤判定は行いません。</div>`;
+  } else if (kind === 'multi') {
+    const picked = your.length;
+    kindBadge = `<div class="kind-badge multi">✌️ <b>${set.length}つ選べ</b>${picked && picked < set.length ? ` — 選択中 ${picked}/${set.length}` : ''}</div>`;
+  } else if (kind === 'multi_correct') {
+    kindBadge = `<div class="kind-badge multi">⚖️ <b>複数正解</b>の問題（${set.join('・')} のいずれも正解）</div>`;
+  }
+  const answerLine = kind === 'excluded'
+    ? '⊘ 採点除外（正解なし）'
+    : `✓ 正解: ${set.join('・') || '?'}`;
+  const progressMark = (!ans || kind === 'excluded') ? ''
+    : ans.partial ? ' · <span style="color:var(--accent)">選択中</span>'
+    : ans.correct ? ' · <span style="color:var(--ok)">已对</span>'
+                  : ' · <span style="color:var(--err)">已错</span>';
+
   $('#questionArea').innerHTML = `
     ${filterChip}
     <div class="question-panel">
       <div class="q-header">
-        <div>${rec.kai ? `第${rec.kai}回 ${rec.ampm}${rec.qno}` : `まとめ ${rec.qno}`} · ${rec.subject} · ${rec.subject_l1}</div>
+        <div>${rec.kai ? `第${rec.kai}回 ${rec.ampm}${rec.qno}` : `まとめ ${rec.qno}`} · ${rec.subject} · ${rec.subject_l1}${srcBadge}</div>
         <div class="concepts">${conceptChips}</div>
       </div>
+      ${kindBadge}
       <div class="q-stem">${renderMd(rec.stem_md)}</div>
       <div class="actions">
         <button class="primary" id="showAnsBtn">${DRILL.showAnswer ? '隐藏答案' : '显示答案 (Space)'}</button>
@@ -852,12 +877,12 @@ function renderQuestion() {
         ${ans ? `<button id="resetBtn">重置答案</button>` : ''}
       </div>
       ${DRILL.showAnswer ? `<div class="explain">
-        <div style="color:var(--ok);font-weight:600;margin-bottom:8px;">✓ 正解: ${rec.answer || '?'}</div>
+        <div style="color:var(--ok);font-weight:600;margin-bottom:8px;">${answerLine}</div>
         ${renderMd(rec.explain_md)}
       </div>` : ''}
       <div class="pagination">
         <button id="prevBtn">← 上一题 (K)</button>
-        <div class="progress">${DRILL.index + 1} / ${recs.length}${ans ? (ans.correct?' · <span style="color:var(--ok)">已对</span>':' · <span style="color:var(--err)">已错</span>'):''}</div>
+        <div class="progress">${DRILL.index + 1} / ${recs.length}${progressMark}</div>
         <button id="nextBtn">下一题 (J) →</button>
       </div>
     </div>
@@ -867,11 +892,7 @@ function renderQuestion() {
   const stemEl = $('#questionArea .q-stem');
   stemEl.innerHTML = stemEl.innerHTML.replace(/(^|<br>|<\/p>|\n)([1-5])[．\.] /g, (m, pre, n) => `${pre}<div class="choice" data-c="${n}"><span class="choice-num">${n}．</span>`);
   markChoices(rec, ans);
-  $$('.choice').forEach(el => el.addEventListener('click', () => {
-    const c = el.dataset.c;
-    STATE.answered[id] = { your: c, correct: c === rec.answer, ts: Date.now() };
-    persist(); DRILL.showAnswer = true; renderQuestion();
-  }));
+  $$('.choice').forEach(el => el.addEventListener('click', () => pickAnswer(rec, id, el.dataset.c)));
 
   $('#showAnsBtn').onclick = () => { DRILL.showAnswer = !DRILL.showAnswer; renderQuestion(); };
   $('#bmBtn').onclick = () => {
@@ -907,15 +928,56 @@ function renderFilterChip() {
   </div>`;
 }
 
+// --- 答案模型（厚労省 正答値表ベース）---
+// answer_kind: single | multi(2つ選べ) | multi_correct(複数正解) | excluded(採点除外)
+function ansSet(rec) {
+  if (Array.isArray(rec.answer_set) && rec.answer_set.length) return rec.answer_set;
+  const a = (rec.answer || '').trim();
+  return a ? [a] : [];
+}
+function ansKind(rec) {
+  return rec.answer_kind || (rec.answer ? 'single' : 'unknown');
+}
+function yourArr(ans) {
+  if (!ans) return [];
+  return Array.isArray(ans.your) ? ans.your : (ans.your ? [ans.your] : []);
+}
+function sameSet(a, b) {
+  if (a.length !== b.length) return false;
+  const s = new Set(b);
+  return a.every(x => s.has(x));
+}
+
+function pickAnswer(rec, id, c) {
+  const kind = ansKind(rec);
+  const set = ansSet(rec);
+  if (kind === 'excluded') return;          // 採点除外題は正誤判定しない
+
+  if (kind === 'multi') {                   // 「2つ選べ」→ 選び切るまで判定を保留
+    let cur = yourArr(STATE.answered[id]);
+    cur = cur.includes(c) ? cur.filter(x => x !== c) : [...cur, c];
+    const done = cur.length >= set.length;
+    if (!cur.length) { delete STATE.answered[id]; }
+    else STATE.answered[id] = { your: cur, correct: done && sameSet(cur, set), ts: Date.now(), partial: !done };
+    persist();
+    if (done) DRILL.showAnswer = true;
+    renderQuestion();
+    return;
+  }
+  // single / multi_correct: 1つ選べば確定（multi_correct はどれでも正解集合に入れば可）
+  STATE.answered[id] = { your: [c], correct: set.includes(c), ts: Date.now() };
+  persist(); DRILL.showAnswer = true; renderQuestion();
+}
+
 function markChoices(rec, ans) {
+  const set = ansSet(rec), your = yourArr(ans), kind = ansKind(rec);
   $$('.choice').forEach(el => {
     const c = el.dataset.c;
+    if (kind === 'excluded') { if (your.includes(c)) el.classList.add('selected'); return; }
     if (DRILL.showAnswer) {
-      if (c === rec.answer) el.classList.add('correct');
-      else if (ans && ans.your === c && !ans.correct) el.classList.add('incorrect');
-    } else if (ans) {
-      if (ans.your === c) el.classList.add('selected');
-    }
+      if (set.includes(c)) el.classList.add('correct');
+      else if (your.includes(c)) el.classList.add('incorrect');
+    } else if (your.includes(c)) el.classList.add('selected');
   });
 }
 
@@ -936,11 +998,7 @@ function onKeydown(e) {
     if (STATE.bookmarks[id]) delete STATE.bookmarks[id]; else STATE.bookmarks[id] = true;
     persist(); renderQuestion();
   }
-  else if (['1','2','3','4','5'].includes(e.key)) {
-    const id = qid(rec);
-    STATE.answered[id] = { your: e.key, correct: e.key === rec.answer, ts: Date.now() };
-    persist(); DRILL.showAnswer = true; renderQuestion();
-  }
+  else if (['1','2','3','4','5'].includes(e.key)) { e.preventDefault(); pickAnswer(rec, qid(rec), e.key); }
 }
 
 function renderMd(md) {
