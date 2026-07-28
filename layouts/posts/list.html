@@ -1,0 +1,97 @@
+{{ define "main" }}
+{{- /* ===========================================================
+     「万法归一」策展索引 · 潜蛟阁
+     取代 Blowfish 的 _default/list.html（仅对 posts 段生效）。
+
+     组织轴是**主题**，不是时间：不分年份、不显示日期、不分页。
+     分区定义见 data/sections.toml，文章归入**第一个**命中的分区；
+     一个分区都不命中的落入末尾「散记」。
+
+     单篇文章内部仍保留日期（诚实），只是不作为组织轴。
+     =========================================================== */ -}}
+{{- $cfg := site.Data.sections -}}
+{{- $all := .Pages -}}
+
+<header class="qj-head">
+  <h1 class="qj-h1">{{ .Title }}</h1>
+  {{- with .Params.description }}<p class="qj-lede">{{ . }}</p>{{ end -}}
+  <p class="qj-tally">存文 {{ len $all }} 篇</p>
+</header>
+
+{{- with .Content }}<div class="qj-intro prose dark:prose-invert">{{ . }}</div>{{ end -}}
+
+{{- range $gi, $g := $cfg.group -}}
+  {{- $pages := slice -}}
+  {{- range $p := $all -}}
+    {{- $cats := $p.Params.categories | default slice -}}
+    {{- $hit := false -}}
+    {{- range $c := $g.categories }}{{ if in $cats $c }}{{ $hit = true }}{{ end }}{{ end -}}
+    {{- if $hit -}}
+      {{- /* 已被更靠前的分区认领则跳过，保证一篇只出现一次 */ -}}
+      {{- $earlier := false -}}
+      {{- range $gj, $g2 := $cfg.group -}}
+        {{- if lt $gj $gi -}}
+          {{- range $c2 := $g2.categories }}{{ if in $cats $c2 }}{{ $earlier = true }}{{ end }}{{ end -}}
+        {{- end -}}
+      {{- end -}}
+      {{- if not $earlier }}{{ $pages = $pages | append $p }}{{ end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- with $pages -}}
+    {{- $sorted := cond (eq ($g.order | default "desc") "asc") (sort . "Date" "asc") (sort . "Date" "desc") -}}
+    <section class="qj-sec">
+      <div class="qj-sec-hd">
+        <span class="qj-seal" aria-hidden="true">{{ $g.seal }}</span>
+        <h2 class="qj-sec-name">{{ $g.name }}</h2>
+        <span class="qj-rule"></span>
+        <span class="qj-num">{{ len $sorted }} 篇</span>
+      </div>
+      {{- with $g.blurb }}<p class="qj-blurb">{{ . }}</p>{{ end }}
+      <div class="qj-list">
+        {{- range $sorted }}
+        <a class="qj-item" href="{{ .RelPermalink }}">
+          <span class="qj-item-t">{{ .Title | emojify }}</span>
+          {{- with .Summary }}<span class="qj-item-s">{{ . | plainify | truncate 62 "…" }}</span>{{ end }}
+        </a>
+        {{- end }}
+      </div>
+    </section>
+  {{- end -}}
+{{- end -}}
+
+{{- /* 散记：一个分区都不命中者 */ -}}
+{{- $rest := slice -}}
+{{- range $p := $all -}}
+  {{- $cats := $p.Params.categories | default slice -}}
+  {{- $any := false -}}
+  {{- range $g := $cfg.group -}}
+    {{- range $c := $g.categories }}{{ if in $cats $c }}{{ $any = true }}{{ end }}{{ end -}}
+  {{- end -}}
+  {{- if not $any }}{{ $rest = $rest | append $p }}{{ end -}}
+{{- end -}}
+
+{{- with $rest -}}
+  {{- $fb := $cfg.fallback -}}
+  <section class="qj-sec">
+    <div class="qj-sec-hd">
+      <span class="qj-seal qj-seal-dim" aria-hidden="true">{{ $fb.seal }}</span>
+      <h2 class="qj-sec-name">{{ $fb.name }}</h2>
+      <span class="qj-rule"></span>
+      <span class="qj-num">{{ len . }} 篇</span>
+    </div>
+    {{- with $fb.blurb }}<p class="qj-blurb">{{ . }}</p>{{ end }}
+    <div class="qj-list">
+      {{- range sort . "Date" "desc" }}
+      <a class="qj-item" href="{{ .RelPermalink }}">
+        <span class="qj-item-t">{{ .Title | emojify }}</span>
+        {{- with .Summary }}<span class="qj-item-s">{{ . | plainify | truncate 62 "…" }}</span>{{ end }}
+      </a>
+      {{- end }}
+    </div>
+  </section>
+{{- end -}}
+
+<p class="qj-foot">按主题存放，不按年月。欲依标签检索，见 <a href="{{ "tags" | relURL }}">寻物</a>。</p>
+
+{{ end }}

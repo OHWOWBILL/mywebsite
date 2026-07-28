@@ -1,0 +1,20 @@
+{{- /* Person 实体 · 数据源 data/identity.toml
+       稳定 @id 让各页面的引用被搜索引擎合并为同一实体。
+       首页走 layouts/index.html（绕开 baseof），其余页面走 extend-head.html，
+       两处都调用本 partial。 */ -}}
+{{- with site.Data.identity -}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "{{ site.BaseURL }}#person",
+  "name": {{ .name | jsonify }},
+  "alternateName": {{ .alternateName | jsonify }},
+  {{ with .description }}"description": {{ . | jsonify }},{{ end }}
+  {{ with .knowsAbout }}"knowsAbout": {{ . | jsonify }},{{ end }}
+  "url": {{ site.BaseURL | jsonify }},
+  "mainEntityOfPage": {{ site.BaseURL | jsonify }},
+  "sameAs": [{{ range $i, $p := .profile }}{{ if $i }},{{ end }}{{ $p.url | jsonify }}{{ end }}]
+}
+</script>
+{{- end -}}

@@ -1,0 +1,43 @@
+# ===========================================================
+# 身份唯一事实来源
+#
+# 以下两处都从本文件生成，加平台只改这里，不要改模板：
+#   1. rel="me"        — layouts/_default/_markup/render-link.html
+#   2. JSON-LD sameAs  — layouts/partials/person-schema.html
+#
+# profile 里的 url 必须与 content/links/index.md 中的写法完全一致
+# （逐字符匹配），否则 rel="me" 不会挂上。
+# ===========================================================
+
+name = "潜蛟子"
+alternateName = ["潜蛟阁", "ohwowbill", "潜蛟子 ohwowbill"]
+description = "只手攀南斗，翻身倚北辰。昂首天外望，无我这般人。"
+knowsAbout = ["术数", "命理", "中医", "语言学", "写作"]
+
+# —— 身份账号 —— 同时获得 rel="me" 与 JSON-LD sameAs
+[[profile]]
+  label = "Instagram"
+  url   = "https://www.instagram.com/ohwowbill"
+
+[[profile]]
+  label = "YouTube"
+  url   = "https://www.youtube.com/@ohwowbill"
+
+[[profile]]
+  label = "B站"
+  url   = "https://space.bilibili.com/401941756"
+
+[[profile]]
+  label = "方格子"
+  url   = "https://vocus.cc/user/641709fffd89780001ddf405"
+
+# note 与 Discord 待补，格式同上：
+# [[profile]]
+#   label = "note"
+#   url   = "https://note.com/xxxx"
+
+# —— 作品页 —— 不加 rel="me"（是作品，不是身份账号）
+[[work]]
+  label   = "晋江文学城 ·《锦中燕》"
+  url     = "https://www.jjwxc.net/onebook.php?novelid=10661960"
+  penName = "潜蛟子"

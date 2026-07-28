@@ -1,0 +1,21 @@
+{{- /* 覆写 themes/blowfish/layouts/_default/_markup/render-link.html
+       保留原有外链 target="_blank" 行为，另加两项：
+         · rel="me"      — 命中 data/identity.toml 的 profile.url 时
+         · rel="noopener" — 所有外链（安全默认，与 nofollow 无关，不影响权重传递）
+       注意：站点未开 goldmark.unsafe，markdown 里手写 <a rel="me"> 会被吞，
+       因此 rel="me" 必须由本钩子注入。 */ -}}
+{{- $me := slice -}}
+{{- with site.Data.identity -}}
+  {{- range .profile -}}
+    {{- $me = $me | append .url -}}
+  {{- end -}}
+{{- end -}}
+{{- $external := or (strings.HasPrefix .Destination "http:") (strings.HasPrefix .Destination "https:") -}}
+{{- $isMe := in $me .Destination -}}
+<a
+  href="{{ .Destination | safeURL }}"
+  {{- with .Title }} title="{{ . }}"{{ end }}
+  {{- if $external }} target="_blank" rel="{{ if $isMe }}me {{ end }}noopener"{{ end }}>
+  {{- .Text | safeHTML -}}
+</a>
+{{- /* Trim EOF */ -}}

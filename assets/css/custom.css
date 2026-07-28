@@ -1,6 +1,50 @@
-/* ==============================
-   潜蛟阁 · 自定义样式
-   ============================== */
+/* ===========================================================
+   潜蛟阁 · 设计层
+   -----------------------------------------------------------
+   本文件在 Blowfish 的 compiled/main.css 之后加载（见主题
+   head.html 的 CSS 拼接顺序），因此可直接覆盖主题外观，
+   不需要 fork 任何主题模板，也不需要构建步骤。
+
+   色彩语言取自站内既有三处实现的公约数：
+     首页名片 static/card/styles.css    墨 + 金 + 朱砂
+     梅花 static/meihua/styles/main.css 宣纸 + 墨 + 朱砂 + 青瓷
+     奇门 static/qimen/index.html       深靛墨 + 宣纸 + 朱砂 + 金
+
+   目录
+     〇 色彩与字型 token
+     一 原有笔触（辉光 · 卦象分隔 · 链接微光）
+     二 万法归一 · 策展索引
+     三 文章页微调
+   =========================================================== */
+
+/* ===========================================================
+   〇 色彩与字型 token
+   =========================================================== */
+
+:root {
+  --qj-ink-0: #0e0c14;
+  --qj-ink-1: #15121d;
+  --qj-ink-2: #1f1a2a;
+  --qj-line:  #2e2a38;
+
+  --qj-paper-0: #ece4d3;
+  --qj-paper-1: #d6cab1;
+  --qj-paper-2: #9a9184;
+  --qj-paper-3: #6f675e;
+
+  --qj-zhu:   #c44536;
+  --qj-zhu-2: #d4553a;
+  --qj-jin:   #c9a15a;
+  --qj-jin-2: #d4af37;
+  --qj-qing:  #7fa8c9;
+
+  --qj-serif-cn: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  --qj-serif-en: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+}
+
+/* ===========================================================
+   一 原有笔触 · 保留
+   =========================================================== */
 
 /* 标题发光 - 金色脉冲 */
 @keyframes goldenGlow {
@@ -32,12 +76,10 @@
   }
 }
 
-/* 首页 profile 名字 */
 h1 {
   animation: goldenGlow 3.5s ease-in-out infinite;
 }
 
-/* 文章内各级标题 */
 .prose h1,
 .prose h2 {
   animation: blueGlow 4s ease-in-out infinite;
@@ -47,7 +89,7 @@ h1 {
   animation: blueGlow 5s ease-in-out infinite;
 }
 
-/* 分隔线改为卦象装饰 */
+/* 分隔线 · 八卦 */
 .prose hr {
   border: none;
   text-align: center;
@@ -70,7 +112,234 @@ a:hover {
   transition: text-shadow 0.3s ease;
 }
 
-/* 导航栏链接悬停 */
 nav a:hover {
   text-shadow: 0 0 12px rgba(212, 170, 50, 0.6);
+}
+
+/* ===========================================================
+   二 万法归一 · 策展索引
+   配合 layouts/posts/list.html —— 组织轴是主题，不是时间
+   =========================================================== */
+
+.qj-head {
+  margin: 0 0 2.6rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid var(--qj-line);
+}
+
+.qj-h1 {
+  font-family: var(--qj-serif-cn);
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  font-weight: 500;
+  letter-spacing: .22em;
+  color: var(--qj-paper-0);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.qj-lede {
+  font-family: var(--qj-serif-cn);
+  font-size: .95rem;
+  color: var(--qj-paper-2);
+  letter-spacing: .06em;
+  margin: .7rem 0 0;
+  line-height: 1.7;
+}
+
+.qj-tally {
+  font-size: .72rem;
+  color: var(--qj-paper-3);
+  letter-spacing: .18em;
+  margin: .85rem 0 0;
+}
+
+.qj-intro { margin-bottom: 2rem; }
+
+/* —— 分区标头 —— */
+
+.qj-sec { margin: 0 0 2.9rem; }
+
+.qj-sec-hd {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  margin-bottom: .35rem;
+}
+
+.qj-seal {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--qj-serif-cn);
+  font-size: .85rem;
+  font-weight: 500;
+  color: var(--qj-zhu-2);
+  border: 1.5px solid var(--qj-zhu);
+  border-radius: 3px;
+  background: rgba(196, 69, 54, .08);
+  transform: rotate(-4deg);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.qj-sec:hover .qj-seal {
+  transform: rotate(0deg);
+  box-shadow: 0 0 14px -4px rgba(196, 69, 54, .55);
+}
+
+.qj-seal-dim {
+  color: var(--qj-paper-3);
+  border-color: var(--qj-paper-3);
+  background: transparent;
+}
+
+.qj-sec-name {
+  font-family: var(--qj-serif-cn);
+  font-size: 1.22rem;
+  font-weight: 500;
+  letter-spacing: .16em;
+  color: var(--qj-paper-0);
+  margin: 0;
+  line-height: 1.2;
+  animation: none;
+}
+
+.qj-rule {
+  flex: 1;
+  height: 1px;
+  min-width: 1.5rem;
+  background: linear-gradient(90deg, var(--qj-line), transparent);
+}
+
+.qj-num {
+  font-size: .7rem;
+  color: var(--qj-paper-3);
+  letter-spacing: .12em;
+  flex-shrink: 0;
+}
+
+.qj-blurb {
+  font-family: var(--qj-serif-cn);
+  font-size: .8rem;
+  color: var(--qj-paper-3);
+  letter-spacing: .05em;
+  margin: 0 0 .9rem 2.3rem;
+  line-height: 1.6;
+}
+
+/* —— 篇目 —— */
+
+.qj-list {
+  display: flex;
+  flex-direction: column;
+  margin-left: .55rem;
+}
+
+.qj-item {
+  display: block;
+  padding: .5rem 0 .5rem 1.15rem;
+  border-left: 1px solid var(--qj-line);
+  text-decoration: none;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.qj-item:hover {
+  border-left-color: var(--qj-jin);
+  background: linear-gradient(90deg, rgba(201, 161, 90, .05), transparent 60%);
+  text-shadow: none;
+}
+
+.qj-item-t {
+  display: block;
+  font-family: var(--qj-serif-cn);
+  font-size: 1rem;
+  color: var(--qj-paper-0);
+  line-height: 1.55;
+  letter-spacing: .02em;
+  transition: color .2s ease;
+}
+
+.qj-item:hover .qj-item-t { color: var(--qj-jin-2); }
+
+.qj-item-s {
+  display: block;
+  font-size: .78rem;
+  color: var(--qj-paper-3);
+  line-height: 1.6;
+  margin-top: .12rem;
+  letter-spacing: .01em;
+}
+
+.qj-foot {
+  margin-top: 3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--qj-line);
+  font-size: .76rem;
+  color: var(--qj-paper-3);
+  letter-spacing: .08em;
+}
+
+.qj-foot a {
+  color: var(--qj-jin);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* —— 浅色模式 —— */
+
+html:not(.dark) .qj-h1,
+html:not(.dark) .qj-sec-name,
+html:not(.dark) .qj-item-t { color: #1a1714; }
+
+html:not(.dark) .qj-lede { color: #5f574c; }
+
+html:not(.dark) .qj-tally,
+html:not(.dark) .qj-num,
+html:not(.dark) .qj-blurb,
+html:not(.dark) .qj-item-s,
+html:not(.dark) .qj-foot { color: #857c70; }
+
+html:not(.dark) .qj-head,
+html:not(.dark) .qj-item,
+html:not(.dark) .qj-foot { border-color: #ded3bd; }
+
+html:not(.dark) .qj-rule {
+  background: linear-gradient(90deg, #ded3bd, transparent);
+}
+
+html:not(.dark) .qj-seal {
+  color: #a8321f;
+  border-color: #a8321f;
+  background: rgba(168, 50, 31, .06);
+}
+
+/* —— 窄屏 —— */
+
+@media (max-width: 640px) {
+  .qj-h1 { letter-spacing: .14em; }
+  .qj-blurb { margin-left: 0; }
+  .qj-list { margin-left: 0; }
+  .qj-sec { margin-bottom: 2.2rem; }
+  .qj-item { padding-left: .9rem; }
+}
+
+/* ===========================================================
+   三 文章页微调
+   =========================================================== */
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-family: var(--qj-serif-cn);
+  letter-spacing: .06em;
+}
+
+.prose blockquote {
+  border-left: 2px solid var(--qj-jin);
+  font-style: normal;
+  font-family: var(--qj-serif-cn);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  h1, .prose h1, .prose h2, .prose h3 { animation: none !important; }
+  .qj-seal, .qj-item, .qj-item-t { transition: none !important; }
 }
