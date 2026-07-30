@@ -49,7 +49,11 @@ fingerprintAlgorithm = "sha512"
   showHero = false
   showBreadcrumbs = true
   showDraftLabel = false
-  showEdit = false
+  # 每篇文章挂一个「编辑」图标，直达 GitHub 网页编辑器。
+  # 改完在网页上直接 commit，CI 自动部署 —— 不必 clone、不必推拉。
+  showEdit = true
+  editURL = "https://github.com/ohwowbill/mywebsite/edit/main/content/"
+  editAppendPath = true
   showHeadingAnchors = true
   showPagination = true
   invertPagination = false

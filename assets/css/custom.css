@@ -286,6 +286,19 @@ nav a:hover {
   text-underline-offset: 3px;
 }
 
+.qj-new {
+  float: right;
+  text-decoration: none !important;
+  opacity: .55;
+  transition: opacity .2s ease;
+}
+
+.qj-new:hover { opacity: 1; }
+
+@media (max-width: 640px) {
+  .qj-new { float: none; display: block; margin-top: .6rem; }
+}
+
 /* —— 浅色模式 —— */
 
 html:not(.dark) .qj-h1,

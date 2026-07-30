@@ -92,6 +92,24 @@
   </section>
 {{- end -}}
 
-<p class="qj-foot">按主题存放，不按年月。欲依标签检索，见 <a href="{{ "tags" | relURL }}">寻物</a>。</p>
+<p class="qj-foot">
+  按主题存放，不按年月。欲依标签检索，见 <a href="{{ "tags" | relURL }}">寻物</a>。
+  <a class="qj-new" id="qj-new" href="https://github.com/ohwowbill/mywebsite/new/main?filename=content/posts/new-post/index.md" rel="noopener" target="_blank">✎ 写新篇</a>
+</p>
+
+{{- /* 「写新篇」直达 GitHub 新建文件页，预填当日日期与 frontmatter 骨架。
+       日期须在点击时生成（而非构建时），故用这几行内联脚本。 */ -}}
+<script>
+(function () {
+  var a = document.getElementById('qj-new');
+  if (!a) return;
+  var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
+  var today = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  var fm = '---\ntitle: ""\ndate: ' + today + '\ncategories: ["随笔"]\n---\n\n';
+  a.href = 'https://github.com/ohwowbill/mywebsite/new/main'
+    + '?filename=content/posts/new-post/index.md'
+    + '&value=' + encodeURIComponent(fm);
+})();
+</script>
 
 {{ end }}
