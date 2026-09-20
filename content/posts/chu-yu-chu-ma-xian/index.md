@@ -1,6 +1,7 @@
 ---
 title: "初遇出马仙"
 date: 2026-05-14
+description: "塞北之行，初识出马仙家"
 categories: ["玄学"]
 ---
 

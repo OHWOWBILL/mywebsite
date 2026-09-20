@@ -1,0 +1,23 @@
+{{- /* 问答录条目 · 还原旧站 Hugo Stack 的 thought-record
+
+     用法：
+       {{< thought-record type="question" >}}不能吃牛肉的道理。{{< /thought-record >}}
+       {{< thought-record type="answer" >}}肉牛可以，耕牛不行。{{< /thought-record >}}
+       {{< thought-record type="thought" tags="命,星" >}}读宿曜经。{{< /thought-record >}}
+
+     type: question(问) / answer(答) / thought(悟)，缺省为 question
+     tags: 逗号分隔，可空
+     旧站用 Font Awesome 图标；此处改用朱砂印章字，与站内语汇一致。 */ -}}
+{{- $type := .Get "type" | default "question" -}}
+{{- $seal := dict "question" "问" "answer" "答" "thought" "悟" -}}
+<div class="tr tr--{{ $type }}">
+  <span class="tr-seal" aria-hidden="true">{{ index $seal $type | default "问" }}</span>
+  <div class="tr-body">
+    <div class="tr-content">{{ .Inner | markdownify }}</div>
+    {{- with .Get "tags" }}
+    <div class="tr-tags">
+      {{- range split . "," }}<span class="tr-tag">{{ trim . " " }}</span>{{ end }}
+    </div>
+    {{- end }}
+  </div>
+</div>

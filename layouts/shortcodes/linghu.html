@@ -1,0 +1,48 @@
+{{- /* 靈狐掌中樹 · 起數小工具
+
+     用法：{{< linghu >}}
+
+     旧站原版依赖 React 17 + ReactDOM + Babel standalone 三个 CDN 脚本，
+     此处改写为原生 JS：无外部依赖、无构建、体积约 1KB。
+     取象逻辑与原版一致（十點天地羅，順時掌中記）。 */ -}}
+{{- $id := printf "lh-%d" (now.UnixNano) -}}
+<div class="lh" id="{{ $id }}">
+  <div class="lh-ctl">
+    <select class="lh-pick" aria-label="想一個數字">
+      <option value="">想一個數字</option>
+      {{- range seq 10 }}<option value="{{ . }}">{{ . }}</option>{{ end }}
+    </select>
+    <button class="lh-rand" type="button">隨機起數</button>
+  </div>
+  <div class="lh-out" hidden>
+    <div class="lh-cell"><span class="lh-lab">初傳</span><b class="lh-a"></b></div>
+    <div class="lh-cell"><span class="lh-lab">中傳</span><b class="lh-b"></b></div>
+    <div class="lh-cell"><span class="lh-lab">三傳</span><b class="lh-c"></b></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('{{ $id }}');
+  if (!root) return;
+  var SEQ = { 1:'冠', 2:'慧', 3:'納', 4:'憫', 5:'順', 6:'麗', 7:'勝', 8:'榮', 9:'基', 10:'國' };
+  var NEXT = { '冠':'慧', '慧':'納', '納':'憫', '憫':'國', '順':'冠',
+               '麗':'勝', '勝':'憫', '榮':'慧', '基':'慧', '國':'國' };
+  var out = root.querySelector('.lh-out');
+  function cast(n) {
+    var a = SEQ[n]; if (!a) { out.hidden = true; return; }
+    var b = NEXT[a], c = NEXT[b];
+    root.querySelector('.lh-a').textContent = a;
+    root.querySelector('.lh-b').textContent = b || '—';
+    root.querySelector('.lh-c').textContent = c || '—';
+    out.hidden = false;
+  }
+  root.querySelector('.lh-pick').addEventListener('change', function (e) {
+    cast(parseInt(e.target.value, 10));
+  });
+  root.querySelector('.lh-rand').addEventListener('click', function () {
+    var n = Math.floor(Math.random() * 10) + 1;
+    root.querySelector('.lh-pick').value = String(n);
+    cast(n);
+  });
+})();
+</script>

@@ -21,6 +21,15 @@ enableEmoji = true
   tag = "tags"
   category = "categories"
 
+# 旧站（Hugo Stack）正文大量使用裸 HTML 与自定义短代码。
+# Hugo 默认 unsafe=false 会静默吞掉这些标记 —— 2024 年迁移时
+# 正文段落、下划线强调、问答卡片、对话气泡的丢失皆源于此。
+# 本站内容均为自撰，开启无第三方 HTML 风险。
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
 [outputs]
   home = ["HTML", "RSS", "JSON"]
 

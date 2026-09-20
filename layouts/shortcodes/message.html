@@ -1,0 +1,17 @@
+{{- /* 对话气泡 · 还原旧站 Hugo Stack 的 message
+
+     用法：
+       {{< message name="茴香豆" date="2024-9-29" >}}内容{{< /message >}}
+       {{< message name="我" date="2024-9-29" self="true" >}}内容{{< /message >}}
+
+     self="true" 靠右显示（本人发言）。 */ -}}
+{{- $self := eq (.Get "self" | default "false") "true" -}}
+<div class="msg{{ if $self }} msg--self{{ end }}">
+  <div class="msg-bubble">
+    <div class="msg-meta">
+      <span class="msg-name">{{ .Get "name" }}</span>
+      {{- with .Get "date" }}<span class="msg-date">{{ . }}</span>{{ end }}
+    </div>
+    <div class="msg-text">{{ .Inner | markdownify }}</div>
+  </div>
+</div>

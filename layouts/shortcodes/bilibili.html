@@ -1,0 +1,19 @@
+{{- /* B 站视频嵌入 · 还原旧站的 video-wrapper
+
+     用法：{{< bilibili "BV1YUeEeQEA6" >}}
+          {{< bilibili bvid="BV1YUeEeQEA6" page="2" >}}
+
+     16:9 自适应，不依赖外部脚本。 */ -}}
+{{- $bvid := or (.Get "bvid") (.Get 0) -}}
+{{- $page := .Get "page" | default "1" -}}
+{{- with $bvid }}
+<div class="bili-wrap">
+  <iframe
+    src="https://player.bilibili.com/player.html?bvid={{ . }}&amp;page={{ $page }}&amp;as_wide=1&amp;high_quality=1&amp;danmaku=0"
+    loading="lazy"
+    scrolling="no"
+    frameborder="0"
+    allowfullscreen="true"
+    title="B 站视频 {{ . }}"></iframe>
+</div>
+{{- end }}
