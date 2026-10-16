@@ -45,8 +45,9 @@ showEdit: false
 
 阁主接案。命理推算、占断择事、疑难杂事，皆可来问。
 
-- **微信**：搜公众号「哦哇呜比尔」，后台留言
+- **微信**：微信号 `ohwowbill`，加时请注明来意
 - **Instagram**：[@ohwowbill](https://www.instagram.com/ohwowbill) 私信
+- **X**：[@ohwowbill](https://x.com/ohwowbill) 私信
 
 来信请先言明所问何事；需排盘者，附上出生年月日时与出生地。缘至自有回音。
 

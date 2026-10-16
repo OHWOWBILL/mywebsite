@@ -17,15 +17,9 @@ showEdit: false
 
 **方格子**
 
-散文、随笔、不成体系的碎念。比公众号更随意，比博客更轻盈。
+散文、随笔、不成体系的碎念，比博客更轻盈。
 
 [→ 前往方格子](https://vocus.cc/user/641709fffd89780001ddf405)
-
----
-
-**公众号「哦哇呜比尔」**
-
-不定期推送，比较正式时才用。微信内搜索「**哦哇呜比尔**」关注即可。
 
 ---
 
@@ -54,6 +48,18 @@ showEdit: false
 **Instagram · @ohwowbill**
 
 [→ 前往 Instagram](https://www.instagram.com/ohwowbill)
+
+---
+
+**X · @ohwowbill**
+
+[→ 前往 X](https://x.com/ohwowbill)
+
+---
+
+**微信 · ohwowbill**
+
+求问办事请加微信号 `ohwowbill`，注明来意。
 
 ---
 

@@ -722,7 +722,7 @@ body::after {
   }
   .card { display: contents; }
   .card .center { order: 1; }
-  .talismans { order: 2; margin-top: 0; max-width: 360px; gap: 10px 8px; }
+  .talismans { order: 2; margin-top: 0; max-width: 260px; gap: 10px 8px; }
   .talisman { width: 76px; height: 94px; }
   .talisman .glyph { font-size: 23px; }
   .talisman .label-zh { top: 12px; }

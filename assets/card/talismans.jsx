@@ -29,11 +29,11 @@ const TALISMANS = [
   },
   {
     key: "wx",
-    glyph: "言",        // 公众号 言
+    glyph: "言",        // 微信 言
     labelEn: "PARABLE",
-    labelZh: "公众号",
+    labelZh: "微信",
     href: "#wechat",
-    wechatName: "哦哇呜比尔",
+    wechatName: "ohwowbill",
     rune: "卍",
   },
   {
@@ -53,6 +53,15 @@ const TALISMANS = [
     href: "https://www.youtube.com/@ohwowbill",
     target: "_blank",
     rune: "▲",
+  },
+  {
+    key: "x",
+    glyph: "X",
+    labelEn: "EPISTOLAE",
+    labelZh: "推文",
+    href: "https://x.com/ohwowbill",
+    target: "_blank",
+    rune: "✧",
   },
   {
     key: "meihua",
@@ -124,7 +133,7 @@ const Talisman = ({ data }) => {
       target={data.target || undefined}
       rel={data.target === "_blank" ? "noopener noreferrer" : undefined}
       onClick={onClick}
-      title={isWechat ? `公众号：${data.wechatName}（点击复制）` : data.labelZh}
+      title={isWechat ? `微信号：${data.wechatName}（点击复制）` : data.labelZh}
     >
       <span className="frame"><TalismanFrame /></span>
       <span className="label-zh">{data.labelZh}</span>
