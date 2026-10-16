@@ -1,6 +1,13 @@
 ---
 title: "阁主何人"
 description: "关于潜蛟子"
+showDate: false
+showAuthor: false
+showReadingTime: false
+showTableOfContents: false
+showRelatedContent: false
+showPagination: false
+showEdit: false
 ---
 
 ## 潜蛟子 ohwowbill

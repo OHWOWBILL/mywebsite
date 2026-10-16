@@ -61,32 +61,15 @@
   }
 }
 
-/* 文章标题发光 - 幽蓝 */
-@keyframes blueGlow {
-  0%, 100% {
-    text-shadow:
-      0 0 6px rgba(100, 180, 255, 0.3),
-      0 0 14px rgba(100, 180, 255, 0.15);
-  }
-  50% {
-    text-shadow:
-      0 0 14px rgba(100, 180, 255, 0.65),
-      0 0 30px rgba(100, 180, 255, 0.3),
-      0 0 46px rgba(100, 180, 255, 0.1);
-  }
-}
-
 h1 {
   animation: goldenGlow 3.5s ease-in-out infinite;
 }
 
+/* 正文小标题：与首页同一套金色，静态微光（不再脉动） */
 .prose h1,
-.prose h2 {
-  animation: blueGlow 4s ease-in-out infinite;
-}
-
+.prose h2,
 .prose h3 {
-  animation: blueGlow 5s ease-in-out infinite;
+  text-shadow: 0 0 14px rgba(212, 170, 50, 0.22);
 }
 
 /* 分隔线 · 八卦 */
@@ -571,4 +554,41 @@ html:not(.dark) .colorfulfont { color: #a88732; }
 @media (prefers-reduced-motion: reduce) {
   h1, .prose h1, .prose h2, .prose h3 { animation: none !important; }
   .qj-seal, .qj-item, .qj-item-t { transition: none !important; }
+}
+
+/* ===========================================================
+   五 与首页名片同色
+   首页是墨底 + 金线；内页原本是 Blowfish noir 的蓝灰。
+   这里只改主题的色板变量，所有组件随之换色，不动模板。
+   本站固定暗色（params.toml: defaultAppearance = "dark"）。
+   =========================================================== */
+
+:root {
+  --color-neutral-600: 70, 63, 84;
+  --color-neutral-700: 44, 39, 56;
+  --color-neutral-800: 18, 16, 26;
+  --color-neutral-900: 12, 10, 17;
+  --color-primary-300: 244, 228, 184;
+  --color-primary-400: 232, 204, 128;
+  --color-primary-500: 212, 175, 55;
+  --color-primary-600: 184, 147, 44;
+  --color-primary-700: 138, 108, 29;
+  --color-primary-800: 108, 84, 22;
+  --color-primary-900: 80, 62, 16;
+}
+
+/* 站名与导航用宋体，和首页的名号同一种字 */
+.main-menu,
+#menu-wrapper,
+.qj-h1,
+article > header h1,
+main h1 {
+  font-family: var(--qj-serif-cn);
+}
+
+article > header h1,
+main > header h1 {
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: var(--qj-paper-0);
 }

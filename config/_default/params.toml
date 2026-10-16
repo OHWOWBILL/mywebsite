@@ -8,6 +8,8 @@ autoSwitchAppearance = false
 enableSearch = true
 enableCodeCopy = true
 
+defaultSocialImage = "img/og-card.jpg"
+
 mainSections = ["posts"]
 
 disableImageOptimization = false

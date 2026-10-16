@@ -41,25 +41,14 @@ const useCursorTrail = () => {
 };
 
 const App = () => {
-  // tweaks: density (0..1), darkMode bool, theme color
-  const [tweaks, setTweak] = useTweaks(/*EDITMODE-BEGIN*/{
-    "density": 1,
-    "darkMode": true,
-    "theme": "gold",
-    "animate": true
-  }/*EDITMODE-END*/);
-
+  // 定稿外观：深夜金、满密度。系统开启「减少动态效果」时星盘停转。
   React.useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty("--density", tweaks.density);
-    root.classList.toggle("is-light", !tweaks.darkMode);
-    root.classList.remove("theme-violet", "theme-jade", "theme-vermillion");
-    if (tweaks.theme && tweaks.theme !== "gold") {
-      root.classList.add(`theme-${tweaks.theme}`);
-    }
-    root.dataset.animate = tweaks.animate ? "1" : "0";
-    root.dataset.densityMode = tweaks.density < 0.35 ? "minimal" : "lush";
-  }, [tweaks]);
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    root.style.setProperty("--density", 1);
+    root.dataset.animate = still ? "0" : "1";
+    root.dataset.densityMode = "lush";
+  }, []);
 
   useCursorTrail();
 
@@ -105,7 +94,7 @@ const App = () => {
             <Compass />
             <div className="sigil">
               <div className="ohw">OHWOWBILL</div>
-              <div className="name-zh">潜&nbsp;蛟&nbsp;子</div>
+              <h1 className="name-zh">潜&nbsp;蛟&nbsp;子</h1>
               <div className="tag">玄&nbsp;·&nbsp;言&nbsp;·&nbsp;生</div>
             </div>
           </main>
@@ -139,48 +128,6 @@ const App = () => {
         </div>
       </div>
 
-      {/* tweaks panel */}
-      <TweaksPanel title="Tweaks · 调谐">
-        <TweakSection title="氛围 · Ambience">
-          <TweakToggle
-            label="明 / 暗"
-            sublabel="Light / Dark"
-            value={tweaks.darkMode}
-            onChange={v => setTweak("darkMode", v)}
-          />
-          <TweakToggle
-            label="星图自转"
-            sublabel="Animations"
-            value={tweaks.animate}
-            onChange={v => setTweak("animate", v)}
-          />
-        </TweakSection>
-
-        <TweakSection title="玄学浓度 · Density">
-          <TweakSlider
-            label="符纹密度"
-            sublabel="Mystical density"
-            min={0} max={1.4} step={0.05}
-            value={tweaks.density}
-            onChange={v => setTweak("density", v)}
-            format={v => `${Math.round(v * 100)}%`}
-          />
-        </TweakSection>
-
-        <TweakSection title="主调 · Hue">
-          <TweakRadio
-            label="主题色"
-            value={tweaks.theme}
-            onChange={v => setTweak("theme", v)}
-            options={[
-              { label: "深夜金", value: "gold" },
-              { label: "深紫银", value: "violet" },
-              { label: "墨绿金", value: "jade" },
-              { label: "朱砂", value: "vermillion" },
-            ]}
-          />
-        </TweakSection>
-      </TweaksPanel>
     </>
   );
 };

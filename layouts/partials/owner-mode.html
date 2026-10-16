@@ -1,0 +1,20 @@
+{{- /* 阁主模式：文章的「编辑」图标与「写新篇」只给阁主看。
+       在任意页面网址后加 ?owner=1 打开（本设备记住），?owner=0 关闭。
+       访客默认看不到这些入口；hugo server 本地预览时始终显示。 */ -}}
+<style>
+  html:not(.qj-owner) .qj-edit,
+  html:not(.qj-owner) .qj-new,
+  html:not(.qj-owner) .px-2.text-primary-500:has(+ .qj-edit) { display: none !important; }
+</style>
+<script>
+(function () {
+  var k = 'qj-owner', on = {{ hugo.IsServer }};
+  try {
+    var q = new URLSearchParams(location.search).get('owner');
+    if (q === '1') localStorage.setItem(k, '1');
+    if (q === '0') localStorage.removeItem(k);
+    on = on || localStorage.getItem(k) === '1';
+  } catch (e) {}
+  if (on) document.documentElement.classList.add('qj-owner');
+})();
+</script>

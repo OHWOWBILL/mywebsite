@@ -15,7 +15,7 @@ const TALISMANS = [
     glyph: "Ig",
     labelEn: "ICONOGRAM",
     labelZh: "生活",
-    href: "https://instagram.com/ohwowbill",
+    href: "https://www.instagram.com/ohwowbill",
     target: "_blank",
     rune: "◎",
   },
@@ -41,7 +41,7 @@ const TALISMANS = [
     glyph: "B",
     labelEn: "BILIVISION",
     labelZh: "哔哩",
-    href: "https://b23.tv/aT5uWeT",
+    href: "https://space.bilibili.com/401941756",
     target: "_blank",
     rune: "✦",
   },
@@ -50,7 +50,7 @@ const TALISMANS = [
     glyph: "Y",
     labelEn: "YOUTUBIA",
     labelZh: "影坊",
-    href: "https://youtube.com/channel/UCrlefr8uy8jfDxBfY0jKeyg",
+    href: "https://www.youtube.com/@ohwowbill",
     target: "_blank",
     rune: "▲",
   },
@@ -119,7 +119,7 @@ const Talisman = ({ data }) => {
 
   return (
     <a
-      className={"talisman" + (isWechat ? " is-wechat" : "")}
+      className={"talisman" + (isWechat ? " is-wechat" : "") + (copied ? " is-copied" : "")}
       href={data.href}
       target={data.target || undefined}
       rel={data.target === "_blank" ? "noopener noreferrer" : undefined}

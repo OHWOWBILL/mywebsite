@@ -4,6 +4,9 @@ description: "潜蛟所至之处，按图索骥"
 showDate: false
 showAuthor: false
 showReadingTime: false
+showRelatedContent: false
+showPagination: false
+showEdit: false
 ---
 
 潜蛟子散于各处，不聚于一地。以下列明各处去向，各有分工，读者自取。

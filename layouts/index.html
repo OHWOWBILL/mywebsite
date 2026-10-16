@@ -1,12 +1,35 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>潜蛟子 · ohwowbill — 玄学 × 语言 × 生活</title>
 <meta name="description" content="{{ site.Params.description }}"/>
+<meta name="theme-color" content="#08070b"/>
 <link rel="canonical" href="{{ site.BaseURL }}"/>
 <link rel="alternate" type="application/rss+xml" title="{{ site.Title }}" href="{{ site.BaseURL }}index.xml"/>
+
+{{- /* 首页绕开了主题的 head.html，图标与分享卡片在这里自己补 */}}
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+<link rel="manifest" href="/site.webmanifest"/>
+
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="{{ site.Title }}"/>
+<meta property="og:title" content="潜蛟子 · ohwowbill"/>
+<meta property="og:description" content="{{ site.Params.description }}"/>
+<meta property="og:url" content="{{ site.BaseURL }}"/>
+<meta property="og:locale" content="zh_CN"/>
+{{- with resources.Get site.Params.defaultSocialImage }}
+<meta property="og:image" content="{{ .Permalink }}"/>
+<meta property="og:image:width" content="{{ .Width }}"/>
+<meta property="og:image:height" content="{{ .Height }}"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="{{ .Permalink }}"/>
+{{- end }}
+<meta name="twitter:title" content="潜蛟子 · ohwowbill"/>
+<meta name="twitter:description" content="{{ site.Params.description }}"/>
 
 {{ partial "person-schema.html" . }}
 
@@ -15,40 +38,42 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Noto+Serif+SC:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Sans+Symbols+2&display=swap"/>
 <link rel="stylesheet" href="/card/styles.css"/>
 
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-
-<style>
-  .blog-portal {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    font-family: "Cinzel", serif;
-    font-size: 11px;
-    letter-spacing: 0.35em;
-    color: rgba(212,175,55,0.5);
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: color 0.3s, opacity 0.3s;
-    white-space: nowrap;
-  }
-  .blog-portal:hover {
-    color: rgba(212,175,55,1);
-  }
-</style>
+{{- /* 名片的 jsx 在构建时由 Hugo（esbuild）编译压缩成一个文件，
+       React 用本站自带的 production 版，不再依赖 unpkg 和浏览器端 Babel。 */}}
+{{- $card := slice "card/decorations.jsx" "card/compass.jsx" "card/talismans.jsx" "card/app.jsx" -}}
+{{- $js := partial "card-bundle.html" $card -}}
+<script defer src="/card/vendor/react.production.min.js"></script>
+<script defer src="/card/vendor/react-dom.production.min.js"></script>
+<script defer src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
 </head>
 <body>
-<div id="root"></div>
+<div id="root">
+  {{- /* 静态名片：脚本运行前、或脚本加载失败时显示；搜索引擎读的也是这份。
+         React 挂载后整块被星盘名片替换。 */}}
+  <div class="fallback">
+    <p class="fb-en">OHWOWBILL</p>
+    <h1 class="fb-name">潜蛟子</h1>
+    <p class="fb-tag">玄学 · 语言 · 生活</p>
+    <p class="fb-verse">{{ replace site.Params.description "辰。" "辰。<br/>" | safeHTML }}</p>
+    <nav class="fb-links" aria-label="去处">
+      <a href="/posts/">文章 · 万法归一</a>
+      <a href="/about/">阁主何人</a>
+      <a href="/links/">各处去向</a>
+      <a href="/meihua/">梅花易数</a>
+      <a href="/yanzhi/">閩吳谚文</a>
+      {{- range site.Data.identity.profile }}
+      <a href="{{ .url }}" rel="me noopener" target="_blank">{{ .label }}</a>
+      {{- end }}
+    </nav>
+    <div class="fb-recent">
+      <p class="fb-recent-hd">近作</p>
+      {{- range first 3 (where site.RegularPages "Section" "posts").ByDate.Reverse }}
+      <a href="{{ .RelPermalink }}">{{ .Title }}<span>{{ .Date.Format "2006.01" }}</span></a>
+      {{- end }}
+    </div>
+  </div>
+</div>
 
 <a class="blog-portal" href="/posts/">万 法 归 一 &nbsp;→</a>
-
-<script type="text/babel" src="/card/tweaks-panel.jsx"></script>
-<script type="text/babel" src="/card/compass.jsx"></script>
-<script type="text/babel" src="/card/talismans.jsx"></script>
-<script type="text/babel" src="/card/decorations.jsx"></script>
-<script type="text/babel" src="/card/app.jsx"></script>
 </body>
 </html>
