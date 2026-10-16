@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/main.css?v=3">
   <style>
     /* 奇门链接 — 样式复用 nav-btn，不参与 JS tab 切换 */
     a.nav-btn { text-decoration: none; }
@@ -90,7 +90,19 @@
       <div class="page-head">
         <div>
           <h1 class="page-title">排盘速查 <span class="en">HEXAGRAM LOOKUP</span></h1>
-          <div class="page-subtitle">本卦 · 互卦 · 变卦 — 逐爻查询</div>
+          <div class="page-subtitle">时间起卦 · 随机起卦 · 手动选卦 — 逐爻查询</div>
+        </div>
+      </div>
+
+      <!-- 起卦面板 -->
+      <div class="qigua-panel">
+        <div class="qigua-info" id="qiguaInfo">
+          <div class="qg-hint">正在按当前时间起卦…</div>
+        </div>
+        <div class="qigua-actions">
+          <button class="qg-btn primary" type="button" data-qigua="time">按此刻时间起卦</button>
+          <button class="qg-btn" type="button" data-qigua="random">随机起卦</button>
+          <button class="qg-btn ghost" type="button" data-qigua="clear">清空自选</button>
         </div>
       </div>
 
@@ -224,7 +236,8 @@
 
 </div>
 
-<script src="data/hexagrams.js?v=2"></script>
-<script src="js/app.js?v=2"></script>
+<script src="data/hexagrams.js?v=3"></script>
+<script src="data/yao.js?v=3"></script>
+<script src="js/app.js?v=3"></script>
 </body>
 </html>
