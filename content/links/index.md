@@ -13,13 +13,7 @@ showEdit: false
 
 ---
 
-## 文 · 小说与文字
-
-**晋江文学城 · 《锦中燕》**
-
-[→ 前往晋江](https://www.jjwxc.net/onebook.php?novelid=10661960)
-
----
+## 文 · 文字
 
 **方格子**
 
@@ -50,6 +44,12 @@ showEdit: false
 ---
 
 ## 人 · 日常
+
+**小红书**
+
+[→ 前往小红书](https://xhslink.cn/m/2ntNFVgKnH9)
+
+---
 
 **Instagram · @ohwowbill**
 

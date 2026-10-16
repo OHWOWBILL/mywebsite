@@ -6,7 +6,7 @@ const TALISMANS = [
     glyph: "赤",        // 朱砂赤书
     labelEn: "VERMILION",
     labelZh: "小红书",
-    href: "https://xhslink.com/m/bhywG962OR",
+    href: "https://xhslink.cn/m/2ntNFVgKnH9",
     target: "_blank",
     rune: "❀",
   },
