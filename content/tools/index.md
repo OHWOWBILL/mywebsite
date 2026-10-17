@@ -5,6 +5,9 @@ showDate: false
 showAuthor: false
 showReadingTime: false
 showTableOfContents: true
+showRelatedContent: false
+showPagination: false
+showEdit: false
 ---
 
 ## 法宝库

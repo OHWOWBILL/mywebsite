@@ -52,7 +52,7 @@
         {{- range $sorted }}
         <a class="qj-item" href="{{ .RelPermalink }}">
           <span class="qj-item-t">{{ .Title | emojify }}</span>
-          {{- with .Summary }}<span class="qj-item-s">{{ . | plainify | truncate 62 "…" }}</span>{{ end }}
+          {{- with (.Description | default (.Summary | plainify)) }}<span class="qj-item-s">{{ . | truncate 62 "…" }}</span>{{ end }}
         </a>
         {{- end }}
       </div>
@@ -85,7 +85,7 @@
       {{- range sort . "Date" "desc" }}
       <a class="qj-item" href="{{ .RelPermalink }}">
         <span class="qj-item-t">{{ .Title | emojify }}</span>
-        {{- with .Summary }}<span class="qj-item-s">{{ . | plainify | truncate 62 "…" }}</span>{{ end }}
+        {{- with (.Description | default (.Summary | plainify)) }}<span class="qj-item-s">{{ . | truncate 62 "…" }}</span>{{ end }}
       </a>
       {{- end }}
     </div>

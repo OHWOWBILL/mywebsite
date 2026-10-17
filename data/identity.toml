@@ -31,13 +31,15 @@ knowsAbout = ["术数", "命理", "中医", "语言学", "写作"]
   label = "方格子"
   url   = "https://vocus.cc/user/641709fffd89780001ddf405"
 
+[[profile]]
+  label = "小红书"
+  url   = "https://xhslink.cn/m/2ntNFVgKnH9"
+
+[[profile]]
+  label = "X"
+  url   = "https://x.com/ohwowbill"
+
 # note 与 Discord 待补，格式同上：
 # [[profile]]
 #   label = "note"
 #   url   = "https://note.com/xxxx"
-
-# —— 作品页 —— 不加 rel="me"（是作品，不是身份账号）
-[[work]]
-  label   = "晋江文学城 ·《锦中燕》"
-  url     = "https://www.jjwxc.net/onebook.php?novelid=10661960"
-  penName = "潜蛟子"

@@ -122,3 +122,15 @@ git push
 
 **Q: HTTPS 证书错误？**  
 A: DNS 生效后，在 GitHub Pages 设置中点击 "Enforce HTTPS"，等待几分钟即可。
+
+## 阁主模式（编辑入口）
+
+文章标题旁的「编辑」图标和「万法归一」页底的「✎ 写新篇」默认只有阁主看得到。
+在任意页面网址后加 `?owner=1` 打开一次，这台设备之后都会显示；加 `?owner=0` 关闭。
+`hugo server` 本地预览时始终显示。
+
+## 首页名片
+
+首页的 jsx 源码在 `assets/card/`，构建时由 Hugo 自带的 esbuild 编译成一个压缩文件（见 `layouts/partials/card-bundle.html`），
+不需要另装 Node。React 用 `static/card/vendor/` 里的 production 版。
+样式仍在 `static/card/styles.css`。

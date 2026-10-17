@@ -1,3 +1,8 @@
 {{- /* Blowfish head 扩展点（head.html 以 partialCached ... .Site 调用）。
        本 partial 只用 site.* 全局函数，不依赖传入上下文。 */ -}}
 {{ partial "person-schema.html" . }}
+{{ partial "owner-mode.html" . }}
+{{- /* 内页也载入首页用的宋体，标题与导航才对得上 */}}
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600&display=swap"/>
