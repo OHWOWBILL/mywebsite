@@ -36,6 +36,12 @@
   url = "https://www.instagram.com/ohwowbill"
   weight = 100
 
+[[main]]
+  identifier = "x"
+  pre = "x-twitter"
+  url = "https://x.com/ohwowbill"
+  weight = 90
+
 # -- Footer Menu --
 
 [[footer]]
