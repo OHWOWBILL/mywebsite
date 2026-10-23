@@ -198,7 +198,8 @@ h1, h2, h3, h4,
 }
 
 @media (min-width: 640px) {
-  .qj-hero { aspect-ratio: 16 / 9; }
+  .qj-hero { aspect-ratio: 16 / 10; }
+  .qj-hero .qj-hero-img { object-position: 50% 9%; }
 }
 
 .qj-hero-img {
@@ -207,7 +208,7 @@ h1, h2, h3, h4,
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 40%;
+  object-position: 50% 22%;
   margin: 0 !important;
 }
 
@@ -270,8 +271,6 @@ h1, h2, h3, h4,
   letter-spacing: .24em;
   color: var(--ge-fg);
 }
-
-.qj-seal-svg { display: inline-block; width: 1.9em; height: 1.9em; flex-shrink: 0; }
 
 .qj-home {
   max-width: 42rem;
@@ -439,7 +438,7 @@ h1, h2, h3, h4,
   margin-bottom: .35rem;
 }
 
-/* 分区印：紫底白字，与潜蛟印同一路数 */
+/* 分区字：紫色细框单字 */
 .qj-seal {
   width: 26px;
   height: 26px;
@@ -449,16 +448,14 @@ h1, h2, h3, h4,
   font-family: var(--font-title);
   font-size: .85rem;
   font-weight: 900;
-  color: #EEF0EE;
-  background: var(--zi);
+  color: var(--ge-zi);
+  border: 1px solid rgba(169, 148, 224, .55);
   border-radius: 3px;
-  box-shadow: inset 0 0 0 2px var(--zi), inset 0 0 0 3px rgba(238, 240, 238, .7);
 }
 
 .qj-seal-dim {
   color: var(--ge-muted);
-  background: transparent;
-  box-shadow: inset 0 0 0 1.5px var(--ge-muted);
+  border-color: var(--ge-rule);
 }
 
 .qj-sec-name {
@@ -818,6 +815,53 @@ h1, h2, h3, h4,
   .msg-bubble { max-width: 92%; }
 }
 
+
+/* ===========================================================
+   星盘 · 原首页名片的中心，改为静态 SVG（layouts/partials/compass.html，
+   由 scripts/compass.py 生成）。用在法宝库页首与 404。
+   线用雾色，字用紫，五芒顶点五粒金是本屏唯一的金。
+   =========================================================== */
+
+.qj-compass-wrap {
+  position: relative;
+  width: min(100%, 26rem);
+  aspect-ratio: 1;
+  margin: 0 auto 2.4rem;
+}
+
+.qj-compass-wrap.is-small { width: min(70%, 16rem); margin-bottom: 1.6rem; }
+
+.qj-compass { display: block; width: 100%; height: 100%; overflow: visible; }
+
+.qj-compass .cp-hair { fill: none; stroke: var(--ge-muted); stroke-width: .5; opacity: .45; }
+.qj-compass .cp-line { fill: none; stroke: var(--ge-muted); stroke-width: .8; opacity: .7; }
+.qj-compass .cp-dim  { fill: none; stroke: var(--ge-rule); stroke-width: .6; }
+.qj-compass .cp-tick { stroke: var(--ge-muted); stroke-width: .8; opacity: .7; }
+.qj-compass .cp-fine { stroke: var(--ge-muted); stroke-width: .4; opacity: .4; }
+.qj-compass text { text-anchor: middle; }
+.qj-compass .cp-glyph { fill: var(--ge-muted); font-family: "Noto Sans Symbols 2", "Segoe UI Symbol", serif; }
+.qj-compass .cp-han { fill: var(--ge-fg-2); font-family: var(--font-title); }
+.qj-compass .cp-gua { fill: var(--ge-zi); font-size: 18px; }
+.qj-compass .cp-s10 { font-size: 10px; }
+.qj-compass .cp-s14 { font-size: 14px; }
+.qj-compass .cp-s16 { font-size: 16px; }
+.qj-compass .cp-star { fill: none; stroke: var(--ge-zi); stroke-width: .6; opacity: .7; }
+.qj-compass .cp-hex { fill: none; stroke: var(--zi); stroke-width: .7; opacity: .9; }
+.qj-compass .cp-dot { fill: var(--jin); }
+
+.qj-compass .cp-ring { transform-origin: 250px 250px; transform-box: view-box; }
+
+@keyframes qj-spin { to { transform: rotate(360deg); } }
+
+.qj-compass .cp-r5 { animation: qj-spin 240s linear infinite; }
+.qj-compass .cp-r4 { animation: qj-spin 180s linear infinite reverse; }
+.qj-compass .cp-r3 { animation: qj-spin 140s linear infinite; }
+.qj-compass .cp-r2 { animation: qj-spin 100s linear infinite reverse; }
+.qj-compass .cp-r1 { animation: qj-spin 70s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .qj-compass .cp-ring { animation: none; }
+}
 
 /* ===========================================================
    六 文章页

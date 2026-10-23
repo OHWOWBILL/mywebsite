@@ -2,20 +2,20 @@
 {{- /* ===========================================================
      首页 · 潜蛟阁
      视觉基调「放到实处 · 网站首屏」：进门就是潜蛟阁。
-     竖排阁名，一道金线，落款「阁主 潜蛟子」配紫印。
+     竖排阁名，一道金线，落款「阁主 潜蛟子」。
      走主题的 baseof（导航、搜索、页脚与内页一致），不再有加载帘幕。
      =========================================================== */ -}}
 {{- $posts := where site.RegularPages "Section" "posts" -}}
-{{- $hero := resources.Get "img/ge-damashan.jpg" -}}
+{{- $hero := resources.Get "img/ge-hero.jpg" -}}
 
 <section class="qj-hero" aria-label="潜蛟阁">
   {{- with $hero }}
-  <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="大麻山石阶，雾中山门" fetchpriority="high"/>
+  <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="月下屋檐，云层压着瓦" fetchpriority="high"/>
   {{- end }}
   <span class="qj-hero-v2">翻身倚北辰</span>
   <h1 class="qj-hero-v">潜蛟阁</h1>
   <span class="qj-hero-line" aria-hidden="true"></span>
-  <p class="qj-hero-sig">阁主　潜蛟子{{ partial "seal.html" . }}</p>
+  <p class="qj-hero-sig">阁主　潜蛟子</p>
 </section>
 
 <div class="qj-home">
