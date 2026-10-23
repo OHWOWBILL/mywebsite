@@ -11,7 +11,7 @@
 
 name = "潜蛟子"
 alternateName = ["潜蛟阁", "ohwowbill", "潜蛟子 ohwowbill"]
-description = "只手攀南斗，翻身倚北辰。昂首天外望，无我这般人。"
+description = "只手攀南斗，翻身倚北辰。举头天外望，无我这般人。"
 knowsAbout = ["术数", "命理", "中医", "语言学", "写作"]
 
 # —— 身份账号 —— 同时获得 rel="me" 与 JSON-LD sameAs

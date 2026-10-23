@@ -1,40 +1,36 @@
 # -- Main Menu --
+# 导航用中文单字（见视觉基调「阁内」规则），全名放在 title 里，悬停可见。
+# 站名「ohwowbill 潜蛟阁」本身就是回首页的入口，所以不再单列「潜蛟阁」。
 
 [[main]]
-  name = "潜蛟阁"
-  pageRef = "/"
+  name = "文"
+  title = "万法归一 · 全部文章"
+  pageRef = "posts"
   weight = 10
 
 [[main]]
-  name = "阁主何人"
-  pageRef = "about"
+  name = "术"
+  title = "法宝库 · 自制术数工具"
+  pageRef = "tools"
   weight = 20
 
 [[main]]
-  name = "万法归一"
-  pageRef = "posts"
+  name = "寻"
+  title = "寻物 · 站内搜索"
+  pageRef = "seek"
   weight = 30
 
 [[main]]
-  name = "去处"
-  pageRef = "links"
-  weight = 35
-
-[[main]]
-  name = "寻物"
-  pageRef = "tags"
+  name = "人"
+  title = "阁主何人"
+  pageRef = "about"
   weight = 40
 
 [[main]]
-  name = "法宝"
-  pageRef = "tools"
+  name = "往"
+  title = "去处 · 各平台"
+  pageRef = "links"
   weight = 50
-
-[[main]]
-  identifier = "instagram"
-  pre = "instagram"
-  url = "https://www.instagram.com/ohwowbill"
-  weight = 100
 
 [[main]]
   identifier = "x"
@@ -42,14 +38,31 @@
   url = "https://x.com/ohwowbill"
   weight = 90
 
+[[main]]
+  identifier = "instagram"
+  pre = "instagram"
+  url = "https://www.instagram.com/ohwowbill"
+  weight = 100
+
 # -- Footer Menu --
+# 页脚只给「万法归一」的分区入口，与归档页同一套口径。
 
 [[footer]]
-  name = "标签"
-  pageRef = "tags"
+  name = "万法归一"
+  pageRef = "posts"
   weight = 10
 
 [[footer]]
-  name = "分类"
-  pageRef = "categories"
+  name = "法宝库"
+  pageRef = "tools"
   weight = 20
+
+[[footer]]
+  name = "寻物"
+  pageRef = "seek"
+  weight = 30
+
+[[footer]]
+  name = "阁主何人"
+  pageRef = "about"
+  weight = 40

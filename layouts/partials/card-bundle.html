@@ -1,7 +1,0 @@
-{{- /* 把首页名片的几个 jsx 按顺序拼起来，交给 esbuild 编译成一个压缩文件。
-       各文件靠顶层常量互相引用，所以必须拼接后整体编译，顺序即依赖顺序。 */ -}}
-{{- $parts := slice -}}
-{{- range . }}{{ $parts = $parts | append (resources.Get .) }}{{ end -}}
-{{- $src := resources.Concat "card/card.jsx" $parts -}}
-{{- $js := js.Build (dict "minify" true "target" "es2018" "format" "iife") $src | fingerprint "sha384" -}}
-{{- return $js -}}

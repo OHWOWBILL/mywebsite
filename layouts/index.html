@@ -1,79 +1,83 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>潜蛟子 · ohwowbill — 玄学 × 语言 × 生活</title>
-<meta name="description" content="{{ site.Params.description }}"/>
-<meta name="theme-color" content="#08070b"/>
-<link rel="canonical" href="{{ site.BaseURL }}"/>
-<link rel="alternate" type="application/rss+xml" title="{{ site.Title }}" href="{{ site.BaseURL }}index.xml"/>
+{{ define "main" }}
+{{- /* ===========================================================
+     首页 · 潜蛟阁
+     视觉基调「放到实处 · 网站首屏」：进门就是潜蛟阁。
+     竖排阁名，一道金线，落款「阁主 潜蛟子」配紫印。
+     走主题的 baseof（导航、搜索、页脚与内页一致），不再有加载帘幕。
+     =========================================================== */ -}}
+{{- $posts := where site.RegularPages "Section" "posts" -}}
+{{- $hero := resources.Get "img/ge-damashan.jpg" -}}
 
-{{- /* 首页绕开了主题的 head.html，图标与分享卡片在这里自己补 */}}
-<link rel="icon" href="/favicon.ico" sizes="any"/>
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
-<link rel="manifest" href="/site.webmanifest"/>
+<section class="qj-hero" aria-label="潜蛟阁">
+  {{- with $hero }}
+  <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="大麻山石阶，雾中山门" fetchpriority="high"/>
+  {{- end }}
+  <span class="qj-hero-v2">翻身倚北辰</span>
+  <h1 class="qj-hero-v">潜蛟阁</h1>
+  <span class="qj-hero-line" aria-hidden="true"></span>
+  <p class="qj-hero-sig">阁主　潜蛟子{{ partial "seal.html" . }}</p>
+</section>
 
-<meta property="og:type" content="website"/>
-<meta property="og:site_name" content="{{ site.Title }}"/>
-<meta property="og:title" content="潜蛟子 · ohwowbill"/>
-<meta property="og:description" content="{{ site.Params.description }}"/>
-<meta property="og:url" content="{{ site.BaseURL }}"/>
-<meta property="og:locale" content="zh_CN"/>
-{{- with resources.Get site.Params.defaultSocialImage }}
-<meta property="og:image" content="{{ .Permalink }}"/>
-<meta property="og:image:width" content="{{ .Width }}"/>
-<meta property="og:image:height" content="{{ .Height }}"/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="{{ .Permalink }}"/>
-{{- end }}
-<meta name="twitter:title" content="潜蛟子 · ohwowbill"/>
-<meta name="twitter:description" content="{{ site.Params.description }}"/>
+<div class="qj-home">
+  <p class="qj-verse">只手攀南斗，翻身倚北辰。<br/>举头天外望，无我这般人。</p>
+  <p class="qj-intro-line">玄门鼯鼠一只。山、医、命、卜、相都碰，兼修几门语言。此处存文、存术、存杂记。</p>
 
-{{ partial "person-schema.html" . }}
+  <nav class="qj-doors" aria-label="门径">
+    <a class="qj-door" href="{{ "posts/" | relURL }}">
+      <span class="qj-door-z">文</span>
+      <span class="qj-door-t">万法归一</span>
+      <span class="qj-door-s">全部文章 {{ len $posts }} 篇，按{{ len site.Data.sections.group }}个主题分区存放</span>
+    </a>
+    <a class="qj-door" href="{{ "tools/" | relURL }}">
+      <span class="qj-door-z">术</span>
+      <span class="qj-door-t">法宝库</span>
+      <span class="qj-door-s">梅花易数排盘、奇门手记、閩吳淮泰谚文，打开即用</span>
+    </a>
+    <a class="qj-door" href="{{ "seek/" | relURL }}">
+      <span class="qj-door-z">寻</span>
+      <span class="qj-door-t">寻物</span>
+      <span class="qj-door-s">按字词搜全站文章</span>
+    </a>
+    <a class="qj-door" href="{{ "about/" | relURL }}">
+      <span class="qj-door-z">人</span>
+      <span class="qj-door-t">阁主何人</span>
+      <span class="qj-door-s">所习诸术、求问办事的方式</span>
+    </a>
+  </nav>
 
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Noto+Serif+SC:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Sans+Symbols+2&display=swap"/>
-<link rel="stylesheet" href="/card/styles.css"/>
-
-{{- /* 名片的 jsx 在构建时由 Hugo（esbuild）编译压缩成一个文件，
-       React 用本站自带的 production 版，不再依赖 unpkg 和浏览器端 Babel。 */}}
-{{- $card := slice "card/decorations.jsx" "card/compass.jsx" "card/talismans.jsx" "card/app.jsx" -}}
-{{- $js := partial "card-bundle.html" $card -}}
-<script defer src="/card/vendor/react.production.min.js"></script>
-<script defer src="/card/vendor/react-dom.production.min.js"></script>
-<script defer src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
-</head>
-<body>
-<div id="root">
-  {{- /* 静态名片：脚本运行前、或脚本加载失败时显示；搜索引擎读的也是这份。
-         React 挂载后整块被星盘名片替换。 */}}
-  <div class="fallback">
-    <p class="fb-en">OHWOWBILL</p>
-    <h1 class="fb-name">潜蛟子</h1>
-    <p class="fb-tag">玄学 · 语言 · 生活</p>
-    <p class="fb-verse">{{ replace site.Params.description "辰。" "辰。<br/>" | safeHTML }}</p>
-    <nav class="fb-links" aria-label="去处">
-      <a href="/posts/">文章 · 万法归一</a>
-      <a href="/about/">阁主何人</a>
-      <a href="/links/">各处去向</a>
-      <a href="/meihua/">梅花易数</a>
-      <a href="/yanzhi/">閩吳谚文</a>
-      {{- range site.Data.identity.profile }}
-      <a href="{{ .url }}" rel="me noopener" target="_blank">{{ .label }}</a>
+  <section class="qj-block">
+    <h2 class="qj-block-h">分区</h2>
+    <ul class="qj-boards">
+      {{- range site.Data.sections.group }}
+      <li><a href="{{ "posts/" | relURL }}#sec-{{ .seal }}"><span class="qj-seal" aria-hidden="true">{{ .seal }}</span>{{ .name }}</a></li>
       {{- end }}
-    </nav>
-    <div class="fb-recent">
-      <p class="fb-recent-hd">近作</p>
-      {{- range first 3 (where site.RegularPages "Section" "posts").ByDate.Reverse }}
-      <a href="{{ .RelPermalink }}">{{ .Title }}<span>{{ .Date.Format "2006.01" }}</span></a>
+    </ul>
+  </section>
+
+  <section class="qj-block">
+    <h2 class="qj-block-h">近作</h2>
+    <div class="qj-list">
+      {{- range first 5 $posts.ByDate.Reverse }}
+      <a class="qj-item" href="{{ .RelPermalink }}">
+        <span class="qj-item-t">{{ .Title | emojify }}<time class="qj-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time></span>
+        {{- with (.Description | default (.Summary | plainify)) }}<span class="qj-item-s">{{ . | truncate 62 "…" }}</span>{{ end }}
+      </a>
       {{- end }}
     </div>
-  </div>
-</div>
+  </section>
 
-<a class="blog-portal" href="/posts/">万 法 归 一 &nbsp;→</a>
-</body>
-</html>
+  <section class="qj-block">
+    <h2 class="qj-block-h">初来者，先读这两篇</h2>
+    <div class="qj-list">
+      {{- range slice "posts/zhi-zhui-sui-zhe" "posts/qing-xu-ben-yuan-lun" }}
+      {{- with site.GetPage . }}
+      <a class="qj-item" href="{{ .RelPermalink }}">
+        <span class="qj-item-t">{{ .Title | emojify }}</span>
+        {{- with (.Description | default (.Summary | plainify)) }}<span class="qj-item-s">{{ . | truncate 62 "…" }}</span>{{ end }}
+      </a>
+      {{- end }}
+      {{- end }}
+    </div>
+  </section>
+</div>
+{{ end }}

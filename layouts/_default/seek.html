@@ -1,0 +1,78 @@
+{{ define "main" }}
+{{- /* 寻物：站内搜索的结果页。
+       与导航里的搜索浮层共用 /index.json 与 Fuse（主题已在 head 里载入），
+       多了一个可分享、可回退的网址：/seek/?q=字词。 */ -}}
+<header class="qj-head">
+  <h1 class="qj-h1">{{ .Title }}</h1>
+  <p class="qj-lede">{{ .Description }}。也可按分区翻：</p>
+  <ul class="qj-boards">
+    {{- range site.Data.sections.group }}
+    <li><a href="{{ "posts/" | relURL }}#sec-{{ .seal }}"><span class="qj-seal" aria-hidden="true">{{ .seal }}</span>{{ .name }}</a></li>
+    {{- end }}
+  </ul>
+</header>
+
+<form class="qj-seek" role="search" action="{{ .RelPermalink }}" method="get">
+  <label class="sr-only" for="qj-seek-q">搜索字词</label>
+  <input id="qj-seek-q" name="q" type="search" autocomplete="off" placeholder="如：梅花、命理、白狐" />
+  <button type="submit">寻</button>
+</form>
+<p class="qj-seek-status" id="qj-seek-status" aria-live="polite"></p>
+<div class="qj-list" id="qj-seek-out"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var form = document.querySelector(".qj-seek");
+  var input = document.getElementById("qj-seek-q");
+  var out = document.getElementById("qj-seek-out");
+  var status = document.getElementById("qj-seek-status");
+  var fuse = null, composing = false;
+
+  function esc(s) {
+    return String(s || "").replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function plain(html) {
+    var d = document.createElement("div");
+    d.innerHTML = html || "";
+    return (d.textContent || "").trim();
+  }
+
+  function run() {
+    var q = input.value.trim();
+    var url = new URL(location.href);
+    if (q) url.searchParams.set("q", q); else url.searchParams.delete("q");
+    history.replaceState(null, "", url);
+    if (!q) { out.innerHTML = ""; status.textContent = ""; return; }
+    if (!fuse) { status.textContent = "正在取索引……"; return; }
+    var hits = fuse.search(q).filter(function (r) {
+      return r.item.type !== "categories" && r.item.type !== "tags";
+    });
+    status.textContent = hits.length ? "寻得 " + hits.length + " 处" : "未寻得与「" + q + "」相关的文字，换个字试试，或按上面的分区翻。";
+    out.innerHTML = hits.map(function (r) {
+      var it = r.item, s = plain(it.summary);
+      if (s.length > 62) s = s.slice(0, 62) + "…";
+      return '<a class="qj-item" href="' + esc(it.permalink) + '"><span class="qj-item-t">' + esc(it.title) +
+        (it.date ? '<span class="qj-date">' + esc(it.date) + "</span>" : "") + "</span>" +
+        (s ? '<span class="qj-item-s">' + esc(s) + "</span>" : "") + "</a>";
+    }).join("");
+  }
+
+  form.addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  input.addEventListener("compositionstart", function () { composing = true; });
+  input.addEventListener("compositionend", function () { composing = false; run(); });
+  input.addEventListener("input", function () { if (!composing) run(); });
+
+  input.value = new URLSearchParams(location.search).get("q") || "";
+  fetch({{ "index.json" | relURL }}).then(function (r) { return r.json(); }).then(function (data) {
+    fuse = new Fuse(data, {
+      shouldSort: true, ignoreLocation: true, threshold: 0.0,
+      keys: [{ name: "title", weight: 0.8 }, { name: "summary", weight: 0.6 }, { name: "content", weight: 0.4 }]
+    });
+    run();
+  }).catch(function () { status.textContent = "索引取不回来，稍后再试。"; });
+  if (!input.value) input.focus();
+});
+</script>
+{{ end }}
