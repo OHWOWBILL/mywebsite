@@ -6,11 +6,11 @@
      走主题的 baseof（导航、搜索、页脚与内页一致），不再有加载帘幕。
      =========================================================== */ -}}
 {{- $posts := where site.RegularPages "Section" "posts" -}}
-{{- $hero := resources.Get "img/ge-hero.jpg" -}}
+{{- $hero := (resources.Get "img/ge-hero.jpg").Process "webp q70" -}}
 
 <section class="qj-hero" aria-label="潜蛟阁">
   {{- with $hero }}
-  <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="月下屋檐，云层压着瓦" fetchpriority="high"/>
+  <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="大麻山神社，鸟居下石阶通往雾中社殿" fetchpriority="high"/>
   {{- end }}
   <span class="qj-hero-v2">翻身倚北辰</span>
   <h1 class="qj-hero-v">潜蛟阁</h1>
