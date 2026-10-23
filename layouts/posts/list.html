@@ -40,7 +40,7 @@
 
   {{- with $pages -}}
     {{- $sorted := cond (eq ($g.order | default "desc") "asc") (sort . "Date" "asc") (sort . "Date" "desc") -}}
-    <section class="qj-sec">
+    <section class="qj-sec" id="sec-{{ $g.seal }}">
       <div class="qj-sec-hd">
         <span class="qj-seal" aria-hidden="true">{{ $g.seal }}</span>
         <h2 class="qj-sec-name">{{ $g.name }}</h2>
@@ -73,7 +73,7 @@
 
 {{- with $rest -}}
   {{- $fb := $cfg.fallback -}}
-  <section class="qj-sec">
+  <section class="qj-sec" id="sec-{{ $fb.seal }}">
     <div class="qj-sec-hd">
       <span class="qj-seal qj-seal-dim" aria-hidden="true">{{ $fb.seal }}</span>
       <h2 class="qj-sec-name">{{ $fb.name }}</h2>
@@ -93,7 +93,7 @@
 {{- end -}}
 
 <p class="qj-foot">
-  按主题存放，不按年月。欲依标签检索，见 <a href="{{ "tags" | relURL }}">寻物</a>。
+  按主题存放，不按年月。欲按字词检索，见 <a href="{{ "seek/" | relURL }}">寻物</a>。
   <a class="qj-new" id="qj-new" href="https://github.com/ohwowbill/mywebsite/new/main?filename=content/posts/new-post/index.md" rel="noopener" target="_blank">✎ 写新篇</a>
 </p>
 

@@ -1,0 +1,2 @@
+{{- /* 星盘：{{< compass >}}，加 size="small" 缩小 */ -}}
+<div class="qj-compass-wrap not-prose{{ if eq (.Get "size") "small" }} is-small{{ end }}">{{ partial "compass.html" . }}</div>

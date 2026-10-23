@@ -17,8 +17,8 @@ enableEmoji = true
 [imaging]
   anchor = 'Center'
 
+# 文章只用 categories，不打 tags；「tags」若开着会生成一个空的 /tags/ 页。
 [taxonomies]
-  tag = "tags"
   category = "categories"
 
 # 旧站（Hugo Stack）正文大量使用裸 HTML 与自定义短代码。
@@ -36,10 +36,6 @@ enableEmoji = true
 [related]
   threshold = 0
   toLower = false
-
-  [[related.indices]]
-    name = "tags"
-    weight = 100
 
   [[related.indices]]
     name = "categories"

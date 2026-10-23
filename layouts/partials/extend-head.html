@@ -2,7 +2,8 @@
        本 partial 只用 site.* 全局函数，不依赖传入上下文。 */ -}}
 {{ partial "person-schema.html" . }}
 {{ partial "owner-mode.html" . }}
-{{- /* 内页也载入首页用的宋体，标题与导航才对得上 */}}
+{{- /* 字体全部来自 Google Fonts（视觉基调指定）：
+       Noto Serif SC 600/900 标题 · LXGW WenKai TC 正文与引文 · Archivo 宽体只写 ohwowbill 与日期 */}}
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600&display=swap"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap"/>

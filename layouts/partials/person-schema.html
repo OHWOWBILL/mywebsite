@@ -1,7 +1,6 @@
 {{- /* Person 实体 · 数据源 data/identity.toml
        稳定 @id 让各页面的引用被搜索引擎合并为同一实体。
-       首页走 layouts/index.html（绕开 baseof），其余页面走 extend-head.html，
-       两处都调用本 partial。 */ -}}
+       所有页面（含首页）经 extend-head.html 调用本 partial。 */ -}}
 {{- with site.Data.identity -}}
 <script type="application/ld+json">
 {
