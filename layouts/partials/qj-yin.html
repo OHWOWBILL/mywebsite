@@ -1,0 +1,118 @@
+{{- /* 音律：Web Audio 现场合成的磬声，不加载任何音频文件。
+       默认关；点页眉的磬形按钮开启，选择记在 localStorage。
+       门径悬停按五音（宫商角徵羽）各发一声，导航与近作悬停发高八度轻声，
+       星空里点一下落一粒金星、响一声。 */ -}}
+<script>
+(function () {
+  var KEY = 'qj-yin';
+  var AC = window.AudioContext || window.webkitAudioContext;
+  var btns = document.querySelectorAll('.qj-yin-toggle');
+  if (!AC) { btns.forEach(function (b) { b.hidden = true; }); return; }
+
+  var on = false;
+  try { on = localStorage.getItem(KEY) === '1'; } catch (e) {}
+
+  var ctx = null, bus = null;
+
+  // 殿内回响：用衰减白噪声现做一段脉冲响应
+  function makeHall(c) {
+    var len = Math.floor(c.sampleRate * 2.8);
+    var buf = c.createBuffer(2, len, c.sampleRate);
+    for (var ch = 0; ch < 2; ch++) {
+      var d = buf.getChannelData(ch);
+      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2);
+    }
+    var conv = c.createConvolver();
+    conv.buffer = buf;
+    return conv;
+  }
+
+  function ensure() {
+    if (!ctx) {
+      ctx = new AC();
+      var master = ctx.createGain();
+      master.gain.value = 0.18;
+      master.connect(ctx.destination);
+      bus = ctx.createGain();
+      var wet = ctx.createGain();
+      wet.gain.value = 0.42;
+      var hall = makeHall(ctx);
+      bus.connect(master);
+      bus.connect(hall); hall.connect(wet); wet.connect(master);
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+
+  // 磬：几道非谐泛音各自指数衰减，石质的「叮——」
+  var PARTIALS = [[1, 1, 3.2], [2.76, .42, 1.8], [5.4, .2, 1.0], [8.93, .08, .5]];
+  function qing(freq, vel, delay) {
+    if (!on || !ctx || ctx.state !== 'running') return;
+    var t = ctx.currentTime + (delay || 0);
+    PARTIALS.forEach(function (p) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq * p[0];
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(p[1] * vel, t + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + p[2]);
+      o.connect(g); g.connect(bus);
+      o.start(t); o.stop(t + p[2] + 0.05);
+    });
+  }
+
+  // 五音，D 宫：宫 商 角 徵 羽
+  var WU = [293.66, 329.63, 369.99, 440.0, 493.88];
+
+  function render() {
+    btns.forEach(function (b) {
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.title = on ? '音律：开' : '音律：关';
+    });
+  }
+  render();
+
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      on = !on;
+      try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+      render();
+      if (on) {
+        ensure();
+        // 开：五音自宫至羽一路扬上去
+        WU.forEach(function (f, i) { qing(f, .5, i * .11); });
+        qing(WU[0] * 2, .35, .62);
+      }
+    });
+  });
+
+  // 浏览器只许在点击或按键之后出声：换页后第一次点按时唤醒
+  function wake() { if (on) ensure(); }
+  document.addEventListener('pointerdown', wake, true);
+  document.addEventListener('keydown', wake, true);
+
+  // 同一元素 150ms 内不重复响，免得鼠标抖动连发
+  var last = new WeakMap();
+  function play(el, freq, vel) {
+    var now = performance.now();
+    if (now - (last.get(el) || 0) < 150) return;
+    last.set(el, now);
+    qing(freq, vel);
+  }
+
+  function hover(selector, pick, vel) {
+    document.querySelectorAll(selector).forEach(function (el, i) {
+      el.addEventListener('pointerenter', function (e) {
+        if (e.pointerType === 'mouse') play(el, pick(i), vel);
+      });
+      el.addEventListener('focus', function () { play(el, pick(i), vel * .7); });
+    });
+  }
+  hover('.qj-door', function (i) { return WU[i % 5]; }, .55);
+  hover('.qj-boards a', function (i) { return WU[(i + 2) % 5] * 2; }, .22);
+  hover('.qj-item', function (i) { return WU[i % 5] * 2; }, .18);
+
+  // 星空点按：给 extend-footer 里的粒子系统用
+  window.qjYin = { tap: function () { qing(WU[Math.floor(Math.random() * 5)] * 2, .3); } };
+})();
+</script>
