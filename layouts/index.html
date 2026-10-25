@@ -8,12 +8,14 @@
 {{- $posts := where site.RegularPages "Section" "posts" -}}
 {{- $hero := (resources.Get "img/ge-hero.jpg").Process "webp q70" -}}
 
+{{- /* 开阁动效只在本次会话第一次进首页时放；再回来直接静态呈现 */}}
+<script>try{if(sessionStorage.getItem('qj-opened'))document.documentElement.classList.add('qj-opened');sessionStorage.setItem('qj-opened','1')}catch(e){}</script>
 <section class="qj-hero" aria-label="潜蛟阁">
   {{- with $hero }}
   <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="大麻山神社，鸟居下石阶通往雾中社殿" fetchpriority="high"/>
   {{- end }}
   <span class="qj-hero-v2">翻身倚北辰</span>
-  <h1 class="qj-hero-v">潜蛟阁</h1>
+  <h1 class="qj-hero-v">{{ range $i, $c := split "潜蛟阁" "" }}<span class="qj-ch" style="--i:{{ $i }}">{{ $c }}</span>{{ end }}</h1>
   <span class="qj-hero-line" aria-hidden="true"></span>
   <p class="qj-hero-sig">阁主　潜蛟子</p>
 </section>

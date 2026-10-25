@@ -45,6 +45,11 @@
       </button>
     {{ end }}
 
+    {{- /* 本站改动：音律开关（默认关，见 partials/qj-yin.html） */}}
+    <button type="button" class="qj-yin-toggle text-base hover:text-primary-600 dark:hover:text-primary-400" aria-pressed="false" aria-label="音律" title="音律：关">
+      <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2.5M7.5 4.5h9L18 16H6Z"/><circle cx="12" cy="19" r="1.4"/><path class="qj-yin-on" d="M3 9.5c-1.2 2-1.2 4 0 6M21 9.5c1.2 2 1.2 4 0 6"/></svg>
+    </button>
+
     {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
       <div class="{{ if .Site.Params.footer.showScrollToTop | default true -}}{{- end }} flex items-center">
         <button
@@ -79,6 +84,11 @@
         {{ partial "icon.html" "search" }}
       </button>
     {{ end }}
+
+    {{- /* 本站改动：音律开关（默认关，见 partials/qj-yin.html） */}}
+    <button type="button" class="qj-yin-toggle text-base hover:text-primary-600 dark:hover:text-primary-400" aria-pressed="false" aria-label="音律" title="音律：关">
+      <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2.5M7.5 4.5h9L18 16H6Z"/><circle cx="12" cy="19" r="1.4"/><path class="qj-yin-on" d="M3 9.5c-1.2 2-1.2 4 0 6M21 9.5c1.2 2 1.2 4 0 6"/></svg>
+    </button>
 
     {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
       <button

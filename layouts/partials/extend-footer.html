@@ -9,13 +9,15 @@
     'width:100vw', 'height:100vh',
     'pointer-events:none',
     'z-index:9999',
-    'opacity:0.22',
+    'opacity:1',
     'mix-blend-mode:screen'
   ].join(';');
   document.body.appendChild(canvas);
 
   var ctx = canvas.getContext('2d');
   var W, H, stars = [], trail = [];
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var running = false;
 
   function resize() {
     W = canvas.width  = window.innerWidth;
@@ -41,6 +43,7 @@
 
   // 鼠标跟随
   document.addEventListener('mousemove', function (e) {
+    if (still.matches) return;
     for (var i = 0; i < 3; i++) {
       trail.push({
         x:  e.clientX + (Math.random() - 0.5) * 14,
@@ -52,6 +55,21 @@
         gold: Math.random() > 0.92
       });
     }
+  });
+
+  // 点按落星：一圈金紫碎屑向外散开（点在链接、按钮上不放，免得抢戏）
+  document.addEventListener('pointerdown', function (e) {
+    if (still.matches || e.button > 0) return;
+    if (e.target.closest && e.target.closest('a,button,input,textarea,select,label')) return;
+    for (var k = 0; k < 22; k++) {
+      var ang = (k / 22) * 6.283 + Math.random() * .3, sp = Math.random() * 2.4 + 1.2;
+      trail.push({
+        x: e.clientX, y: e.clientY,
+        vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+        life: 1.0, r: Math.random() * 2.2 + 1.2, gold: Math.random() > 0.55, k: 0.9
+      });
+    }
+    if (window.qjYin) window.qjYin.tap();
   });
 
   function draw() {
@@ -66,7 +84,7 @@
       var a = 0.45 + 0.5 * Math.sin(t * s.freq * 60 + s.phase);
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, 6.283);
-      ctx.fillStyle = 'rgba(237,235,242,' + a + ')';
+      ctx.fillStyle = 'rgba(237,235,242,' + (a * 0.22) + ')';  // 画布本身不透明，星光在这里压到两成
       ctx.fill();
     }
 
@@ -79,14 +97,28 @@
       var col = p.gold ? '217,174,78' : '169,148,224';
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r * p.life, 0, 6.283);
-      ctx.fillStyle = 'rgba(' + col + ',' + (p.life * 0.85) + ')';
+      ctx.fillStyle = 'rgba(' + col + ',' + (p.life * (p.k || 0.19)) + ')';
       ctx.fill();
     }
 
-    requestAnimationFrame(draw);
+    if (running) requestAnimationFrame(draw);
   }
 
+  // 减少动态效果：只画一帧静止的星空；切到后台标签时停表省电
+  function start() {
+    if (running || still.matches || document.hidden) return;
+    running = true;
+    requestAnimationFrame(draw);
+  }
+  function stop() { running = false; }
+
   resize(); initStars(); draw();
-  window.addEventListener('resize', function () { resize(); initStars(); });
+  start();
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+  if (still.addEventListener) still.addEventListener('change', function () {
+    if (still.matches) { stop(); trail = []; draw(); } else start();
+  });
+  window.addEventListener('resize', function () { resize(); initStars(); if (!running) draw(); });
 })();
 </script>
+{{ partial "qj-yin.html" . }}

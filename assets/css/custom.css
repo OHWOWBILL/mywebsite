@@ -885,3 +885,107 @@ main > header h1 {
 @media (prefers-reduced-motion: reduce) {
   .qj-item, .qj-item-t, .qj-door { transition: none !important; }
 }
+
+/* ===========================================================
+   十 动效与音律
+   一律包在 prefers-reduced-motion: no-preference 里：
+   系统设了「减少动态效果」的人看到的是原来的静态页。
+   =========================================================== */
+
+/* --- 开阁：雾散、三字逐个洇出、金线垂下、落款展开 --- */
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.qj-opened) .qj-hero-img {
+    animation: qj-mist 2.6s cubic-bezier(.2, .7, .2, 1) both;
+  }
+  html:not(.qj-opened) .qj-hero-v .qj-ch {
+    animation: qj-ink 1.2s cubic-bezier(.2, .7, .2, 1) both;
+    animation-delay: calc(.55s + var(--i) * .32s);
+  }
+  html:not(.qj-opened) .qj-hero-v2 {
+    animation: qj-fade 1.4s ease both 1.6s;
+  }
+  html:not(.qj-opened) .qj-hero-line {
+    transform-origin: top;
+    animation: qj-drop 1.1s cubic-bezier(.6, 0, .2, 1) both 1.9s;
+  }
+  html:not(.qj-opened) .qj-hero-sig {
+    animation: qj-sign 1.6s cubic-bezier(.2, .7, .2, 1) both 2.4s;
+  }
+}
+
+@keyframes qj-mist {
+  from { opacity: 0; filter: blur(16px) brightness(.4); transform: scale(1.08); }
+  to   { opacity: 1; filter: none; transform: none; }
+}
+/* 字是行内元素（竖排里换成 inline-block 会叠字），
+   所以不用 filter/transform，借 text-shadow 做墨晕 */
+@keyframes qj-ink {
+  0%   { color: transparent; text-shadow: 0 0 28px rgba(237, 235, 242, 0); }
+  45%  { color: transparent; text-shadow: 0 0 14px rgba(237, 235, 242, .9); }
+  100% { color: var(--ge-fg); text-shadow: 0 1px 16px rgba(18, 12, 28, .6); }
+}
+@keyframes qj-fade { from { opacity: 0; } }
+@keyframes qj-drop { from { transform: scaleY(0); } }
+@keyframes qj-sign {
+  from { opacity: 0; letter-spacing: .7em; }
+  to   { opacity: 1; letter-spacing: .24em; }
+}
+
+/* 金线有气息：极慢的明暗起伏 */
+@media (prefers-reduced-motion: no-preference) {
+  .qj-hero-line::after {
+    content: "";
+    position: absolute;
+    inset: -6px -5px;
+    background: radial-gradient(closest-side, rgba(217, 174, 78, .55), transparent);
+    animation: qj-breathe 4.5s ease-in-out infinite 3s;
+    opacity: 0;
+  }
+}
+@keyframes qj-breathe { 50% { opacity: 1; } }
+
+/* --- 门径：悬停时字印亮起 --- */
+.qj-door-z { transition: color .3s ease, text-shadow .3s ease, transform .3s ease; }
+.qj-door:hover .qj-door-z,
+.qj-door:focus-visible .qj-door-z {
+  color: var(--ge-fg);
+  text-shadow: 0 0 18px rgba(169, 148, 224, .8);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .qj-door:hover .qj-door-z,
+  .qj-door:focus-visible .qj-door-z { transform: translateY(-2px) scale(1.06); }
+}
+
+/* --- 滚动浮现：支持 scroll-driven animations 的浏览器上，
+       首页各条目随滚动由雾中浮出；不支持的浏览器原样显示 --- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .qj-door, .qj-boards li, .qj-item, .qj-block-h {
+      animation: qj-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+@keyframes qj-rise {
+  from { opacity: 0; transform: translateY(18px); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+/* --- 换页：同站跳转时整页如墨洇开（View Transitions API，
+       Chrome 126+ / Safari 18.2+；其余浏览器照常硬切） --- */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  #qianjiao-stars { view-transition-name: qj-stars; }
+  ::view-transition-old(root) { animation: qj-vt-out .32s ease-in both; }
+  ::view-transition-new(root) { animation: qj-vt-in .55s cubic-bezier(.2, .7, .2, 1) both; }
+}
+@keyframes qj-vt-out { to { opacity: 0; filter: blur(8px); transform: scale(.985); } }
+@keyframes qj-vt-in  { from { opacity: 0; filter: blur(8px); transform: scale(1.015); } }
+
+/* --- 音律开关 --- */
+.qj-yin-toggle { display: inline-flex; align-items: center; font-size: 1.15em; opacity: .6; }
+.qj-yin-toggle .qj-yin-on { display: none; }
+.qj-yin-toggle[aria-pressed="true"] { opacity: 1; color: var(--ge-zi); }
+.qj-yin-toggle[aria-pressed="true"] .qj-yin-on { display: inline; }
