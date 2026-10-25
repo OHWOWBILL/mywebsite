@@ -863,6 +863,37 @@ h1, h2, h3, h4,
   .qj-compass .cp-ring { animation: none; }
 }
 
+/* 实时星盘（layouts/partials/qj-compass-live.html）：
+   宫、宿两环交给脚本按天象定位，开页时缓缓转到当下 */
+.qj-compass-wrap.is-live .cp-r3,
+.qj-compass-wrap.is-live .cp-r4 {
+  animation: none;
+  transition: transform 3.2s cubic-bezier(.3, .05, .1, 1);
+}
+.qj-compass .cp-axis { fill: var(--ge-zi); opacity: .9; }
+.qj-compass .cp-now {
+  fill: var(--ge-fg);
+  filter: drop-shadow(0 0 4px rgba(169, 148, 224, .95));
+  transition: fill .6s ease;
+}
+.qj-compass-now {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .2rem 1.2em;
+  margin: -1.4rem 0 2.4rem;
+  font-family: var(--font-body);
+  font-size: .9rem;
+  letter-spacing: .14em;
+  color: var(--ge-muted);
+  text-align: center;
+}
+.qj-compass-wrap.is-small + .qj-compass-now { margin: -.8rem 0 1.6rem; font-size: .82rem; }
+@media (prefers-reduced-motion: reduce) {
+  .qj-compass-wrap.is-live .cp-r3,
+  .qj-compass-wrap.is-live .cp-r4 { transition: none; }
+}
+
 /* ===========================================================
    六 文章页
    =========================================================== */
