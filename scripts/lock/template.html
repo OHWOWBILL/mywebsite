@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>闭关</title>
+<style>
+  :root { --bg:#14111c; --panel:#1d1828; --line:#3a3150; --ink:#e8e0cc; --dim:#8f8699; --gold:#c9a24a; --err:#d4553a; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family:"Songti SC","STSong","Noto Serif SC",serif; }
+  body { display:flex; align-items:center; justify-content:center; padding:16px; }
+  form { width:100%; max-width:320px; background:var(--panel); border:1px solid var(--line);
+    border-radius:6px; padding:28px 24px; text-align:center; }
+  h1 { margin:0 0 6px; font-size:20px; letter-spacing:.3em; color:var(--gold); font-weight:600; }
+  p { margin:0 0 18px; font-size:13px; color:var(--dim); letter-spacing:.1em; }
+  input[type=password] { width:100%; padding:10px 12px; font:inherit; font-size:16px; color:var(--ink);
+    background:var(--bg); border:1px solid var(--line); border-radius:4px; outline:none; text-align:center; }
+  input[type=password]:focus { border-color:var(--gold); }
+  label { display:flex; align-items:center; justify-content:center; gap:6px; margin:12px 0 16px;
+    font-size:13px; color:var(--dim); cursor:pointer; }
+  button { width:100%; padding:10px; font:inherit; font-size:15px; letter-spacing:.4em; color:var(--bg);
+    background:var(--gold); border:0; border-radius:4px; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:wait; }
+  #msg { min-height:1.4em; margin:12px 0 0; color:var(--err); }
+</style>
+</head>
+<body>
+<form id="f" autocomplete="off">
+  <h1>闭关</h1>
+  <p>此处不待客</p>
+  <input type="password" id="pw" placeholder="口令" autofocus>
+  <label><input type="checkbox" id="keep" checked> 此设备记住</label>
+  <button id="go">开</button>
+  <p id="msg"></p>
+</form>
+<script>
+(function () {
+  // 加密数据由 scripts/lock/encrypt.mjs 写入，原文不在仓库中
+  var BOX = /*BOX*/null/*BOX*/;
+  var KEY_STORE = 'lock_key_' + BOX.id;
+  var enc = new TextEncoder();
+  function b64(s) { return Uint8Array.from(atob(s), function (c) { return c.charCodeAt(0); }); }
+  function b64e(buf) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); }
+
+  async function deriveRaw(pw) {
+    var base = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits']);
+    return crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: b64(BOX.salt), iterations: BOX.iter }, base, 256);
+  }
+  async function open(raw) {
+    var key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+    var plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(BOX.iv) }, key, b64(BOX.data));
+    var html = new TextDecoder().decode(plain);
+    document.open(); document.write(html); document.close();
+  }
+  function get() { try { return localStorage.getItem(KEY_STORE); } catch (e) { return null; } }
+  function set(v) { try { v ? localStorage.setItem(KEY_STORE, v) : localStorage.removeItem(KEY_STORE); } catch (e) {} }
+
+  var saved = get();
+  // 页面解析完再替换文档，否则 document.open 可能不生效
+  if (saved) {
+    document.documentElement.style.visibility = 'hidden';
+    var auto = function () {
+      open(b64(saved).buffer).catch(function () {
+        set(null);
+        document.documentElement.style.visibility = '';
+      });
+    };
+    if (document.readyState === 'complete') auto(); else window.addEventListener('load', auto);
+  }
+
+  document.getElementById('f').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('go'), msg = document.getElementById('msg');
+    btn.disabled = true; msg.textContent = '';
+    try {
+      var keep = document.getElementById('keep').checked;
+      var raw = await deriveRaw(document.getElementById('pw').value);
+      await open(raw);
+      set(keep ? b64e(raw) : null);
+    } catch (err) {
+      msg.textContent = '口令不对';
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>
