@@ -3,6 +3,7 @@ title: "【置顶】志追随者"
 date: 2024-09-11
 description: "浩渺微星竟能感动人；星河人海中，之于我又何尝不然"
 categories: ["诗词", "随笔", "生活"]
+pinned: true
 weight: 1
 ---
 

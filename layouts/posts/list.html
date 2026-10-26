@@ -20,6 +20,8 @@
 
 {{- with .Content }}<div class="qj-intro prose dark:prose-invert">{{ . }}</div>{{ end -}}
 
+{{- partial "qj-pinned.html" (dict "title" "置顶") }}
+
 {{- range $gi, $g := $cfg.group -}}
   {{- $pages := slice -}}
   {{- range $p := $all -}}

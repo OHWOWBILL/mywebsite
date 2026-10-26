@@ -3,6 +3,7 @@ title: "【置顶】情绪本源论"
 date: 2024-07-01
 description: "情绪推动思维引发行为 —— 核心、机制、与应用"
 categories: ["随笔", "模型", "人性"]
+pinned: true
 weight: 2
 ---
 
