@@ -1,0 +1,5 @@
+{{- /* Blowfish 不缓存的 head 扩展点，拿得到当前页。
+       文章页留一枚记号给 assets/js/qj/article.js：发文日（起卦印用）、是否默认竖排。 */ -}}
+{{- if and .IsPage (eq .Section "posts") }}
+<meta name="qj-post" content="{{ .Date.Format "2006-01-02" }}" data-vertical="{{ if .Params.vertical }}true{{ else }}false{{ end }}">
+{{- end }}

@@ -7,3 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap"/>
+{{- /* 节气换肤：在画面出来之前按太阳黄经算出当令节气与季节，
+       写到 <html data-season data-jieqi>，custom.css「十一 节气」据此微调那一处金。
+       网址带 ?jieqi=冬至 可预览。算法与 assets/js/qj/li.js 同。 */}}
+<script>
+(function () {
+  var J = '春分清明谷雨立夏小满芒种夏至小暑大暑立秋处暑白露秋分寒露霜降立冬小雪大雪冬至小寒大寒立春雨水惊蛰'.match(/../g);
+  var n = Date.now() / 864e5 + 2440587.5 - 2451545, g = (357.528 + .9856003 * n) * Math.PI / 180;
+  var lon = ((280.46 + .9856474 * n + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) % 360 + 360) % 360;
+  var i = Math.floor(lon / 15);
+  try { var q = J.indexOf(new URLSearchParams(location.search).get('jieqi')); if (q >= 0) i = q; } catch (e) {}
+  var el = document.documentElement;
+  el.dataset.jieqi = J[i];
+  el.dataset.season = ['spring', 'summer', 'autumn', 'winter'][Math.floor((((i - 21) % 24) + 24) % 24 / 6)];
+})();
+</script>

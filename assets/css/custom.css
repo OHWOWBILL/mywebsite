@@ -1026,3 +1026,460 @@ main > header h1 {
 .qj-pinned-note { font-family: var(--font-body); font-size: .8rem; letter-spacing: .05em; font-weight: 400; color: var(--ge-muted); margin-left: auto; }
 .qj-pinned .qj-item { border-left-color: var(--zi); }
 .qj-head + .qj-pinned, .qj-intro + .qj-pinned { margin-top: 0; margin-bottom: 2.6rem; }
+
+/* --- 音律：三档（关 / 磬 / 磬与琴），琴档多一根弦 --- */
+.qj-yin-toggle .qj-yin-qin { display: none; }
+.qj-yin-toggle[data-yin="2"] .qj-yin-qin { display: inline; }
+.qj-yin-tip {
+  position: fixed;
+  z-index: 80;
+  transform: translate(-50%, -4px);
+  padding: .25rem .65rem;
+  font-family: var(--font-body);
+  font-size: .8rem;
+  letter-spacing: .12em;
+  white-space: nowrap;
+  color: var(--ge-fg);
+  background: var(--ge-bg-2);
+  border: 1px solid var(--ge-rule);
+  border-radius: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.qj-yin-tip.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ===========================================================
+   十一 节气
+   head 里按太阳黄经写好 html[data-season]（extend-head.html），
+   那一处金随四季微变：春嫩金、夏赤金、秋本色、冬淡金。
+   时令粒子画在星空画布上（assets/js/qj/season.js）。
+   =========================================================== */
+
+html[data-season="spring"] { --jin: #CDBA62; --color-secondary-400: 205, 186, 98;  --color-secondary-500: 205, 186, 98; }
+html[data-season="summer"] { --jin: #E1A64E; --color-secondary-400: 225, 166, 78;  --color-secondary-500: 225, 166, 78; }
+html[data-season="winter"] { --jin: #D8C597; --color-secondary-400: 216, 197, 151; --color-secondary-500: 216, 197, 151; }
+
+/* ===========================================================
+   十二 日课（partials/qj-rike.html · assets/js/qj/rike.js）
+   =========================================================== */
+
+.qj-rike .qj-block-h { display: flex; align-items: center; gap: .6rem; color: var(--ge-fg); }
+.qj-rike-date {
+  margin-left: auto;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: .82rem;
+  letter-spacing: .06em;
+  color: var(--ge-muted);
+  text-align: right;
+}
+.qj-rike-date span { margin-left: .7em; color: var(--ge-fg-2); }
+
+.qj-rike-body {
+  display: grid;
+  grid-template-columns: 4.6rem minmax(0, 1fr) minmax(0, 12.5rem);
+  gap: 1.1rem 1.4rem;
+  align-items: center;
+}
+
+.qj-rike-moon { display: grid; justify-items: center; gap: .3rem; }
+.qj-rike-moon svg { width: 3.6rem; height: 3.6rem; overflow: visible; }
+.qj-rike-moon .mo-dark { fill: var(--ge-bg-2); stroke: var(--ge-rule); stroke-width: .8; }
+.qj-rike-moon .mo-lit { fill: var(--ge-fg); filter: drop-shadow(0 0 6px rgba(237, 235, 242, .35)); }
+.qj-rike-moon span { font-family: var(--font-body); font-size: .82rem; letter-spacing: .2em; color: var(--ge-fg-2); }
+
+.qj-rike-facts { margin: 0; display: grid; gap: .3rem; }
+.qj-rike-facts div { display: grid; grid-template-columns: 1.7rem minmax(0, 1fr); align-items: baseline; }
+.qj-rike-facts dt {
+  font-family: var(--font-title);
+  font-weight: 900;
+  font-size: .85rem;
+  color: var(--ge-zi);
+}
+.qj-rike-facts dd {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: .95rem;
+  line-height: 1.7;
+  color: var(--ge-fg-2);
+}
+.qj-rike-facts dd b { font-weight: 400; color: var(--ge-fg); letter-spacing: .06em; }
+
+.qj-rike-gua {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto;
+  column-gap: .9rem;
+  align-items: center;
+  padding: .85rem .95rem;
+  text-decoration: none;
+  background: var(--ge-bg-2);
+  border: 1px solid var(--ge-rule);
+  border-radius: 4px;
+  transition: border-color .2s ease, background .2s ease;
+}
+.qj-rike-gua:hover { border-color: var(--zi); background: rgba(122, 91, 192, .14); }
+.qj-rike-gua .qj-gua-svg { grid-row: 1 / 4; fill: var(--ge-fg); }
+.qj-rike-gua .qj-gua-svg .dong { fill: var(--ge-zi); }
+.qj-rike-gua .g-k { font-family: var(--font-body); font-size: .75rem; letter-spacing: .2em; color: var(--ge-muted); }
+.qj-rike-gua .g-n { font-family: var(--font-title); font-weight: 900; font-size: 1.15rem; letter-spacing: .12em; color: var(--ge-fg); }
+.qj-rike-gua .g-d { font-family: var(--font-body); font-size: .8rem; color: var(--ge-zi); }
+.qj-rike-gua .g-m {
+  grid-column: 1 / -1;
+  margin-top: .45rem;
+  font-family: var(--font-body);
+  font-size: .82rem;
+  line-height: 1.6;
+  color: var(--ge-muted);
+}
+
+.qj-rike-foot { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+.qj-rike-qian {
+  padding: .45rem 1.1rem;
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: .92rem;
+  letter-spacing: .16em;
+  color: var(--ge-fg);
+  background: transparent;
+  border: 1px solid var(--zi);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+.qj-rike-qian:hover, .qj-rike-qian:focus-visible { background: rgba(122, 91, 192, .25); }
+.qj-rike-qian[disabled] { opacity: .6; cursor: progress; }
+.qj-rike-note { font-family: var(--font-body); font-size: .78rem; color: var(--ge-muted); }
+
+@media (max-width: 640px) {
+  .qj-rike-body { grid-template-columns: 3.8rem minmax(0, 1fr); }
+  .qj-rike-moon svg { width: 3rem; height: 3rem; }
+  .qj-rike-gua { grid-column: 1 / -1; }
+  .qj-rike .qj-block-h { flex-wrap: wrap; }
+  .qj-rike-date { flex-basis: 100%; margin-left: 0; text-align: left; }
+  .qj-rike-date span { margin-left: .5em; }
+}
+
+/* ===========================================================
+   十三 日签（assets/js/qj/qian.js）
+   =========================================================== */
+
+html.qj-noscroll { overflow: hidden; }
+.qj-qian-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(15, 12, 22, .82);
+  backdrop-filter: blur(6px);
+}
+.qj-qian-modal.on { display: grid; }
+.qj-qian-card { display: grid; justify-items: center; gap: .8rem; max-height: 100%; }
+.qj-qian-card img {
+  display: block;
+  max-width: min(90vw, 27rem);
+  max-height: calc(100svh - 8rem);
+  width: auto;
+  height: auto;
+  margin: 0;
+  border-radius: 4px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .55);
+}
+.qj-qian-acts { display: flex; gap: .7rem; }
+.qj-qian-acts a, .qj-qian-acts button {
+  padding: .45rem 1.2rem;
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: .92rem;
+  letter-spacing: .14em;
+  text-decoration: none;
+  color: var(--ge-fg);
+  background: var(--ge-bg-2);
+  border: 1px solid var(--ge-rule);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.qj-qian-acts .qj-qian-dl { background: var(--zi); border-color: var(--zi); }
+.qj-qian-tip { margin: 0; font-family: var(--font-body); font-size: .78rem; color: var(--ge-muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .qj-qian-modal.on .qj-qian-card img { animation: qj-vt-in .5s cubic-bezier(.2, .7, .2, 1) both; }
+}
+
+/* ===========================================================
+   十四 文章页四件（assets/js/qj/article.js）
+   =========================================================== */
+
+/* --- 阅读金线：文章页这一屏的那一处金 --- */
+.qj-read {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 120;  /* 主题的固定页眉是 z-100 */
+  pointer-events: none;
+  --p: 0;
+}
+.qj-read-line {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(217, 174, 78, 0), var(--jin) 40%);
+  transform-origin: left center;
+  transform: scaleX(var(--p));
+}
+.qj-read-wu {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 26px;
+  height: 16px;
+  fill: var(--ge-fg);
+  opacity: 0;
+  /* 横移用 translate 属性（最后施加），滑翔的起伏用 transform，两者不打架 */
+  translate: calc(var(--p) * (100vw - 30px) - 6px) 0;
+  transition: opacity .4s ease;
+}
+.qj-read.on .qj-read-wu { opacity: .85; }
+.qj-read.landed .qj-read-wu { opacity: .4; }
+@media (prefers-reduced-motion: no-preference) {
+  .qj-read.on:not(.landed) .qj-read-wu { animation: qj-glide 2.6s ease-in-out infinite; }
+}
+@keyframes qj-glide {
+  0%, 100% { transform: none; }
+  50% { transform: translateY(3px) rotate(4deg); }
+}
+
+/* --- 标题下：发文日卦印 · 竖排开关 --- */
+.qj-post-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .6rem 1rem;
+  margin: -.6rem 0 1.4rem;
+}
+.qj-gua-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .2rem .65rem .2rem .5rem;
+  font-family: var(--font-body);
+  font-size: .82rem;
+  color: var(--ge-muted);
+  text-decoration: none;
+  border: 1px solid var(--ge-rule);
+  border-radius: 3px;
+  transition: border-color .2s ease, color .2s ease;
+}
+.qj-gua-mark b { font-family: var(--font-title); font-weight: 600; letter-spacing: .1em; color: var(--ge-fg); }
+.qj-gua-mark .qj-gua-svg { fill: var(--ge-fg-2); }
+.qj-gua-mark .qj-gua-svg .dong { fill: var(--ge-zi); }
+.qj-gua-mark:hover { border-color: var(--zi); color: var(--ge-fg-2); }
+
+.qj-vert-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .2rem .7rem .2rem .45rem;
+  font-family: var(--font-body);
+  font-size: .82rem;
+  color: var(--ge-muted);
+  background: none;
+  border: 1px solid var(--ge-rule);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.qj-vert-btn .v {
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  font-family: var(--font-title);
+  font-weight: 900;
+  font-size: .78rem;
+  color: var(--ge-zi);
+  border: 1px solid rgba(169, 148, 224, .55);
+  border-radius: 2px;
+}
+.qj-vert-btn:hover, .qj-vert-btn[aria-pressed="true"] { border-color: var(--zi); color: var(--ge-fg-2); }
+@media print { .qj-post-tools, .qj-read, .qj-fin { display: none !important; } }
+
+/* --- 竖排阅读：右起直行，横向翻阅 --- */
+.qj-vert-wrap { max-width: 100% !important; width: 100%; }
+html.qj-vert-on .toc { display: none; }
+.article-content.qj-vert {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  max-width: none;
+  width: 100%;
+  height: max(22rem, calc(100svh - 9rem));
+  margin-bottom: 2rem;
+  padding: .5rem .2rem 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  line-height: 2.1;
+  letter-spacing: .08em;
+  scrollbar-color: var(--ge-rule) transparent;
+  border-block: 0;
+}
+.article-content.qj-vert:focus-visible { outline: 1px dashed var(--ge-rule); outline-offset: 4px; }
+.article-content.qj-vert > * { margin-top: 0; margin-bottom: 0; margin-block: 0 1.4em; }
+.article-content.qj-vert h1, .article-content.qj-vert h2, .article-content.qj-vert h3 { margin-block: .4em 1.2em; }
+.article-content.qj-vert img { max-height: 70%; max-width: none; width: auto; margin-block: 0 1em; }
+.article-content.qj-vert blockquote { border-left: 0; border-top: 2px solid var(--zi); padding: 1em 0 0; }
+.article-content.qj-vert ul, .article-content.qj-vert ol { padding: 1.4em 0 0; }
+.article-content.qj-vert table, .article-content.qj-vert pre, .article-content.qj-vert iframe {
+  writing-mode: horizontal-tb;
+  max-height: 100%;
+  max-width: 34rem;
+  overflow: auto;
+}
+.article-content.qj-vert hr {
+  block-size: 1px;
+  inline-size: 36%;
+  margin-block: .4em 1.8em;
+  margin-inline: 32%;
+  background: var(--ge-rule);
+  border: 0;
+}
+.article-content.qj-vert hr::after { content: none; }
+.article-content.qj-vert a { text-underline-offset: .3em; }
+
+/* --- 文末落款：读到底，「潜蛟子印」盖下 --- */
+.qj-fin {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  max-width: 65ch;
+  margin: -2.5rem 0 3.5rem;
+}
+.qj-fin-rule { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--ge-rule)); }
+.qj-fin-txt { font-family: var(--font-body); font-size: .85rem; letter-spacing: .3em; color: var(--ge-muted); }
+.qj-fin-seal {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.9rem;
+  height: 3.9rem;
+  background: var(--zi);
+  border-radius: 5px;
+  transform: rotate(-5deg);
+  filter: url(#qj-rough);
+}
+.qj-fin-seal span {
+  writing-mode: vertical-rl;
+  height: 2.2em;
+  font-family: var(--font-title);
+  font-weight: 900;
+  font-size: 1.32rem;
+  line-height: 1.12;
+  letter-spacing: .04em;
+  color: var(--ge-bg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .qj-fin:not(.on) .qj-fin-seal, .qj-fin:not(.on) .qj-fin-txt { opacity: 0; }
+  .qj-fin.on .qj-fin-seal { animation: qj-stamp .62s cubic-bezier(.3, 1.4, .5, 1) both .15s; }
+  .qj-fin.on .qj-fin-txt { animation: qj-fade 1.2s ease both .7s; }
+}
+@keyframes qj-stamp {
+  0%   { opacity: 0; transform: rotate(-16deg) scale(1.9); }
+  55%  { opacity: 1; transform: rotate(-4deg) scale(.93); }
+  100% { opacity: 1; transform: rotate(-5deg) scale(1); }
+}
+
+/* ===========================================================
+   十五 问路（覆盖主题搜索浮层，脚本见 assets/js/search.js）
+   =========================================================== */
+
+#search-wrapper { background: rgba(15, 12, 22, .72) !important; }
+#search-modal {
+  background: var(--ge-bg) !important;
+  border: 1px solid var(--ge-rule) !important;
+  border-top: 1px solid var(--zi) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .5) !important;
+}
+#search-modal header { border-bottom: 1px solid var(--ge-rule); }
+#search-query { font-family: var(--font-body); font-size: 1.05rem; color: var(--ge-fg); }
+#search-query, #search-query:focus, #search-query:focus-visible { border: 0 !important; outline: none !important; box-shadow: none !important; }
+#search-query::placeholder { color: var(--ge-muted); }
+#search-results { list-style: none; margin: .5rem 0; padding: 0; }
+#search-results li { margin: 0; }
+.qj-q-cap {
+  padding: .3rem .8rem .4rem;
+  font-family: var(--font-title);
+  font-size: .78rem;
+  letter-spacing: .3em;
+  color: var(--ge-muted);
+}
+.qj-q-item {
+  display: grid;
+  gap: .1rem;
+  padding: .6rem .8rem;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  border-radius: 2px;
+  outline: none;
+}
+.qj-q-item:hover, .qj-q-item:focus { background: rgba(122, 91, 192, .16); border-left-color: var(--zi); }
+.qj-q-path { grid-template-columns: 26px 6.5rem minmax(0, 1fr); align-items: center; gap: .8rem; }
+.qj-q-t { font-family: var(--font-title); font-weight: 600; font-size: 1rem; letter-spacing: .08em; color: var(--ge-fg); }
+.qj-q-m { font-family: var(--font-body); font-size: .75rem; color: var(--ge-muted); }
+.qj-q-s { font-family: var(--font-body); font-size: .85rem; line-height: 1.6; color: var(--ge-fg-2); }
+.qj-q-path .qj-q-s { color: var(--ge-muted); }
+#search-results mark { background: none; color: var(--ge-zi); font-weight: 600; }
+.qj-q-none { padding: .8rem; font-family: var(--font-body); font-size: .9rem; color: var(--ge-muted); }
+.qj-q-none a { color: var(--ge-zi); }
+.qj-q-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem 1.2rem;
+  padding: .55rem .9rem;
+  font-family: var(--font-body);
+  font-size: .75rem;
+  color: var(--ge-muted);
+  border-top: 1px solid var(--ge-rule);
+}
+.qj-q-foot .qj-q-any { margin-left: auto; }
+.qj-q-foot kbd {
+  display: inline-block;
+  min-width: 1.4em;
+  margin-right: .2em;
+  padding: 0 .3em;
+  font: 500 .7rem/1.5 var(--font-mark);
+  text-align: center;
+  color: var(--ge-fg-2);
+  border: 1px solid var(--ge-rule);
+  border-radius: 3px;
+}
+@media (max-width: 640px) {
+  .qj-q-foot { display: none; }
+  .qj-q-path { grid-template-columns: 26px minmax(0, 1fr); }
+  .qj-q-path .qj-q-s { grid-column: 2; }
+}
+
+/* ===========================================================
+   十六 内室（控制台彩蛋的终点）
+   =========================================================== */
+
+.qj-slip {
+  display: grid;
+  justify-items: center;
+  gap: .6rem;
+  max-width: 22rem;
+  margin: 2rem auto;
+  padding: 1.6rem 1.4rem;
+  text-align: center;
+  background: var(--ge-bg-2);
+  border: 1px solid var(--ge-rule);
+  border-top: 2px solid var(--zi);
+  border-radius: 3px;
+}
+.qj-slip-k { font-family: var(--font-title); font-size: .8rem; letter-spacing: .4em; color: var(--ge-muted); }
+.qj-slip .qj-gua-svg { fill: var(--ge-fg); margin: .4rem 0; }
+.qj-slip .qj-gua-svg .dong { fill: var(--ge-zi); }
+.qj-slip b { font-family: var(--font-title); font-weight: 900; font-size: 1.4rem; letter-spacing: .15em; color: var(--ge-fg); }
+.qj-slip span:last-child { font-family: var(--font-body); font-size: .9rem; line-height: 1.7; color: var(--ge-fg-2); }
