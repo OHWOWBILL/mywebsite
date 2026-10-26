@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<title>闭关</title>
+<title>禁制 · 潜蛟阁</title>
 <style>
   :root { --bg:#14111c; --panel:#1d1828; --line:#3a3150; --ink:#e8e0cc; --dim:#8f8699; --gold:#c9a24a; --err:#d4553a; }
   * { box-sizing: border-box; }
@@ -13,7 +13,7 @@
   body { display:flex; align-items:center; justify-content:center; padding:16px; }
   form { width:100%; max-width:320px; background:var(--panel); border:1px solid var(--line);
     border-radius:6px; padding:28px 24px; text-align:center; }
-  h1 { margin:0 0 6px; font-size:20px; letter-spacing:.3em; color:var(--gold); font-weight:600; }
+  h1 { margin:0 0 6px; font-size:18px; letter-spacing:.15em; color:var(--gold); font-weight:600; }
   p { margin:0 0 18px; font-size:13px; color:var(--dim); letter-spacing:.1em; }
   input[type=password] { width:100%; padding:10px 12px; font:inherit; font-size:16px; color:var(--ink);
     background:var(--bg); border:1px solid var(--line); border-radius:4px; outline:none; text-align:center; }
@@ -23,17 +23,23 @@
   button { width:100%; padding:10px; font:inherit; font-size:15px; letter-spacing:.4em; color:var(--bg);
     background:var(--gold); border:0; border-radius:4px; cursor:pointer; }
   button:disabled { opacity:.6; cursor:wait; }
+  .seal { width:56px; height:56px; margin:0 auto 14px; border:2px solid var(--err); color:var(--err);
+    border-radius:4px; font-size:30px; line-height:52px; transform:rotate(-8deg); opacity:.85; }
+  .back { display:inline-block; margin-top:6px; font-size:13px; color:var(--dim); text-decoration:none; }
+  .back:hover { color:var(--gold); }
   #msg { min-height:1.4em; margin:12px 0 0; color:var(--err); }
 </style>
 </head>
 <body>
 <form id="f" autocomplete="off">
-  <h1>闭关</h1>
-  <p>此处不待客</p>
-  <input type="password" id="pw" placeholder="口令" autofocus>
+  <div class="seal">禁</div>
+  <h1>此宝被阁主下了禁制</h1>
+  <p>非持诀者不得开启</p>
+  <input type="password" id="pw" placeholder="解禁口诀" autofocus>
   <label><input type="checkbox" id="keep" checked> 此设备记住</label>
-  <button id="go">开</button>
+  <button id="go">解禁</button>
   <p id="msg"></p>
+  <a class="back" href="/tools/">← 回法宝库</a>
 </form>
 <script>
 (function () {
@@ -80,7 +86,7 @@
       await open(raw);
       set(keep ? b64e(raw) : null);
     } catch (err) {
-      msg.textContent = '口令不对';
+      msg.textContent = '口诀不对，禁制未动';
       btn.disabled = false;
     }
   });
