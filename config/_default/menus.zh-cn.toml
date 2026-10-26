@@ -9,6 +9,12 @@
   weight = 10
 
 [[main]]
+  name = "庭"
+  title = "五术门庭 · 山医命卜相"
+  pageRef = "wushu"
+  weight = 15
+
+[[main]]
   name = "术"
   title = "法宝库 · 自制术数工具"
   pageRef = "tools"
@@ -51,6 +57,11 @@
   name = "万法归一"
   pageRef = "posts"
   weight = 10
+
+[[footer]]
+  name = "五术门庭"
+  pageRef = "wushu"
+  weight = 15
 
 [[footer]]
   name = "法宝库"

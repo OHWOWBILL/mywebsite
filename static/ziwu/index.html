@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>子午流注 · 潜蛟阁法宝库</title>
+  <meta name="description" content="子午流注按时取穴：纳子法、纳甲法、灵龟八法、飞腾八法，打开即按此刻开穴，附流注钟与当日十二时辰开穴表。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=1">
+  <style>
+    [data-wx="木"] { --wc: var(--wx-mu); }
+    [data-wx="火"] { --wc: var(--wx-huo); }
+    [data-wx="土"] { --wc: var(--wx-tu); }
+    [data-wx="金"] { --wc: var(--wx-jin); }
+    [data-wx="水"] { --wc: var(--wx-shui); }
+
+    .lz-four { display: flex; gap: 6px; flex-wrap: wrap; }
+    .lz-four .fb-pillar { min-width: 64px; }
+    .lz-four .fb-pillar b { font-size: 15px; }
+    .lz-step { display: flex; gap: 8px; }
+    .lz-step .fb-btn { flex: 1; padding: 7px 10px; font-size: 13px; letter-spacing: .1em; }
+
+    .lz-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+    .lz-grid.wide-left { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+    .lz-card { padding: 18px 20px; min-width: 0; }
+    .lz-card h2 { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .25em; margin-bottom: 12px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .lz-card h2 small { font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: .1em; }
+    .lz-card h3 { font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .2em; color: var(--fg-2); margin: 14px 0 8px; }
+
+    /* 穴名；十总穴、天星十二穴里有的，点得进去看取穴 */
+    .pt { font-family: var(--font-title); font-weight: 600; color: var(--fg); letter-spacing: .06em; text-decoration: none; white-space: nowrap; }
+    a.pt { border-bottom: 1px dotted var(--zi-2); }
+    a.pt:hover { color: var(--zi-2); }
+    .pt sup { font-family: var(--font-body); font-weight: 400; font-size: 10px; color: var(--zi-2); margin-left: 2px; letter-spacing: 0; vertical-align: super; line-height: 0; }
+
+    /* —— 流注钟 —— */
+    .lz-clock { display: grid; place-items: center; }
+    .lz-clock svg { width: 100%; max-width: 430px; height: auto; display: block; overflow: visible; }
+    .lz-clock .sec { fill: color-mix(in oklab, var(--wc, var(--zi)) 7%, var(--bg-2)); stroke: var(--rule); stroke-width: 1; cursor: pointer; transition: fill .3s; }
+    .lz-clock .sec.ring-a { fill: var(--bg-2); }
+    .lz-clock .sec:hover { fill: var(--bg-3); }
+    .lz-clock .sec.cur { fill: color-mix(in oklab, var(--zi) 34%, var(--bg-2)); stroke: var(--zi-2); }
+    .lz-clock text { font-family: var(--font-title); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+    .lz-clock .t-zhi { font-size: 19px; font-weight: 600; fill: var(--fg-2); }
+    .lz-clock .t-hr { font-size: 8.5px; fill: var(--faint); font-family: var(--font-mark); letter-spacing: .02em; }
+    .lz-clock .t-jing { font-size: 13px; font-weight: 600; fill: var(--wc); }
+    .lz-clock .t-pt { font-size: 10px; fill: var(--fg-2); letter-spacing: .02em; }
+    .lz-clock .t-pt.he { fill: var(--muted); font-weight: 400; }
+    .lz-clock .t-pt.bi { fill: var(--faint); font-weight: 400; }
+    .lz-clock .cur-t .t-zhi, .lz-clock .cur-t .t-pt { fill: var(--fg); }
+    .lz-clock .flow { fill: none; stroke: var(--zi-2); stroke-width: 1.4; stroke-dasharray: 1.5 13.2; stroke-linecap: round; opacity: .7; }
+    .lz-clock .hub { fill: var(--bg-3); stroke: var(--rule-2); }
+    .lz-clock .hub-zhi { font-size: 27px; font-weight: 900; fill: var(--fg); }
+    .lz-clock .hub-jing { font-size: 10.5px; fill: var(--zi-2); letter-spacing: .12em; }
+    .lz-clock .hub-hr { font-size: 9.5px; fill: var(--muted); font-family: var(--font-mark); }
+    .lz-clock .hand { transition: transform .9s cubic-bezier(.3, .7, .2, 1); }
+    .lz-clock .hand line { stroke: var(--fg); stroke-width: 1.6; stroke-linecap: round; }
+    .lz-clock .hand circle { fill: var(--zi-2); stroke: var(--fg); stroke-width: 1.2; }
+    .lz-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+    .lz-legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .lz-legend i { width: 9px; height: 9px; border-radius: 2px; background: var(--wc); }
+    @media (prefers-reduced-motion: no-preference) {
+      .lz-clock .flow { animation: lzFlow 6s linear infinite; }
+    }
+    @keyframes lzFlow { to { stroke-dashoffset: -73.5; } }
+
+    /* —— 纳子法 —— */
+    .lz-jing { font-family: var(--font-title); font-size: 15px; letter-spacing: .1em; color: var(--fg-2); margin-bottom: 12px; }
+    .lz-jing b { color: var(--fg); font-weight: 600; }
+    .lz-jing i { font-style: normal; color: var(--wc); margin-left: 6px; }
+    .lz-rows { display: flex; flex-direction: column; gap: 8px; }
+    .lz-rows > div { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 12px; background: var(--bg-3); border-radius: var(--r-sm); }
+    .lz-rows dt { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 4px; font-family: var(--font-title); font-weight: 900; font-size: 17px; color: #fff; background: var(--zi); }
+    .lz-rows dt.xie { background: color-mix(in oklab, var(--zhu) 75%, var(--bg)); }
+    .lz-rows dt.bu { background: color-mix(in oklab, var(--lv) 60%, var(--bg)); }
+    .lz-rows dt.ping { background: var(--rule-2); }
+    .lz-rows dd { font-size: 14px; line-height: 1.7; color: var(--fg-2); }
+    .lz-rows dd .pt { font-size: 17px; margin-right: 6px; }
+    .lz-rows dd p { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+    /* —— 纳甲法 —— */
+    .lz-res { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 6px; }
+    .lz-res .pt { font-size: 26px; }
+    .lz-res .pt.more { font-size: 19px; color: var(--fg-2); }
+    .lz-res .k { font-size: 13px; color: var(--muted); letter-spacing: .08em; }
+    .lz-res.shut .bi { font-family: var(--font-title); font-size: 22px; letter-spacing: .3em; color: var(--muted); }
+    .lz-why { font-size: 13px; line-height: 1.8; color: var(--fg-2); margin-bottom: 12px; }
+    .lz-why span { display: block; }
+    .lz-why span::before { content: "· "; color: var(--faint); }
+    .lz-seq { list-style: none; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; margin-bottom: 12px; }
+    .lz-seq li { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px 6px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent; text-align: center; min-width: 0; }
+    .lz-seq li.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 22%, var(--bg-3)); }
+    .lz-seq .h { font-family: var(--font-title); font-size: 13px; color: var(--muted); letter-spacing: .05em; }
+    .lz-seq .h em { font-style: normal; font-size: 10px; color: var(--faint); margin-left: 2px; }
+    .lz-seq .p { font-family: var(--font-title); font-weight: 600; font-size: 14px; color: var(--fg); line-height: 1.35; }
+    .lz-seq .p small { display: block; font-weight: 400; font-size: 11px; color: var(--fg-2); }
+    .lz-seq .s { font-size: 11px; color: var(--faint); letter-spacing: .1em; }
+    .lz-ge { padding: 10px 14px; border-left: 2px solid var(--rule-2); font-family: var(--font-body); font-size: 14px; line-height: 1.9; color: var(--muted); }
+    .lz-ge .src { display: block; font-size: 11.5px; color: var(--faint); letter-spacing: .12em; margin-bottom: 2px; }
+    .lz-ge span.l { display: inline-block; margin-right: .9em; }
+    .lz-ge span.l.on { color: var(--fg); }
+    .lz-ge mark { background: none; color: var(--zi-2); font-weight: 600; }
+
+    /* —— 灵龟 · 飞腾 —— */
+    .lz-calc { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    .lz-calc .n { display: inline-flex; flex-direction: column; align-items: center; padding: 3px 8px 4px; background: var(--bg-3); border-radius: var(--r-sm); line-height: 1.25; }
+    .lz-calc .n small { font-size: 10px; color: var(--faint); letter-spacing: .15em; }
+    .lz-calc .n b { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: var(--fg-2); }
+    .lz-calc .n b i { font-style: normal; color: var(--zi-2); margin-left: 4px; }
+    .lz-calc .op { color: var(--faint); }
+    .lz-calc .eq { color: var(--fg-2); font-family: var(--font-title); }
+    .lz-lg { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: center; }
+    .lz-lg .lz-pair { flex: 1 1 200px; }
+    .lz-gong { display: grid; grid-template-columns: repeat(3, 62px); grid-auto-rows: 58px; gap: 4px; }
+    .lz-gong div { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 5px; background: var(--bg-3); line-height: 1.25; border: 1px solid transparent; }
+    .lz-gong div small { font-size: 10px; color: var(--faint); letter-spacing: .1em; }
+    .lz-gong div b { font-family: var(--font-title); font-weight: 600; font-size: 13px; color: var(--fg-2); }
+    .lz-gong div.off { opacity: .35; }
+    .lz-gong div.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 30%, var(--bg-3)); }
+    .lz-gong div.on b { color: var(--fg); }
+    .lz-pair { font-size: 13.5px; line-height: 1.85; color: var(--fg-2); }
+    .lz-pair .pt { font-size: 18px; }
+    .lz-pair .mai { color: var(--muted); font-size: 12px; margin-left: 4px; }
+    .lz-pair .he { display: block; font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+    .lz-ft { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; margin-bottom: 14px; }
+    .lz-ft div { display: flex; flex-direction: column; align-items: center; padding: 6px 0 5px; border-radius: 5px; background: var(--bg-3); border: 1px solid transparent; line-height: 1.3; min-width: 0; }
+    .lz-ft div b { font-family: var(--font-title); font-size: 15px; font-weight: 600; color: var(--fg-2); }
+    .lz-ft div span { font-family: var(--font-title); font-size: 11px; color: var(--muted); writing-mode: vertical-rl; letter-spacing: .1em; margin-top: 3px; min-height: 3.3em; }
+    .lz-ft div small { font-size: 10px; color: var(--faint); }
+    .lz-ft div.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 30%, var(--bg-3)); }
+    .lz-ft div.on b, .lz-ft div.on span { color: var(--fg); }
+    .lz-bm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+    .lz-bm div { padding: 8px 10px; border-radius: var(--r-sm); background: var(--bg-3); font-size: 13px; line-height: 1.6; color: var(--muted); border: 1px solid transparent; }
+    .lz-bm div b { font-family: var(--font-title); font-weight: 600; color: var(--fg-2); font-size: 14px; }
+    .lz-bm div.on { border-color: var(--zi-2); }
+    .lz-bm div.on b { color: var(--fg); }
+
+    /* —— 当日十二时辰 —— */
+    .lz-day { padding: 6px; overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--rule-2) transparent; }
+    .lz-day-h { padding: 12px 14px 4px; }
+    .lz-tab { width: 100%; min-width: 640px; border-collapse: separate; border-spacing: 0 3px; font-size: 13.5px; }
+    .lz-tab th { font-family: var(--font-title); font-weight: 400; font-size: 12px; letter-spacing: .2em; color: var(--faint); text-align: left; padding: 6px 10px; }
+    .lz-tab td { padding: 8px 10px; background: var(--bg-3); color: var(--fg-2); white-space: nowrap; }
+    .lz-tab td:first-child { border-radius: 5px 0 0 5px; position: sticky; left: 0; z-index: 1; }
+    .lz-tab td:last-child { border-radius: 0 5px 5px 0; }
+    .lz-tab tr { cursor: pointer; }
+    .lz-tab tr:hover td { background: color-mix(in oklab, var(--zi) 12%, var(--bg-3)); }
+    .lz-tab tr.cur td { background: color-mix(in oklab, var(--zi) 28%, var(--bg-3)); color: var(--fg); }
+    .lz-tab .z { font-family: var(--font-title); font-weight: 600; font-size: 16px; color: var(--fg); }
+    .lz-tab .z small { font-family: var(--font-mark); font-weight: 500; font-size: 10px; color: var(--faint); margin-left: 6px; letter-spacing: .02em; }
+    .lz-tab .j { color: var(--wc); font-family: var(--font-title); }
+    .lz-tab .bi { color: var(--faint); }
+    .lz-tab .he { color: var(--muted); }
+    .lz-tab .he em { font-style: normal; font-size: 11px; color: var(--faint); margin-left: 3px; }
+    .lz-tab .pt { font-weight: 600; font-size: 14px; }
+    .lz-tab .pair { color: var(--muted); font-size: 12px; margin-left: 4px; }
+
+    .lz-notes { font-size: 13.5px; line-height: 1.95; color: var(--fg-2); }
+    .lz-notes li { list-style: none; padding-left: 14px; position: relative; }
+    .lz-notes li::before { content: ""; position: absolute; left: 0; top: .95em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .lz-notes b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 4px; }
+    .lz-warn { margin-top: 12px; padding: 10px 14px; border-radius: var(--r-sm); background: color-mix(in oklab, var(--zhu) 10%, var(--bg-3)); color: var(--fg-2); font-size: 13px; line-height: 1.8; }
+    .lz-rel { margin-top: 12px; font-size: 13px; color: var(--muted); line-height: 1.9; }
+
+    @media (max-width: 860px) {
+      .lz-grid, .lz-grid.wide-left { grid-template-columns: 1fr; gap: 14px; margin-top: 14px; }
+      .lz-card { padding: 16px; }
+      .lz-seq { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .lz-gong { grid-template-columns: repeat(3, 66px); }
+      .lz-ft { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .lz-bm { grid-template-columns: 1fr; }
+      .lz-tab { min-width: 560px; }
+    }
+  </style>
+</head>
+<body data-tool="ziwu">
+
+<main class="fb-main">
+  <div class="fb-head">
+    <div class="fb-seal">注</div>
+    <div>
+      <h1 class="fb-title">子午流注 <span class="en">MERIDIAN TIDE</span></h1>
+      <div class="fb-sub">纳子、纳甲、灵龟、飞腾，四法按时开穴</div>
+    </div>
+  </div>
+
+  <section class="fb-now">
+    <div class="fb-now-info" id="nowInfo"></div>
+    <div class="fb-now-ctrl">
+      <div class="fb-row">
+        <input type="datetime-local" id="dtInput" class="grow" aria-label="查看时间">
+        <button type="button" class="fb-btn" id="nowBtn">此刻</button>
+      </div>
+      <div class="lz-step">
+        <button type="button" class="fb-btn" id="prevBtn">‹ 前一时辰</button>
+        <button type="button" class="fb-btn" id="nextBtn">后一时辰 ›</button>
+      </div>
+      <div class="fb-fine">点流注钟或下方时辰表，可改看当日别的时辰</div>
+    </div>
+  </section>
+
+  <div class="lz-grid">
+    <section class="fb-card lz-card">
+      <h2>流注钟 <small>内圈经脉 · 中圈时辰 · 外圈当日纳甲开穴</small></h2>
+      <div class="lz-clock" id="clock"></div>
+      <div class="lz-legend" id="legend"></div>
+    </section>
+    <section class="fb-card lz-card">
+      <h2>纳子法 <small>一时一经，补母泻子</small></h2>
+      <div class="lz-jing" id="nzJing"></div>
+      <dl class="lz-rows" id="nzRows"></dl>
+      <p class="fb-fine" id="nzLater" style="margin-top:10px"></p>
+    </section>
+  </div>
+
+  <div class="lz-grid wide-left">
+    <section class="fb-card lz-card">
+      <h2>纳甲法 <small>徐凤 · 逐日按时定穴</small></h2>
+      <div class="lz-res" id="njRes"></div>
+      <p class="lz-why" id="njWhy"></p>
+      <ol class="lz-seq" id="njSeq"></ol>
+      <div class="lz-ge" id="njGe"></div>
+      <p class="fb-fine" id="njNext" style="margin-top:10px"></p>
+    </section>
+    <section class="fb-card lz-card">
+      <h2>灵龟八法 <small>四数相加，阳日除九，阴日除六</small></h2>
+      <div class="lz-calc" id="lgCalc"></div>
+      <div class="lz-lg">
+        <div class="lz-gong" id="lgGong"></div>
+        <div class="lz-pair" id="lgPair"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="lz-grid">
+    <section class="fb-card lz-card">
+      <h2>飞腾八法 <small>只看时干</small></h2>
+      <div class="lz-ft" id="ftRow"></div>
+      <div class="lz-pair" id="ftPair"></div>
+      <div class="lz-ge" style="margin-top:12px"><span class="src">飞腾八法歌</span><span id="ftGe"></span></div>
+    </section>
+    <section class="fb-card lz-card">
+      <h2>八脉交会 <small>八法所开，皆在此八穴</small></h2>
+      <div class="lz-bm" id="bmGrid"></div>
+      <div class="lz-ge" style="margin-top:12px"><span class="src">八脉交会八穴歌</span><span id="bmGe"></span></div>
+    </section>
+  </div>
+
+  <section class="fb-card" style="margin-top:18px">
+    <div class="lz-card lz-day-h" style="padding-bottom:0"><h2 id="dayTitle" style="margin-bottom:0">当日十二时辰</h2></div>
+    <div class="lz-day">
+      <table class="lz-tab" id="dayTab">
+        <thead><tr><th>时辰</th><th>时柱</th><th>纳子 · 流注</th><th>纳甲开穴</th><th>灵龟八法</th><th>飞腾八法</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="fb-card lz-card" style="margin-top:18px">
+    <h2>口诀 <small>四法怎么算</small></h2>
+    <ul class="lz-notes">
+      <li><b>纳子法</b>寅肺卯大辰胃宫，脾巳心午小未中，申胱酉肾心包戌，亥焦子胆丑肝通。实则泻其子，于本经之时泻其子穴；虚则补其母，于本经之时刚过补其母穴。</li>
+      <li><b>纳甲法</b>日干值经，于同干之时开其井穴（甲戌、乙酉、丙申……逐日日干进一、时支退一）；此后隔一时辰，时干所属之经依次开荥、输、经、合，经生经，穴生穴；开输穴时并开值日经原穴；第六步阳日气纳三焦、阴日血归包络。闭穴时取合日（甲己、乙庚、丙辛、丁壬、戊癸）同一时辰所开之穴。</li>
+      <li><b>灵龟八法</b>日干、日支、时干、时支各按歌诀取数，四数相加，阳日除以九，阴日除以六，余数入九宫开穴（整除取九或六）；中五寄坤取照海，一说女子寄艮取内关。开穴为主，配其相合之穴为客。</li>
+      <li><b>飞腾八法</b>不论日，只按时干开穴，配穴同上。</li>
+      <li><b>时辰</b>按此处钟表时间划分，23 点起算次日子时；未作真太阳时校正，要细算可自行调时间。</li>
+    </ul>
+    <div class="lz-warn">仅供学习参考，不是医疗建议。针灸须由合格医师施行，身体不适请就医。</div>
+    <p class="lz-rel">相关：<a href="/posts/bi-bei-er-shi-zong-xue-tian-xing-shi-er-xue/">必背（二）——十总穴+天星十二穴</a>（上文带「总」「星」小字的穴，点开即到取穴法）· <a href="/wushu/#men-%E5%8C%BB">五术门庭 · 医门</a></p>
+  </section>
+</main>
+
+<script src="/fabao/fabao.js?v=4"></script>
+<script src="/ziwu/liuzhu.js?v=1"></script>
+<script>
+(function () {
+  'use strict';
+  const L = window.Liuzhu, { GAN, ZHI, JING } = L;
+
+  // 十总穴（总）、天星十二穴（星）：链到「必背（二）」的取穴小节
+  const POST = '/posts/bi-bei-er-shi-zong-xue-tian-xing-shi-er-xue/';
+  const REF = {
+    '足三里': ['三里膝眼下三寸兩筋間', 3], '内庭': ['內庭次趾外本屬足陽明', 2], '曲池': ['曲池拱手取屈肘骨邊求', 2],
+    '合谷': ['合谷在虎口兩指歧骨間', 3], '委中': ['委中曲膕裏橫紋脈中央', 3], '太冲': ['太沖足大趾節後二寸中', 2],
+    '昆仑': ['崑崙足外踝跟骨上邊尋', 2], '阳陵泉': ['陽陵居膝下外廉一寸中', 3], '列缺': ['列缺腕側上次指手交叉', 3],
+    '支沟': ['支沟', 1], '内关': ['内关', 1], '公孙': ['公孙', 1]
+  };
+  function P(name, cls) {
+    const r = REF[name], c = 'pt' + (cls ? ' ' + cls : '');
+    if (!r) return `<b class="${c}">${name}</b>`;
+    const tag = [r[1] & 1 ? '总' : '', r[1] & 2 ? '星' : ''].filter(Boolean).join('·');
+    const title = [r[1] & 1 ? '十总穴' : '', r[1] & 2 ? '天星十二穴' : ''].filter(Boolean).join('、') + '之一，点开看取穴';
+    return `<a class="${c}" href="${POST}#${encodeURIComponent(r[0])}" title="${title}">${name}<sup>${tag}</sup></a>`;
+  }
+  const HR = z => { const a = (z * 2 + 23) % 24, b = (z * 2 + 1) % 24; return `${String(a).padStart(2, '0')}–${String(b).padStart(2, '0')}`; };
+  const hourGan = (dg, hz) => ((dg % 5) * 2 + hz) % 10;
+  const short = n => n.replace(/^足(?!三里)/, '').replace(/^足三里$/, '三里');
+
+  let when, live = !Fabao.linkedTime(), shownKey = '';
+
+  // 该时刻对应的「日」：23 点后算次日（与 Fabao.dayHour 一致），表格按这一日排
+  function baseDate(d) {
+    const b = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if (d.getHours() >= 23) b.setDate(b.getDate() + 1);
+    return b;
+  }
+  function at(zi) { const b = baseDate(when); b.setHours(zi * 2, 0, 0, 0); return b; }
+
+  function compute(d) {
+    const dh = Fabao.dayHour(d);
+    const dg = dh.day.gan, dz = dh.day.zhi, hg = dh.hour.gan, hz = dh.hour.zhi;
+    return { dh, dg, dz, hg, hz, nz: L.nazi(hz), nj: L.najia(dg, hz), lg: L.linggui(dg, dz, hg, hz), ft: L.feiteng(hg) };
+  }
+
+  // ---------- 此刻 ----------
+  function renderNow(c) {
+    const { dh, nz, nj, lg, ft } = c;
+    const njTxt = nj.open ? nj.open.points[0].name : nj.heOpen ? nj.heOpen.points[0].name : '闭';
+    let key;
+    if (nj.open) {
+      const more = nj.open.points.slice(1).map(p => p.name).join('、');
+      key = `${ZHI[c.hz]}时 纳甲开 <strong>${nj.open.points[0].name}</strong>` + (more ? `<span class="sep">·</span><span style="font-size:.8em">并开${more}</span>` : '');
+    } else if (nj.heOpen) {
+      key = `${ZHI[c.hz]}时 纳甲闭<span class="sep">→</span>合日取 <strong>${nj.heOpen.points[0].name}</strong>`;
+    } else {
+      key = `${ZHI[c.hz]}时 纳甲闭<span class="sep">→</span>灵龟开 <strong>${lg.point}</strong>`;
+    }
+    document.getElementById('nowInfo').innerHTML = `
+      <div class="fb-when"><span class="fb-tag">${live ? '此刻' : '所查'}</span><span>${Fabao.fmt(when)}</span></div>
+      <div class="fb-key">${key}</div>
+      <div class="fb-note">气血流注${nz.full}（${ZHI[c.hz]}时 ${HR(c.hz)}）· ${GAN[c.dg]}日值${L.GAN_JING[c.dg]}经</div>
+      <div class="lz-four">
+        <span class="fb-pillar"><small>日</small><b>${dh.day.name}</b></span>
+        <span class="fb-pillar"><small>时</small><b>${dh.hour.name}</b></span>
+        <span class="fb-pillar"><small>纳子</small><b>${nz.jing}经</b></span>
+        <span class="fb-pillar"><small>纳甲</small><b>${njTxt}</b></span>
+        <span class="fb-pillar"><small>灵龟</small><b>${short(lg.point)}·${short(lg.pair)}</b></span>
+        <span class="fb-pillar"><small>飞腾</small><b>${short(ft.point)}·${short(ft.pair)}</b></span>
+      </div>`;
+  }
+
+  // ---------- 流注钟 ----------
+  const RA = [154, 124], RB = [124, 92], RC = [92, 62];
+  const pol = (r, a) => [+(r * Math.sin(a * Math.PI / 180)).toFixed(2), +(-r * Math.cos(a * Math.PI / 180)).toFixed(2)];
+  function arc(r0, r1, a0, a1) {
+    const [x0, y0] = pol(r1, a0), [x1, y1] = pol(r1, a1), [x2, y2] = pol(r0, a1), [x3, y3] = pol(r0, a0);
+    return `M${x0} ${y0}A${r1} ${r1} 0 0 1 ${x1} ${y1}L${x2} ${y2}A${r0} ${r0} 0 0 0 ${x3} ${y3}Z`;
+  }
+  function handAngle(d) { return ((d.getHours() + d.getMinutes() / 60) / 24 * 360) % 360; }
+  function renderClock(c) {
+    let s = '';
+    for (let z = 0; z < 12; z++) {
+      const a0 = z * 30 - 15, a1 = z * 30 + 15, cur = z === c.hz ? ' cur' : '';
+      const j = L.NAZI[z], wx = JING[j].wx, nj = L.najia(c.dg, z);
+      const ptName = nj.open ? short(nj.open.points[0].name) + (nj.open.points.length > 1 ? '+' : '') : nj.heOpen ? short(nj.heOpen.points[0].name) : '闭';
+      const ptCls = nj.open ? '' : nj.heOpen ? ' he' : ' bi';
+      const [xa, ya] = pol(139, z * 30), [xb, yb] = pol(108, z * 30), [xc, yc] = pol(77, z * 30);
+      s += `<g data-z="${z}" class="${cur ? 'cur-t' : ''}">
+        <path class="sec ring-a${cur}" d="${arc(RA[1], RA[0], a0, a1)}"/>
+        <path class="sec${cur}" d="${arc(RB[1], RB[0], a0, a1)}"/>
+        <path class="sec${cur}" data-wx="${wx}" d="${arc(RC[1], RC[0], a0, a1)}"/>
+        <text class="t-pt${ptCls}" x="${xa}" y="${ya}">${ptName}</text>
+        <text class="t-zhi" x="${xb}" y="${yb - 5}">${ZHI[z]}</text>
+        <text class="t-hr" x="${xb}" y="${yb + 11}">${HR(z)}</text>
+        <text class="t-jing" data-wx="${wx}" x="${xc}" y="${yc}">${j}</text>
+      </g>`;
+    }
+    const ang = handAngle(when);
+    document.getElementById('clock').innerHTML = `
+      <svg viewBox="-160 -160 320 320" role="img" aria-label="流注钟：此刻${ZHI[c.hz]}时，气血流注${c.nz.full}">
+        ${s}
+        <circle class="flow" r="${RB[0]}"/>
+        <circle class="hub" r="${RC[1] - 3}"/>
+        <text class="hub-zhi" y="-12">${ZHI[c.hz]}时</text>
+        <text class="hub-jing" y="13">${c.nz.full}</text>
+        <text class="hub-hr" y="28">${HR(c.hz)}</text>
+        <g class="hand" style="transform:rotate(${ang}deg)"><line y1="-${RC[1] - 1}" y2="-157"/><circle cy="-157" r="3.6"/></g>
+      </svg>`;
+    document.querySelectorAll('#clock [data-z]').forEach(g => g.addEventListener('click', () => go(at(+g.dataset.z))));
+  }
+
+  // ---------- 纳子法 ----------
+  function renderNazi(c) {
+    const n = c.nz;
+    document.getElementById('nzJing').innerHTML = `${ZHI[c.hz]}时 气血流注 <b>${n.full}</b><i data-wx="${n.wx}">${n.wx}</i>`;
+    document.getElementById('nzRows').innerHTML = `
+      <div><dt class="xie">泻</dt><dd>${P(n.xie.name)}${n.jing}经子穴（${n.xie.kind}·${n.xie.wx}）<p>${n.jing}经实证：经气方盛，实则泻其子，迎而夺之</p></dd></div>
+      <div><dt class="bu">补</dt><dd>${P(n.bu.name)}${n.bu.jing}经母穴（${n.bu.kind}·${n.bu.wx}）<p>${n.bu.jing}经虚证：其时（${ZHI[(c.hz + 11) % 12]}时）刚过，虚则补其母，随而济之</p></dd></div>
+      <div><dt class="ping">平</dt><dd>${P(n.ben.name)}本穴（${n.ben.kind}·${n.ben.wx}）　${P(n.yuan.name)}原穴<p>不虚不实，以经取之</p></dd></div>`;
+    document.getElementById('nzLater').innerHTML =
+      `${n.jing}经若虚，候下一时辰（${ZHI[(c.hz + 1) % 12]}时，气注${n.next}经）补其母穴 ${n.buLater.name}。`;
+  }
+
+  // ---------- 纳甲法 ----------
+  function renderNajia(c) {
+    const nj = c.nj, res = document.getElementById('njRes'), why = document.getElementById('njWhy');
+    let step = nj.open || nj.heOpen, seqDay = step ? step.day : c.dg;
+    const kindOf = p => `${p.jing}经${p.kind}${p.wx ? '·' + p.wx : ''}`;
+    if (nj.open) {
+      res.className = 'lz-res';
+      res.innerHTML = nj.open.points.map((p, i) => `${P(p.name, i ? 'more' : '')}<span class="k">${kindOf(p)}</span>`).join('');
+      why.innerHTML = nj.open.why.map(w => `<span>${w}</span>`).join('') +
+        (nj.open.day !== c.dg ? `<span>此穴承${GAN[nj.open.day]}日之序，跨过子夜而来</span>` : '');
+    } else if (nj.heOpen) {
+      res.className = 'lz-res shut';
+      res.innerHTML = `<span class="bi">闭穴</span><span class="k">合日互用 →</span>` +
+        nj.heOpen.points.map((p, i) => `${P(p.name, i ? 'more' : '')}<span class="k">${kindOf(p)}</span>`).join('');
+      why.innerHTML = `<span>${GAN[c.dg]}${GAN[nj.he]}相合，取${GAN[nj.he]}日同一时辰（${nj.heOpen.hour}）所开之穴</span>` +
+        nj.heOpen.why.map(w => `<span>${w}</span>`).join('');
+    } else {
+      res.className = 'lz-res shut';
+      res.innerHTML = `<span class="bi">闭穴</span><span class="k">合日（${GAN[nj.he]}日）此时亦闭</span>`;
+      why.innerHTML = `<span>纳甲无穴可开，可取纳子法本经之穴，或用灵龟、飞腾八法</span><span>下表为${GAN[c.dg]}日值${L.GAN_JING[c.dg]}经的六穴</span>`;
+    }
+    const seq = L.najiaSeq(seqDay);
+    document.getElementById('njSeq').innerHTML = seq.map(s => `
+      <li class="${step && step.day === s.day && step.k === s.k ? 'on' : ''}">
+        <span class="h">${s.hour}${s.nextDay ? '<em>次日</em>' : ''}</span>
+        <span class="p">${short(s.points[0].name)}${s.points.length > 1 ? `<small>${s.points.slice(1).map(p => p.name).join(' ')}</small>` : ''}</span>
+        <span class="s">${s.k === 5 ? (s.day % 2 ? '归包络' : '纳三焦') : L.SHU[s.k] + (s.k === 2 ? '·原' : '')}</span>
+      </li>`).join('');
+    const ge = L.geSteps(seqDay), names = step ? step.points.map(p => short(p.name)) : [];
+    document.getElementById('njGe').innerHTML = `<span class="src">子午流注逐日按时定穴歌 · ${GAN[seqDay]}日</span>` +
+      ge.map(g => {
+        let t = g.line;
+        const on = step && g.k === step.k;
+        if (on) names.forEach(n => { t = t.replace(n, `<mark>${n}</mark>`); });
+        return `<span class="l${on ? ' on' : ''}">${t}</span>`;
+      }).join('');
+    const nx = L.najiaNext(c.dg, c.hz);
+    document.getElementById('njNext').textContent = nx
+      ? `下一开穴：${nx.nextDay ? '次日' : ''}${ZHI[nx.hz]}时（${nx.step.hour}，${nx.after * 2} 小时后）开 ${nx.step.points.map(p => p.name).join('、')}。`
+      : '';
+  }
+
+  // ---------- 灵龟 · 飞腾 · 八脉 ----------
+  const LOSHU = [4, 9, 2, 3, 5, 7, 8, 1, 6];
+  function pairHTML(point, pair) {
+    const a = L.BAMAI[point], b = L.BAMAI[pair];
+    return `开 ${P(point)}<span class="mai">通${a.mai}</span>　配 ${P(pair)}<span class="mai">通${b.mai}</span>
+      <span class="he">主客相应，合于${a.he}</span>`;
+  }
+  function renderBafa(c) {
+    const lg = c.lg, ft = c.ft, dh = c.dh;
+    const n = (k, ch, v) => `<span class="n"><small>${k}</small><b>${ch}<i>${v}</i></b></span>`;
+    document.getElementById('lgCalc').innerHTML =
+      n('日干', dh.day.name[0], lg.nums[0]) + '<span class="op">+</span>' + n('日支', dh.day.name[1], lg.nums[1]) + '<span class="op">+</span>' +
+      n('时干', dh.hour.name[0], lg.nums[2]) + '<span class="op">+</span>' + n('时支', dh.hour.name[1], lg.nums[3]) +
+      `<span class="eq">= ${lg.sum}</span><span class="op">·</span><span class="eq">${lg.div === 9 ? '阳日除九' : '阴日除六'}，${lg.rem ? '余 ' + lg.rem : '整除取 ' + lg.div}</span>`;
+    document.getElementById('lgGong').innerHTML = LOSHU.map(g =>
+      `<div class="${g === lg.gong ? 'on' : ''}${g > lg.div ? ' off' : ''}"><small>${L.GONG_GUA[g]}${'〇一二三四五六七八九'[g]}</small><b>${short(L.GONG[g])}</b></div>`).join('');
+    document.getElementById('lgPair').innerHTML = pairHTML(lg.point, lg.pair) +
+      (lg.div === 6 ? '<span class="he">阴日除六，七、八、九宫不开</span>' : '') +
+      (lg.gong === 5 ? '<span class="he">中五寄坤取照海；一说女子寄艮，取内关</span>' : '');
+
+    document.getElementById('ftRow').innerHTML = [...GAN].map((g, i) =>
+      `<div class="${i === c.hg ? 'on' : ''}"><b>${g}</b><span>${short(L.FT[i])}</span><small>${L.FT_GUA[i]}</small></div>`).join('');
+    document.getElementById('ftPair').innerHTML = `${dh.hour.name}时，时干${GAN[c.hg]}属${ft.gua}<br>` + pairHTML(ft.point, ft.pair);
+    const ftLine = L.FT_GE.findIndex(l => l.indexOf(GAN[c.hg]) >= 0 && l.indexOf(short(ft.point)) >= 0);
+    document.getElementById('ftGe').innerHTML = L.FT_GE.map((l, i) => `<span class="l${i === ftLine ? ' on' : ''}">${l}</span>`).join('');
+
+    const pairs = [['公孙', '内关'], ['后溪', '申脉'], ['足临泣', '外关'], ['列缺', '照海']];
+    const hot = [lg.point, ft.point];
+    document.getElementById('bmGrid').innerHTML = pairs.map(([a, b]) => {
+      const on = hot.indexOf(a) >= 0 || hot.indexOf(b) >= 0;
+      return `<div class="${on ? 'on' : ''}">${P(a)} <span>${L.BAMAI[a].mai}</span> · ${P(b)} <span>${L.BAMAI[b].mai}</span><br>合于${L.BAMAI[a].he}</div>`;
+    }).join('');
+    document.getElementById('bmGe').innerHTML = L.BAMAI_GE.map(l => {
+      const on = hot.some(p => l.indexOf(short(p)) >= 0);
+      return `<span class="l${on ? ' on' : ''}">${l}</span>`;
+    }).join('');
+  }
+
+  // ---------- 当日十二时辰 ----------
+  function renderDay(c) {
+    const b = baseDate(when);
+    document.getElementById('dayTitle').innerHTML =
+      `当日十二时辰 <small>${b.getFullYear()}-${String(b.getMonth() + 1).padStart(2, '0')}-${String(b.getDate()).padStart(2, '0')} · ${c.dh.day.name}日 · 点一行看那个时辰</small>`;
+    let rows = '';
+    for (let z = 0; z < 12; z++) {
+      const hg = hourGan(c.dg, z), nj = L.najia(c.dg, z), lg = L.linggui(c.dg, c.dz, hg, z), ft = L.feiteng(hg);
+      const j = L.NAZI[z];
+      const njCell = nj.open
+        ? nj.open.points.map(p => P(p.name)).join(' ')
+        : nj.heOpen ? `<span class="he">${nj.heOpen.points.map(p => p.name).join(' ')}<em>合日</em></span>` : '<span class="bi">闭</span>';
+      rows += `<tr class="${z === c.hz ? 'cur' : ''}" data-z="${z}">
+        <td><span class="z">${ZHI[z]}<small>${HR(z)}</small></span></td>
+        <td>${GAN[hg]}${ZHI[z]}</td>
+        <td><span class="j" data-wx="${JING[j].wx}">${JING[j].full}</span></td>
+        <td>${njCell}</td>
+        <td>${P(lg.point)}<span class="pair">配${lg.pair}</span></td>
+        <td>${P(ft.point)}<span class="pair">配${ft.pair}</span></td>
+      </tr>`;
+    }
+    const tb = document.querySelector('#dayTab tbody');
+    tb.innerHTML = rows;
+    tb.querySelectorAll('tr').forEach(tr => tr.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      go(at(+tr.dataset.z));
+    }));
+  }
+
+  function render() {
+    const c = compute(when);
+    shownKey = Fabao.dayHour(when).hour.name + baseDate(when).toDateString();
+    renderNow(c); renderClock(c); renderNazi(c); renderNajia(c); renderBafa(c); renderDay(c);
+  }
+  function go(d, isNow) {
+    when = d; live = !!isNow;
+    document.getElementById('dtInput').value = Fabao.toLocalInput(d);
+    render();
+  }
+
+  document.getElementById('legend').innerHTML = ['木', '火', '土', '金', '水'].map(w => `<span data-wx="${w}"><i></i>${w}</span>`).join('') +
+    '<span>外圈：开穴 · <span style="color:var(--muted)">合日</span> · <span style="color:var(--faint)">闭</span></span>';
+  document.getElementById('prevBtn').addEventListener('click', () => go(new Date(when.getTime() - 7200e3)));
+  document.getElementById('nextBtn').addEventListener('click', () => go(new Date(when.getTime() + 7200e3)));
+  when = Fabao.bindWhen(document.getElementById('dtInput'), document.getElementById('nowBtn'), (d, isNow) => go(d, isNow));
+  render();
+
+  // 停在「此刻」时，表针跟着走，换了时辰整页重排
+  setInterval(() => {
+    if (!live) return;
+    when = new Date(); when.setSeconds(0, 0);
+    const key = Fabao.dayHour(when).hour.name + baseDate(when).toDateString();
+    if (key !== shownKey) { document.getElementById('dtInput').value = Fabao.toLocalInput(when); render(); return; }
+    const h = document.querySelector('#clock .hand');
+    if (h) h.style.transform = `rotate(${handAngle(when)}deg)`;
+    const w = document.querySelector('#nowInfo .fb-when span:last-child');
+    if (w) w.textContent = Fabao.fmt(when);
+  }, 30000);
+})();
+</script>
+</body>
+</html>

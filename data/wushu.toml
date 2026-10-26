@@ -1,0 +1,77 @@
+# ===========================================================
+# 五术门庭 · /wushu/（layouts/_default/wushu.html）
+#
+# 山、医、命、卜、相，一术一门。
+# 文章按 categories 进门：带上任一列出的分类就会出现在这扇门里，
+# 一篇可以同时进几扇门（例如又命又卜）。
+# 最省事的写法：分类里直接写单字「山」「医」「命」「卜」「相」。
+#
+# 门里既没有文章也没有法宝时，门扇合着，贴「门未开」封条，
+# 并显示 shut 那句话。
+#
+# order = 门里文章排序，"desc" 新在前（默认）／"asc" 旧在前（成系列的）
+# lamp = 门里那盏灯：开页时按此刻现算的一行字（assets/js/qj/wushu.js），
+#        可选 moon / liuzhu / changsheng / gua，留空就不点灯。
+# ===========================================================
+
+[[door]]
+  seal = "山"
+  name = "修持"
+  blurb = "亲历与修持，与山中相识者往来"
+  categories = ["山", "玄学", "异闻录"]
+  order = "asc"
+  lamp = "moon"
+
+[[door]]
+  seal = "医"
+  name = "方脉针灸"
+  blurb = "中医经典，条文必背，医案逐条拆解；针灸按时取穴"
+  categories = ["医", "医案", "必背"]
+  order = "asc"
+  lamp = "liuzhu"
+  [[door.tools]]
+    seal = "注"
+    name = "子午流注"
+    href = "/ziwu/"
+    desc = "按此刻排纳子、纳甲、灵龟、飞腾四法开穴"
+
+[[door]]
+  seal = "命"
+  name = "推命"
+  blurb = "八字、紫微、星盘诸法互证"
+  categories = ["命", "知识点做题法"]
+  lamp = "changsheng"
+  [[door.tools]]
+    seal = "生"
+    name = "十二长生"
+    href = "/changsheng/"
+    desc = "天干 × 地支旺衰速查"
+  [[door.tools]]
+    seal = "禁"
+    name = "命部"
+    href = "/mingbu/"
+    desc = "占星与八字读盘，持诀者可开"
+
+[[door]]
+  seal = "卜"
+  name = "占断"
+  blurb = "以梅花易数为主，兼及奇门"
+  categories = ["卜"]
+  lamp = "gua"
+  [[door.tools]]
+    seal = "梅"
+    name = "梅花"
+    href = "/meihua/"
+    desc = "此刻起卦，本互变卦并排"
+  [[door.tools]]
+    seal = "奇"
+    name = "奇门手记"
+    href = "/qimen/"
+    desc = "起局、封盘存断、次日复盘"
+
+[[door]]
+  seal = "相"
+  name = "观形"
+  blurb = "面相、手相"
+  categories = ["相"]
+  shut = "暂未成文，问之可也。"

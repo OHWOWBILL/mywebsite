@@ -29,6 +29,12 @@
   {{- partial "qj-pinned.html" (dict "title" "置顶" "note" "初来者先读") }}
 
   <nav class="qj-doors" aria-label="门径">
+    <a class="qj-door qj-door-wide" href="{{ "wushu/" | relURL }}">
+      <span class="qj-door-z">庭</span>
+      <span class="qj-door-t">五术门庭</span>
+      <span class="qj-door-s">山、医、命、卜、相，一术一门，文章与法宝各归其门</span>
+      <span class="qj-door-five" aria-hidden="true">{{ range site.Data.wushu.door }}<i>{{ .seal }}</i>{{ end }}</span>
+    </a>
     <a class="qj-door" href="{{ "posts/" | relURL }}">
       <span class="qj-door-z">文</span>
       <span class="qj-door-t">万法归一</span>
@@ -37,7 +43,7 @@
     <a class="qj-door" href="{{ "tools/" | relURL }}">
       <span class="qj-door-z">术</span>
       <span class="qj-door-t">法宝库</span>
-      <span class="qj-door-s">梅花易数排盘、奇门手记、閩吳淮泰谚文，打开即用</span>
+      <span class="qj-door-s">梅花排盘、子午流注、十二长生、奇门手记，打开即用</span>
     </a>
     <a class="qj-door" href="{{ "seek/" | relURL }}">
       <span class="qj-door-z">寻</span>

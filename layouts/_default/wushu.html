@@ -1,0 +1,99 @@
+{{ define "main" }}
+{{- /* ===========================================================
+     五术门庭 · /wushu/
+     山、医、命、卜、相五扇门：门里有文章或法宝的，门扇虚掩、透出灯光，
+     悬停推开；一样都没有的，门扇合着、贴「门未开」封条。
+     门的定义见 data/wushu.toml；门里那盏灯由 assets/js/qj/wushu.js 现算。
+     =========================================================== */ -}}
+{{- $posts := where site.RegularPages "Section" "posts" -}}
+{{- $doors := site.Data.wushu.door -}}
+
+{{- /* 先数一遍，页首要用总数 */ -}}
+{{- $nPost := slice -}}
+{{- $nTool := 0 -}}
+{{- range $doors -}}
+  {{- $nPost = $nPost | append (where $posts "Params.categories" "intersect" .categories) -}}
+  {{- $nTool = add $nTool (len (.tools | default slice)) -}}
+{{- end -}}
+
+<header class="qj-head">
+  <h1 class="qj-h1">{{ .Title }}</h1>
+  {{- with .Description }}<p class="qj-lede">{{ . }}。</p>{{ end }}
+  <p class="qj-tally">五门 · 文 {{ len ($nPost | uniq) }} 篇 · 法宝 {{ $nTool }} 件</p>
+</header>
+
+<nav class="ws-gate" id="ws-gate" aria-label="五术五门">
+  {{- range $i, $d := $doors }}
+  {{- $pages := where $posts "Params.categories" "intersect" $d.categories -}}
+  {{- $tools := $d.tools | default slice -}}
+  {{- $shut := and (eq (len $pages) 0) (eq (len $tools) 0) }}
+  <a class="ws-door{{ if $shut }} is-shut{{ end }}" href="#men-{{ $d.seal }}" style="--i:{{ $i }}"
+     aria-label="{{ $d.seal }}门 · {{ $d.name }}{{ if $shut }}（门未开）{{ else }}，文 {{ len $pages }} 篇，法宝 {{ len $tools }} 件{{ end }}">
+    <span class="ws-roof" aria-hidden="true"></span>
+    <span class="ws-plaque" aria-hidden="true"><b>{{ $d.seal }}</b></span>
+    <span class="ws-frame" aria-hidden="true">
+      <span class="ws-inside">
+        <span class="ws-name">{{ $d.name }}</span>
+        {{- if not $shut }}
+        <span class="ws-count">文 {{ len $pages }} · 宝 {{ len $tools }}</span>
+        {{- with $d.lamp }}<span class="ws-lamp" data-lamp="{{ . }}"></span>{{ end }}
+        {{- end }}
+      </span>
+      <span class="ws-leaf ws-leaf-l"></span>
+      <span class="ws-leaf ws-leaf-r"></span>
+      {{- if $shut }}<span class="ws-strip"><span>门未开</span></span>{{ end }}
+    </span>
+  </a>
+  {{- end }}
+</nav>
+
+{{- range $d := $doors }}
+{{- $pages := where $posts "Params.categories" "intersect" $d.categories -}}
+{{- $tools := $d.tools | default slice -}}
+{{- $shut := and (eq (len $pages) 0) (eq (len $tools) 0) }}
+<section class="qj-sec ws-yuan{{ if $shut }} is-shut{{ end }}" id="men-{{ $d.seal }}">
+  <div class="qj-sec-hd">
+    <span class="qj-seal{{ if $shut }} qj-seal-dim{{ end }}" aria-hidden="true">{{ $d.seal }}</span>
+    <h2 class="qj-sec-name">{{ $d.seal }}门<span class="ws-sec-sub">{{ $d.name }}</span></h2>
+    <span class="qj-rule"></span>
+    <span class="qj-num">{{ if $shut }}门未开{{ else }}文 {{ len $pages }} · 宝 {{ len $tools }}{{ end }}</span>
+  </div>
+  {{- with $d.blurb }}<p class="qj-blurb">{{ . }}</p>{{ end }}
+  {{- if and (not $shut) $d.lamp }}<p class="ws-lamp-line" data-lamp="{{ $d.lamp }}" data-long hidden></p>{{ end }}
+
+  {{- with $tools }}
+  <div class="ws-tools">
+    {{- range . }}
+    <a class="ws-tool" href="{{ .href }}">
+      <span class="ws-tool-z" aria-hidden="true">{{ .seal }}</span>
+      <span class="ws-tool-t">{{ .name }}</span>
+      <span class="ws-tool-s">{{ .desc }}</span>
+    </a>
+    {{- end }}
+  </div>
+  {{- end }}
+
+  {{- with $pages }}
+  <div class="qj-list">
+    {{- range sort . "Date" ($d.order | default "desc") }}
+    <a class="qj-item" href="{{ .RelPermalink }}">
+      <span class="qj-item-t">{{ .Title | emojify }}</span>
+      {{- with (.Description | default (.Summary | plainify)) }}<span class="qj-item-s">{{ . | truncate 62 "…" }}</span>{{ end }}
+    </a>
+    {{- end }}
+  </div>
+  {{- end }}
+
+  {{- if $shut }}
+  <div class="ws-shut">
+    <span class="ws-strip ws-strip-flat"><span>门未开</span></span>
+    <p>{{ $d.shut | default "此门下尚无文字，亦无法宝。" }}</p>
+  </div>
+  {{- end }}
+</section>
+{{- end }}
+
+<p class="qj-foot">
+  按术分门。欲按主题读，见 <a href="{{ "posts/" | relURL }}">万法归一</a>；欲取工具，见 <a href="{{ "tools/" | relURL }}">法宝库</a>。
+</p>
+{{ end }}

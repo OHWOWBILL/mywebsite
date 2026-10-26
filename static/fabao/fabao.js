@@ -11,12 +11,14 @@
     meihua: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 5h14M5 9.5h5.5M13.5 9.5H19M5 14h14M5 18.5h5.5M13.5 18.5H19"/></svg>',
     changsheng: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/></svg>',
     qimen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17"/></svg>',
+    ziwu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M6.3 13.2c1.9-2.6 3.8-2.6 5.7 0s3.8 2.6 5.7 0"/><circle cx="12" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>',
     mingbu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.5l1.4 4.1 4.1 1.4-4.1 1.4-1.4 4.1-1.4-4.1-4.1-1.4 4.1-1.4z"/></svg>'
   };
   const TOOLS = [
     { id: 'meihua', name: '梅花', href: '/meihua/' },
     { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/' },
     { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/' },
+    { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/' },
     { id: 'mingbu', name: '命部', href: '/mingbu/' }   // 口令加密页，未解禁时为锁屏
   ];
 

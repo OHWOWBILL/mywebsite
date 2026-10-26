@@ -1,6 +1,6 @@
-{{- /* 本站脚本合成一包：历法小库、日课、日签、文章页四件、时令粒子、控制台彩蛋。
+{{- /* 本站脚本合成一包：历法小库、日课、日签、文章页四件、时令粒子、控制台彩蛋、五术门庭的灯。
        各件自己判断当前页用不用得上，用不上就不动手。 */ -}}
-{{- $qj := slice "li" "rike" "qian" "article" "season" "egg" -}}
+{{- $qj := slice "li" "rike" "qian" "article" "season" "egg" "wushu" -}}
 {{- $parts := slice -}}
 {{- range $qj }}{{ $parts = $parts | append (resources.Get (printf "js/qj/%s.js" .)) }}{{ end -}}
 {{- $bundle := $parts | resources.Concat "js/qj.js" | minify | fingerprint "sha512" -}}
