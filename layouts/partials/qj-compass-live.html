@@ -1,0 +1,109 @@
+{{- /* 星盘实时：页面上有 .qj-compass 才动手。
+       · 十二宫环按太阳黄经转，太阳此刻所躔之宫停在天心线下；
+       · 二十八宿环按本地恒星时转，此刻上中天的那一宿停在天心线下；
+       · 星盘下写一行当下的干支四柱、时辰、太阳躔宫、中天之宿、月相。
+       经度取浏览器时区估算（每小时 15°），不问访客要定位。
+       全是低精度公式，误差在一两度以内，看个意思够了。 */ -}}
+<script>
+(function () {
+  var wraps = document.querySelectorAll('.qj-compass-wrap');
+  if (!wraps.length) return;
+
+  var GAN = '甲乙丙丁戊己庚辛壬癸', ZHI = '子丑寅卯辰巳午未申酉戌亥';
+  var GONG = ['白羊', '金牛', '双子', '巨蟹', '狮子', '室女', '天秤', '天蝎', '人马', '摩羯', '宝瓶', '双鱼'];
+  var XIU = '角亢氐房心尾箕斗牛女虛危室壁奎婁胃昴畢觜參井鬼柳星張翼軫';
+  // 二十八宿距星赤经（度，J2000，取整到十分之一）
+  var XIU_RA = [201.3, 213.2, 222.7, 239.7, 245.3, 253.0, 271.5, 281.4, 305.3, 311.9, 322.9, 331.4, 346.2, 3.3,
+                11.8, 28.7, 40.9, 56.2, 67.2, 83.8, 85.2, 95.7, 127.9, 129.4, 141.9, 147.9, 164.9, 183.9];
+  var YUE = ['朔', '蛾眉月', '上弦', '盈凸', '望', '亏凸', '下弦', '残月'];
+
+  function mod(a, n) { return ((a % n) + n) % n; }
+  function rad(d) { return d * Math.PI / 180; }
+
+  function sky(now) {
+    var jd = now.getTime() / 86400000 + 2440587.5;
+    var n = jd - 2451545.0;
+    // 太阳视黄经
+    var L = 280.460 + 0.9856474 * n, g = rad(357.528 + 0.9856003 * n);
+    var sun = mod(L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g), 360);
+    // 本地恒星时（度）
+    var lon = -now.getTimezoneOffset() / 4;
+    var lst = mod(280.46061837 + 360.98564736629 * n + lon, 360);
+    // 上中天之宿：赤经落在哪两颗距星之间
+    var xi = 0, frac = 0;
+    for (var i = 0; i < 28; i++) {
+      var a = XIU_RA[i], b = XIU_RA[(i + 1) % 28];
+      var w = mod(b - a, 360), d = mod(lst - a, 360);
+      if (d < w) { xi = i; frac = d / w; break; }
+    }
+    // 月相
+    var age = mod((jd - 2451550.1) / 29.530588853, 1);
+    return { jd: jd, sun: sun, xi: xi, frac: frac, moon: YUE[Math.floor(mod(age * 8 + 0.5, 8))] };
+  }
+
+  function bazi(now, s) {
+    var y = now.getFullYear();
+    // 立春（黄经 315°）前仍算上一年
+    if (now.getMonth() < 2 && s.sun >= 270 && s.sun < 315) y -= 1;
+    var ys = mod(y - 4, 10), yb = mod(y - 4, 12);
+    var m = Math.floor(mod(s.sun - 315, 360) / 30);          // 0 = 寅月
+    var ms = mod(ys * 2 + 2 + m, 10), mb = mod(m + 2, 12);
+    var local = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var djd = Math.floor(local.getTime() / 86400000 - local.getTimezoneOffset() / 1440 + 2440588);
+    var di = mod(djd + 49, 60), ds = di % 10, db = di % 12;
+    var hb = Math.floor(mod(now.getHours() + 1, 24) / 2);
+    var hs = mod(ds * 2 + hb, 10);
+    return {
+      text: GAN[ys] + ZHI[yb] + '年 ' + GAN[ms] + ZHI[mb] + '月 ' + GAN[ds] + ZHI[db] + '日 ' + GAN[hs] + ZHI[hb] + '时',
+      shi: ZHI[hb]
+    };
+  }
+
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  wraps.forEach(function (wrap) {
+    var svg = wrap.querySelector('.qj-compass');
+    if (!svg) return;
+    wrap.classList.add('is-live');
+    var r3 = svg.querySelector('.cp-r3'), r4 = svg.querySelector('.cp-r4');
+    var signs = r3 ? r3.querySelectorAll('.cp-glyph') : [];
+    var xius = r4 ? r4.querySelectorAll('.cp-han') : [];
+
+    // 天心标：正上方一对小三角，标出「此刻」
+    var NS = 'http://www.w3.org/2000/svg';
+    var axis = document.createElementNS(NS, 'path');
+    // 落在宿环与宫环之间的空隙里：上尖指宿，下尖指宫
+    axis.setAttribute('d', 'M245 62h10l-5-7zM245 64h10l-5 7z');
+    axis.setAttribute('class', 'cp-axis');
+    svg.appendChild(axis);
+
+    var cap = document.createElement('p');
+    cap.className = 'qj-compass-now';
+    wrap.after(cap);
+
+    var turned3 = 0, turned4 = 0;
+    // 每次只往前转，不倒退：跨过 360° 时继续累加
+    function ahead(prev, target) { return prev + mod(target - prev, 360); }
+
+    function tick() {
+      var now = new Date(), s = sky(now), b = bazi(now, s);
+      var gi = Math.floor(s.sun / 30);
+      // 十二宫环：白羊起点在正上方、顺时针排，转 -黄经 即让太阳所在点到正上
+      turned3 = ahead(turned3, mod(-s.sun, 360));
+      // 二十八宿环：角宿在正上、顺时针等分。环上各宿等宽而真宿宽窄不一，
+      // 所以让当值那一宿的字始终停在天心标附近（宿内进度只带它左右挪一点）
+      turned4 = ahead(turned4, mod(-(s.xi + (s.frac - 0.5) * 0.6) * 360 / 28, 360));
+      if (r3) r3.style.transform = 'rotate(' + turned3 + 'deg)';
+      if (r4) r4.style.transform = 'rotate(' + turned4 + 'deg)';
+      signs.forEach(function (el, i) { el.classList.toggle('cp-now', i === gi); });
+      xius.forEach(function (el, i) { el.classList.toggle('cp-now', i === s.xi); });
+      cap.innerHTML = '<span>' + b.text + '</span><span>日躔' + GONG[gi] + ' · ' + XIU[s.xi] + '宿中天 · ' + s.moon + '</span>';
+    }
+
+    // 先停在原位，下一帧再转到当下：开页时看得到星盘「对时」
+    if (still) tick();
+    else requestAnimationFrame(function () { requestAnimationFrame(tick); });
+    setInterval(tick, 60000);
+  });
+})();
+</script>
