@@ -1020,3 +1020,9 @@ main > header h1 {
 .qj-yin-toggle .qj-yin-on { display: none; }
 .qj-yin-toggle[aria-pressed="true"] { opacity: 1; color: var(--ge-zi); }
 .qj-yin-toggle[aria-pressed="true"] .qj-yin-on { display: inline; }
+
+/* 置顶（partials/qj-pinned.html） */
+.qj-pinned .qj-block-h { display: flex; align-items: center; gap: .6rem; color: var(--ge-fg); }
+.qj-pinned-note { font-family: var(--font-body); font-size: .8rem; letter-spacing: .05em; font-weight: 400; color: var(--ge-muted); margin-left: auto; }
+.qj-pinned .qj-item { border-left-color: var(--zi); }
+.qj-head + .qj-pinned, .qj-intro + .qj-pinned { margin-top: 0; margin-bottom: 2.6rem; }
