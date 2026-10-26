@@ -1,6 +1,8 @@
 // 覆盖主题 search.js：主题版只在 keyup 时检索，中文输入法上屏、粘贴、
 // 自动填充都不触发 keyup，于是搜中文永远没结果；索引未取回时检索还会报错；
 // 无结果时按回车会提交表单，页面跳成「当前地址?」。以下三处为本站所改。
+// 另改作「问路」：Ctrl/⌘ K 随处唤出；没输字时列出各处去处；结果换成本站版式，
+// 命中的字标紫；分类页不进结果。
 var fuse;
 var showButton = document.getElementById("search-button");
 var showButtonMobile = document.getElementById("search-button-mobile");
@@ -28,6 +30,14 @@ modal.addEventListener("click", function (event) {
   return false;
 });
 document.addEventListener("keydown", function (event) {
+  // 本站另加：Ctrl K / ⌘ K 随处问路（再按一次合上）
+  if ((event.ctrlKey || event.metaKey) && !event.altKey && (event.key == "k" || event.key == "K")) {
+    event.preventDefault();
+    if (searchVisible) hideSearch();
+    else displaySearch();
+    return;
+  }
+
   // Forward slash to open search wrapper
   if (event.key == "/") {
     const active = document.activeElement;
@@ -109,6 +119,44 @@ input.form.addEventListener("submit", function (event) {
   event.preventDefault();
 });
 
+// 问路：没输字时列出的去处
+var PATHS = [
+  ["文", "万法归一", "全部文章", "/posts/"],
+  ["术", "法宝库", "自制术数工具", "/tools/"],
+  ["梅", "梅花", "此刻起一卦", "/meihua/"],
+  ["生", "十二长生", "长生帝旺速查", "/changsheng/"],
+  ["奇", "奇门手记", "排盘与笔记", "/qimen/"],
+  ["寻", "寻物", "整页搜索，网址可分享", "/seek/"],
+  ["人", "阁主何人", "所习诸术、求问方式", "/about/"],
+  ["往", "去处", "阁主在各平台", "/links/"],
+];
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+  });
+}
+function showPaths() {
+  output.innerHTML =
+    '<li class="qj-q-cap">去处</li>' +
+    PATHS.map(function (p) {
+      return '<li><a class="qj-q-item qj-q-path" href="' + p[3] + '" tabindex="0">' +
+        '<span class="qj-seal" aria-hidden="true">' + p[0] + "</span>" +
+        '<span class="qj-q-t">' + p[1] + '</span><span class="qj-q-s">' + p[2] + "</span></a></li>";
+    }).join("");
+  hasResults = true;
+  var links = output.querySelectorAll("a");
+  first = links[0];
+  last = links[links.length - 1];
+}
+if (!document.getElementById("qj-q-foot")) {
+  var foot = document.createElement("footer");
+  foot.id = "qj-q-foot";
+  foot.className = "qj-q-foot";
+  foot.innerHTML = "<span><kbd>↑</kbd><kbd>↓</kbd> 择</span><span><kbd>⏎</kbd> 往</span><span><kbd>Esc</kbd> 退</span>" +
+    '<span class="qj-q-any"><kbd>Ctrl</kbd><kbd>K</kbd> 随处问路</span>';
+  modal.appendChild(foot);
+}
+
 function displaySearch() {
   if (!indexed) {
     buildIndex();
@@ -116,6 +164,7 @@ function displaySearch() {
   if (!searchVisible) {
     document.body.style.overflow = "hidden";
     wrapper.style.visibility = "visible";
+    if (!input.value.trim()) showPaths();
     input.focus();
     searchVisible = true;
   }
@@ -183,51 +232,45 @@ function executeQuery(term) {
   pendingTerm = null;
   term = term.trim();
   if (!term) {
-    output.innerHTML = "";
-    hasResults = false;
+    showPaths();
     return;
   }
-  let results = fuse.search(term);
+  let results = fuse.search(term).filter(function (r) {
+    return r.item.type !== "categories" && r.item.type !== "tags";
+  });
   let resultsHTML = "";
 
   if (results.length > 0) {
-    results.forEach(function (value, key) {
-      var html = value.item.summary;
+    // 命中的字标紫：把检索词里的每个字（去重）在标题与摘要里标出
+    var marks = Array.from(new Set(term.replace(/\s+/g, "").split(""))).map(function (c) {
+      return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    });
+    var re = marks.length ? new RegExp("(" + marks.join("|") + ")", "g") : null;
+    var hl = function (s) {
+      if (!re) return esc(s);
+      return String(s).split(re).map(function (part, i) { return i % 2 ? "<mark>" + esc(part) + "</mark>" : esc(part); }).join("");
+    };
+    results.forEach(function (value) {
+      var it = value.item;
       var div = document.createElement("div");
-      div.innerHTML = html;
-      value.item.summary = div.textContent || div.innerText || "";
-      var title = value.item.externalUrl
-        ? value.item.title +
-          '<span class="text-xs ml-2 align-center cursor-default text-neutral-400 dark:text-neutral-500">' +
-          value.item.externalUrl +
-          "</span>"
-        : value.item.title;
-      var linkconfig = value.item.externalUrl
-        ? 'target="_blank" rel="noopener" href="' + value.item.externalUrl + '"'
-        : 'href="' + value.item.permalink + '"';
-      resultsHTML =
-        resultsHTML +
-        `<li class="mb-2">
-          <a class="flex items-center px-3 py-2 rounded-md appearance-none bg-neutral-100 dark:bg-neutral-700 focus:bg-primary-100 hover:bg-primary-100 dark:hover:bg-primary-900 dark:focus:bg-primary-900 focus:outline-dotted focus:outline-transparent focus:outline-2" 
-          ${linkconfig} tabindex="0">
-            <div class="grow">
-              <div class="-mb-1 text-lg font-bold">
-                ${title}
-              </div>
-              <div class="text-sm text-neutral-500 dark:text-neutral-400">${value.item.section}<span class="px-2 text-primary-500">&middot;</span>${value.item.date ? value.item.date : ""}</span></div>
-              <div class="text-sm italic">${value.item.summary}</div>
-            </div>
-            <div class="ml-2 ltr:block rtl:hidden text-neutral-500">&rarr;</div>
-            <div class="mr-2 ltr:hidden rtl:block text-neutral-500">&larr;</div>
-          </a>
-        </li>`;
+      div.innerHTML = it.summary;
+      var summary = (div.textContent || div.innerText || "").trim();
+      if (summary.length > 70) summary = summary.slice(0, 70) + "…";
+      var link = it.externalUrl
+        ? 'target="_blank" rel="noopener" href="' + esc(it.externalUrl) + '"'
+        : 'href="' + esc(it.permalink) + '"';
+      resultsHTML +=
+        '<li><a class="qj-q-item" ' + link + ' tabindex="0">' +
+        '<span class="qj-q-t">' + hl(it.title) + "</span>" +
+        '<span class="qj-q-m">' + esc(it.section) + (it.date ? " · " + esc(it.date) : "") + "</span>" +
+        (summary ? '<span class="qj-q-s">' + hl(summary) + "</span>" : "") +
+        "</a></li>";
     });
     hasResults = true;
   } else {
     resultsHTML =
-      '<li class="px-3 py-2 text-neutral-500 dark:text-neutral-400">未寻得与「' +
-      term.replace(/[&<>"]/g, "") +
-      "」相关的文字，换个字试试，或去<a class=\"underline\" href=\"/posts/\">万法归一</a>翻翻。</li>";
+      '<li class="qj-q-none">未寻得与「' + esc(term) +
+      '」相关的文字，换个字试试，或去<a href="/posts/">万法归一</a>翻翻。按回车可到寻物页细找。</li>';
     hasResults = false;
   }
 

@@ -484,7 +484,8 @@
     try { localStorage.removeItem('meihua.tab'); localStorage.removeItem('meihua.theme'); } catch (e) { /* 无痕模式 */ }
     let saved = null;
     try { saved = localStorage.getItem(METHOD_KEY); } catch (e) { /* 无痕模式 */ }
-    setMethod(saved === 'random' ? 'random' : 'time');
+    // 从文章卦印链进来（?t=…）时一定按那一刻的时间起卦
+    setMethod(saved === 'random' && !(Fabao.linkedTime && Fabao.linkedTime()) ? 'random' : 'time');
     // 打开页面即按此刻起一卦（浏览器不支持农历时退回随机）
     if (method === 'random') applyCast(castRandom());
     else applyCast(castByTime(when) || castRandom());

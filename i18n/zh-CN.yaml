@@ -2,4 +2,5 @@
 author:
   byline_title: "阁主"
 search:
-  input_placeholder: "寻物：输入字词"
+  input_placeholder: "问路：输入字词，或从下面的去处择一"
+  open_button_title: "问路（Ctrl K 或 /）"

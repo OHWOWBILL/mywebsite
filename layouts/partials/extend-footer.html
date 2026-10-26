@@ -1,3 +1,10 @@
+{{- /* 本站脚本合成一包：历法小库、日课、日签、文章页四件、时令粒子、控制台彩蛋。
+       各件自己判断当前页用不用得上，用不上就不动手。 */ -}}
+{{- $qj := slice "li" "rike" "qian" "article" "season" "egg" -}}
+{{- $parts := slice -}}
+{{- range $qj }}{{ $parts = $parts | append (resources.Get (printf "js/qj/%s.js" .)) }}{{ end -}}
+{{- $bundle := $parts | resources.Concat "js/qj.js" | minify | fingerprint "sha512" -}}
+<script src="{{ $bundle.RelPermalink }}" integrity="{{ $bundle.Data.Integrity }}"></script>
 <script>
 (function () {
   // ===== 星空 + 鼠标拖尾粒子系统 =====
@@ -87,6 +94,9 @@
       ctx.fillStyle = 'rgba(237,235,242,' + (a * 0.22) + ')';  // 画布本身不透明，星光在这里压到两成
       ctx.fill();
     }
+
+    // 时令粒子（assets/js/qj/season.js）
+    if (window.qjSeason) window.qjSeason.draw(ctx, W, H);
 
     // 拖尾
     for (var j = trail.length - 1; j >= 0; j--) {

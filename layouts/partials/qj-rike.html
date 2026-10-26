@@ -1,0 +1,25 @@
+{{- /* ===========================================================
+     日课 · 首页小卡（assets/js/qj/rike.js 现算填入）
+     农历、日柱与建除、节气进度、月相、此时一卦，每次打开都不一样。
+     宜忌取自 data/rike.yaml；「生成日签」见 assets/js/qj/qian.js。
+     没有脚本时整块不显示。
+     =========================================================== */ -}}
+{{- $hero := (resources.Get "img/ge-hero.jpg").Process "webp q80" -}}
+<section class="qj-block qj-rike" id="qj-rike" aria-label="日课" hidden data-hero="{{ $hero.RelPermalink }}">
+  <h2 class="qj-block-h"><span class="qj-seal" aria-hidden="true">课</span>日课<span class="qj-rike-date" data-k="date"></span></h2>
+  <div class="qj-rike-body">
+    <div class="qj-rike-moon" data-k="moon"></div>
+    <dl class="qj-rike-facts">
+      <div><dt>日</dt><dd data-k="day"></dd></div>
+      <div><dt>气</dt><dd data-k="qi"></dd></div>
+      <div><dt>宜</dt><dd data-k="yi"></dd></div>
+      <div><dt>忌</dt><dd data-k="ji"></dd></div>
+    </dl>
+    <a class="qj-rike-gua" href="{{ "meihua/" | relURL }}" data-k="gua" title="去梅花排盘看全卦"></a>
+  </div>
+  <div class="qj-rike-foot">
+    <button type="button" class="qj-rike-qian">生成日签</button>
+    <span class="qj-rike-note">卦随时辰换，日课每日换</span>
+  </div>
+  <script type="application/json" id="qj-rike-data">{{ site.Data.rike | jsonify | safeJS }}</script>
+</section>

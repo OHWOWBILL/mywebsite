@@ -1,7 +1,9 @@
-{{- /* 音律：Web Audio 现场合成的磬声，不加载任何音频文件。
-       默认关；点页眉的磬形按钮开启，选择记在 localStorage。
-       门径悬停按五音（宫商角徵羽）各发一声，导航与近作悬停发高八度轻声，
-       星空里点一下落一粒金星、响一声。 */ -}}
+{{- /* 音律：Web Audio 现场合成的磬声与琴声，不加载任何音频文件。
+       页眉的磬形按钮三档轮转：关 → 磬 → 磬与琴 → 关，选择记在 localStorage。
+       磬：门径悬停按五音（宫商角徵羽）各发一声，导航与近作悬停发高八度轻声，
+           星空里点一下落一粒金星、响一声，文末盖印时一声低磬。
+       琴：散板古琴，D 宫五声，散音、按音（带绰注吟猱）、泛音随机成句，
+           句末落宫或徵，句间留白。切到后台标签即停。 */ -}}
 <script>
 (function () {
   var KEY = 'qj-yin';
@@ -9,8 +11,10 @@
   var btns = document.querySelectorAll('.qj-yin-toggle');
   if (!AC) { btns.forEach(function (b) { b.hidden = true; }); return; }
 
-  var on = false;
-  try { on = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  // 0 关 · 1 磬 · 2 磬与琴
+  var mode = 0;
+  try { mode = Math.max(0, Math.min(2, parseInt(localStorage.getItem(KEY), 10) || 0)); } catch (e) {}
+  var on = mode > 0;
 
   var ctx = null, bus = null;
 
@@ -64,30 +68,182 @@
   // 五音，D 宫：宫 商 角 徵 羽
   var WU = [293.66, 329.63, 369.99, 440.0, 493.88];
 
+  // ---------- 琴 ----------
+  // 拨弦用 Karplus-Strong 现算一段音频，同一音高只算一次
+  var ksCache = {};
+  function ks(freq) {
+    var key = Math.round(freq * 10);
+    if (ksCache[key]) return ksCache[key];
+    var sr = ctx.sampleRate, n = Math.floor(sr * 5), p = Math.max(2, Math.round(sr / freq));
+    var buf = ctx.createBuffer(1, n, sr), d = buf.getChannelData(0), ring = new Float32Array(p), lp = 0;
+    // 拨弦的噪声先过一道低通，音色闷一些，像丝弦而不是钢弦
+    for (var i = 0; i < p; i++) { lp += .45 * ((Math.random() * 2 - 1) - lp); ring[i] = lp; }
+    var decay = .9975 + Math.min(.0018, 60 / freq * .0016), idx = 0;
+    for (var j = 0; j < n; j++) {
+      var a = ring[idx], b = ring[(idx + 1) % p];
+      d[j] = a;
+      ring[idx] = decay * .5 * (a + b);
+      idx = (idx + 1) % p;
+    }
+    return (ksCache[key] = buf);
+  }
+
+  var qinBus = null;
+  function qinOut() {
+    if (!qinBus) {
+      qinBus = ctx.createGain();
+      qinBus.gain.value = .55;
+      var lpf = ctx.createBiquadFilter();
+      lpf.type = 'lowpass'; lpf.frequency.value = 2400; lpf.Q.value = .4;
+      qinBus.connect(lpf); lpf.connect(bus);
+    }
+    return qinBus;
+  }
+
+  // 散音 / 按音：slide 为绰注（自下滑上），yin 为吟猱（尾音微颤）
+  function pluck(freq, t, vel, slide, yin) {
+    var src = ctx.createBufferSource(), g = ctx.createGain();
+    src.buffer = ks(freq);
+    var pr = src.playbackRate;
+    if (slide) { pr.setValueAtTime(.9439, t); pr.exponentialRampToValueAtTime(1, t + .28); }
+    else pr.setValueAtTime(1, t);
+    if (yin) {
+      var steps = 24, curve = new Float32Array(steps);
+      for (var i = 0; i < steps; i++) curve[i] = 1 + Math.sin(i / steps * Math.PI * 6) * .007 * (1 - i / steps);
+      pr.setValueCurveAtTime(curve, t + .45, 1.6);
+    }
+    g.gain.setValueAtTime(vel, t);
+    g.gain.setTargetAtTime(0, t + 2.6, .9);
+    src.connect(g); g.connect(qinOut());
+    src.start(t); src.stop(t + 5);
+  }
+  // 泛音：清亮如铃，正弦为主，带一点高次
+  function fan(freq, t, vel) {
+    [[1, 1, 2.4], [2, .22, 1.2], [3, .08, .6]].forEach(function (h) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = freq * h[0];
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(vel * h[1], t + .012);
+      g.gain.exponentialRampToValueAtTime(.0001, t + h[2]);
+      o.connect(g); g.connect(qinOut());
+      o.start(t); o.stop(t + h[2] + .05);
+    });
+  }
+
+  // D 宫五声，自 D2 至 D5
+  var SCALE = [];
+  [73.42, 146.83, 293.66].forEach(function (base) {
+    [1, 1.1225, 1.2599, 1.4983, 1.6818].forEach(function (r) { SCALE.push(base * r); });
+  });
+  SCALE.push(587.33);
+  var qinTimer = 0, qinOn = false, qinPos = 7;
+
+  function phrase() {
+    if (!qinOn || !ctx || ctx.state !== 'running' || document.hidden) { qinTimer = 0; return; }
+    var t = ctx.currentTime + .05, kind = Math.random();
+    var len = 3 + Math.floor(Math.random() * 4), DUR = [.7, 1, 1, 1.4, 2];
+    if (kind < .22) {
+      // 泛音句：高一两个八度，轻
+      var k = 10 + Math.floor(Math.random() * 3);
+      for (var i = 0; i < len; i++) {
+        fan(SCALE[Math.min(15, k)] * 2, t, .16);
+        t += DUR[Math.floor(Math.random() * DUR.length)];
+        k += [-2, -1, 1, 2][Math.floor(Math.random() * 4)];
+        k = Math.max(8, Math.min(14, k));
+      }
+      fan(SCALE[Math.random() < .5 ? 10 : 13] * 2, t, .18);
+    } else {
+      // 散音、按音句：中低音区，步进为主，偶有大跳；起句常带一声散音低宫
+      if (Math.random() < .5) pluck(SCALE[Math.random() < .5 ? 0 : 5], t, .5, false, false);
+      for (var j = 0; j < len; j++) {
+        qinPos += [-2, -1, -1, 0, 1, 1, 2, 3][Math.floor(Math.random() * 8)];
+        qinPos = Math.max(3, Math.min(12, qinPos));
+        pluck(SCALE[qinPos], t, .42, Math.random() < .3, Math.random() < .35);
+        t += DUR[Math.floor(Math.random() * DUR.length)];
+      }
+      // 句末落宫或徵，长音带吟
+      qinPos = [5, 8, 10][Math.floor(Math.random() * 3)];
+      pluck(SCALE[qinPos], t, .46, Math.random() < .5, true);
+      if (Math.random() < .4) pluck(SCALE[qinPos - 5], t + .02, .3, false, false);
+    }
+    var rest = (t - ctx.currentTime) + 3 + Math.random() * 4;
+    qinTimer = setTimeout(phrase, rest * 1000);
+  }
+  function qinStart() {
+    if (qinOn || mode !== 2 || !ctx) return;
+    if (ctx.state !== 'running') {
+      ctx.resume().then(function () { if (ctx.state === 'running') qinStart(); }, function () {});
+      return;
+    }
+    qinOn = true;
+    qinTimer = setTimeout(phrase, 400);
+  }
+  function qinStop() {
+    qinOn = false;
+    clearTimeout(qinTimer); qinTimer = 0;
+    if (qinBus) {
+      var g = qinBus.gain, t = ctx.currentTime;
+      g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(0, t + .6);
+      var old = qinBus; qinBus = null;
+      setTimeout(function () { old.disconnect(); }, 900);
+    }
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) qinStop(); else if (mode === 2 && ctx) { ensure(); setTimeout(qinStart, 300); }
+  });
+
+  // ---------- 开关 ----------
+  var NAMES = ['关', '磬', '磬与琴'];
+  var tip = null, tipTimer = 0;
   function render() {
     btns.forEach(function (b) {
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
-      b.title = on ? '音律：开' : '音律：关';
+      b.dataset.yin = mode;
+      b.title = '音律：' + NAMES[mode] + '（点按轮换）';
+      b.setAttribute('aria-label', '音律：' + NAMES[mode]);
     });
+  }
+  function say(b) {
+    if (!tip) { tip = document.createElement('span'); tip.className = 'qj-yin-tip'; tip.setAttribute('role', 'status'); document.body.appendChild(tip); }
+    var r = b.getBoundingClientRect();
+    tip.textContent = '音律 · ' + NAMES[mode];
+    tip.style.left = (r.left + r.width / 2) + 'px';
+    tip.style.top = (r.bottom + 8) + 'px';
+    tip.classList.add('on');
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(function () { tip.classList.remove('on'); }, 1600);
   }
   render();
 
   btns.forEach(function (b) {
     b.addEventListener('click', function () {
-      on = !on;
-      try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+      mode = (mode + 1) % 3;
+      on = mode > 0;
+      try { localStorage.setItem(KEY, String(mode)); } catch (e) {}
       render();
-      if (on) {
+      say(b);
+      if (mode === 1) {
         ensure();
         // 开：五音自宫至羽一路扬上去
         WU.forEach(function (f, i) { qing(f, .5, i * .11); });
         qing(WU[0] * 2, .35, .62);
+      } else if (mode === 2) {
+        ensure();
+        // 入琴：一声散音低宫，琴声随后起
+        pluck(SCALE[5], ctx.currentTime + .05, .5, false, true);
+        setTimeout(qinStart, 2200);
+      } else {
+        qinStop();
       }
     });
   });
 
   // 浏览器只许在点击或按键之后出声：换页后第一次点按时唤醒
-  function wake() { if (on) ensure(); }
+  function wake() {
+    if (!on) return;
+    ensure();
+    if (mode === 2) setTimeout(qinStart, 300);
+  }
   document.addEventListener('pointerdown', wake, true);
   document.addEventListener('keydown', wake, true);
 
@@ -113,6 +269,10 @@
   hover('.qj-item', function (i) { return WU[i % 5] * 2; }, .18);
 
   // 星空点按：给 extend-footer 里的粒子系统用
-  window.qjYin = { tap: function () { qing(WU[Math.floor(Math.random() * 5)] * 2, .3); } };
+  window.qjYin = {
+    tap: function () { qing(WU[Math.floor(Math.random() * 5)] * 2, .3); },
+    // 文末盖印：一声低磬
+    seal: function () { qing(WU[0] / 2, .7); qing(WU[3] / 2, .25, .04); }
+  };
 })();
 </script>

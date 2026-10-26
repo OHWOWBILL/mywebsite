@@ -80,10 +80,20 @@
   const toLocalInput = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
+  // 网址带 ?t=2024-09-11T12:00 时，开页就排那一刻（文章的发文日卦印从这里链进来）
+  function linkedTime() {
+    try {
+      const t = new URLSearchParams(location.search).get('t');
+      const d = t ? new Date(t) : null;
+      return d && !isNaN(d) ? d : null;
+    } catch (e) { return null; }
+  }
+
   // 「此刻」时间控件：datetime 输入 + 「此刻」按钮，改动时回调 onChange(date, isNow)
   function bindWhen(input, nowBtn, onChange) {
     const now = () => { const d = new Date(); d.setSeconds(0, 0); return d; };
-    input.value = toLocalInput(now());
+    const first = linkedTime() || now();
+    input.value = toLocalInput(first);
     input.addEventListener('change', () => {
       const d = new Date(input.value);
       if (!isNaN(d)) onChange(d, false);
@@ -93,7 +103,7 @@
       input.value = toLocalInput(d);
       onChange(d, true);
     });
-    return now();
+    return first;
   }
 
   function copy(text, okMsg) {
@@ -110,6 +120,6 @@
     }
   }
 
-  window.Fabao = { GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, toast, copy };
+  window.Fabao = { GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy };
   mountShell();
 })();
