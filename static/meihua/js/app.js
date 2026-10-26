@@ -1,5 +1,5 @@
 // =========================================================
-// 梅花易数工具 · 主逻辑 (上下卦选择器版)
+// 梅花 · 起卦排盘（外框见 /fabao/fabao.js）
 // =========================================================
 
 (function () {
@@ -17,36 +17,8 @@
     { name: '坤', symbol: '☷', lines: [0,0,0], element: '地', wuxing: 'tu' }
   ];
 
-  // —— 主题 & Tab ——
-  const THEME_KEY = 'meihua.theme', TAB_KEY = 'meihua.tab';
-  const SUN_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
-  const MOON_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  function applyTheme(t) {
-    document.documentElement.setAttribute('data-theme', t);
-    localStorage.setItem(THEME_KEY, t);
-    document.querySelectorAll('[data-theme-icon]').forEach(el => el.innerHTML = t === 'dark' ? SUN_ICON : MOON_ICON);
-    document.querySelectorAll('[data-theme-label]').forEach(el => el.textContent = t === 'dark' ? '浅色' : '深色');
-  }
-  function initTheme() {
-    const saved = localStorage.getItem(THEME_KEY);
-    const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    applyTheme(saved || sys);
-    document.querySelectorAll('[data-theme-btn]').forEach(b => b.addEventListener('click', () => {
-      applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }));
-  }
-  function switchTab(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.dataset.page === name));
-    document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-    localStorage.setItem(TAB_KEY, name);
-  }
-  function initTabs() {
-    document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
-    switchTab(localStorage.getItem(TAB_KEY) || 'paipan');
-  }
-
   // =========================================================
-  // 排盘速查
+  // 三卦卡片：上下卦选择、爻线、爻辞
   // =========================================================
 
   const YAO_LABELS = ['初', '二', '三', '四', '五', '上'];
@@ -303,24 +275,52 @@
     }
   }
 
-  function castByTime(now) {
-    const h = now.getHours();
+  // 时辰序数：子=1 … 亥=12（23 点起为子时）
+  const hourZhiOf = date => Math.floor((date.getHours() + 1) / 2) % 12;
+
+  function lunarLabel(date) {
+    const h = date.getHours();
     // 23 点起为子时，按传统算作次日
-    const lunar = lunarDate(h === 23 ? new Date(now.getTime() + 3600 * 1000) : now);
+    const lunar = lunarDate(h === 23 ? new Date(date.getTime() + 3600 * 1000) : date);
     if (!lunar) return null;
     const yearZhi = ((lunar.year - 4) % 12 + 12) % 12;
     const yearGan = ((lunar.year - 4) % 10 + 10) % 10;
-    const hourZhi = Math.floor((h + 1) / 2) % 12;
-    const Y = yearZhi + 1, M = lunar.month, D = lunar.day, H = hourZhi + 1;
+    const hourZhi = hourZhiOf(date);
+    return {
+      lunar, yearZhi, hourZhi,
+      text: `${GAN[yearGan]}${ZHI[yearZhi]}年 ${lunar.leap ? '闰' : ''}${LUNAR_MONTH[lunar.month - 1]}月${lunarDayName(lunar.day)} ${ZHI[hourZhi]}时`
+    };
+  }
+
+  function castByTime(date) {
+    const L = lunarLabel(date);
+    if (!L) return null;
+    const Y = L.yearZhi + 1, M = L.lunar.month, D = L.lunar.day, H = L.hourZhi + 1;
     const upperSum = Y + M + D, lowerSum = upperSum + H;
     return {
-      method: 'time',
+      method: 'time', date,
       upper: (upperSum % 8) || 8,
       lower: (lowerSum % 8) || 8,
       dong: (lowerSum % 6) || 6,
-      label: `${GAN[yearGan]}${ZHI[yearZhi]}年 ${lunar.leap ? '闰' : ''}${LUNAR_MONTH[M - 1]}月${lunarDayName(D)} ${ZHI[hourZhi]}时`,
-      formula: `年${ZHI[yearZhi]}(${Y}) + 月(${M}) + 日(${D}) = ${upperSum}，÷8 余 ${(upperSum % 8) || 8} → 上卦；`
-        + `再加时${ZHI[hourZhi]}(${H}) = ${lowerSum}，÷8 余 ${(lowerSum % 8) || 8} → 下卦；÷6 余 ${(lowerSum % 6) || 6} → 动爻`
+      label: L.text,
+      formula: `年${ZHI[L.yearZhi]}(${Y}) + 月(${M}) + 日(${D}) = ${upperSum}，÷8 余 ${(upperSum % 8) || 8} → 上卦；`
+        + `再加时${ZHI[L.hourZhi]}(${H}) = ${lowerSum}，÷8 余 ${(lowerSum % 8) || 8} → 下卦；÷6 余 ${(lowerSum % 6) || 6} → 动爻`
+    };
+  }
+
+  // 报数起卦：上数定上卦，下数定下卦，两数之和加时辰数定动爻
+  function castByNumber(a, b, date) {
+    const L = lunarLabel(date);
+    const hz = L ? L.hourZhi : hourZhiOf(date);
+    const H = hz + 1, sum = a + b + H;
+    return {
+      method: 'num', date,
+      upper: (a % 8) || 8,
+      lower: (b % 8) || 8,
+      dong: (sum % 6) || 6,
+      label: `报数 ${a}、${b} · ${L ? L.text : ZHI[hz] + '时'}`,
+      formula: `上数 ${a} ÷8 余 ${(a % 8) || 8} → 上卦；下数 ${b} ÷8 余 ${(b % 8) || 8} → 下卦；`
+        + `${a} + ${b} + 时${ZHI[hz]}(${H}) = ${sum}，÷6 余 ${(sum % 6) || 6} → 动爻`
     };
   }
 
@@ -333,7 +333,7 @@
     return Math.floor(Math.random() * n);
   }
   function castRandom() {
-    return { method: 'random', upper: randInt(8) + 1, lower: randInt(8) + 1, dong: randInt(6) + 1, label: '随机数起卦', formula: '' };
+    return { method: 'random', date: new Date(), upper: randInt(8) + 1, lower: randInt(8) + 1, dong: randInt(6) + 1, label: '随机数起卦', formula: '' };
   }
 
   // 体用：动爻所在的经卦为「用」，另一经卦为「体」
@@ -347,6 +347,9 @@
     if (SHENG[a] === b) return { text: '体生用', verdict: '有耗损，付出多回报少', cls: 'warn' };
     return { text: '用克体', verdict: '不利，宜谨慎', cls: 'bad' };
   }
+
+  const METHOD_NAME = { time: '时间起卦', num: '报数起卦', random: '随机起卦' };
+  let lastCast = null;
 
   function applyCast(cast) {
     const upper = TRIGRAMS[cast.upper - 1], lower = TRIGRAMS[cast.lower - 1];
@@ -368,33 +371,37 @@
     const yong = cast.dong <= 3 ? lower : upper;
     const ti = cast.dong <= 3 ? upper : lower;
     const ty = tiYong(ti, yong);
-    const ben = state.ben.hexagram, bian = state.bian.hexagram;
+    const ben = state.ben.hexagram, bian = state.bian.hexagram, hu = state.hu.hexagram;
+
+    lastCast = Object.assign({}, cast, {
+      ben: ben.name, bian: bian.name, hu: hu.name,
+      dongName: yaoName(ben, cast.dong - 1),
+      tiyong: `体 ${ti.name}${WX_LABEL[ti.wuxing]} · 用 ${yong.name}${WX_LABEL[yong.wuxing]} — ${ty.text}，${ty.verdict}`,
+      manual: false
+    });
 
     const info = document.getElementById('qiguaInfo');
-    info.classList.remove('manual');
     info.innerHTML = `
-      <div class="qg-line1">
-        <span class="qg-method">${cast.method === 'time' ? '时间起卦' : '随机起卦'}</span>
-        <span class="qg-time">${cast.label}</span>
+      <div class="fb-when">
+        <span class="fb-tag">${METHOD_NAME[cast.method]}</span>
+        <span>${cast.label}</span>
       </div>
-      <div class="qg-result">
+      <div class="fb-key">
         <strong>${ben.name}</strong> 之 <strong>${bian.name}</strong>
-        <span class="qg-sep">·</span>${yaoName(ben, cast.dong - 1)}动
-        <span class="qg-sep">·</span>互 ${state.hu.hexagram.name}
+        <span class="sep">·</span>${lastCast.dongName}动
+        <span class="sep">·</span>互 ${hu.name}
       </div>
-      <div class="qg-tiyong ${ty.cls}">
-        体 ${ti.name}${WX_LABEL[ti.wuxing]} · 用 ${yong.name}${WX_LABEL[yong.wuxing]} — ${ty.text}，${ty.verdict}
-      </div>
-      ${cast.formula ? `<div class="qg-formula">${cast.formula}</div>` : ''}
+      <div class="fb-note ${ty.cls}">${lastCast.tiyong}</div>
+      ${cast.formula ? `<div class="fb-fine">${cast.formula}</div>` : ''}
     `;
   }
 
   function markManual() {
     const info = document.getElementById('qiguaInfo');
-    if (info && !info.classList.contains('manual')) {
-      info.classList.add('manual');
+    if (lastCast && !lastCast.manual) {
+      lastCast.manual = true;
       const note = document.createElement('div');
-      note.className = 'qg-formula';
+      note.className = 'fb-fine';
       note.textContent = '（已手动调整卦象，上面的起卦结果仅供参考）';
       info.appendChild(note);
     }
@@ -407,139 +414,85 @@
       setTrigram(type, 'lower', null);
       updateHexagram(type);
     });
-    const info = document.getElementById('qiguaInfo');
-    info.classList.remove('manual');
-    info.innerHTML = '<div class="qg-hint">已清空，可在下方自行选择上下卦，或点击右侧按钮重新起卦。</div>';
+    lastCast = null;
+    document.getElementById('qiguaInfo').innerHTML = '<div class="fb-note">已清空。可在下方自选上下卦，或重新起卦。</div>';
+  }
+
+  // 卦例：与奇门判例同一格式，便于贴进笔记
+  function caseMarkdown() {
+    const name = t => state[t].hexagram ? state[t].hexagram.name : '—';
+    const when = lastCast ? Fabao.fmt(lastCast.date) : Fabao.fmt(new Date());
+    const lines = [`## 梅花卦例 · ${when}`, ''];
+    if (lastCast) {
+      lines.push(`- **起法**：${METHOD_NAME[lastCast.method]}（${lastCast.label}）`);
+      lines.push(`- **卦**：${lastCast.ben} 之 ${lastCast.bian} · ${lastCast.dongName}动 · 互 ${lastCast.hu}`);
+      lines.push(`- **体用**：${lastCast.tiyong}`);
+      if (lastCast.manual) lines.push(`- **手动调整后**：本 ${name('ben')} · 互 ${name('hu')} · 变 ${name('bian')}`);
+    } else {
+      lines.push(`- **卦**：本 ${name('ben')} · 互 ${name('hu')} · 变 ${name('bian')}（手动选卦）`);
+    }
+    lines.push('', '### 所问', '', '### 断', '', '#卜部/梅花卦例', '');
+    return lines.join('\n');
   }
 
   function initPaipan() {
     ['ben', 'hu', 'bian'].forEach(renderTriPickers);
+    ['ben', 'hu', 'bian'].forEach(updateHexagram);
     document.addEventListener('click', () => {
       document.querySelectorAll('.tri-menu.open').forEach(m => m.classList.remove('open'));
     });
-    document.querySelectorAll('[data-qigua]').forEach(btn => btn.addEventListener('click', () => {
-      const m = btn.dataset.qigua;
-      if (m === 'time') applyCast(castByTime(new Date()) || castRandom());
-      else if (m === 'random') applyCast(castRandom());
-      else clearAll();
-    }));
-    // 打开页面即按当前时间起一卦（浏览器不支持农历时退回随机）
-    applyCast(castByTime(new Date()) || castRandom());
-  }
 
-  // =========================================================
-  // 十二长生 (with wuxing coloring)
-  // =========================================================
+    let method = 'time';
+    const METHOD_KEY = 'meihua.method';
+    const seg = document.getElementById('methodSeg');
+    const dt = document.getElementById('dtInput');
+    let when = Fabao.bindWhen(dt, document.getElementById('nowBtn'), d => {
+      when = d;
+      if (method === 'time') cast();
+    });
 
-  function buildChangsheng() {
-    const branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-    const stems    = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-    const stages   = ['长生','沐浴','冠带','临官','帝旺','衰','病','死','墓','绝','胎','养'];
-    const isYang   = [true, false, true, false, true, false, true, false, true, false];
-    const startBranch = [11, 6, 2, 9, 2, 9, 5, 0, 8, 3];
-
-    // 天干五行
-    const stemWx = ['mu','mu','huo','huo','tu','tu','jin','jin','shui','shui'];
-    // 地支五行
-    const branchWx = ['shui','tu','mu','mu','tu','huo','huo','tu','jin','jin','tu','shui'];
-
-    const powerMap = {
-      '长生':'rising','沐浴':'neutral','冠带':'rising',
-      '临官':'strong','帝旺':'peak',
-      '衰':'fading','病':'fading','死':'dead',
-      '墓':'weak','绝':'dead','胎':'rising','养':'neutral'
-    };
-    const wuxingLabel = { mu:'木', huo:'火', tu:'土', jin:'金', shui:'水' };
-
-    const data = [];
-    for (let s = 0; s < 10; s++) {
-      data[s] = [];
-      for (let b = 0; b < 12; b++) {
-        let offset = isYang[s] ? (b - startBranch[s] + 12) % 12 : (startBranch[s] - b + 12) % 12;
-        data[s][b] = stages[offset];
+    function setMethod(m) {
+      method = m;
+      seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+      document.querySelectorAll('[data-for]').forEach(el => { el.hidden = !el.dataset.for.split(' ').includes(m); });
+      try { localStorage.setItem(METHOD_KEY, m); } catch (e) { /* 无痕模式 */ }
+    }
+    function cast() {
+      if (method === 'num') {
+        const a = parseInt(document.getElementById('numA').value, 10);
+        const b = parseInt(document.getElementById('numB').value, 10);
+        if (!(a > 0) || !(b > 0)) { Fabao.toast('请先报两个正整数'); return; }
+        applyCast(castByNumber(a, b, when));
+      } else if (method === 'random') {
+        applyCast(castRandom());
+      } else {
+        applyCast(castByTime(when) || castRandom());
       }
     }
 
-    const table = document.getElementById('csTable');
-    const thead = table.querySelector('thead tr');
-    const tbody = table.querySelector('tbody');
+    seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      setMethod(b.dataset.m);
+      if (b.dataset.m === 'num') document.getElementById('numA').focus();
+      else cast();
+    }));
+    ['numA', 'numB'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') cast(); }));
+    document.getElementById('castBtn').addEventListener('click', cast);
+    document.getElementById('clearBtn').addEventListener('click', clearAll);
+    document.getElementById('copyBtn').addEventListener('click', () => Fabao.copy(caseMarkdown(), '卦例已复制，可贴入笔记'));
 
-    thead.innerHTML = '<th class="corner">天干<br>＼<br>地支</th>';
-    branches.forEach((br, i) => {
-      const th = document.createElement('th');
-      th.className = 'branch';
-      th.dataset.col = i;
-      th.dataset.wx = branchWx[i];
-      th.textContent = br;
-      thead.appendChild(th);
-    });
-
-    tbody.innerHTML = '';
-    stems.forEach((st, si) => {
-      const tr = document.createElement('tr');
-      tr.dataset.row = si;
-      const th = document.createElement('th');
-      th.className = 'stem ' + (isYang[si] ? 'yang' : 'yin');
-      th.dataset.wx = stemWx[si];
-      th.textContent = st;
-      tr.appendChild(th);
-      branches.forEach((br, bi) => {
-        const td = document.createElement('td');
-        td.className = (isYang[si] ? 'yang' : 'yin');
-        td.dataset.row = si;
-        td.dataset.col = bi;
-        td.dataset.power = powerMap[data[si][bi]];
-        td.dataset.wx = stemWx[si]; // 用天干五行
-        td.textContent = data[si][bi];
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById('csStageLegend').innerHTML = stages.map(s => `<span class="chip" data-power="${powerMap[s]}">${s}</span>`).join('');
-
-    const infoBox = document.getElementById('csInfoBox');
-    let lastKey = null;
-
-    function clearHl() {
-      table.querySelectorAll('.row-hl,.col-hl,.cell-hl').forEach(el => el.classList.remove('row-hl','col-hl','cell-hl'));
-    }
-    function highlight(td) {
-      if (!td || td.dataset.row === undefined) return;
-      const r = +td.dataset.row, c = +td.dataset.col, key = r + '-' + c;
-      if (key === lastKey) return;
-      lastKey = key;
-      clearHl();
-      tbody.querySelectorAll('tr')[r].classList.add('row-hl');
-      thead.querySelectorAll('th.branch')[c].classList.add('col-hl');
-      tbody.querySelectorAll('tr').forEach(tr => { const cells = tr.querySelectorAll('td'); if (cells[c]) cells[c].classList.add('col-hl'); });
-      td.classList.add('cell-hl');
-
-      const stage = data[r][c];
-      const sWx = stemWx[r], bWx = branchWx[c];
-      infoBox.innerHTML = `
-        <div class="label">${branches[c]}宫（${wuxingLabel[bWx]}）· ${stems[r]}（${wuxingLabel[sWx]}${isYang[r]?'阳':'阴'}）</div>
-        <div class="result">${stage}</div>
-        <div class="detail">天干「<span style="color:var(--wx-${sWx})">${stems[r]}</span>」在地支「<span style="color:var(--wx-${bWx})">${branches[c]}</span>」宫 → <strong>${stage}</strong></div>
-      `;
-    }
-    table.addEventListener('mouseover', (e) => { const td = e.target.closest('td'); if (td) highlight(td); });
-    table.addEventListener('click', (e) => { lastKey = null; const td = e.target.closest('td'); if (td) highlight(td); });
-    table.addEventListener('mouseleave', () => {
-      clearHl(); lastKey = null;
-      infoBox.innerHTML = '<div class="hint">将鼠标移到（或点击）表格单元格<br>即可查看对应的十二长生</div>';
-    });
+    // 旧版把十二长生放在本页的分页里，现已独立成页
+    try { localStorage.removeItem('meihua.tab'); localStorage.removeItem('meihua.theme'); } catch (e) { /* 无痕模式 */ }
+    let saved = null;
+    try { saved = localStorage.getItem(METHOD_KEY); } catch (e) { /* 无痕模式 */ }
+    setMethod(saved === 'random' ? 'random' : 'time');
+    // 打开页面即按此刻起一卦（浏览器不支持农历时退回随机）
+    if (method === 'random') applyCast(castRandom());
+    else applyCast(castByTime(when) || castRandom());
   }
 
-  function initAll() {
-    initTheme();
-    initTabs();
-    initPaipan();
-    buildChangsheng();
-  }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAll);
+    document.addEventListener('DOMContentLoaded', initPaipan);
   } else {
-    initAll();
+    initPaipan();
   }
 })();
