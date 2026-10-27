@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>五运六气 · 潜蛟阁法宝库</title>
+  <meta name="description" content="五运六气司天在泉查询：任选年月，即得岁运太过不及、司天在泉、左右间气、六步主气客气与客主加临、主运客运交接日期，附六十年运气表。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=1">
+  <style>
+    [data-wx="木"] { --wc: var(--wx-mu); }
+    [data-wx="火"] { --wc: var(--wx-huo); }
+    [data-wx="土"] { --wc: var(--wx-tu); }
+    [data-wx="金"] { --wc: var(--wx-jin); }
+    [data-wx="水"] { --wc: var(--wx-shui); }
+    .wx { color: var(--wc); }
+
+    .yq-four { display: flex; gap: 6px; flex-wrap: wrap; }
+    .yq-four .fb-pillar { min-width: 64px; }
+    .yq-four .fb-pillar b { font-size: 15px; }
+    .yq-step { display: flex; gap: 8px; }
+    .yq-step .fb-btn { flex: 1; padding: 7px 10px; font-size: 13px; letter-spacing: .1em; }
+
+    .yq-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+    .yq-card { padding: 18px 20px; min-width: 0; }
+    .yq-card h2 { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .25em; margin-bottom: 12px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .yq-card h2 small { font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: .1em; }
+
+    /* —— 六气轮 —— */
+    .yq-wheel { display: grid; place-items: center; }
+    .yq-wheel svg { width: 100%; max-width: 440px; height: auto; display: block; overflow: visible; }
+    .yq-wheel .sec { fill: color-mix(in oklab, var(--wc, var(--zi)) 9%, var(--bg-2)); stroke: var(--rule); stroke-width: 1; cursor: pointer; transition: fill .3s; }
+    .yq-wheel .sec.ke { fill: color-mix(in oklab, var(--wc) 18%, var(--bg-2)); }
+    .yq-wheel .sec.yun { fill: var(--bg-3); }
+    .yq-wheel .sec:hover { fill: var(--bg-3); }
+    .yq-wheel .sec.cur { stroke: var(--zi-2); stroke-width: 1.4; }
+    .yq-wheel .sec.ke.cur { fill: color-mix(in oklab, var(--wc) 34%, var(--bg-2)); }
+    .yq-wheel text { font-family: var(--font-title); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+    .yq-wheel .t-ke { font-size: 13.5px; font-weight: 600; fill: var(--wc); letter-spacing: .04em; }
+    .yq-wheel .t-ke2 { font-size: 9.5px; fill: var(--muted); }
+    .yq-wheel .t-zhu { font-size: 11.5px; fill: var(--fg-2); }
+    .yq-wheel .t-yun { font-size: 11px; fill: var(--muted); }
+    .yq-wheel .t-step { font-size: 9px; fill: var(--faint); letter-spacing: .1em; }
+    .yq-wheel .t-term { font-size: 8.5px; fill: var(--faint); font-family: var(--font-mark); }
+    .yq-wheel .t-pos { font-size: 12px; font-weight: 600; fill: var(--jin); letter-spacing: .3em; }
+    .yq-wheel .hub { fill: var(--bg-3); stroke: var(--rule-2); }
+    .yq-wheel .hub-gz { font-size: 26px; font-weight: 900; fill: var(--fg); }
+    .yq-wheel .hub-yun { font-size: 11px; fill: var(--zi-2); letter-spacing: .12em; }
+    .yq-wheel .hub-y { font-size: 9.5px; fill: var(--muted); font-family: var(--font-mark); }
+    .yq-wheel .tick { stroke: var(--rule-2); stroke-width: 1; }
+    .yq-wheel .hand { transition: transform .9s cubic-bezier(.3, .7, .2, 1); }
+    .yq-wheel .hand line { stroke: var(--fg); stroke-width: 1.6; stroke-linecap: round; }
+    .yq-wheel .hand circle { fill: var(--zi-2); stroke: var(--fg); stroke-width: 1.2; }
+    .yq-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+    .yq-legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .yq-legend i { width: 9px; height: 9px; border-radius: 2px; background: var(--wc); }
+
+    /* —— 岁运 · 司天在泉 —— */
+    .yq-big { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 4px; }
+    .yq-big b { font-family: var(--font-title); font-weight: 600; font-size: 26px; letter-spacing: .1em; color: var(--wc); }
+    .yq-big span { font-size: 13px; color: var(--muted); letter-spacing: .08em; }
+    .yq-quote { padding: 8px 14px; border-left: 2px solid var(--rule-2); font-size: 14px; line-height: 1.85; color: var(--fg-2); margin: 8px 0 14px; }
+    .yq-quote small { display: block; font-size: 11.5px; color: var(--faint); letter-spacing: .12em; }
+    .yq-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .yq-tags span { padding: 4px 10px; border-radius: 999px; background: var(--bg-3); border: 1px solid var(--rule-2); font-size: 12.5px; color: var(--fg-2); }
+    .yq-tags span b { font-family: var(--font-title); font-weight: 600; color: var(--zi-2); margin-right: 4px; }
+    .yq-tags span.none { border-style: dashed; color: var(--muted); }
+    .yq-sky { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .yq-sky div { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 4px 8px; border-radius: var(--r-sm); background: var(--bg-3); text-align: center; min-width: 0; }
+    .yq-sky small { font-size: 10.5px; color: var(--faint); letter-spacing: .15em; }
+    .yq-sky b { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: var(--wc); letter-spacing: .06em; }
+    .yq-sky em { font-style: normal; font-size: 10.5px; color: var(--muted); }
+    .yq-sky .main { background: color-mix(in oklab, var(--wc) 14%, var(--bg-3)); }
+    .yq-sky .main b { font-size: 17px; }
+    .yq-sky .gap { visibility: hidden; }
+    .yq-rel { margin-top: 12px; font-size: 13px; line-height: 1.85; color: var(--fg-2); }
+    .yq-rel b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 4px; }
+
+    /* —— 六步 —— */
+    .yq-steps { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+    .yq-steps > div { display: flex; flex-direction: column; gap: 6px; padding: 12px 10px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent; min-width: 0; cursor: pointer; }
+    .yq-steps > div:hover { border-color: var(--rule-2); }
+    .yq-steps > div.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 18%, var(--bg-3)); }
+    .yq-steps h3 { font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .15em; color: var(--fg); display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
+    .yq-steps h3 em { font-style: normal; font-weight: 400; font-size: 10.5px; color: var(--jin); letter-spacing: .1em; }
+    .yq-steps .dt { font-size: 11.5px; color: var(--faint); font-family: var(--font-mark); letter-spacing: .02em; line-height: 1.5; }
+    .yq-steps .dt span { font-family: var(--font-title); }
+    .yq-steps .q { display: flex; flex-direction: column; gap: 1px; }
+    .yq-steps .q small { font-size: 10.5px; color: var(--faint); letter-spacing: .15em; }
+    .yq-steps .q b { font-family: var(--font-title); font-weight: 600; font-size: 14.5px; color: var(--wc); letter-spacing: .04em; }
+    .yq-steps .q.zhu b { font-weight: 400; font-size: 13.5px; color: var(--fg-2); }
+    .yq-steps .jl { font-size: 12px; line-height: 1.5; color: var(--muted); }
+    .yq-steps .jl b { font-family: var(--font-title); font-weight: 600; color: var(--lv); margin-right: 3px; }
+    .yq-steps .jl.ni b { color: var(--zhu); }
+
+    /* —— 五运 —— */
+    .yq-yun { width: 100%; border-collapse: separate; border-spacing: 0 3px; font-size: 13.5px; }
+    .yq-yun th { font-family: var(--font-title); font-weight: 400; font-size: 12px; letter-spacing: .2em; color: var(--faint); text-align: left; padding: 6px 10px; }
+    .yq-yun td { padding: 8px 10px; background: var(--bg-3); color: var(--fg-2); }
+    .yq-yun td:first-child { border-radius: 5px 0 0 5px; font-family: var(--font-title); color: var(--fg); white-space: nowrap; }
+    .yq-yun td:last-child { border-radius: 0 5px 5px 0; }
+    .yq-yun tr.on td { background: color-mix(in oklab, var(--zi) 26%, var(--bg-3)); color: var(--fg); }
+    .yq-yun .y { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: var(--wc); }
+    .yq-yun .y small { font-weight: 400; font-size: 11px; color: var(--muted); margin-left: 4px; }
+    .yq-yun .d { font-size: 12px; color: var(--muted); }
+    .yq-yun .d i { font-style: normal; color: var(--faint); }
+
+    /* —— 六十年 —— */
+    .yq-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .yq-filter .fb-seg { flex-wrap: wrap; border-radius: 14px; }
+    .yq-sixty { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; }
+    .yq-sixty button { all: unset; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px 6px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent; cursor: pointer; text-align: center; min-width: 0; transition: opacity .25s; }
+    .yq-sixty button:hover { border-color: var(--rule-2); }
+    .yq-sixty button:focus-visible { outline: 2px solid var(--zi-2); outline-offset: 1px; }
+    .yq-sixty button.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 26%, var(--bg-3)); }
+    .yq-sixty button.dim { opacity: .22; }
+    .yq-sixty .gz { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: var(--fg); letter-spacing: .05em; }
+    .yq-sixty .yr { font-family: var(--font-mark); font-size: 9.5px; color: var(--faint); }
+    .yq-sixty .yn { font-family: var(--font-title); font-size: 11.5px; color: var(--wc); }
+    .yq-sixty .st { font-family: var(--font-title); font-size: 10.5px; color: var(--muted); line-height: 1.35; }
+    .yq-sixty .tg { font-size: 9.5px; color: var(--zi-2); min-height: 1.3em; letter-spacing: .02em; }
+
+    .yq-notes { font-size: 13.5px; line-height: 1.95; color: var(--fg-2); }
+    .yq-notes li { list-style: none; padding-left: 14px; position: relative; }
+    .yq-notes li::before { content: ""; position: absolute; left: 0; top: .95em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .yq-notes b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 4px; }
+    .yq-warn { margin-top: 12px; padding: 10px 14px; border-radius: var(--r-sm); background: color-mix(in oklab, var(--zhu) 10%, var(--bg-3)); color: var(--fg-2); font-size: 13px; line-height: 1.8; }
+    .yq-rel2 { margin-top: 12px; font-size: 13px; color: var(--muted); line-height: 1.9; }
+
+    @media (max-width: 1000px) {
+      .yq-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .yq-sixty { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    }
+    @media (max-width: 860px) {
+      .yq-grid { grid-template-columns: 1fr; gap: 14px; margin-top: 14px; }
+      .yq-card { padding: 16px; }
+      .yq-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .yq-sixty { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .yq-yun th:nth-child(4), .yq-yun td:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body data-tool="yunqi">
+
+<main class="fb-main">
+  <div class="fb-head">
+    <div class="fb-seal">气</div>
+    <div>
+      <h1 class="fb-title">五运六气 <span class="en">SKY &amp; SPRING</span></h1>
+      <div class="fb-sub">岁运太过不及，司天在泉，六步主客，一年一查</div>
+    </div>
+  </div>
+
+  <section class="fb-now">
+    <div class="fb-now-info" id="nowInfo"></div>
+    <div class="fb-now-ctrl">
+      <div class="fb-row">
+        <input type="datetime-local" id="dtInput" class="grow" aria-label="查看时间">
+        <button type="button" class="fb-btn" id="nowBtn">此刻</button>
+      </div>
+      <div class="yq-step">
+        <button type="button" class="fb-btn" id="prevBtn">‹ 前一年</button>
+        <button type="button" class="fb-btn" id="nextBtn">后一年 ›</button>
+      </div>
+      <div class="fb-fine">运气年自大寒交；点轮上一步或下方六十年表可换看</div>
+    </div>
+  </section>
+
+  <div class="yq-grid">
+    <section class="fb-card yq-card">
+      <h2>六气轮 <small>外圈客气 · 中圈主气 · 内圈主运</small></h2>
+      <div class="yq-wheel" id="wheel"></div>
+      <div class="yq-legend" id="legend"></div>
+    </section>
+    <section class="fb-card yq-card">
+      <h2>岁运 <small>甲己土 乙庚金 丙辛水 丁壬木 戊癸火</small></h2>
+      <div class="yq-big" id="yunBig"></div>
+      <div class="yq-quote" id="yunQuote"></div>
+      <div class="yq-tags" id="tags"></div>
+      <h2 style="margin-top:6px">司天 · 在泉 <small>左右间气</small></h2>
+      <div class="yq-sky" id="sky"></div>
+      <p class="yq-rel" id="rel"></p>
+    </section>
+  </div>
+
+  <section class="fb-card yq-card" style="margin-top:18px">
+    <h2 id="stepsTitle">六步主客</h2>
+    <div class="yq-steps" id="steps"></div>
+  </section>
+
+  <section class="fb-card yq-card" style="margin-top:18px">
+    <h2>五运 <small>主运角起羽终，客运以岁运为初，各七十三日五刻</small></h2>
+    <table class="yq-yun" id="yunTab">
+      <thead><tr><th>步</th><th>主运</th><th>客运</th><th>交运</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="fb-card yq-card" style="margin-top:18px">
+    <h2>六十年运气表 <small>点一格换看那一年</small></h2>
+    <div class="yq-filter">
+      <div class="fb-seg" id="filter" role="group" aria-label="只看">
+        <button type="button" data-k="" class="on">全部</button>
+        <button type="button" data-k="tianfu">天符</button>
+        <button type="button" data-k="suihui">岁会</button>
+        <button type="button" data-k="taiyi">太乙天符</button>
+        <button type="button" data-k="tongtianfu">同天符</button>
+        <button type="button" data-k="tongsuihui">同岁会</button>
+        <button type="button" data-k="ping">平气</button>
+      </div>
+    </div>
+    <div class="yq-sixty" id="sixty"></div>
+  </section>
+
+  <section class="fb-card yq-card" style="margin-top:18px">
+    <h2>口诀 <small>怎么推的</small></h2>
+    <ul class="yq-notes">
+      <li><b>岁运</b>甲己化土，乙庚化金，丙辛化水，丁壬化木，戊癸化火；阳干太过，阴干不及。</li>
+      <li><b>司天</b>子午少阴君火，丑未太阴湿土，寅申少阳相火，卯酉阳明燥金，辰戌太阳寒水，巳亥厥阴风木。司天管上半年，居三之气；在泉管下半年，居终之气。</li>
+      <li><b>客气</b>按一阴厥阴、二阴少阴、三阴太阴、一阳少阳、二阳阳明、三阳太阳之序轮转；司天之左为四之气、右为二之气，在泉之左为初之气、右为五之气。</li>
+      <li><b>主气</b>年年不变：初厥阴风木，二少阴君火，三少阳相火，四太阴湿土，五阳明燥金，终太阳寒水。六步分交于大寒、春分、小满、大暑、秋分、小雪。</li>
+      <li><b>客主加临</b>客胜为从，主胜为逆；二火相加，君位臣则顺，臣位君则逆（《至真要大论》）。</li>
+      <li><b>五运</b>主运年年角徵宫商羽，客运以本年岁运为初运，五行相生而下；每音太少依五音建运、太少相生，与《六元正纪大论》所列一致。初运大寒日交，二运春分后十三日，三运芒种后十日，四运处暑后七日，五运立冬后四日。</li>
+      <li><b>天符岁会</b>中运与司天同气为天符，与岁支（四正四季）同气为岁会，兼之为太乙天符；太过之运同在泉为同天符，不及之运同在泉为同岁会。平气取「太过被司天所抑，不及得司天或岁支之助」一说，干德符未计。</li>
+      <li><b>交年</b>运气年按大寒节气时刻交接，节气用天文近似公式现算，误差在一刻钟内；《六元正纪大论》另有各年交司时刻（如寅初一刻）之说，未取。</li>
+    </ul>
+    <div class="yq-warn">仅供学习参考，不是医疗建议。身体不适请就医。</div>
+    <p class="yq-rel2">相关：<a href="/ziwu/">子午流注 · 按时开穴</a> · <a href="/wushu/#men-%E5%8C%BB">五术门庭 · 医门</a></p>
+  </section>
+</main>
+
+<script src="/fabao/fabao.js?v=6"></script>
+<script src="/yunqi/yunqi.js?v=1"></script>
+<script>
+(function () {
+  'use strict';
+  const Y = window.Yunqi, { QI, GAN, ZHI } = Y;
+
+  let when, live = !Fabao.linkedTime(), filterK = '', shownKey = '';
+  const pad = n => String(n).padStart(2, '0');
+  const md = d => `${d.getMonth() + 1}月${d.getDate()}日`;
+  const md2 = d => `${d.getMonth() + 1}.${pad(d.getDate())}`;
+  const ymd = d => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
+  const Q = (k, cls) => `<b class="${cls || ''}" data-wx="${QI[k].wx}">${QI[k].name}</b>`;
+
+  // ---------- 此刻 ----------
+  function renderNow(A) {
+    const R = A.year, s = R.steps[A.step], u = R.zhuyun[A.yun], ku = R.keyun[A.yun];
+    document.getElementById('nowInfo').innerHTML = `
+      <div class="fb-when"><span class="fb-tag">${live ? '此刻' : '所查'}</span><span>${Fabao.fmt(when)}</span></div>
+      <div class="fb-key">${R.gz.name}年<span class="sep">·</span><strong>${QI[R.sitian].name}司天</strong><span class="sep">·</span>${QI[R.zaiquan].name}在泉</div>
+      <div class="fb-note">${R.yun.name}（${R.yun.yinName}）· 运气年 ${ymd(R.start)} 大寒起至 ${ymd(R.end)} · 今在${s.name}、${'初二三四五'[A.yun]}运</div>
+      <div class="yq-four">
+        <span class="fb-pillar"><small>岁运</small><b>${R.yun.wx}${R.yun.tai ? '太过' : '不及'}</b></span>
+        <span class="fb-pillar"><small>司天</small><b>${QI[R.sitian].short}</b></span>
+        <span class="fb-pillar"><small>在泉</small><b>${QI[R.zaiquan].short}</b></span>
+        <span class="fb-pillar"><small>${s.name}·主</small><b>${QI[s.zhu].short}</b></span>
+        <span class="fb-pillar"><small>${s.name}·客</small><b>${QI[s.ke].short}</b></span>
+        <span class="fb-pillar"><small>主运·客运</small><b>${u.name}·${ku.name}</b></span>
+      </div>`;
+  }
+
+  // ---------- 六气轮 ----------
+  // 一年按时间铺满一圈，三之气（司天）正中朝上，终之气（在泉）朝下
+  const R_KE = [158, 124], R_ZHU = [124, 94], R_YUN = [94, 70];
+  const pol = (r, a) => [+(r * Math.sin(a * Math.PI / 180)).toFixed(2), +(-r * Math.cos(a * Math.PI / 180)).toFixed(2)];
+  function arc(r0, r1, a0, a1) {
+    const big = a1 - a0 > 180 ? 1 : 0;
+    const [x0, y0] = pol(r1, a0), [x1, y1] = pol(r1, a1), [x2, y2] = pol(r0, a1), [x3, y3] = pol(r0, a0);
+    return `M${x0} ${y0}A${r1} ${r1} 0 ${big} 1 ${x1} ${y1}L${x2} ${y2}A${r0} ${r0} 0 ${big} 0 ${x3} ${y3}Z`;
+  }
+  function angler(R) {
+    const len = R.end - R.start, s3 = R.steps[2];
+    const mid = ((s3.at - R.start) + (s3.end - R.start)) / 2 / len * 360;
+    return t => (t - R.start) / len * 360 - mid;
+  }
+  function renderWheel(A) {
+    const R = A.year, ang = angler(R);
+    let s = '';
+    R.steps.forEach((st, i) => {
+      const a0 = ang(st.at), a1 = ang(st.end), am = (a0 + a1) / 2, cur = i === A.step ? ' cur' : '';
+      const [xz, yz] = pol(109, am);
+      // 客气名沿圈写；下半圈翻过来，字别倒着
+      const flip = am > 90 && am < 270, rot = flip ? am + 180 : am, sg = flip ? 1 : -1;
+      s += `<g data-i="${i}">
+        <path class="sec ke${cur}" data-wx="${QI[st.ke].wx}" d="${arc(R_KE[1], R_KE[0], a0, a1)}"/>
+        <path class="sec${cur}" data-wx="${QI[st.zhu].wx}" d="${arc(R_ZHU[1], R_ZHU[0], a0, a1)}"/>
+        <g transform="rotate(${rot.toFixed(2)})">
+          <text class="t-ke" data-wx="${QI[st.ke].wx}" x="0" y="${sg * (flip ? 136 : 146)}">${QI[st.ke].name}</text>
+          <text class="t-step" x="0" y="${sg * (flip ? 150 : 132)}">${st.name}</text>
+        </g>
+        <text class="t-zhu" x="${xz}" y="${yz}">${QI[st.zhu].short}</text>
+      </g>`;
+      const [tx0, ty0] = pol(R_ZHU[1], a0), [tx1, ty1] = pol(R_KE[0] + 6, a0), [lx, ly] = pol(R_KE[0] + 15, a0);
+      s += `<line class="tick" x1="${tx0}" y1="${ty0}" x2="${tx1}" y2="${ty1}"/><text class="t-term" x="${lx}" y="${ly}">${st.term}</text>`;
+    });
+    R.zhuyun.forEach((u, i) => {
+      const a0 = ang(u.at), a1 = ang(u.end), am = (a0 + a1) / 2, [x, y] = pol(82, am);
+      s += `<path class="sec yun${i === A.yun ? ' cur' : ''}" d="${arc(R_YUN[1], R_YUN[0], a0, a1)}"/>
+        <text class="t-yun" x="${x}" y="${y}">${u.name}</text>`;
+    });
+    const [px, py] = pol(R_KE[0] + 32, 0), [qx, qy] = pol(R_KE[0] + 32, 180);
+    const h = ang(when);
+    document.getElementById('wheel').innerHTML = `
+      <svg viewBox="-200 -200 400 400" role="img" aria-label="六气轮：${R.gz.name}年，${QI[R.sitian].name}司天，${QI[R.zaiquan].name}在泉，此时在${R.steps[A.step].name}">
+        <text class="t-pos" x="${px}" y="${py}">司天</text>
+        <text class="t-pos" x="${qx}" y="${qy}">在泉</text>
+        ${s}
+        <circle class="hub" r="${R_YUN[1] - 3}"/>
+        <text class="hub-gz" y="-12">${R.gz.name}</text>
+        <text class="hub-yun" y="13">${R.yun.name}</text>
+        <text class="hub-y" y="29">${R.y}–${R.y + 1}</text>
+        <g class="hand" style="transform:rotate(${h}deg)"><line y1="-${R_YUN[1] - 1}" y2="-${R_KE[0] + 2}"/><circle cy="-${R_KE[0] + 2}" r="3.6"/></g>
+      </svg>`;
+    document.querySelectorAll('#wheel [data-i]').forEach(g => g.addEventListener('click', () => goStep(+g.dataset.i)));
+  }
+
+  // ---------- 岁运 · 司天在泉 ----------
+  function renderYun(A) {
+    const R = A.year, yn = R.yun;
+    document.getElementById('yunBig').innerHTML =
+      `<b data-wx="${yn.wx}">${yn.name}</b><span>${GAN[R.gz.gan]}为${yn.tai ? '阳' : '阴'}干 · 五音${yn.yinName} · 中运统一年</span>`;
+    document.getElementById('yunQuote').innerHTML = `<small>素问 · 气交变大论</small>${yn.jing}。`;
+    document.getElementById('tags').innerHTML = R.tags.length
+      ? R.tags.map(t => `<span><b>${t.name}</b>${t.note}</span>`).join('')
+      : '<span class="none">非天符、岁会，亦非平气之年</span>';
+    const j = R.jian;
+    const cell = (lab, k, sub, main) => `<div class="${main ? 'main' : ''}" data-wx="${QI[k].wx}"><small>${lab}</small><b>${QI[k].name}</b><em>${sub}</em></div>`;
+    document.getElementById('sky').innerHTML =
+      cell('司天右间', j.stRight, '二之气') + cell('司天', R.sitian, '三之气 · 主上半年', true) + cell('司天左间', j.stLeft, '四之气') +
+      cell('在泉左间', j.zqLeft, '初之气') + cell('在泉', R.zaiquan, '终之气 · 主下半年', true) + cell('在泉右间', j.zqRight, '五之气');
+    document.getElementById('rel').innerHTML =
+      `<b>运气${R.rel.name}</b>${R.rel.note}。气生运为顺化，气克运为天刑，运生气为小逆，运克气为不和，同气为天符。`;
+  }
+
+  // ---------- 六步 ----------
+  function renderSteps(A) {
+    const R = A.year;
+    document.getElementById('stepsTitle').innerHTML = `六步主客 <small>${R.gz.name}年 · 主气不动，客气随年转 · 点一步看那一步</small>`;
+    document.getElementById('steps').innerHTML = R.steps.map((s, i) => `
+      <div class="${i === A.step ? 'on' : ''}" data-i="${i}">
+        <h3>${s.name}${i === 2 ? '<em>司天</em>' : i === 5 ? '<em>在泉</em>' : ''}</h3>
+        <div class="dt"><span>${s.term}</span> ${md2(s.at)}–${md2(new Date(s.end - 1))}</div>
+        <div class="q" data-wx="${QI[s.ke].wx}"><small>客气</small><b>${QI[s.ke].name}</b></div>
+        <div class="q zhu"><small>主气</small><b>${QI[s.zhu].name}</b></div>
+        <div class="jl${s.jl.shun ? '' : ' ni'}"><b>${s.jl.name}</b>${s.jl.note}</div>
+      </div>`).join('');
+    document.querySelectorAll('#steps [data-i]').forEach(el => el.addEventListener('click', () => goStep(+el.dataset.i)));
+  }
+
+  // ---------- 五运 ----------
+  function renderYunTab(A) {
+    const R = A.year;
+    document.querySelector('#yunTab tbody').innerHTML = R.zhuyun.map((u, i) => {
+      const k = R.keyun[i];
+      const from = u.plus ? `${u.term}后${{ 13: '十三', 10: '十', 7: '七', 4: '四' }[u.plus]}日` : `${u.term}日`;
+      return `<tr class="${i === A.yun ? 'on' : ''}">
+        <td>${'初二三四终'[i]}运</td>
+        <td><span class="y" data-wx="${u.wx}">${u.name}<small>${u.wx}</small></span></td>
+        <td><span class="y" data-wx="${k.wx}">${k.name}<small>${k.wx}</small></span></td>
+        <td class="d">${md(u.at)} <i>${from}</i></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ---------- 六十年 ----------
+  function renderSixty(A) {
+    const R = A.year, base = R.y - R.gz.idx;   // 本甲子周期的甲子年
+    let s = '';
+    for (let i = 0; i < 60; i++) {
+      const g = Y.gzFromIdx(i), yn = Y.suiyun(g.gan), st = Y.ZHI_SITIAN[g.zhi], tg = Y.tags(g.gan, g.zhi);
+      const dim = filterK && !tg.some(t => t.k === filterK || (t.k === 'taiyi' && (filterK === 'tianfu' || filterK === 'suihui')));
+      s += `<button type="button" class="${i === R.gz.idx ? 'on' : ''}${dim ? ' dim' : ''}" data-y="${base + i}" title="${g.name}：${yn.name}，${QI[st].name}司天，${QI[(st + 3) % 6].name}在泉${tg.length ? '；' + tg.map(t => t.name).join('、') : ''}">
+        <span class="gz">${g.name}</span><span class="yr">${base + i}</span>
+        <span class="yn" data-wx="${yn.wx}">${yn.wx}${yn.tai ? '太过' : '不及'}</span>
+        <span class="st">${QI[st].short}司天<br>${QI[(st + 3) % 6].short}在泉</span>
+        <span class="tg">${tg.map(t => t.name.replace('太乙天符', '太乙')).join(' ')}</span>
+      </button>`;
+    }
+    const box = document.getElementById('sixty');
+    box.innerHTML = s;
+    box.querySelectorAll('button').forEach(b => b.addEventListener('click', () => goYear(+b.dataset.y)));
+  }
+
+  function render() {
+    const A = Y.at(when);
+    shownKey = A.year.y + ':' + A.step + ':' + A.yun;
+    renderNow(A); renderWheel(A); renderYun(A); renderSteps(A); renderYunTab(A); renderSixty(A);
+  }
+  function go(d, isNow) {
+    when = d; live = !!isNow;
+    document.getElementById('dtInput').value = Fabao.toLocalInput(d);
+    render();
+  }
+  // 换年：同月同日同时刻挪到目标运气年里
+  function goYear(y) {
+    const cur = Y.yearOf(when), d = new Date(when);
+    d.setFullYear(d.getFullYear() + (y - cur));
+    go(d);
+  }
+  // 换步：取那一步的中间一天正午
+  function goStep(i) {
+    const s = Y.year(Y.yearOf(when)).steps[i];
+    const d = new Date((s.at.getTime() + s.end.getTime()) / 2); d.setHours(12, 0, 0, 0);
+    go(d);
+  }
+
+  document.getElementById('legend').innerHTML = ['木', '火', '土', '金', '水'].map(w => `<span data-wx="${w}"><i></i>${w}</span>`).join('') +
+    '<span>指针：此时在一年中的位置</span>';
+  document.getElementById('prevBtn').addEventListener('click', () => goYear(Y.yearOf(when) - 1));
+  document.getElementById('nextBtn').addEventListener('click', () => goYear(Y.yearOf(when) + 1));
+  document.querySelectorAll('#filter button').forEach(b => b.addEventListener('click', () => {
+    filterK = b.dataset.k;
+    document.querySelectorAll('#filter button').forEach(x => x.classList.toggle('on', x === b));
+    renderSixty(Y.at(when));
+  }));
+  when = Fabao.bindWhen(document.getElementById('dtInput'), document.getElementById('nowBtn'), (d, isNow) => go(d, isNow));
+  render();
+
+  // 停在「此刻」时，指针跟着走，换了步或运整页重排
+  setInterval(() => {
+    if (!live) return;
+    when = new Date(); when.setSeconds(0, 0);
+    const A = Y.at(when);
+    if (A.year.y + ':' + A.step + ':' + A.yun !== shownKey) { document.getElementById('dtInput').value = Fabao.toLocalInput(when); render(); return; }
+    const w = document.querySelector('#nowInfo .fb-when span:last-child');
+    if (w) w.textContent = Fabao.fmt(when);
+  }, 60000);
+})();
+</script>
+</body>
+</html>
