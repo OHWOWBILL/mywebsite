@@ -12,7 +12,7 @@
 <script>try{if(sessionStorage.getItem('qj-opened'))document.documentElement.classList.add('qj-opened');sessionStorage.setItem('qj-opened','1')}catch(e){}</script>
 <section class="qj-hero" aria-label="潜蛟阁">
   {{- with $hero }}
-  <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="大麻山神社，鸟居下石阶通往雾中社殿" fetchpriority="high"/>
+  <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="雾中杉林，石阶通往亮着灯的社殿" fetchpriority="high"/>
   {{- end }}
   <span class="qj-hero-v2">翻身倚北辰</span>
   <h1 class="qj-hero-v">{{ range $i, $c := split "潜蛟阁" "" }}<span class="qj-ch" style="--i:{{ $i }}">{{ $c }}</span>{{ end }}</h1>

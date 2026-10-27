@@ -199,7 +199,7 @@ h1, h2, h3, h4,
 
 @media (min-width: 640px) {
   .qj-hero { aspect-ratio: 16 / 10; }
-  .qj-hero .qj-hero-img { object-position: 50% 27%; }
+  .qj-hero .qj-hero-img { object-position: 50% 60%; }
 }
 
 .qj-hero-img {
