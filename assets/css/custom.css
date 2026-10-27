@@ -239,12 +239,14 @@ h1, h2, h3, h4,
   text-shadow: 0 1px 16px rgba(18, 12, 28, .6);
 }
 
+/* 旁题两句，竖排两列：右列「昂首天外望」，左列「无我这般人」 */
 .qj-hero-v2 {
   right: calc(7% + clamp(4.6rem, 17cqw, 8.6rem));
   top: 9.5%;
   writing-mode: vertical-rl;
   font-family: var(--font-body);
   font-size: clamp(.95rem, 3.4cqw, 1.6rem);
+  line-height: 1.7;
   letter-spacing: .3em;
   color: var(--ge-zi);
   text-shadow: 0 1px 10px rgba(18, 12, 28, .7);
@@ -259,17 +261,17 @@ h1, h2, h3, h4,
   background: var(--jin);
 }
 
-/* 落款两句，各占一行；首屏最后出现的字 */
 .qj-hero-sig {
   left: 5%;
   bottom: 6%;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: .8em;
   font-family: var(--font-body);
   font-size: clamp(.9rem, 3cqw, 1.35rem);
-  line-height: 1.9;
   letter-spacing: .24em;
   color: var(--ge-fg);
-  text-shadow: 0 1px 10px rgba(18, 12, 28, .7);
 }
 
 .qj-home {

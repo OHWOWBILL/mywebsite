@@ -2,7 +2,7 @@
 {{- /* ===========================================================
      首页 · 潜蛟阁
      视觉基调「放到实处 · 网站首屏」：进门就是潜蛟阁。
-     竖排阁名，一道金线，落款两句「昂首天外望，无我这般人」。
+     竖排阁名，旁题两句「昂首天外望，无我这般人」，一道金线，落款「阁主 潜蛟子」。
      走主题的 baseof（导航、搜索、页脚与内页一致），不再有加载帘幕。
      =========================================================== */ -}}
 {{- $posts := where site.RegularPages "Section" "posts" -}}
@@ -14,10 +14,10 @@
   {{- with $hero }}
   <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="雾中杉林，石阶通往亮着灯的社殿" fetchpriority="high"/>
   {{- end }}
-  <span class="qj-hero-v2">翻身倚北辰</span>
+  <span class="qj-hero-v2">昂首天外望<br/>无我这般人</span>
   <h1 class="qj-hero-v">{{ range $i, $c := split "潜蛟阁" "" }}<span class="qj-ch" style="--i:{{ $i }}">{{ $c }}</span>{{ end }}</h1>
   <span class="qj-hero-line" aria-hidden="true"></span>
-  <p class="qj-hero-sig">昂首天外望<br/>无我这般人</p>
+  <p class="qj-hero-sig">阁主　潜蛟子</p>
 </section>
 
 <div class="qj-home">
