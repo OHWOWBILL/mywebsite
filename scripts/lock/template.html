@@ -26,13 +26,13 @@
   button:disabled { opacity: .6; cursor: wait; }
 </style>
 </head>
-<body data-tool="mingbu">
+<body data-tool="{{TOOL}}">
 <main class="fb-main">
   <div class="lock-wrap">
     <form id="f" class="fb-card lock" autocomplete="off">
       <div class="fb-seal">禁</div>
       <h1>此宝被阁主下了<span class="jin">禁制</span></h1>
-      <div class="fb-sub">命部 · 占星八字读盘 · 非持诀者不得开启</div>
+      <div class="fb-sub">{{SUB}}</div>
       <input type="password" id="pw" placeholder="解禁口诀" autofocus aria-label="解禁口诀">
       <label><input type="checkbox" id="keep" checked> 此设备记住</label>
       <button id="go" class="fb-btn primary block">解 禁</button>
@@ -40,7 +40,7 @@
     </form>
   </div>
 </main>
-<script src="/fabao/fabao.js?v=2"></script>
+<script src="/fabao/fabao.js?v=5"></script>
 <script>
 (function () {
   // 加密数据由 scripts/lock/encrypt.mjs 写入，原文不在仓库中
