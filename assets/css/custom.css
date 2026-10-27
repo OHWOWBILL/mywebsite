@@ -259,17 +259,17 @@ h1, h2, h3, h4,
   background: var(--jin);
 }
 
+/* 落款两句，各占一行；首屏最后出现的字 */
 .qj-hero-sig {
   left: 5%;
   bottom: 6%;
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: .8em;
   font-family: var(--font-body);
   font-size: clamp(.9rem, 3cqw, 1.35rem);
+  line-height: 1.9;
   letter-spacing: .24em;
   color: var(--ge-fg);
+  text-shadow: 0 1px 10px rgba(18, 12, 28, .7);
 }
 
 .qj-home {
