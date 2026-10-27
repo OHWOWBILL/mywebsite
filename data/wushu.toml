@@ -75,3 +75,8 @@
   blurb = "面相、手相"
   categories = ["相"]
   shut = "暂未成文，问之可也。"
+  [[door.tools]]
+    seal = "禁"
+    name = "相部"
+    href = "/xiangbu/"
+    desc = "韦千里相法读书卡与流年速查，持诀者可开"
