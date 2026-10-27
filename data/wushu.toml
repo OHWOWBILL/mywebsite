@@ -34,6 +34,11 @@
     name = "子午流注"
     href = "/ziwu/"
     desc = "按此刻排纳子、纳甲、灵龟、飞腾四法开穴"
+  [[door.tools]]
+    seal = "气"
+    name = "五运六气"
+    href = "/yunqi/"
+    desc = "查一年岁运、司天在泉、六步主客"
 
 [[door]]
   seal = "命"
