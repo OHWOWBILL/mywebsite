@@ -1,8 +1,9 @@
 ---
-title: "相片故事之武林"
+title: "武林"
 date: 2026-10-26
 description: "武林风起云涌，正是你我大展身手之时 —— 大麻山神社"
-categories: ["相片故事"]
+categories: ["随笔", "生活"]
+aliases: ["/posts/xiang-pian-gu-shi-zhi-wu-lin/"]
 ---
 
 武林风起云涌，正是你我大展身手之时。
