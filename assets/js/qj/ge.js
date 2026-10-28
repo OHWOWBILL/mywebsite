@@ -74,9 +74,10 @@
     return s;
   }
   // 一层屋身：底 y，宽 w，高 bh；cols 开间；lit 中间一扇亮灯，door 中间开门，rail 底下一道栏杆
+  // 墙面 .wall 平时是底色，指到这一处时窗里点灯（见 custom.css）
   function body(x, y, w, bh, cols, o) {
     o = o || {};
-    var L = x - w / 2, d = '', s = '<rect class="ink fill" x="' + f(L) + '" y="' + f(y - bh) + '" width="' + f(w) + '" height="' + f(bh) + '"/>';
+    var L = x - w / 2, d = '', s = '<rect class="ink fill wall" x="' + f(L) + '" y="' + f(y - bh) + '" width="' + f(w) + '" height="' + f(bh) + '"/>';
     for (var i = 0; i <= cols; i++) { var cx = L + w * i / cols; d += 'M' + f(cx) + ',' + f(y - bh) + ' V' + f(y) + ' '; }
     d += 'M' + f(L) + ',' + f(y - bh + 4) + ' H' + f(L + w) + ' ';
     // 格扇窗棂
@@ -708,6 +709,8 @@
     var id = L.id, B = L.bund, bg = (L.yuan ? yuan(L.yuan, id) : '') + moon(L.moon[0], L.moon[1], L.moon[2]);
     L.ridges.forEach(function (r, i) { bg += mountain(r[1], L.H, r[0], r[2], 7 + i * 13 + L.W); });
     if (L.peak) bg += shan(L.peak, L.bund[2] + 6, 77);
+    // 听雷亭后面藏一团电光，隔一阵闪一下；画在山岩之后，像远处云里打闪
+    bg += '<ellipse class="lei" cx="' + f(L.p.shi[0]) + '" cy="' + f(L.p.shi[1] - 50 * L.s) + '" rx="' + f(80 * L.s) + '" ry="' + f(56 * L.s) + '"/>';
     L.rocks.slice().sort(function (a, b) { return a[1] - b[1]; }).forEach(function (r, i) { bg += rock(r[0], r[1], r[2], r[3], 31 + i * 17, 'ge-fade-' + id); });
     L.yun.forEach(function (y) { bg += yun(y[0], y[1], y[2], y[3]); });
     bg += stairs(L.path, L.sw);
@@ -862,10 +865,32 @@
     return { x: o[1] + (c.x - o[1]) * d, y: o[2] + (c.y - o[2]) * d, k: near ? c.k * 1.2 : Math.pow(c.k, .3) };
   }
   // 把一层摆到镜头下：层里 (ox, oy) 是它左上角，元素按 1 单位 = 1px 排，放大交给 scale
-  function put(el, ox, oy, c, z, ay, base) {
-    var S = z.s * c.k;
-    el.style.transform = 'translate(' + f(z.W / 2 - (c.x - ox) * S) + 'px,' + f(ay - (c.y - oy) * S) + 'px) scale(' + (S / (base || 1)).toFixed(4) + ')';
+  // lean 是这一层跟着鼠标错开多少像素（越近越多）
+  function put(el, ox, oy, c, z, ay, base, lean) {
+    var S = z.s * c.k, dx = -mx * (lean || 0), dy = -my * (lean || 0) * .6;
+    el.style.transform = 'translate(' + f(z.W / 2 - (c.x - ox) * S + dx) + 'px,' + f(ay - (c.y - oy) * S + dy) + 'px) scale(' + (S / (base || 1)).toFixed(4) + ')';
   }
+  // 鼠标视差：桌面上指针一动，远近各层按深浅错开，像探头往画里看；松开慢慢回正
+  var LEAN = { far: 8, mid: 18, wu: 22, near: 44 };
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+  var mx = 0, my = 0, gx = 0, gy = 0, glide = 0;
+  function drift() {
+    glide = 0;
+    mx += (gx - mx) * .1; my += (gy - my) * .1;
+    if (Math.abs(gx - mx) + Math.abs(gy - my) > .003) glide = requestAnimationFrame(drift);
+    else { mx = gx; my = gy; }
+    frame();
+  }
+  function aim(x, y) {
+    gx = x; gy = y;
+    if (climbing && !glide) glide = requestAnimationFrame(drift);
+  }
+  view.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse' || !fine.matches) return;
+    var r = view.getBoundingClientRect();
+    aim(clamp((e.clientX - r.left) / r.width) * 2 - 1, clamp((e.clientY - r.top) / r.height) * 2 - 1);
+  });
+  view.addEventListener('pointerleave', function () { aim(0, 0); });
 
   // 某一处在第几站看：散云、能不能点都按它
   function stopOf(C, id) {
@@ -959,11 +984,11 @@
     var top = Math.max(0, HEAD - vr.top), bot = Math.min(z.H, window.innerHeight - vr.top);
     if (bot - top < 40) return;
     var ay = (top + bot) / 2, C = z.C, L = z.L, c = shot(C, p), Y = L.yuan;
-    put(box.querySelector('.ge-' + L.id), 0, 0, c, z, ay, z.s * kmax(C));
-    put(far, Y[1], Y[2], depth(C, c, C.far), z, ay);
+    put(box.querySelector('.ge-' + L.id), 0, 0, c, z, ay, z.s * kmax(C), LEAN.mid);
+    put(far, Y[1], Y[2], depth(C, c, C.far), z, ay, 1, LEAN.far);
     // 雾沿的正中落在雾线上
-    put(wu, -L.W * .6, c.fog - C.edge / 2 - L.H * 3, c, z, ay);
-    put(qun, 0, 0, c, z, ay);
+    put(wu, -L.W * .6, c.fog - C.edge / 2 - L.H * 3, c, z, ay, 1, LEAN.wu);
+    put(qun, 0, 0, c, z, ay, 1, LEAN.wu);
     tuan.forEach(function (t) {
       var u = clamp((p - t.at[0]) / (t.at[1] - t.at[0]));
       u = Math.round(u * u * (3 - 2 * u) * 200) / 200;
@@ -977,7 +1002,7 @@
       var on = p < h.at;
       if (on !== h.on) { h.on = on; h.el.classList.toggle('ge-hid', on); }
     });
-    put(near, 0, 0, depth(C, c, C.near, 1), z, ay);
+    put(near, 0, 0, depth(C, c, C.near, 1), z, ay, 1, LEAN.near);
     if (hint) hint.style.opacity = f(clamp(1 - p / .04));
   }
   function climb() {
@@ -1017,8 +1042,33 @@
     ring(i, .55);
     a.classList.add('go');
     var href = a.getAttribute('href');
-    setTimeout(function () { location.href = href; }, still.matches ? 0 : 260);
+    if (climbing) dive(a);
+    setTimeout(function () { location.href = href; }, still.matches ? 0 : climbing ? 520 : 260);
   });
+  // 登山时点下一处：整幅画以它为心推近、淡去，像走进去
+  function dive(a) {
+    var r = (a.querySelector('.draw') || a).getBoundingClientRect(), v = view.getBoundingClientRect();
+    view.style.transformOrigin = f(r.left + r.width / 2 - v.left) + 'px ' + f(r.top + r.height / 2 - v.top) + 'px';
+    view.classList.add('dive');
+  }
+  // 从下一页按返回回来（页面从缓存里恢复）时，把推近和描金收回
+  window.addEventListener('pageshow', function () {
+    view.classList.remove('dive');
+    view.style.transformOrigin = '';
+    box.querySelectorAll('.ge-place.go').forEach(function (a) { a.classList.remove('go'); });
+  });
+
+  // 听雷：隔八到十五秒，听雷亭后面的云里闪一下
+  (function lei() {
+    setTimeout(function () {
+      if (climbing && !document.hidden) box.querySelectorAll('.lei').forEach(function (el) {
+        el.classList.remove('on');
+        void el.getBoundingClientRect();
+        el.classList.add('on');
+      });
+      lei();
+    }, 8000 + Math.random() * 7000);
+  })();
   box.addEventListener('keydown', function (e) {
     var a = e.target.closest && e.target.closest('.ge-place[data-act]');
     if (a && e.key === ' ') { e.preventDefault(); a.click(); }
