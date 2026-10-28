@@ -9,6 +9,7 @@
 //   法宝库的宫灯 = 各门 tools（印为「禁」者贴符），书卷 = 文章数。
 // 桌面一屏看全山（1440×900），手机纵向一卷（400×1560），两套排布共用部件。
 // 构图照即梦参考图 A1：楼阁各坐一方山岩台地，一道宽石阶从驳岸直上阁顶，云雾带横过山腰。
+// 远山和雾垫一张即梦生的水墨底图（B1 第三张，static/img/ge/），楼阁仍全是线稿，才能一处一处点、一处一处描金。
 // 线条用雾色，只有指到的那一处描金（一屏一处金）。
 // 选择记在 localStorage qj-ge（'1' 入阁 / '0' 文字版），
 // 网址带 ?ge=1 / ?ge=0 也行；首页 head 那段小脚本在画面出来前就读。
@@ -354,6 +355,29 @@
     var p = Q ? Q.moonPath(Q.moon(new Date()).f, r) : 'M0,' + (-r) + 'A' + r + ',' + r + ' 0 1 0 0,' + r + 'A' + (r * .75) + ',' + r + ' 0 1 1 0,' + (-r) + 'Z';
     return '<g transform="translate(' + x + ',' + y + ')"><circle class="moon-o" r="' + r + '"/><path class="moon" d="' + p + '"/></g>';
   }
+  // 远景底图：即梦生的水墨远山与雾（B1 第三张），垫在线稿最底下，四边渐隐进夜色。
+  // 图随画面一起画，只在入阁时才加载，文字版不多下一张图。
+  // Y = [图, x, y, 宽, 高, 纵向渐隐 [淡入起, 淡入止, 淡出起, 淡出止]]，横向两边各隐 14%
+  function yuan(Y, id) {
+    return '<g mask="url(#ge-yh-' + id + ')"><image href="' + Y[0] + '" x="' + Y[1] + '" y="' + Y[2] + '" width="' + Y[3] + '" height="' + Y[4] +
+      '" preserveAspectRatio="none" mask="url(#ge-yv-' + id + ')"/></g>';
+  }
+  function yuanDefs(Y, id) {
+    // 渐隐走 smoothstep，直线渐变的起止处眼睛会看出一道棱
+    function ramp(a, b, c, d) {
+      var st = [], k;
+      for (k = 0; k <= 6; k++) { var u = k / 6; st.push([a + (b - a) * u, u * u * (3 - 2 * u)]); }
+      for (k = 0; k <= 6; k++) { var v = k / 6; st.push([c + (d - c) * v, 1 - v * v * (3 - 2 * v)]); }
+      return st;
+    }
+    function grad(gid, x2, stops) {
+      return '<linearGradient id="' + gid + '" x1="0" y1="0" x2="' + x2 + '" y2="' + (1 - x2) + '">' +
+        stops.map(function (s) { return '<stop offset="' + f(s[0] * 1000) / 1000 + '" stop-color="#fff" stop-opacity="' + f(s[1] * 1000) / 1000 + '"/>'; }).join('') + '</linearGradient>';
+    }
+    function mask(mid, gid) { return '<mask id="' + mid + '" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#' + gid + ')"/></mask>'; }
+    return grad('ge-yhg-' + id, 1, ramp(0, .14, .86, 1)) + grad('ge-yvg-' + id, 0, ramp.apply(null, Y[5])) +
+      mask('ge-yh-' + id, 'ge-yhg-' + id) + mask('ge-yv-' + id, 'ge-yvg-' + id);
+  }
   // 祥云：一道长云脚，尾上打一个卷，卷前两道小弧；flip 往左卷
   function yun(x, y, s, flip) {
     var k = flip ? -1 : 1, len = 90 * s, r = 7 * s, ex = x + k * len;
@@ -607,11 +631,11 @@
 
   // ---------------- 排布 ----------------
   // 场所坐标 [x, y, 名牌横移, 名牌纵移]；阁、渡口多一个缩放。
-  // rocks 是楼阁脚下的山岩台地 [x, 顶, 宽, 高]，big 是琴台大松，mist 是云雾带 [cx, cy, rx, ry]
+  // rocks 是楼阁脚下的山岩台地 [x, 顶, 宽, 高]，big 是琴台大松，mist 是云雾带 [cx, cy, rx, ry]，yuan 是远景底图（见 yuan()）
   var DESK = {
     id: 'd', W: 1440, H: 900, s: 1.15, t: 1.4, sw: 24,
+    // 远山由底图出，线稿只留近处一道山影
     ridges: [
-      ['far', [[-380, 480], [-200, 430], [0, 450], [120, 390], [260, 420], [400, 350], [540, 380], [640, 330], [800, 340], [920, 300], [1060, 360], [1180, 340], [1320, 380], [1440, 350], [1620, 390], [1820, 420]], 46],
       ['mid', [[-380, 620], [-150, 575], [0, 595], [120, 555], [240, 585], [400, 560], [1040, 560], [1200, 585], [1320, 550], [1440, 578], [1620, 560], [1820, 600]], 34]
     ],
     // 主山轮廓：左山脚 → 琴台崖 → 阁顶两峰 → 法宝库肩 → 右山脚
@@ -625,6 +649,8 @@
     pines: [[300, 626, 1.1, 1], [1170, 644, 1, -1], [900, 486, .9, 1], [850, 300, .85, -1], [1210, 762, .9, -1]],
     bund: [-400, 1840, 800, 24],
     moon: [1260, 110, 26],
+    // 远景底图取 B1 第三张的远山和雾那一段（16:10），两边各镜像糊开 240 再渐隐，宽屏也看不出图边
+    yuan: ['/img/ge/yuan-d.webp', -240, 0, 1920, 900, [0, .24, .7, 1]],
     p: {
       dou: [200, 90, 140, -20],
       ge: [720, 300, 1.25, 120, -235],
@@ -644,8 +670,8 @@
   };
   var MOB = {
     id: 'm', W: 400, H: 1560, s: 1, sw: 18,
+    // 远山由底图出，线稿只留近处一道山影
     ridges: [
-      ['far', [[-120, 540], [0, 520], [40, 430], [90, 470], [150, 330], [200, 250], [250, 320], [300, 300], [360, 420], [400, 380], [520, 430]], 34],
       ['mid', [[-120, 840], [0, 820], [30, 760], [80, 700], [130, 720], [180, 640], [240, 650], [300, 600], [350, 640], [400, 620], [520, 650]], 28]
     ],
     peak: [[-40, 1400], [0, 1370], [10, 1290], [0, 1200], [15, 1100], [10, 1000], [30, 900], [25, 800], [45, 720], [70, 650], [95, 590], [105, 530], [112, 480], [118, 452], [128, 444], [138, 470],
@@ -658,6 +684,8 @@
     pines: [[30, 1005, 1, 1], [378, 1013, .9, -1], [365, 715, .8, -1], [95, 477, .9, 1]],
     bund: [-60, 460, 1395, 36],
     moon: [330, 104, 20],
+    // 手机用 B1 第三张的上半幅，远山落在阁顶背后，往下渐隐
+    yuan: ['/img/ge/yuan-m.webp', -232, -26, 864, 960, [0, .14, .55, 1]],
     p: {
       dou: [40, 96, 130, -10],
       ge: [200, 470, 1.05, 104, -240],
@@ -675,9 +703,9 @@
     }
   };
 
-  // 由远及近：月、远山、山岩、祥云、石阶、松、驳岸与水、云雾，最后才是场所
+  // 由远及近：远景底图、月、远山、山岩、祥云、石阶、松、驳岸与水、云雾，最后才是场所
   function scene(L) {
-    var id = L.id, B = L.bund, bg = moon(L.moon[0], L.moon[1], L.moon[2]);
+    var id = L.id, B = L.bund, bg = (L.yuan ? yuan(L.yuan, id) : '') + moon(L.moon[0], L.moon[1], L.moon[2]);
     L.ridges.forEach(function (r, i) { bg += mountain(r[1], L.H, r[0], r[2], 7 + i * 13 + L.W); });
     if (L.peak) bg += shan(L.peak, L.bund[2] + 6, 77);
     L.rocks.slice().sort(function (a, b) { return a[1] - b[1]; }).forEach(function (r, i) { bg += rock(r[0], r[1], r[2], r[3], 31 + i * 17, 'ge-fade-' + id); });
@@ -692,7 +720,7 @@
       '<linearGradient id="ge-fg-' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>' +
       '<mask id="ge-fade-' + id + '" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#ge-fg-' + id + ')"/></mask>' +
       '<filter id="ge-blur-' + id + '" x="-20%" y="-30%" width="140%" height="160%"><feGaussianBlur stdDeviation="11"/></filter>' +
-      '</defs><g aria-hidden="true">' + bg + '</g>' + places(L.p, L.s, L.t || L.s) + '</svg>';
+      (L.yuan ? yuanDefs(L.yuan, id) : '') + '</defs><g aria-hidden="true">' + bg + '</g>' + places(L.p, L.s, L.t || L.s) + '</svg>';
   }
 
   // ---------------- 声与字 ----------------
