@@ -790,6 +790,104 @@
     });
   });
 
+  // ---------------- 登山 ----------------
+  // 入阁后画面钉在屏上，往下滚就是往上爬：从山脚云从关起，沿石阶拉近、升高，
+  // 最后停在集云斋，月亮与北斗都在画里。爬到半路每一处照样能点；
+  // 键盘停到哪一处，就滚到镜头看得见它的地方。系统设了「减少动态效果」就不爬，照旧一屏看全山。
+  // 桌面镜头 [进度, 中心 x, 中心 y, 倍数]（1 = 一屏装下整座山），相邻两幕之间插值；
+  // 手机不放大，整宽铺满，从水面一路升到月亮上方，滚一屏走一屏。
+  var CLIMB = {
+    d: { run: 2.4, at: [[0, 735, 700, 1.3], [.3, 720, 640, 1.7], [.6, 720, 460, 1.7], [.85, 720, 330, 1.55], [1, 720, 300, 1.2]] },
+    m: { top: -50, bottom: 1560 }
+  };
+  var narrow = window.matchMedia('(max-width: 720px), (orientation: portrait) and (max-width: 1100px)');
+  var view = box.querySelector('.qj-ge-view'), hint = box.querySelector('.qj-ge-hint');
+  var HEAD = 64;  // 顶上浮着的导航条，取景让开这一截
+  var climbing = false, run = 0, tick = 0;
+
+  function lerp(a, b, u) { return a + (b - a) * u; }
+  function clamp(u) { return u < 0 ? 0 : u > 1 ? 1 : u; }
+  // 桌面某一进度的镜头 [x, y, 倍数]；倍数按对数插值，拉近拉远才匀
+  function shot(p) {
+    var at = CLIMB.d.at, i = 1;
+    while (i < at.length - 1 && at[i][0] < p) i++;
+    var a = at[i - 1], b = at[i], u = clamp((p - a[0]) / (b[0] - a[0]));
+    return [lerp(a[1], b[1], u), lerp(a[2], b[2], u), Math.exp(lerp(Math.log(a[3]), Math.log(b[3]), u))];
+  }
+  function sizes() {
+    var W = view.clientWidth, H = view.clientHeight, m = narrow.matches;
+    return { W: W, H: H, m: m, s: m ? Math.min(W, 560) / 400 : Math.min(W / 1440, H / 900) };
+  }
+  // 镜头不改 viewBox（那样每滚一下整幅线稿都要重画）：整幅按最近的倍数画一次，
+  // 之后只做平移与缩小，交给合成层去挪，滚起来才顺，缩小也不糊
+  var KMAX = Math.max.apply(null, CLIMB.d.at.map(function (c) { return c[3]; }));
+  // 整段 .qj-ge 的高 = 一屏 + 爬山要滚的路；顶边提到页首，一进来就钉住，画面上沿不会被切一刀
+  function measure() {
+    box.style.marginTop = '';
+    var gap = box.getBoundingClientRect().top + window.scrollY;
+    box.style.marginTop = (parseFloat(getComputedStyle(box).marginTop) - gap) + 'px';
+    var z = sizes();
+    run = z.m ? Math.max(0, (CLIMB.m.bottom - CLIMB.m.top) * z.s - (z.H - HEAD)) : z.H * CLIMB.d.run;
+    box.style.height = Math.round(z.H + run) + 'px';
+    [DESK, MOB].forEach(function (L) {
+      var S = z.s * (L === DESK ? KMAX : 1), svg = box.querySelector('.ge-' + L.id);
+      svg.style.width = f(L.W * S) + 'px';
+      svg.style.height = f(L.H * S) + 'px';
+    });
+  }
+  function progress() { return run ? clamp(-box.getBoundingClientRect().top / run) : 1; }
+  function frame() {
+    tick = 0;
+    var z = sizes(), vr = view.getBoundingClientRect(), p = progress();
+    // 视框在屏上露出来的那一截：没钉住之前，上头还压着导航，下头可能出了屏
+    var top = Math.max(0, HEAD - vr.top), bot = Math.min(z.H, window.innerHeight - vr.top);
+    if (bot - top < 40) return;
+    var svg = box.querySelector(z.m ? '.ge-m' : '.ge-d'), k, x, y;
+    // 求场景里 (x, y) 一点落到屏上哪里、放大 k 倍，再换算成 translate + scale
+    if (z.m) {
+      k = 1;
+      x = 200;
+      y = lerp(CLIMB.m.bottom - (bot - top) / z.s, CLIMB.m.top, p);
+      svg.style.transform = 'translate(' + f(z.W / 2 - x * z.s) + 'px,' + f(top - y * z.s) + 'px)';
+    } else {
+      var c = shot(p), s = z.s * c[2];
+      svg.style.transform = 'translate(' + f(z.W / 2 - c[0] * s) + 'px,' + f((top + bot) / 2 - c[1] * s) + 'px) scale(' + (c[2] / KMAX).toFixed(4) + ')';
+    }
+    if (hint) hint.style.opacity = f(clamp(1 - p / .05));
+  }
+  function climb() {
+    var on = drawn && root.classList.contains('qj-ge-on') && !still.matches;
+    if (on !== climbing) {
+      climbing = on;
+      box.classList.toggle('qj-ge-climb', on);
+      if (!on) {
+        box.style.height = box.style.marginTop = '';
+        box.querySelectorAll('.ge-svg').forEach(function (svg) { svg.style.width = svg.style.height = svg.style.transform = ''; });
+      }
+    }
+    if (on) { measure(); frame(); }
+  }
+  window.addEventListener('scroll', function () { if (climbing && !tick) tick = requestAnimationFrame(frame); }, { passive: true });
+  window.addEventListener('resize', function () { if (climbing) { measure(); frame(); } });
+  still.addEventListener('change', climb);
+  // 键盘停到某处：滚到镜头正对着它的那一步
+  box.addEventListener('focusin', function (e) {
+    var a = e.target.closest && e.target.closest('.ge-place');
+    // 只认键盘：鼠标点下去也会聚焦，那时不能挪镜头
+    if (!climbing || !a || !a.matches(':focus-visible')) return;
+    var b = a.getBBox(), cy = b.y + b.height / 2, z = sizes(), p;
+    if (z.m) {
+      var vis = (z.H - HEAD) / z.s;
+      p = (CLIMB.m.bottom - vis / 2 - cy) / (CLIMB.m.bottom - vis - CLIMB.m.top);
+    } else {
+      var lo = 0, hi = 1;
+      for (var k = 0; k < 20; k++) { var mid = (lo + hi) / 2; if (shot(mid)[1] > cy) lo = mid; else hi = mid; }
+      p = lo;
+    }
+    // 浏览器聚焦时自己也会滚一下，等它滚完再挪到该到的那一步
+    requestAnimationFrame(function () { window.scrollTo(0, window.scrollY + box.getBoundingClientRect().top + clamp(p) * run); });
+  });
+
   box.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('.ge-place');
     if (!a) return;
@@ -811,6 +909,7 @@
     try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
     root.classList.toggle('qj-ge-on', on);
     if (on) draw();
+    climb();
     if (!keep) {
       window.scrollTo(0, 0);
       var to = on ? box.querySelector('.qj-ge-out') : document.querySelector('.qj-ge-in');
@@ -825,5 +924,5 @@
     var u = new URL(location.href);
     if (u.searchParams.has('ge')) { u.searchParams.delete('ge'); history.replaceState(null, '', u.pathname + u.search + u.hash); }
   } catch (e) {}
-  if (root.classList.contains('qj-ge-on')) draw();
+  if (root.classList.contains('qj-ge-on')) { draw(); climb(); }
 })();
