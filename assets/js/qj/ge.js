@@ -153,24 +153,28 @@
     for (var i = 0; i < 5; i++) st += 'M' + f(x - W * .2 - i * 4 * s) + ',' + f(y + i * 4 * s) + ' h' + f(W * .4 + i * 8 * s) + ' ';
     return g + '<path class="ink thin" d="' + st + '"/>';
   }
-  // 门庭：一道院墙，门数与门印跟 data/wushu.toml 走；没开的门贴封条
-  function ting(x, y, s) {
-    var n = Math.max(DOORS.length, 1), W = Math.max(240, 60 * n) * s, H = 54 * s;
-    var g = '<rect class="ink fill" x="' + f(x - W / 2) + '" y="' + f(y - H) + '" width="' + f(W) + '" height="' + f(H) + '"/>';
-    g += '<path class="ink fill" d="M' + f(x - W / 2 - 8 * s) + ',' + f(y - H) + ' L' + f(x - W / 2 + 4 * s) + ',' + f(y - H - 9 * s) + ' H' + f(x + W / 2 - 4 * s) + ' L' + f(x + W / 2 + 8 * s) + ',' + f(y - H) + ' Z"/>';
-    var tiles = '';
-    for (var i = 0; i <= 44; i++) tiles += 'M' + f(x - W / 2 + 4 * s + (W - 8 * s) * i / 44) + ',' + f(y - H - 9 * s) + ' v' + f(9 * s) + ' ';
-    g += '<path class="ink thin" d="' + tiles + '"/>';
-    // 墙面一皮皮条石，错缝砌
-    var r = rng(23), sto = '', rows = 6, rh = (H - 4 * s) / rows;
-    for (var k = 1; k < rows; k++) {
-      var yy = y - H + 4 * s + rh * k;
-      sto += 'M' + f(x - W / 2) + ',' + f(yy) + ' H' + f(x + W / 2) + ' ';
-      for (var sx = x - W / 2 + (k % 2 ? 9 : 0) * s + r() * 6; sx < x + W / 2; sx += (16 + r() * 10) * s) sto += 'M' + f(sx) + ',' + f(yy) + ' v' + f(-rh) + ' ';
-    }
-    g += '<path class="ink hair" d="' + sto + '"/>';
+  // 门庭：一道院墙，门数与门印跟 data/wushu.toml 走；没开的门贴封条。
+  // W0 给了就按这个宽度砌；gap 是墙正中让给山门的豁口，门分到两边（左边多一扇）
+  function ting(x, y, s, W0, gap) {
+    var n = Math.max(DOORS.length, 1), W = W0 || Math.max(240, 60 * n) * s, H = 54 * s, g = '', r = rng(23), slots = [];
+    var segs = gap ? [[x - W / 2, x - gap / 2, Math.ceil(n / 2)], [x + gap / 2, x + W / 2, Math.floor(n / 2)]] : [[x - W / 2, x + W / 2, n]];
+    segs.forEach(function (sg) {
+      var a = sg[0], b = sg[1], w = b - a, tiles = '', sto = '', rows = 6, rh = (H - 4 * s) / rows, m = Math.round(w / 7);
+      g += '<rect class="ink fill" x="' + f(a) + '" y="' + f(y - H) + '" width="' + f(w) + '" height="' + f(H) + '"/>';
+      g += '<path class="ink fill" d="M' + f(a - 8 * s) + ',' + f(y - H) + ' L' + f(a + 4 * s) + ',' + f(y - H - 9 * s) + ' H' + f(b - 4 * s) + ' L' + f(b + 8 * s) + ',' + f(y - H) + ' Z"/>';
+      for (var i = 0; i <= m; i++) tiles += 'M' + f(a + 4 * s + (w - 8 * s) * i / m) + ',' + f(y - H - 9 * s) + ' v' + f(9 * s) + ' ';
+      g += '<path class="ink thin" d="' + tiles + '"/>';
+      // 墙面一皮皮条石，错缝砌
+      for (var k = 1; k < rows; k++) {
+        var yy = y - H + 4 * s + rh * k;
+        sto += 'M' + f(a) + ',' + f(yy) + ' H' + f(b) + ' ';
+        for (var sx = a + (k % 2 ? 9 : 0) * s + r() * 6; sx < b; sx += (16 + r() * 10) * s) sto += 'M' + f(sx) + ',' + f(yy) + ' v' + f(-rh) + ' ';
+      }
+      g += '<path class="ink hair" d="' + sto + '"/>';
+      for (var j = 0; j < sg[2]; j++) slots.push(a + w * (j + .5) / sg[2]);
+    });
     DOORS.forEach(function (d, i) {
-      var dx = x - W / 2 + W * (i + .5) / n, dw = 26 * s, dh = 32 * s;
+      var dx = slots[i], dw = 26 * s, dh = 32 * s;
       g += '<path class="ink fill door" d="M' + f(dx - dw / 2) + ',' + f(y) + ' V' + f(y - dh + 8 * s) + ' Q' + f(dx) + ',' + f(y - dh - 4 * s) + ' ' + f(dx + dw / 2) + ',' + f(y - dh + 8 * s) + ' V' + f(y) + ' Z"/>';
       g += '<path class="ink thin" d="M' + f(dx) + ',' + f(y) + ' V' + f(y - dh + 2 * s) + ' M' + f(dx - dw / 2 - 3 * s) + ',' + f(y - dh + 8 * s) + ' Q' + f(dx) + ',' + f(y - dh - 10 * s) + ' ' + f(dx + dw / 2 + 3 * s) + ',' + f(y - dh + 8 * s) + '"/>';
       g += '<rect class="ink thin fill" x="' + f(dx - 8 * s) + '" y="' + f(y - dh - 19 * s) + '" width="' + f(16 * s) + '" height="' + f(15.5 * s) + '"/>';
@@ -377,6 +381,78 @@
     }
     return '<path class="mt ' + cls + '" d="' + d + '"/><path class="cun ' + cls + '" d="' + cun + '"/>';
   }
+  // 折线加细碎起伏后，用 Catmull-Rom 磨成一道顺滑的曲线
+  function smooth(pts, jit, r) {
+    var q = [pts[0]];
+    for (var i = 1; i < pts.length; i++) {
+      var a = pts[i - 1], b = pts[i], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), n = Math.max(1, Math.round(len / 14));
+      for (var j = 1; j <= n; j++) {
+        var u = j / n, e = j < n ? (r() - .5) * 2 * jit : 0;
+        q.push([a[0] + dx * u - dy / len * e, a[1] + dy * u + dx / len * e]);
+      }
+    }
+    var d = 'M' + f(q[0][0]) + ',' + f(q[0][1]);
+    for (var k = 0; k < q.length - 1; k++) {
+      var p0 = q[k - 1] || q[k], p1 = q[k], p2 = q[k + 1], p3 = q[k + 2] || p2;
+      d += ' C' + f(p1[0] + (p2[0] - p0[0]) / 6) + ',' + f(p1[1] + (p2[1] - p0[1]) / 6) + ' ' + f(p2[0] - (p3[0] - p1[0]) / 6) + ',' + f(p2[1] - (p3[1] - p1[1]) / 6) + ' ' + f(p2[0]) + ',' + f(p2[1]);
+    }
+    return d;
+  }
+  // 主山（照 A2）：整座山连成一体。一道山脊轮廓，山里从脊上往下拉一道道山脊线，
+  // 脊旁几笔披麻皴顺着往下，层层升起的意思就出来了
+  function shan(pts, foot, seed) {
+    var r = rng(seed), ridge = smooth(pts, 3.2, r), top = pts[0], lines = '', cun = '';
+    pts.forEach(function (p) { if (p[1] < top[1]) top = p; });
+    // 山顶正中：最高那一截的平均横坐标
+    var hi = pts.filter(function (p) { return p[1] < top[1] + 60; }), cx = hi.reduce(function (a, p) { return a + p[0]; }, 0) / hi.length;
+    // 某一高度上山体的左右边
+    function edge(y) {
+      var lo = Infinity, up = -Infinity;
+      for (var i = 1; i < pts.length; i++) {
+        var a = pts[i - 1], b = pts[i];
+        if ((a[1] - y) * (b[1] - y) > 0 || a[1] === b[1]) continue;
+        var x = a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]);
+        lo = Math.min(lo, x); up = Math.max(up, x);
+      }
+      return [lo, up];
+    }
+    var fill = ridge + ' L' + f(pts[pts.length - 1][0]) + ',' + foot + ' L' + f(pts[0][0]) + ',' + foot + ' Z';
+    // 一道山脊线：从 (x, y) 顺坡往下拉，side 定往哪边斜；返回折点好再分岔
+    function spur(x, y, side, len, ang) {
+      var q = [[x, y]], n = 4;
+      for (var k = 1; k <= n; k++) {
+        x += Math.sin(ang) * len / n + (r() - .5) * 8; y += Math.cos(ang) * len / n;
+        var e = edge(Math.min(y, foot - 6));
+        if (x < e[0] + 6 || x > e[1] - 6) break;
+        q.push([x, Math.min(y, foot - 6)]);
+      }
+      n = q.length - 1;
+      if (n < 1) return q.concat([q[0]]);
+      lines += smooth(q, 3, r) + ' ';
+      // 脊旁披麻：在山脊外侧落几笔，和脊线大致平行
+      for (var c = 0; c < 6; c++) {
+        var u = .1 + r() * .7, a = q[Math.floor(u * n)], b = q[Math.floor(u * n) + 1], off = (4 + r() * 12) * side, l = .35 + r() * .55;
+        cun += 'M' + f(a[0] + off) + ',' + f(a[1] + 3) + ' q' + f((b[0] - a[0]) * l * .5 + (r() - .5) * 4) + ',' + f((b[1] - a[1]) * l * .5) + ' ' + f((b[0] - a[0]) * l) + ',' + f((b[1] - a[1]) * l) + ' ';
+      }
+      return q;
+    }
+    pts.forEach(function (p, i) {
+      if (i === 0 || i === pts.length - 1 || p[1] > foot - 70) return;
+      var side = p[0] < cx ? -1 : 1, ang = (.22 + r() * .32) * side, len = 70 + r() * Math.min(280, (foot - p[1]) * .9);
+      var q = spur(p[0] - side * 3, p[1] + 5, side, len, ang);
+      // 半山腰再分一岔，往外撇得更开
+      if (len > 140 && q.length > 3 && r() < .7) { var m = q[2]; spur(m[0], m[1], side, len * (.35 + r() * .3), ang + side * (.25 + r() * .2)); }
+    });
+    // 山身里头也起几道脊：越靠两边斜得越开，像一层层从山顶散下来
+    var span = foot - top[1];
+    for (var k = 0; k < Math.round(span / 22); k++) {
+      var y0 = top[1] + 40 + r() * span * .75, e = edge(y0), hw = (e[1] - e[0]) / 2;
+      if (!(hw > 30)) continue;
+      var x0 = e[0] + 14 + r() * (hw * 2 - 28), t = (x0 - cx) / Math.max(hw, 1), sd = t < 0 ? -1 : 1;
+      spur(x0, y0, sd, 50 + r() * Math.min(200, (foot - y0) * .8), sd * (.08 + Math.abs(t) * .5 + r() * .12));
+    }
+    return '<path class="shan-f" d="' + fill + '"/><path class="shan-c" d="' + cun + '"/><path class="shan-r" d="' + lines + '"/><path class="shan-o" d="' + ridge + '"/>';
+  }
   // 山岩台地：顶上平，好让楼阁坐上去；两侧一团团岩块往外鼓、往下放宽，
   // 块与块之间一道岩缝，岩面顺坡落披麻皴。底边不描，用渐隐遮罩没进云雾里（mask 由 scene 给）
   function rock(x, top, w, h, seed, mask) {
@@ -467,7 +543,7 @@
     return '<path class="water" d="' + d + '"/>';
   }
 
-  // 云雾：一团团糊开的雾，几团顶上再勾一道弧边，像参考图里那样上沿亮一点
+  // 云雾：一团团糊开的雾，几团顶上再勾一道弧边，像参考图里那样上沿亮一点；第五项给 0 就不勾边（水面上的雾）
   function mist(list, id) {
     var r = rng(41), blur = '', edge = '';
     list.forEach(function (m) {
@@ -476,7 +552,7 @@
         var u = (i + .5) / n * 2 - 1, px = m[0] + u * m[2] * .85, rx = m[2] * (.22 + r() * .14), ry = m[3] * (.8 + r() * .8) * (1 - .4 * u * u);
         var py = m[1] - ry * .3 + (r() - .5) * m[3] * .4;
         blur += '<ellipse cx="' + f(px) + '" cy="' + f(py) + '" rx="' + f(rx) + '" ry="' + f(ry) + '"/>';
-        if (Math.abs(u) < .6 && r() < .7) edge += 'M' + f(px - rx * .7) + ',' + f(py + ry * .15) + ' Q' + f(px) + ',' + f(py - ry * 1.15) + ' ' + f(px + rx * .7) + ',' + f(py + ry * .15) + ' ';
+        if (m[4] !== 0 && Math.abs(u) < .6 && r() < .7) edge += 'M' + f(px - rx * .7) + ',' + f(py + ry * .15) + ' Q' + f(px) + ',' + f(py - ry * 1.15) + ' ' + f(px + rx * .7) + ',' + f(py + ry * .15) + ' ';
       }
     });
     return '<g class="mist" filter="url(#ge-blur-' + id + ')">' + blur + '</g><path class="mist-l" d="' + edge + '"/>';
@@ -505,7 +581,7 @@
       ['men', '#', '崖上小门', xiaomen(P.men[0], P.men[1], S), null, 'men'],
       ['cang', '/posts/', '藏经阁：万法归一，' + han(POSTS) + '篇', cangjing(P.cang[0], P.cang[1], S), ['藏经阁', han(SHELVES.length) + '架 ' + han(POSTS) + '卷']],
       ['shi', shi ? '/posts/#sec-文' : '/posts/', '诗亭：' + (shi ? shi.name : '词章'), shiting(P.shi[0], P.shi[1], S), ['诗亭', shi ? shi.name : '词章']],
-      ['ting', '/wushu/', '五术门庭', ting(P.ting[0], P.ting[1], S), ['门庭', DOORS.map(function (d) { return d.seal; }).join('')]],
+      ['ting', '/wushu/', '五术门庭', ting(P.ting[0], P.ting[1], S, P.ting.length > 4 ? P.ting[2] : 0, P.ting.length > 4 ? P.ting[3] : 0), ['门庭', DOORS.map(function (d) { return d.seal; }).join('')]],
       ['qian', '#', '签筒：摇一支今日日签', qiantong(P.qian[0], P.qian[1], S), ['签筒', '摇一支日签'], 'qian'],
       ['shanmen', '/', '山门：出阁，回文字版', shanmen(P.shanmen[0], P.shanmen[1], S), ['山门', '出阁 · 回文字版'], 'out'],
       ['wenlu', '/seek/', '问路石：寻物', wenlu(P.wenlu[0], P.wenlu[1], S), ['寻物', '问路']],
@@ -524,15 +600,18 @@
   var DESK = {
     id: 'd', W: 1440, H: 900, s: 1.15, t: 1.4, sw: 24,
     ridges: [
-      ['far', [[-380, 470], [-200, 400], [0, 420], [120, 330], [260, 370], [420, 250], [560, 180], [720, 90], [880, 170], [1030, 230], [1180, 320], [1320, 300], [1440, 360], [1620, 320], [1820, 400]], 46],
-      ['mid', [[-380, 600], [-150, 540], [0, 560], [150, 500], [300, 460], [460, 400], [600, 330], [720, 300], [860, 340], [1000, 390], [1160, 430], [1300, 480], [1440, 470], [1620, 520], [1820, 500]], 34]
+      ['far', [[-380, 480], [-200, 430], [0, 450], [120, 390], [260, 420], [400, 350], [540, 380], [640, 330], [800, 340], [920, 300], [1060, 360], [1180, 340], [1320, 380], [1440, 350], [1620, 390], [1820, 420]], 46],
+      ['mid', [[-380, 620], [-150, 575], [0, 595], [120, 555], [240, 585], [400, 560], [1040, 560], [1200, 585], [1320, 550], [1440, 578], [1620, 560], [1820, 600]], 34]
     ],
-    rocks: [[720, 309, 300, 220], [1012, 486, 250, 130], [495, 436, 250, 100], [430, 626, 280, 120], [1065, 644, 220, 150], [720, 682, 420, 80]],
+    // 主山轮廓：左山脚 → 琴台崖 → 阁顶两峰 → 法宝库肩 → 右山脚
+    peak: [[-80, 806], [60, 796], [170, 772], [240, 740], [290, 700], [320, 655], [345, 610], [372, 560], [395, 515], [430, 478], [470, 452], [520, 425], [560, 392], [580, 350], [596, 300], [608, 268], [624, 256], [640, 270], [652, 300],
+      [788, 300], [800, 270], [816, 252], [834, 262], [846, 296], [862, 330], [890, 365], [930, 400], [975, 428], [1025, 452], [1075, 480], [1110, 520], [1140, 566], [1168, 615], [1196, 660], [1230, 705], [1280, 748], [1350, 780], [1520, 806]],
+    rocks: [[1012, 486, 250, 80], [495, 436, 250, 80], [430, 626, 280, 80], [1065, 644, 220, 80]],
     big: [[420, 436, 1.2, 1]],
-    yun: [[200, 400, 1.2], [1180, 440, 1.1, 1], [1330, 590, 1.2, 1], [80, 580, 1]],
-    mist: [[480, 505, 300, 20], [1030, 590, 300, 22], [330, 700, 360, 22], [1120, 740, 360, 20], [720, 430, 220, 16]],
-    path: [[720, 309], [762, 380], [692, 470], [758, 570], [720, 630], [720, 680], [746, 742], [720, 800]],
-    pines: [[312, 626, 1.1, 1], [1160, 644, 1, -1], [905, 486, .9, 1], [858, 309, .9, -1], [540, 682, .8, 1]],
+    yun: [[150, 380, 1.2], [1240, 420, 1.1, 1], [1360, 560, 1.2, 1], [60, 560, 1]],
+    mist: [[460, 505, 260, 18], [1040, 585, 280, 20], [250, 690, 260, 20], [1180, 700, 260, 18], [720, 470, 200, 14], [720, 872, 640, 16, 0]],
+    path: [[720, 309], [765, 375], [690, 455], [758, 545], [695, 630], [740, 700], [720, 740], [720, 800]],
+    pines: [[300, 626, 1.1, 1], [1170, 644, 1, -1], [900, 486, .9, 1], [850, 300, .85, -1], [1210, 762, .9, -1]],
     bund: [-400, 1840, 800, 24],
     moon: [1260, 110, 26],
     p: {
@@ -541,14 +620,15 @@
       fabao: [1010, 480, 125, -165],
       qin: [470, 432, -90, -110],
       fox: [552, 428],
-      men: [1150, 720],
+      men: [1150, 712],
       cang: [430, 620, -150, -170],
       shi: [1060, 640, 90, -130],
-      ting: [720, 680, -205, -75],
-      qian: [860, 770, 55, -80],
-      shanmen: [720, 800, -110, -95],
-      wenlu: [1000, 800, 30, -115],
-      du: [470, 824, .9, 62, -6]
+      // 院墙在山脚，正中让出一道豁口给山门：[x, y, 墙宽, 豁口, 名牌横移, 纵移]
+      ting: [720, 800, 780, 150, -415, -85],
+      qian: [860, 720, 55, -80],
+      shanmen: [720, 800, -70, -150],
+      wenlu: [1240, 800, 30, -115],
+      du: [230, 824, .9, 62, -6]
     }
   };
   var MOB = {
@@ -557,7 +637,9 @@
       ['far', [[-120, 540], [0, 520], [40, 430], [90, 470], [150, 330], [200, 250], [250, 320], [300, 300], [360, 420], [400, 380], [520, 430]], 34],
       ['mid', [[-120, 840], [0, 820], [30, 760], [80, 700], [130, 720], [180, 640], [240, 650], [300, 600], [350, 640], [400, 620], [520, 650]], 28]
     ],
-    rocks: [[200, 477, 240, 190], [288, 715, 200, 100], [90, 795, 150, 90], [104, 1005, 200, 120], [312, 1013, 150, 130], [200, 1182, 380, 70], [275, 1268, 110, 60]],
+    peak: [[-40, 1400], [0, 1370], [10, 1290], [0, 1200], [15, 1100], [10, 1000], [30, 900], [25, 800], [45, 720], [70, 650], [95, 590], [105, 530], [112, 480], [118, 452], [128, 444], [138, 470],
+      [262, 470], [272, 448], [284, 440], [294, 462], [300, 520], [318, 590], [345, 660], [372, 730], [385, 820], [392, 920], [400, 1020], [410, 1150], [420, 1280], [440, 1400]],
+    rocks: [[288, 715, 200, 100], [90, 795, 150, 90], [104, 1005, 200, 120], [312, 1013, 150, 130], [200, 1182, 380, 70], [275, 1268, 110, 60]],
     big: [[50, 795, 1, 1]],
     yun: [[10, 590, .8], [390, 610, .8, 1], [-10, 900, .7], [400, 880, .7, 1], [20, 1200, .7], [395, 1170, .7, 1]],
     mist: [[200, 640, 220, 26], [160, 880, 240, 24], [250, 1140, 260, 26], [180, 1345, 260, 22]],
@@ -586,6 +668,7 @@
   function scene(L) {
     var id = L.id, B = L.bund, bg = moon(L.moon[0], L.moon[1], L.moon[2]);
     L.ridges.forEach(function (r, i) { bg += mountain(r[1], L.H, r[0], r[2], 7 + i * 13 + L.W); });
+    if (L.peak) bg += shan(L.peak, L.bund[2] + 6, 77);
     L.rocks.slice().sort(function (a, b) { return a[1] - b[1]; }).forEach(function (r, i) { bg += rock(r[0], r[1], r[2], r[3], 31 + i * 17, 'ge-fade-' + id); });
     L.yun.forEach(function (y) { bg += yun(y[0], y[1], y[2], y[3]); });
     bg += stairs(L.path, L.sw);

@@ -1857,6 +1857,11 @@ html.qj-ge-on body { overflow-x: clip; }
 .ge-svg .eye { fill: var(--ge-fg); }
 .ge-svg .water { fill: none; stroke: var(--ge-zi); stroke-width: .7; stroke-linecap: round; opacity: .4; }
 /* 山岩台地：岩面比夜色深一点，轮廓用亮雾色勾，皴笔淡；底下由遮罩渐隐进云雾 */
+/* 主山：一整座连成一体 */
+.ge-svg .shan-f { fill: #1C1628; }
+.ge-svg .shan-o { fill: none; stroke: #8A83A0; stroke-width: 1.1; stroke-linejoin: round; }
+.ge-svg .shan-r { fill: none; stroke: #6A6084; stroke-width: .9; stroke-linecap: round; }
+.ge-svg .shan-c { fill: none; stroke: #4A4062; stroke-width: .7; stroke-linecap: round; }
 .ge-svg .rock-f { fill: #1E1829; }
 .ge-svg .rock-o { fill: none; stroke: #7E7696; stroke-width: 1; stroke-linejoin: round; }
 .ge-svg .rock-c { fill: none; stroke: #4E4466; stroke-width: .7; stroke-linecap: round; }
