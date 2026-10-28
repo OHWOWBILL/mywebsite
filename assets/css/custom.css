@@ -1830,6 +1830,62 @@ html.qj-ge-on body { overflow-x: clip; }
   .ge-d { display: none; }
   .ge-m { display: block; max-width: 560px; margin: 0 auto; }
 }
+.qj-ge-view { position: relative; }
+.qj-ge-hint { display: none; }
+
+/* 登山：.qj-ge 由 ge.js 拉长成要滚的路，.qj-ge-view 钉在屏上，镜头靠改 viewBox 走。
+   overflow 用 clip 不用 hidden，hidden 会让 sticky 认它当滚动容器而钉不住 */
+.qj-ge.qj-ge-climb { overflow: clip; }
+.qj-ge-climb .qj-ge-view { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.qj-ge-climb .qj-ge-stage { position: relative; height: 100%; min-height: 0; }
+/* 宽高由 ge.js 按最近一幕的倍数给，镜头只平移缩放 */
+.qj-ge-climb .ge-svg { position: absolute; left: 0; top: 0; min-height: 0; max-width: none; margin: 0; transform-origin: 0 0; will-change: transform; }
+.qj-ge-climb .qj-ge-out { top: 5.5rem; }
+/* 顶上压一层夜色，浮着的导航字不和线稿缠在一起 */
+.qj-ge-climb .qj-ge-view::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 auto;
+  height: 6.5rem;
+  background: linear-gradient(var(--ge-bg) 25%, rgba(23, 19, 31, 0));
+  pointer-events: none;
+}
+.qj-ge-climb .qj-ge-hint {
+  display: block;
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 3.8rem;
+  transform: translateX(-50%);
+  writing-mode: vertical-rl;
+  font-family: var(--font-title);
+  font-size: .85rem;
+  letter-spacing: .4em;
+  color: var(--ge-muted);
+  pointer-events: none;
+  transition: opacity .2s linear;
+}
+/* 字底下一道细线往下流，示意往下滚 */
+.qj-ge-climb .qj-ge-hint::after {
+  content: "";
+  position: absolute;
+  top: calc(100% + .5rem);
+  left: 50%;
+  width: 1px;
+  height: 2.2rem;
+  background: linear-gradient(var(--ge-muted), transparent);
+  animation: ge-hint 2.4s ease-in-out infinite;
+}
+@media (max-width: 720px), (orientation: portrait) and (max-width: 1100px) {
+  .qj-ge-climb .qj-ge-hint { left: auto; right: 1.1rem; transform: none; }
+}
+@keyframes ge-hint {
+  0%   { transform: scaleY(0); transform-origin: top; }
+  50%  { transform: scaleY(1); transform-origin: top; }
+  51%  { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
 
 /* 线稿 */
 .ge-svg .mt { stroke: var(--ge-rule); stroke-width: 1; }

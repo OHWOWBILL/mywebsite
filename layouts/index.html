@@ -117,8 +117,12 @@ try{var g=new URLSearchParams(location.search).get('ge');if(g==='1'||g==='0')loc
 {{- end -}}
 {{- if not $tools }}{{ $tools = $wtools }}{{ end }}
 <section class="qj-ge" id="qj-ge" aria-label="入阁 · 潜蛟阁全景">
-  <nav class="qj-ge-stage" aria-label="潜蛟阁各处"></nav>
-  <button type="button" class="qj-ge-out" title="出阁，回文字版">出阁</button>
+  {{- /* 登山时 .qj-ge-view 钉在屏上，整段 .qj-ge 的高度就是爬山要滚的路 */}}
+  <div class="qj-ge-view">
+    <nav class="qj-ge-stage" aria-label="潜蛟阁各处"></nav>
+    <button type="button" class="qj-ge-out" title="出阁，回文字版">出阁</button>
+    <span class="qj-ge-hint" aria-hidden="true">拾级而上</span>
+  </div>
   <script type="application/json" id="qj-ge-data">{{ dict "doors" $doors "tools" $tools "shelves" $shelves "posts" (len $posts) | jsonify | safeJS }}</script>
 </section>
 {{ end }}
