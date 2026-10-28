@@ -25,7 +25,7 @@ fingerprintAlgorithm = "sha512"
   layout = "fixed"
 
 [footer]
-  showMenu = true
+  showMenu = false  # 底部那排链接拿掉：顶上导航已有，手机在右上角菜单
   showCopyright = true
   showThemeAttribution = false
   showAppearanceSwitcher = false

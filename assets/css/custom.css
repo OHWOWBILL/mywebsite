@@ -1833,14 +1833,32 @@ html.qj-ge-on body { overflow-x: clip; }
 .qj-ge-view { position: relative; }
 .qj-ge-hint { display: none; }
 
-/* 登山：.qj-ge 由 ge.js 拉长成要滚的路，.qj-ge-view 钉在屏上，镜头靠改 viewBox 走。
+/* 登山：.qj-ge 由 ge.js 拉长成要滚的路，.qj-ge-view 钉在屏上，镜头靠 transform 平移缩放。
    overflow 用 clip 不用 hidden，hidden 会让 sticky 认它当滚动容器而钉不住 */
 .qj-ge.qj-ge-climb { overflow: clip; }
-.qj-ge-climb .qj-ge-view { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+/* 视框也用 clip：hidden 的框键盘聚焦时会被浏览器自己卷动，楼就跑出画面 */
+.qj-ge-climb .qj-ge-view { position: sticky; top: 0; height: 100svh; overflow: clip; }
 .qj-ge-climb .qj-ge-stage { position: relative; height: 100%; min-height: 0; }
 /* 宽高由 ge.js 按最近一幕的倍数给，镜头只平移缩放 */
-.qj-ge-climb .ge-svg { position: absolute; left: 0; top: 0; min-height: 0; max-width: none; margin: 0; transform-origin: 0 0; will-change: transform; }
+.qj-ge-climb .ge-svg { position: absolute; z-index: 1; left: 0; top: 0; min-height: 0; max-width: none; margin: 0; transform-origin: 0 0; will-change: transform; }
 .qj-ge-climb .qj-ge-out { top: 5.5rem; }
+/* 2.5D 四层：远山（即梦底图）< 线稿 < 云雾 < 近处雾带。stage 自成一叠，顶上的夜色、提示、出阁都压在四层之上 */
+.qj-ge-climb .qj-ge-stage { z-index: 0; }
+.qj-ge-climb .ge-yuan { display: none; }
+.qj-ge-far, .qj-ge-wu, .qj-ge-yun, .qj-ge-near { display: none; }
+.qj-ge-climb .qj-ge-far,
+.qj-ge-climb .qj-ge-wu,
+.qj-ge-climb .qj-ge-yun,
+.qj-ge-climb .qj-ge-near { display: block; position: absolute; left: 0; top: 0; max-width: none; margin: 0; transform-origin: 0 0; will-change: transform; pointer-events: none; }
+.qj-ge-climb .qj-ge-far { z-index: 0; opacity: .9; background-size: 100% 100%; }
+.qj-ge-climb .qj-ge-wu, .qj-ge-climb .qj-ge-yun { z-index: 2; }
+.qj-ge-climb .qj-ge-near { z-index: 3; overflow: visible; }
+.wu-body { background: url(/img/ge/wu-body.webp) 0 0 / 512px 512px repeat; }
+.wu-edge { background: url(/img/ge/wu-edge.webp) 0 0 / 100% 100% no-repeat; }
+.qj-ge-yun i { position: absolute; background: url(/img/ge/wu-tuan.webp) 0 0 / 100% 100% no-repeat; will-change: transform, opacity; }
+.qj-ge-near .near-mist { fill: url(#ge-nm); }
+/* 还在雾里的地方点不着（键盘仍停得到，停到就爬过去） */
+.qj-ge-climb .ge-place.ge-hid { pointer-events: none; }
 /* 顶上压一层夜色，浮着的导航字不和线稿缠在一起 */
 .qj-ge-climb .qj-ge-view::before {
   content: "";
