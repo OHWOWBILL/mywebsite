@@ -1,5 +1,5 @@
 ---
-title: "别家在猜，此家只查：macSKK 上手记"
+title: "输入法教程之SKK日语输入法"
 date: 2026-10-28
 description: "别家输入法在猜你意思，SKK 只听你意思 —— macSKK 装法与打法"
 categories: ["工具", "语言"]
