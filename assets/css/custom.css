@@ -1816,6 +1816,7 @@ html.qj-ge-on body { overflow-x: clip; }
 
 .qj-ge {
   position: relative;
+  overflow: hidden;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-top: -3rem;
@@ -1839,8 +1840,7 @@ html.qj-ge-on body { overflow-x: clip; }
 .ge-svg .cun { fill: none; stroke: #3A3150; stroke-width: .7; stroke-linecap: round; }
 .ge-svg .cun.far { opacity: .55; }
 .ge-svg .yun { fill: none; stroke: #5A5070; stroke-width: .9; stroke-linecap: round; }
-.ge-svg .path { fill: none; stroke: #4A4060; stroke-width: 1; }
-.ge-svg .steps { fill: none; stroke: #5A5070; stroke-width: .8; stroke-linecap: round; }
+.ge-svg .steps { fill: none; stroke-linecap: round; }
 .ge-svg .ink { fill: none; stroke: #9E97B2; stroke-width: 1.1; stroke-linejoin: round; stroke-linecap: round; transition: stroke .35s ease; }
 .ge-svg .ink.thin { stroke-width: .6; opacity: .8; }
 .ge-svg .ink.hair { stroke-width: .45; opacity: .6; }
@@ -1862,11 +1862,36 @@ html.qj-ge-on body { overflow-x: clip; }
 .ge-svg .moon { fill: var(--ge-fg-2); opacity: .78; }
 .ge-svg .moon-o { fill: none; stroke: var(--ge-rule); stroke-width: .8; }
 .ge-svg .eye { fill: var(--ge-fg); }
-.ge-svg .water { stroke: var(--ge-zi); opacity: .45; }
+.ge-svg .water { fill: none; stroke: var(--ge-zi); stroke-width: .7; stroke-linecap: round; opacity: .4; }
+/* 山岩台地：岩面比夜色深一点，轮廓用亮雾色勾，皴笔淡；底下由遮罩渐隐进云雾 */
+/* 主山：一整座连成一体 */
+.ge-svg .shan-f { fill: #1C1628; }
+.ge-svg .shan-o { fill: none; stroke: #8A83A0; stroke-width: 1.1; stroke-linejoin: round; }
+.ge-svg .shan-r { fill: none; stroke: #6A6084; stroke-width: .9; stroke-linecap: round; }
+.ge-svg .shan-c { fill: none; stroke: #4A4062; stroke-width: .7; stroke-linecap: round; }
+.ge-svg .rock-f { fill: #1E1829; }
+.ge-svg .rock-o { fill: none; stroke: #7E7696; stroke-width: 1; stroke-linejoin: round; }
+.ge-svg .rock-c { fill: none; stroke: #4E4466; stroke-width: .7; stroke-linecap: round; }
+/* 石阶 */
+.ge-svg .stair { fill: #231C31; }
+.ge-svg .stair-side { fill: none; stroke: #8A83A0; stroke-width: .9; stroke-linecap: round; }
+.ge-svg .steps { stroke: #5E5476; stroke-width: .6; }
+/* 云雾带：糊开的一团团 */
+.ge-svg .mist { fill: #625880; opacity: .42; }
+.ge-svg .mist-l { fill: none; stroke: #8E85AA; stroke-width: .8; stroke-linecap: round; opacity: .5; }
+.ge-svg .stair.land { stroke: #8A83A0; stroke-width: .8; }
+/* 驳岸 */
+.ge-svg .bund { fill: #1C1626; }
+.ge-svg .bund-st { fill: none; stroke: #4E4466; stroke-width: .6; }
+.ge-svg .bund-top { fill: none; stroke: #8A83A0; stroke-width: .9; }
+/* 白狐：整只填月白，指到时也描金 */
+.ge-svg .fox { fill: var(--ge-fg); opacity: .92; transition: fill .35s ease; }
+.ge-svg .fox-eye { fill: var(--ge-bg); }
 .ge-svg .tag { fill: rgba(23, 19, 31, .9); stroke: var(--ge-rule); transition: stroke .35s ease; }
 .ge-svg .name { fill: var(--ge-fg); transition: fill .35s ease; }
 .ge-svg .note { fill: var(--ge-muted); font-family: var(--font-body); transition: opacity .35s ease; }
-.ge-d .note { opacity: 0; }
+.ge-svg .note-bg { fill: rgba(23, 19, 31, .9); transition: opacity .35s ease; }
+.ge-d .note, .ge-d .note-bg { opacity: 0; }
 
 /* 场所：指到、键盘停到，描金；点下去略往前一凑再走 */
 .ge-place { cursor: pointer; outline: none; }
@@ -1876,15 +1901,17 @@ html.qj-ge-on body { overflow-x: clip; }
 .ge-place:focus-visible .ink, .ge-place.go .ink { stroke: var(--jin); }
 .ge-place:focus-visible .tag, .ge-place.go .tag { stroke: var(--jin); }
 .ge-place:focus-visible .name, .ge-place.go .name { fill: var(--jin); }
-.ge-place:focus-visible .note { opacity: 1; }
+.ge-place:focus-visible .note, .ge-place:focus-visible .note-bg { opacity: 1; }
 .ge-place:focus-visible .lantern:not(.locked), .ge-place.go .lantern:not(.locked) { fill: rgba(217, 174, 78, .28); }
+.ge-place:focus-visible .fox, .ge-place.go .fox { fill: var(--jin); }
 .ge-place:focus-visible .draw, .ge-place.go .draw { filter: drop-shadow(0 0 6px rgba(217, 174, 78, .35)); }
 @media (hover: hover) {
   .ge-place:hover .ink { stroke: var(--jin); }
   .ge-place:hover .tag { stroke: var(--jin); }
   .ge-place:hover .name { fill: var(--jin); }
-  .ge-place:hover .note { opacity: 1; }
+  .ge-place:hover .note, .ge-place:hover .note-bg { opacity: 1; }
   .ge-place:hover .lantern:not(.locked) { fill: rgba(217, 174, 78, .28); }
+  .ge-place:hover .fox { fill: var(--jin); }
   .ge-place:hover .draw { filter: drop-shadow(0 0 6px rgba(217, 174, 78, .35)); }
 }
 .ge-place:focus-visible .ge-hit { stroke: var(--jin); stroke-width: 1; stroke-dasharray: 3 4; }

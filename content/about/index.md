@@ -24,7 +24,7 @@ showEdit: false
 
 ### 所习诸术
 
-- **山**：亲历与修持，与山中相识者往来。见[吾友，天日鹫命](/posts/wu-you-jiu-shen/)、[初遇出马仙](/posts/chu-yu-chu-ma-xian/)。
+- **山**：堪舆风水，此门尚封。
 - **医**：中医经典，条文必背，医案逐条拆解。见[必背（一）——原病式](/posts/bi-bei-yi-yuan-bing-shi/)、[寓意草（一）](/posts/yu-yi-cao-yi/)。
 - **命**：八字、紫微、星盘诸法互证。见[命理师大赛2024题目解析（二）](/posts/ming-li-shi-da-sai-2024-ti-mu-jie-xi-er/)。
 - **卜**：以梅花易数为主。见[靈狐掌中樹](/posts/ling-hu-zhang-zhong-shu/)，并自制[梅花易数排盘工具](/meihua/)一套，随意取用。
