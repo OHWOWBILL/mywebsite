@@ -1883,7 +1883,8 @@ html.qj-ge-on body { overflow-x: clip; }
 .ge-svg .tag { fill: rgba(23, 19, 31, .9); stroke: var(--ge-rule); transition: stroke .35s ease; }
 .ge-svg .name { fill: var(--ge-fg); transition: fill .35s ease; }
 .ge-svg .note { fill: var(--ge-muted); font-family: var(--font-body); transition: opacity .35s ease; }
-.ge-d .note { opacity: 0; }
+.ge-svg .note-bg { fill: rgba(23, 19, 31, .9); transition: opacity .35s ease; }
+.ge-d .note, .ge-d .note-bg { opacity: 0; }
 
 /* 场所：指到、键盘停到，描金；点下去略往前一凑再走 */
 .ge-place { cursor: pointer; outline: none; }
@@ -1893,7 +1894,7 @@ html.qj-ge-on body { overflow-x: clip; }
 .ge-place:focus-visible .ink, .ge-place.go .ink { stroke: var(--jin); }
 .ge-place:focus-visible .tag, .ge-place.go .tag { stroke: var(--jin); }
 .ge-place:focus-visible .name, .ge-place.go .name { fill: var(--jin); }
-.ge-place:focus-visible .note { opacity: 1; }
+.ge-place:focus-visible .note, .ge-place:focus-visible .note-bg { opacity: 1; }
 .ge-place:focus-visible .lantern:not(.locked), .ge-place.go .lantern:not(.locked) { fill: rgba(217, 174, 78, .28); }
 .ge-place:focus-visible .fox, .ge-place.go .fox { fill: var(--jin); }
 .ge-place:focus-visible .draw, .ge-place.go .draw { filter: drop-shadow(0 0 6px rgba(217, 174, 78, .35)); }
@@ -1901,7 +1902,7 @@ html.qj-ge-on body { overflow-x: clip; }
   .ge-place:hover .ink { stroke: var(--jin); }
   .ge-place:hover .tag { stroke: var(--jin); }
   .ge-place:hover .name { fill: var(--jin); }
-  .ge-place:hover .note { opacity: 1; }
+  .ge-place:hover .note, .ge-place:hover .note-bg { opacity: 1; }
   .ge-place:hover .lantern:not(.locked) { fill: rgba(217, 174, 78, .28); }
   .ge-place:hover .fox { fill: var(--jin); }
   .ge-place:hover .draw { filter: drop-shadow(0 0 6px rgba(217, 174, 78, .35)); }

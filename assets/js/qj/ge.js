@@ -1,7 +1,8 @@
 // =========================================================
 // 入阁 · 首页的另一种看法（layouts/index.html 的 #qj-ge）
-// 把潜蛟阁画成一座山：自山门登阶，过门庭、藏经阁、诗亭、
-// 琴台、法宝库，到阁顶书斋。点哪一处，就去哪一处。
+// 把潜蛟阁画成一座山：入云从关（山门）登阶，过门庭、汲玄楼（藏经阁）、
+// 听雷亭、叩云台、法宝库，到阁顶集云斋。点哪一处，就去哪一处。
+// 取名守 place-names 的规矩：不用「殿」，字只取乾卦六爻、虺蛟龙、水云雷三条线。
 //
 // 线稿全由下面的部件函数现画，数量跟着站点数据走：
 //   门庭的门 = data/wushu.toml 的门，书架 = data/sections.toml 的分区，
@@ -24,6 +25,8 @@
   try { D = JSON.parse(document.getElementById('qj-ge-data').textContent); } catch (e) {}
   var DOORS = D.doors || [], SHELVES = D.shelves || [], POSTS = D.posts || 0;
   var TOOLS = [], seen = {};
+  // 云从关门联
+  var LIAN = ['云从龙起，方知其势', '水抱渊深，始见其机'];
   (D.tools || []).forEach(function (t) { if (!seen[t.href]) { seen[t.href] = 1; TOOLS.push(t); } });
   var still = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -295,7 +298,7 @@
       ' Q' + f(x - 12 * s) + ',' + f(y + 4.5 * s) + ' ' + f(x + 3 * s) + ',' + f(y + 1 * s) + ' Q' + f(x - 8 * s) + ',' + f(y) + ' ' + f(x - 11 * s) + ',' + f(y - 2 * s) + ' Z';
     return '<path class="fox" d="' + d + '"/><path class="fox" d="' + tail + '"/><circle class="fox-eye" cx="' + f(x + 15.5 * s) + '" cy="' + f(y - 4 * s) + '" r="' + f(.7 * s) + '"/>';
   }
-  // 崖上小门（内室）
+  // 蛰庐：崖上一扇锁着的小门
   function xiaomen(x, y, s) {
     return '<path class="ink fill" d="M' + f(x - 6 * s) + ',' + f(y) + ' V' + f(y - 13 * s) + ' Q' + f(x) + ',' + f(y - 19 * s) + ' ' + f(x + 6 * s) + ',' + f(y - 13 * s) + ' V' + f(y) + ' Z"/><circle class="ink thin" cx="' + f(x + 3 * s) + '" cy="' + f(y - 6 * s) + '" r="' + f(1.2 * s) + '"/>';
   }
@@ -558,11 +561,19 @@
     return '<g class="mist" filter="url(#ge-blur-' + id + ')">' + blur + '</g><path class="mist-l" d="' + edge + '"/>';
   }
 
-  // 名牌：竖排一块签，签下一行小注（桌面悬停才出注，手机常显）
+  // 名牌：竖排一块签，签下小注（桌面悬停才出注，手机常显）；注给数组就一行一句
   function tag(x, y, name, note, s) {
     var size = 12 * s, h = size * Array.from(name).length + 10 * s, w = size + 9 * s;
     var g = '<rect class="tag" x="' + f(x - w / 2) + '" y="' + f(y) + '" width="' + f(w) + '" height="' + f(h) + '" rx="1.5"/>' + vtext(x, y + 3 * s, name, size, 'v name');
-    if (note) g += '<text class="note" x="' + f(x) + '" y="' + f(y + h + 12 * s) + '" font-size="' + f(9.5 * s) + '" text-anchor="middle">' + esc(note) + '</text>';
+    var lines = [].concat(note || []), ns = 9.5 * s;
+    // 多行的注垫一块底，免得压在线稿上读不清
+    if (lines.length > 1) {
+      var lw = Math.max.apply(null, lines.map(function (l) { return Array.from(l).length; })) * ns + 10 * s;
+      g += '<rect class="note-bg" x="' + f(x - lw / 2) + '" y="' + f(y + h + 2 * s) + '" width="' + f(lw) + '" height="' + f(lines.length * 12.5 * s + 4 * s) + '" rx="2"/>';
+    }
+    lines.forEach(function (line, i) {
+      g += '<text class="note" x="' + f(x) + '" y="' + f(y + h + (12 + i * 12.5) * s) + '" font-size="' + f(ns) + '" text-anchor="middle">' + esc(line) + '</text>';
+    });
     return g;
   }
 
@@ -574,16 +585,16 @@
     var yi = SHELVES.filter(function (x) { return x.seal === '异'; })[0];
     var row = [
       ['dou', '#', '北斗：看此刻天时', beidou(P.dou[0], P.dou[1], S), ['北斗', '此刻天时'], 'dou'],
-      ['ge', '/about/', '潜蛟阁顶层书斋：阁主何人', ge(P.ge[0], P.ge[1], P.ge[2]), ['书斋', '阁主何人']],
+      ['ge', '/about/', '集云斋（潜蛟阁顶层书斋）：阁主何人', ge(P.ge[0], P.ge[1], P.ge[2]), ['集云斋', '阁主何人']],
       ['fabao', '/tools/', '法宝库：' + han(TOOLS.length) + '件法宝', fabao(P.fabao[0], P.fabao[1], S), ['法宝库', han(TOOLS.length) + '件' + (locked ? ' · ' + han(locked) + '件有禁制' : '')]],
-      ['qin', '#', '琴台：轮换音律', qintai(P.qin[0], P.qin[1], S), ['琴台', '音律 关/磬/琴'], 'qin'],
+      ['qin', '#', '叩云台：轮换音律', qintai(P.qin[0], P.qin[1], S), ['叩云台', '音律 关/磬/琴'], 'qin'],
       ['fox', yi ? '/posts/#sec-异' : '/posts/', '松下白狐：异闻', fox(P.fox[0], P.fox[1], S * 1.3), null],
-      ['men', '#', '崖上小门', xiaomen(P.men[0], P.men[1], S), null, 'men'],
-      ['cang', '/posts/', '藏经阁：万法归一，' + han(POSTS) + '篇', cangjing(P.cang[0], P.cang[1], S), ['藏经阁', han(SHELVES.length) + '架 ' + han(POSTS) + '卷']],
-      ['shi', shi ? '/posts/#sec-文' : '/posts/', '诗亭：' + (shi ? shi.name : '词章'), shiting(P.shi[0], P.shi[1], S), ['诗亭', shi ? shi.name : '词章']],
+      ['men', '#', '蛰庐', xiaomen(P.men[0], P.men[1], S), null, 'men'],
+      ['cang', '/posts/', '汲玄楼（藏经阁）：万法归一，' + han(POSTS) + '篇', cangjing(P.cang[0], P.cang[1], S), ['汲玄楼', ['藏经阁', han(SHELVES.length) + '架' + han(POSTS) + '卷']]],
+      ['shi', shi ? '/posts/#sec-文' : '/posts/', '听雷亭：' + (shi ? shi.name : '词章'), shiting(P.shi[0], P.shi[1], S), ['听雷亭', shi ? shi.name : '词章']],
       ['ting', '/wushu/', '五术门庭', ting(P.ting[0], P.ting[1], S, P.ting.length > 4 ? P.ting[2] : 0, P.ting.length > 4 ? P.ting[3] : 0), ['门庭', DOORS.map(function (d) { return d.seal; }).join('')]],
       ['qian', '#', '签筒：摇一支今日日签', qiantong(P.qian[0], P.qian[1], S), ['签筒', '摇一支日签'], 'qian'],
-      ['shanmen', '/', '山门：出阁，回文字版', shanmen(P.shanmen[0], P.shanmen[1], S), ['山门', '出阁 · 回文字版'], 'out'],
+      ['shanmen', '/', '云从关（山门）：出阁，回文字版。门联：' + LIAN.join('；'), shanmen(P.shanmen[0], P.shanmen[1], S), ['云从关', LIAN.concat('出阁 · 回文字版')], 'out'],
       ['wenlu', '/seek/', '问路石：寻物', wenlu(P.wenlu[0], P.wenlu[1], S), ['寻物', '问路']],
       ['du', '/links/', '渡口：去处，各平台', dukou(P.du[0], P.du[1], S * P.du[2], 1), ['渡口', '去处 · 各平台']]
     ];
@@ -626,7 +637,7 @@
       // 院墙在山脚，正中让出一道豁口给山门：[x, y, 墙宽, 豁口, 名牌横移, 纵移]
       ting: [720, 800, 780, 150, -415, -85],
       qian: [860, 720, 55, -80],
-      shanmen: [720, 800, -70, -150],
+      shanmen: [720, 800, -70, -195],
       wenlu: [1240, 800, 30, -115],
       du: [230, 824, .9, 62, -6]
     }
@@ -712,7 +723,7 @@
       var b = document.querySelector('.qj-rike-qian');
       if (b) b.click(); else say('今日签筒空了，换个时辰再来。', a);
     },
-    men: function (a) { say('小门上了锁。锁上刻一行字：题在开发者工具的控制台里。', a); },
+    men: function (a) { say('蛰庐闭着门。门上刻一行字：题在开发者工具的控制台里。', a); },
     out: function () { mode(false); }
   };
 
