@@ -131,5 +131,7 @@
   window.addEventListener('resize', function () { resize(); initStars(); if (!running) draw(); });
 })();
 </script>
+{{- /* 蛟标记模板：文章页脚本（assets/js/qj/article.js）克隆它做文末标记 */ -}}
+<template id="qj-mark-tpl">{{ partial "qj-mark.html" . }}</template>
 {{ partial "qj-yin.html" . }}
 {{ partial "qj-compass-live.html" . }}
