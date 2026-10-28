@@ -1990,6 +1990,14 @@ html.qj-ge-on body { overflow-x: clip; }
 }
 .ge-place:focus-visible .ge-hit { stroke: var(--jin); stroke-width: 1; stroke-dasharray: 3 4; }
 .ge-place.go .draw { transform: scale(1.06); }
+/* 指到哪一处：楼阁微微浮起，墙里点上灯（窗棂描金，墙面透出暖光） */
+.ge-svg .wall { transition: fill .35s ease; }
+.ge-place:focus-visible .wall, .ge-place.go .wall { fill: #3A2E22; fill: color-mix(in srgb, var(--jin) 20%, var(--ge-bg)); }
+@media (hover: hover) {
+  .ge-place:hover .draw { transform: translateY(-2.5px); }
+  .ge-place:hover .wall { fill: #3A2E22; fill: color-mix(in srgb, var(--jin) 20%, var(--ge-bg)); }
+  .ge-place.go:hover .draw { transform: translateY(-2.5px) scale(1.06); }
+}
 
 /* 入阁 / 出阁 两枚竖印 */
 .qj-ge-in, .qj-ge-out, .qj-ge-back {
@@ -2034,7 +2042,24 @@ html.qj-ge-on body { overflow-x: clip; }
 }
 .qj-ge-tip.on { opacity: 1; }
 
+/* 听雷亭后的电光：平时不见，ge.js 隔一阵加 .on 闪一下 */
+.ge-svg .lei { opacity: 0; pointer-events: none; }
+.ge-d .lei { fill: url(#ge-glow-d); }
+.ge-m .lei { fill: url(#ge-glow-m); }
+/* 点下一处：整幅推近淡去，再进页面 */
+.qj-ge-climb .qj-ge-view.dive { transform: scale(2.2); opacity: 0; transition: transform .52s cubic-bezier(.55, 0, .8, .35), opacity .4s ease .12s; }
+
 @media (prefers-reduced-motion: no-preference) {
+  .ge-svg .lei.on { animation: ge-lei 1.1s ease-out; }
+  .ge-svg .star { animation: ge-star 3.2s ease-in-out infinite alternate; }
+  .ge-svg .star:nth-of-type(2n) { animation-duration: 4.4s; animation-delay: -1.3s; }
+  .ge-svg .star:nth-of-type(3n) { animation-duration: 2.6s; animation-delay: -2.1s; }
+  .ge-svg .lantern-g { transform-box: fill-box; transform-origin: 50% 0; animation: ge-sway 3.6s ease-in-out infinite alternate; }
+  .ge-svg .lantern-g:nth-child(2n) { animation-delay: -1.8s; animation-duration: 4.2s; }
+  /* 云海和一团团云慢慢流；云团的散开由 ge.js 写 transform，这里只动 translate，两不相扰 */
+  .qj-ge-climb .wu-body, .qj-ge-climb .wu-edge { animation: ge-wu 46s ease-in-out infinite alternate; will-change: transform; }
+  .qj-ge-climb .qj-ge-yun i { animation: ge-tuan 13s ease-in-out infinite alternate; }
+  .qj-ge-climb .qj-ge-yun i:nth-child(2n) { animation-duration: 17s; animation-direction: alternate-reverse; }
   .ge-svg .yun { animation: ge-yun 22s ease-in-out infinite alternate; }
   .ge-svg .yun:nth-of-type(2n) { animation-duration: 28s; animation-direction: alternate-reverse; }
   .ge-svg .smoke { stroke-dasharray: 3 3; animation: ge-smoke 3.2s linear infinite; }
@@ -2043,9 +2068,14 @@ html.qj-ge-on body { overflow-x: clip; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ge-place .draw, .ge-svg .ink, .ge-svg .tag, .ge-svg .note { transition: none; }
-  .ge-place.go .draw { transform: none; }
+  .ge-place.go .draw, .ge-place:hover .draw, .ge-place.go:hover .draw { transform: none; }
 }
 @keyframes ge-yun { to { transform: translateX(14px); } }
 @keyframes ge-smoke { to { stroke-dashoffset: -12; } }
 @keyframes ge-boat { to { transform: translateY(1.5px) rotate(-.6deg); } }
 @keyframes ge-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ge-lei { 0% { opacity: 0; } 5% { opacity: .75; } 11% { opacity: .1; } 17% { opacity: .55; } 45% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes ge-star { from { opacity: 1; } to { opacity: .45; } }
+@keyframes ge-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+@keyframes ge-wu { to { transform: translateX(-6%); } }
+@keyframes ge-tuan { to { translate: 4% 1%; } }
