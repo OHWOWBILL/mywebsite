@@ -111,23 +111,16 @@
     }
   }, { passive: false });
 
-  // ---------- 文末落款：读到底，「潜蛟子印」盖下 ----------
+  // ---------- 文末落款：读到底，蛟标记落下（模板见 extend-footer.html） ----------
   var fin = document.createElement('div');
   fin.className = 'qj-fin';
   fin.setAttribute('aria-hidden', 'true');
-  fin.innerHTML = '<span class="qj-fin-rule"></span><span class="qj-fin-txt">全文完</span>' +
-    '<span class="qj-fin-seal"><span>潜蛟子印</span></span>';
+  var tpl = document.getElementById('qj-mark-tpl');
+  fin.innerHTML = '<span class="qj-fin-rule"></span><span class="qj-fin-seal"></span><span class="qj-fin-rule qj-fin-rule-r"></span>';
+  var seal = fin.querySelector('.qj-fin-seal');
+  if (tpl && tpl.content) seal.appendChild(tpl.content.cloneNode(true));
+  else seal.innerHTML = '<span class="qj-fin-txt">全文完</span>';
   body.after(fin);
-  if (!document.getElementById('qj-rough')) {
-    var defs = document.createElement('div');
-    defs.innerHTML = '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="qj-rough" x="-10%" y="-10%" width="120%" height="120%">' +
-      '<feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="3" result="n"/>' +
-      '<feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" result="d"/>' +
-      '<feTurbulence type="fractalNoise" baseFrequency="1.9" numOctaves="1" seed="11" result="s"/>' +
-      '<feColorMatrix in="s" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -5 0 0 0 4.2" result="m"/>' +
-      '<feComposite in="d" in2="m" operator="in"/></filter></svg>';
-    document.body.appendChild(defs.firstChild);
-  }
   function stamp() {
     if (fin.classList.contains('on')) return;
     fin.classList.add('on');

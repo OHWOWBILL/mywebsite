@@ -168,9 +168,10 @@
   {{ template "HeaderLogo" . }}
   <div class="flex flex-1 items-center justify-between">
     <nav class="flex space-x-3">
-      {{- /* 本站改动（覆盖主题同名 partial，仅此一处）：
+      {{- /* 本站改动（覆盖主题同名 partial）：
              站名改为「拉丁字标 ohwowbill + 潜蛟阁」，见视觉基调「交给网站那边」。 */}}
       <a href="{{ "" | relLangURL }}" class="qj-brand" aria-label="{{ .Site.Title }} · 首页">
+        <span class="qj-brand-mark">{{ partial "qj-mark.html" . }}</span>
         <span class="qj-brand-lat">ohwowbill</span>
         <span class="qj-brand-zh">{{ .Site.Title }}</span>
       </a>
