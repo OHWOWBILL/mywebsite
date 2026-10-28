@@ -1792,3 +1792,152 @@ html.qj-vert-on .toc { display: none; }
   .qj-door-wide { grid-template-columns: 2.4rem minmax(0, 1fr); }
   .qj-door-five { grid-column: 2; grid-row: auto; margin-top: .5rem; }
 }
+
+/* ===========================================================
+   十八 入阁（layouts/index.html #qj-ge · assets/js/qj/ge.js）
+   首页的另一种看法：整座潜蛟阁画成一座山，点场所去各处。
+   html.qj-ge-on 时换上全景、收起文字版；默认仍是文字版。
+   线用雾色，指到的那一处才描金（一屏一处金）。
+   桌面一屏看全山，≤720px 换纵向一卷。
+   =========================================================== */
+
+.qj-ge { display: none; }
+html.qj-ge-on .qj-ge { display: block; }
+html.qj-ge-on .qj-hero,
+html.qj-ge-on .qj-home { display: none; }
+html.qj-ge-on body { overflow-x: clip; }
+
+.qj-ge {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: -3rem;
+}
+.qj-ge-stage { display: block; min-height: 60vh; }
+.ge-svg { display: block; width: 100%; overflow: visible; }
+.ge-d { height: calc(100svh - 6.5rem); min-height: 520px; }
+.ge-m { display: none; height: auto; }
+/* 手机与竖着拿的平板都走纵向一卷，宽了也只放到 560px，两边让山伸出去 */
+@media (max-width: 720px), (orientation: portrait) and (max-width: 1100px) {
+  .ge-d { display: none; }
+  .ge-m { display: block; max-width: 560px; margin: 0 auto; }
+}
+
+/* 线稿 */
+.ge-svg .mt { stroke: var(--ge-rule); stroke-width: 1; }
+.ge-svg .mt.far  { fill: #1A1525; }
+.ge-svg .mt.mid  { fill: #1D1728; }
+.ge-svg .mt.near { fill: #1F192B; }
+.ge-svg .mt.foot { fill: #1B1626; }
+.ge-svg .cun { fill: none; stroke: #3A3150; stroke-width: .7; stroke-linecap: round; }
+.ge-svg .cun.far { opacity: .55; }
+.ge-svg .yun { fill: none; stroke: #5A5070; stroke-width: .9; stroke-linecap: round; }
+.ge-svg .path { fill: none; stroke: #4A4060; stroke-width: 1; }
+.ge-svg .steps { fill: none; stroke: #5A5070; stroke-width: .8; stroke-linecap: round; }
+.ge-svg .ink { fill: none; stroke: #9E97B2; stroke-width: 1.1; stroke-linejoin: round; stroke-linecap: round; transition: stroke .35s ease; }
+.ge-svg .ink.thin { stroke-width: .6; opacity: .8; }
+.ge-svg .ink.hair { stroke-width: .45; opacity: .6; }
+.ge-svg .ink.fill { fill: var(--ge-bg); }
+.ge-svg .ink.book { stroke-width: 1.4; opacity: .85; }
+.ge-svg .v { fill: var(--ge-fg); font-family: var(--font-title); }
+.ge-svg .plaque { fill: var(--ge-fg-2); font-weight: 600; }
+.ge-svg .carve { fill: var(--ge-muted); }
+.ge-svg .seal { fill: var(--ge-zi); font-family: var(--font-title); font-weight: 600; }
+.ge-d .lit { fill: url(#ge-glow-d); }
+.ge-m .lit { fill: url(#ge-glow-m); }
+.ge-svg .lamp { fill: var(--ge-fg-2); opacity: .7; }
+.ge-svg .lantern { fill: #2C2340; stroke: #9E97B2; stroke-width: .8; transition: fill .35s ease; }
+.ge-svg .lantern.locked { fill: #1F1A2B; stroke-dasharray: 2 1.5; }
+.ge-svg .fu { stroke: var(--zi); stroke-width: 2.4; }
+.ge-svg .hui { fill: var(--ge-fg-2); }
+.ge-svg .star { fill: var(--ge-fg); }
+.ge-svg .dou { fill: none; stroke: var(--ge-muted); stroke-width: .6; stroke-dasharray: 2 3; }
+.ge-svg .moon { fill: var(--ge-fg-2); opacity: .78; }
+.ge-svg .moon-o { fill: none; stroke: var(--ge-rule); stroke-width: .8; }
+.ge-svg .eye { fill: var(--ge-fg); }
+.ge-svg .water { stroke: var(--ge-zi); opacity: .45; }
+.ge-svg .tag { fill: rgba(23, 19, 31, .9); stroke: var(--ge-rule); transition: stroke .35s ease; }
+.ge-svg .name { fill: var(--ge-fg); transition: fill .35s ease; }
+.ge-svg .note { fill: var(--ge-muted); font-family: var(--font-body); transition: opacity .35s ease; }
+.ge-d .note { opacity: 0; }
+
+/* 场所：指到、键盘停到，描金；点下去略往前一凑再走 */
+.ge-place { cursor: pointer; outline: none; }
+.ge-place .ge-hit { fill: transparent; }
+.ge-place .draw { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .26s ease, filter .35s ease; }
+/* 触屏点过之后 :hover 会粘住，所以悬停描金只给有鼠标的设备；键盘停到、点下去走的那一刻都描 */
+.ge-place:focus-visible .ink, .ge-place.go .ink { stroke: var(--jin); }
+.ge-place:focus-visible .tag, .ge-place.go .tag { stroke: var(--jin); }
+.ge-place:focus-visible .name, .ge-place.go .name { fill: var(--jin); }
+.ge-place:focus-visible .note { opacity: 1; }
+.ge-place:focus-visible .lantern:not(.locked), .ge-place.go .lantern:not(.locked) { fill: rgba(217, 174, 78, .28); }
+.ge-place:focus-visible .draw, .ge-place.go .draw { filter: drop-shadow(0 0 6px rgba(217, 174, 78, .35)); }
+@media (hover: hover) {
+  .ge-place:hover .ink { stroke: var(--jin); }
+  .ge-place:hover .tag { stroke: var(--jin); }
+  .ge-place:hover .name { fill: var(--jin); }
+  .ge-place:hover .note { opacity: 1; }
+  .ge-place:hover .lantern:not(.locked) { fill: rgba(217, 174, 78, .28); }
+  .ge-place:hover .draw { filter: drop-shadow(0 0 6px rgba(217, 174, 78, .35)); }
+}
+.ge-place:focus-visible .ge-hit { stroke: var(--jin); stroke-width: 1; stroke-dasharray: 3 4; }
+.ge-place.go .draw { transform: scale(1.06); }
+
+/* 入阁 / 出阁 两枚竖印 */
+.qj-ge-in, .qj-ge-out, .qj-ge-back {
+  writing-mode: vertical-rl;
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: .95rem;
+  letter-spacing: .3em;
+  padding: .6em .35em;
+  color: var(--ge-fg);
+  background: rgba(23, 19, 31, .78);
+  border: 1px solid var(--ge-rule);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color .3s ease, border-color .3s ease;
+}
+.qj-ge-in:hover, .qj-ge-out:hover, .qj-ge-back:hover,
+.qj-ge-in:focus-visible, .qj-ge-out:focus-visible, .qj-ge-back:focus-visible { color: var(--jin); border-color: var(--jin); }
+.qj-ge-in { position: absolute; z-index: 3; top: 5%; left: 5%; }
+.qj-ge-out { position: absolute; z-index: 3; top: 1rem; right: max(1rem, calc(50vw - 40rem)); }
+.qj-ge-back { position: fixed; z-index: 70; left: 1rem; bottom: 1.2rem; text-decoration: none; }
+
+/* 北斗、小门、签筒没签时说的话 */
+.qj-ge-tip {
+  position: fixed;
+  z-index: 80;
+  max-width: min(22rem, calc(100vw - 2rem));
+  transform: translate(-50%, -100%);
+  padding: .45rem .8rem;
+  font-family: var(--font-body);
+  font-size: .85rem;
+  line-height: 1.7;
+  letter-spacing: .08em;
+  text-align: center;
+  color: var(--ge-fg);
+  background: var(--ge-bg-2);
+  border: 1px solid var(--ge-rule);
+  border-radius: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.qj-ge-tip.on { opacity: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ge-svg .yun { animation: ge-yun 22s ease-in-out infinite alternate; }
+  .ge-svg .yun:nth-of-type(2n) { animation-duration: 28s; animation-direction: alternate-reverse; }
+  .ge-svg .smoke { stroke-dasharray: 3 3; animation: ge-smoke 3.2s linear infinite; }
+  .ge-svg .boat { animation: ge-boat 6s ease-in-out infinite alternate; }
+  html.qj-ge-on .qj-ge-stage { animation: ge-in .8s ease both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ge-place .draw, .ge-svg .ink, .ge-svg .tag, .ge-svg .note { transition: none; }
+  .ge-place.go .draw { transform: none; }
+}
+@keyframes ge-yun { to { transform: translateX(14px); } }
+@keyframes ge-smoke { to { stroke-dashoffset: -12; } }
+@keyframes ge-boat { to { transform: translateY(1.5px) rotate(-.6deg); } }
+@keyframes ge-in { from { opacity: 0; } to { opacity: 1; } }

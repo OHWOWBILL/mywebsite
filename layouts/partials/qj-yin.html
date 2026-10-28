@@ -271,6 +271,8 @@
   // 星空点按：给 extend-footer 里的粒子系统用
   window.qjYin = {
     tap: function () { qing(WU[Math.floor(Math.random() * 5)] * 2, .3); },
+    // 入阁全景：第 i 处场所按五音轮着响，越往山上越高（assets/js/qj/ge.js）
+    ring: function (i, vel) { qing(WU[i % 5] * (i < 5 ? 2 : 1), vel || .45); },
     // 文末盖印：一声低磬
     seal: function () { qing(WU[0] / 2, .7); qing(WU[3] / 2, .25, .04); }
   };
