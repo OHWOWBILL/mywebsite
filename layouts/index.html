@@ -9,7 +9,9 @@
 {{- $hero := (resources.Get "img/ge-hero.jpg").Process "webp q70" -}}
 
 {{- /* 开阁动效只在本次会话第一次进首页时放；再回来直接静态呈现 */}}
-<script>try{if(sessionStorage.getItem('qj-opened'))document.documentElement.classList.add('qj-opened');sessionStorage.setItem('qj-opened','1')}catch(e){}</script>
+<script>try{if(sessionStorage.getItem('qj-opened'))document.documentElement.classList.add('qj-opened');sessionStorage.setItem('qj-opened','1')}catch(e){}
+{{- /* 入阁：localStorage qj-ge 为 '1' 时首页换成全景图（assets/js/qj/ge.js），网址 ?ge=1 / ?ge=0 可直接指定 */ -}}
+try{var g=new URLSearchParams(location.search).get('ge');if(g==='1'||g==='0')localStorage.setItem('qj-ge',g);if(localStorage.getItem('qj-ge')==='1')document.documentElement.classList.add('qj-ge-on')}catch(e){}</script>
 <section class="qj-hero" aria-label="潜蛟阁">
   {{- with $hero }}
   <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="雾中杉林，石阶通往亮着灯的社殿" fetchpriority="high"/>
@@ -18,6 +20,7 @@
   <h1 class="qj-hero-v">{{ range $i, $c := split "潜蛟阁" "" }}<span class="qj-ch" style="--i:{{ $i }}">{{ $c }}</span>{{ end }}</h1>
   <span class="qj-hero-line" aria-hidden="true"></span>
   <p class="qj-hero-sig">阁主　潜蛟子</p>
+  <button type="button" class="qj-ge-in" hidden title="以图游阁：点场所进各处">入阁</button>
 </section>
 
 <div class="qj-home">
@@ -79,4 +82,43 @@
   </section>
 
 </div>
+
+{{- /* 入阁 · 全景。数量都从站点数据来：门 = data/wushu.toml，书架 = data/sections.toml（一篇归第一个命中的分区），
+       宫灯 = 各门 tools。图由 assets/js/qj/ge.js 现画；没有脚本时这一块不出现。 */ -}}
+{{- $cfg := site.Data.sections -}}
+{{- $count := dict -}}
+{{- range $p := $posts -}}
+  {{- $cats := $p.Params.categories | default slice -}}
+  {{- $k := $cfg.fallback.seal -}}
+  {{- $found := false -}}
+  {{- range $g := $cfg.group -}}
+    {{- if and (not $found) (gt (len (intersect $cats $g.categories)) 0) }}{{ $k = $g.seal }}{{ $found = true }}{{ end -}}
+  {{- end -}}
+  {{- $count = merge $count (dict $k (add (index $count $k | default 0) 1)) -}}
+{{- end -}}
+{{- $shelves := slice -}}
+{{- range $g := $cfg.group }}{{ with index $count $g.seal }}{{ $shelves = $shelves | append (dict "seal" $g.seal "name" $g.name "count" .) }}{{ end }}{{ end -}}
+{{- with index $count $cfg.fallback.seal }}{{ $shelves = $shelves | append (dict "seal" $cfg.fallback.seal "name" $cfg.fallback.name "count" .) }}{{ end -}}
+{{- $doors := slice -}}
+{{- $wtools := slice -}}
+{{- $locked := slice -}}
+{{- range site.Data.wushu.door -}}
+  {{- $t := .tools | default slice -}}
+  {{- $ps := where $posts "Params.categories" "intersect" .categories -}}
+  {{- $doors = $doors | append (dict "seal" .seal "name" .name "shut" (and (eq (len $ps) 0) (eq (len $t) 0))) -}}
+  {{- range $t }}{{ $wtools = $wtools | append (dict "seal" .seal "name" .name "href" .href) }}{{ if eq .seal "禁" }}{{ $locked = $locked | append .name }}{{ end }}{{ end -}}
+{{- end -}}
+{{- /* 宫灯按法宝库页（content/tools/index.md）的三级标题数，一件一盏；五术门庭里印为「禁」的贴符 */ -}}
+{{- $tools := slice -}}
+{{- with site.GetPage "/tools" -}}
+  {{- range .Fragments.Headings }}{{ range .Headings -}}
+    {{- range .Headings }}{{ $n := index (split .Title " · ") 0 }}{{ $tools = $tools | append (dict "name" $n "seal" (cond (in $locked $n) "禁" "") "href" (printf "/tools/#%s" .ID)) }}{{ end -}}
+  {{- end }}{{ end -}}
+{{- end -}}
+{{- if not $tools }}{{ $tools = $wtools }}{{ end }}
+<section class="qj-ge" id="qj-ge" aria-label="入阁 · 潜蛟阁全景">
+  <nav class="qj-ge-stage" aria-label="潜蛟阁各处"></nav>
+  <button type="button" class="qj-ge-out" title="出阁，回文字版">出阁</button>
+  <script type="application/json" id="qj-ge-data">{{ dict "doors" $doors "tools" $tools "shelves" $shelves "posts" (len $posts) | jsonify | safeJS }}</script>
+</section>
 {{ end }}
