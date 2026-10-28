@@ -359,7 +359,7 @@
   // 图随画面一起画，只在入阁时才加载，文字版不多下一张图。
   // Y = [图, x, y, 宽, 高, 纵向渐隐 [淡入起, 淡入止, 淡出起, 淡出止]]，横向两边各隐 14%
   function yuan(Y, id) {
-    return '<g mask="url(#ge-yh-' + id + ')"><image href="' + Y[0] + '" x="' + Y[1] + '" y="' + Y[2] + '" width="' + Y[3] + '" height="' + Y[4] +
+    return '<g class="ge-yuan" mask="url(#ge-yh-' + id + ')"><image href="' + Y[0] + '" x="' + Y[1] + '" y="' + Y[2] + '" width="' + Y[3] + '" height="' + Y[4] +
       '" preserveAspectRatio="none" mask="url(#ge-yv-' + id + ')"/></g>';
   }
   function yuanDefs(Y, id) {
@@ -791,49 +791,165 @@
   });
 
   // ---------------- 登山 ----------------
-  // 入阁后画面钉在屏上，往下滚就是往上爬：从山脚云从关起，沿石阶拉近、升高，
-  // 最后停在集云斋，月亮与北斗都在画里。爬到半路每一处照样能点；
-  // 键盘停到哪一处，就滚到镜头看得见它的地方。系统设了「减少动态效果」就不爬，照旧一屏看全山。
-  // 桌面镜头 [进度, 中心 x, 中心 y, 倍数]（1 = 一屏装下整座山），相邻两幕之间插值；
-  // 手机不放大，整宽铺满，从水面一路升到月亮上方，滚一屏走一屏。
+  // 入阁后画面钉在屏上，往下滚就是一级一级往上爬。2.5D，前后分四层，走的快慢不同：
+  //   远层  即梦远山底图，走得最慢；
+  //   中层  山与楼阁线稿，镜头一站一站停，经过楼阁往左右看；
+  //   雾    开头只露云从关与渡口，其余都在雾里：高处压一整片云海，随站往上退；
+  //         和山门同高的几处另各盖一团云，走到看它的那一站前才散；
+  //   近层  镜头前横过的淡雾带，走得最快，像眼前的景深。
+  // 雾里的地方点不着；键盘停到哪一处，就滚到看它的那一站。
+  // 系统设了「减少动态效果」就不爬，照旧一屏看全山，也没有雾。
+  // 一站 [进度, 中心 x, 中心 y, 倍数, 云海线 y, 这一站看的场所…]
+  // 倍数：桌面 1 = 一屏装下整座山，手机 1 = 整宽。云海线上下各一小截是散开的雾丝，再往上全在雾里。
+  // yun 是一团团云 [场所, 中心 x, 中心 y, 宽, 高]，跟着它那一处一起散。
+  // run 是整段要滚几屏；far / near 是远近两层跟着镜头走的比例（手机一卷高，远山走得少了爬到顶也看不见，故给大些）。
   var CLIMB = {
-    d: { run: 2.4, at: [[0, 735, 700, 1.3], [.3, 720, 640, 1.7], [.6, 720, 460, 1.7], [.85, 720, 330, 1.55], [1, 720, 300, 1.2]] },
-    m: { top: -50, bottom: 1560 }
+    d: { run: 4.2, far: .3, near: 1.7, edge: 260, at: [
+      [0, 461, 700, 2, 560, 'du', 'shanmen'],
+      [.13, 990, 715, 2.3, 555, 'qian', 'wenlu', 'men'],
+      [.25, 705, 690, 1.65, 545, 'ting'],
+      [.38, 400, 545, 2.3, 400, 'cang'],
+      [.5, 1060, 560, 2.3, 400, 'shi'],
+      [.63, 470, 390, 2.3, 270, 'qin', 'fox'],
+      [.76, 1030, 400, 2.3, 260, 'fabao'],
+      [.89, 738, 200, 2, 10, 'ge'],
+      [1, 720, 300, 1.3, -700, 'dou']
+    ], yun: [
+      ['qian', 891, 680, 230, 170], ['wenlu', 1255, 742, 200, 230], ['men', 1150, 703, 130, 110],
+      ['ting', 430, 755, 500, 170], ['ting', 975, 760, 500, 170],
+      ['cang', 380, 548, 470, 320], ['shi', 1099, 578, 270, 230], ['qin', 462, 377, 400, 200], ['fabao', 1048, 400, 440, 280], ['ge', 738, 250, 380, 240]
+    ] },
+    m: { run: 5, far: .7, near: 1.6, edge: 200, at: [
+      [0, 152, 1385, 1.5, 1200, 'du', 'shanmen'],
+      [.12, 300, 1300, 1.5, 1190, 'qian', 'wenlu'],
+      [.24, 190, 1120, 1.1, 1010, 'ting'],
+      [.36, 300, 975, 1.5, 820, 'shi', 'men'],
+      [.48, 100, 920, 1.5, 800, 'cang'],
+      [.6, 120, 745, 1.5, 650, 'qin', 'fox'],
+      [.72, 290, 640, 1.5, 520, 'fabao'],
+      [.86, 215, 360, 1.25, 190, 'ge'],
+      [1, 200, 330, 1, -1200, 'dou']
+    ], yun: [
+      ['qian', 306, 1240, 190, 120], ['wenlu', 330, 1340, 110, 200], ['men', 372, 1077, 90, 80],
+      ['ting', 185, 1118, 545, 212], ['shi', 335, 937, 200, 250], ['cang', 92, 920, 310, 280],
+      ['qin', 115, 742, 220, 190], ['fabao', 294, 638, 300, 260], ['ge', 215, 420, 300, 200]
+    ] }
   };
   var narrow = window.matchMedia('(max-width: 720px), (orientation: portrait) and (max-width: 1100px)');
   var view = box.querySelector('.qj-ge-view'), hint = box.querySelector('.qj-ge-hint');
+  var stage = box.querySelector('.qj-ge-stage');
   var HEAD = 64;  // 顶上浮着的导航条，取景让开这一截
-  var climbing = false, run = 0, tick = 0;
+  var climbing = false, run = 0, tick = 0, built = '', far, wu, qun, near, tuan = [], hid = [];
 
   function lerp(a, b, u) { return a + (b - a) * u; }
   function clamp(u) { return u < 0 ? 0 : u > 1 ? 1 : u; }
-  // 桌面某一进度的镜头 [x, y, 倍数]；倍数按对数插值，拉近拉远才匀
-  function shot(p) {
-    var at = CLIMB.d.at, i = 1;
-    while (i < at.length - 1 && at[i][0] < p) i++;
-    var a = at[i - 1], b = at[i], u = clamp((p - a[0]) / (b[0] - a[0]));
-    return [lerp(a[1], b[1], u), lerp(a[2], b[2], u), Math.exp(lerp(Math.log(a[3]), Math.log(b[3]), u))];
-  }
   function sizes() {
     var W = view.clientWidth, H = view.clientHeight, m = narrow.matches;
-    return { W: W, H: H, m: m, s: m ? Math.min(W, 560) / 400 : Math.min(W / 1440, H / 900) };
+    return { W: W, H: H, m: m, L: m ? MOB : DESK, C: m ? CLIMB.m : CLIMB.d, s: m ? Math.min(W, 560) / 400 : Math.min(W / 1440, H / 900) };
   }
-  // 镜头不改 viewBox（那样每滚一下整幅线稿都要重画）：整幅按最近的倍数画一次，
-  // 之后只做平移与缩小，交给合成层去挪，滚起来才顺，缩小也不糊
-  var KMAX = Math.max.apply(null, CLIMB.d.at.map(function (c) { return c[3]; }));
+  function kmax(C) { return Math.max.apply(null, C.at.map(function (c) { return c[3]; })); }
+  // 某一进度的镜头：站与站之间插值，到站前后放慢，像停下来看一眼；倍数按对数插值
+  function shot(C, p) {
+    var at = C.at, i = 1;
+    while (i < at.length - 1 && at[i][0] < p) i++;
+    var a = at[i - 1], b = at[i], u = clamp((p - a[0]) / (b[0] - a[0]));
+    u += (u * u * (3 - 2 * u) - u) * .7;
+    return { x: lerp(a[1], b[1], u), y: lerp(a[2], b[2], u), k: Math.exp(lerp(Math.log(a[3]), Math.log(b[3]), u)), fog: lerp(a[4], b[4], u) };
+  }
+  // 远近两层的镜头：离开起点的位移按比例放缩，远层几乎不放大，近层比中层再大一圈
+  function depth(C, c, d, near) {
+    var o = C.at[0];
+    return { x: o[1] + (c.x - o[1]) * d, y: o[2] + (c.y - o[2]) * d, k: near ? c.k * 1.2 : Math.pow(c.k, .3) };
+  }
+  // 把一层摆到镜头下：层里 (ox, oy) 是它左上角，元素按 1 单位 = 1px 排，放大交给 scale
+  function put(el, ox, oy, c, z, ay, base) {
+    var S = z.s * c.k;
+    el.style.transform = 'translate(' + f(z.W / 2 - (c.x - ox) * S) + 'px,' + f(ay - (c.y - oy) * S) + 'px) scale(' + (S / (base || 1)).toFixed(4) + ')';
+  }
+
+  // 某一处在第几站看：散云、能不能点都按它
+  function stopOf(C, id) {
+    for (var i = 0; i < C.at.length; i++) if (C.at[i].indexOf(id, 5) > 4) return i;
+    return 0;
+  }
+  // 那一处的云从上一站走到六成时开始散，快到站时散尽；第一站的两处本来就在雾外
+  function opens(C, id) {
+    var i = stopOf(C, id);
+    if (!i) return [-1, -1];
+    var P = C.at[i][0], d = P - C.at[i - 1][0];
+    return [P - d * .6, P - d * .1];
+  }
+  // 近层：每两站之间横过一道雾带，左右错开
+  function nearSvg(z) {
+    var C = z.C, L = z.L, r = rng(L.W + 9), hw0 = L.W / 2, hh0 = (z.m ? 780 : 836) / 2, g = '';
+    for (var i = 0; i < C.at.length - 2; i++) {
+      var c = depth(C, shot(C, (C.at[i][0] + C.at[i + 1][0]) / 2), C.near, 1), hw = hw0 / c.k, hh = hh0 / c.k, side = i % 2 ? 1 : -1;
+      g += '<ellipse class="near-mist" cx="' + f(c.x + side * hw * (.3 + r() * .4)) + '" cy="' + f(c.y + hh * (.35 + r() * .3)) + '" rx="' + f(hw * (.9 + r() * .4)) + '" ry="' + f(hh * .12) + '"/>';
+    }
+    return '<svg class="qj-ge-near" width="' + L.W + '" height="' + L.H + '" aria-hidden="true" focusable="false"><defs>' +
+      '<radialGradient id="ge-nm"><stop offset="0" stop-color="#A49AC4" stop-opacity=".22"/><stop offset="1" stop-color="#A49AC4" stop-opacity="0"/></radialGradient></defs>' + g + '</svg>';
+  }
+  // 远、雾、近三层按当下的排布（桌面 / 手机）现做；换了排布就重做
+  function layers(z) {
+    var key = z.L.id;
+    if (built === key) return;
+    built = key;
+    [far, wu, qun, near].forEach(function (el) { if (el) el.remove(); });
+    hid.forEach(function (h) { h.el.classList.remove('ge-hid'); });
+    var Y = z.L.yuan, v = Y[5], C = z.C;
+    // 远山四边淡进底色：用底色渐变压在图上，不用 mask，滚起来省一层合成
+    far = document.createElement('div');
+    far.className = 'qj-ge-far';
+    far.style.width = Y[3] + 'px'; far.style.height = Y[4] + 'px';
+    far.style.backgroundImage = 'linear-gradient(90deg, var(--ge-bg), transparent 14%, transparent 86%, var(--ge-bg)),' +
+      'linear-gradient(var(--ge-bg) ' + v[0] * 100 + '%, transparent ' + v[1] * 100 + '%, transparent ' + v[2] * 100 + '%, var(--ge-bg) ' + v[3] * 100 + '%),' +
+      'url(' + Y[0] + ')';
+    stage.insertBefore(far, stage.firstChild);
+    // 雾：上面一整片雾身，下沿一截散开的雾丝；左右多铺出去，镜头往两边看也不露边
+    wu = document.createElement('div');
+    wu.className = 'qj-ge-wu';
+    wu.style.width = z.L.W * 2.2 + 'px';
+    wu.innerHTML = '<div class="wu-body"></div><div class="wu-edge" style="height:' + C.edge + 'px"></div>';
+    stage.appendChild(wu);
+    // 一团团云：飘走的方向背着这一站镜头的中心
+    qun = document.createElement('div');
+    qun.className = 'qj-ge-yun';
+    tuan = C.yun.map(function (b) {
+      var i = document.createElement('i');
+      i.style.cssText = 'left:' + (b[1] - b[3] / 2) + 'px;top:' + (b[2] - b[4] / 2) + 'px;width:' + b[3] + 'px;height:' + b[4] + 'px';
+      qun.appendChild(i);
+      return { el: i, at: opens(C, b[0]), dx: (b[1] < C.at[stopOf(C, b[0])][1] ? -.4 : .4) * b[3], u: -1 };
+    });
+    stage.appendChild(qun);
+    stage.insertAdjacentHTML('beforeend', nearSvg(z));
+    near = stage.lastChild;
+    // 每处要到哪儿才点得着：云散过半
+    hid = [].map.call(box.querySelectorAll('.ge-' + key + ' .ge-place'), function (a) {
+      var w = opens(C, a.id.replace('ge-', ''));
+      return { el: a, at: (w[0] + w[1]) / 2, on: null };
+    });
+  }
+  function unlayer() {
+    [far, wu, qun, near].forEach(function (el) { if (el) el.remove(); });
+    hid.forEach(function (h) { h.el.classList.remove('ge-hid'); });
+    far = wu = qun = near = null; tuan = []; hid = []; built = '';
+  }
   // 整段 .qj-ge 的高 = 一屏 + 爬山要滚的路；顶边提到页首，一进来就钉住，画面上沿不会被切一刀
   function measure() {
     box.style.marginTop = '';
     var gap = box.getBoundingClientRect().top + window.scrollY;
     box.style.marginTop = (parseFloat(getComputedStyle(box).marginTop) - gap) + 'px';
     var z = sizes();
-    run = z.m ? Math.max(0, (CLIMB.m.bottom - CLIMB.m.top) * z.s - (z.H - HEAD)) : z.H * CLIMB.d.run;
+    run = z.H * z.C.run;
     box.style.height = Math.round(z.H + run) + 'px';
+    // 线稿按这套排布最近一站的倍数画一次，之后只平移、缩小，交给合成层，滚起来不重画也不糊
     [DESK, MOB].forEach(function (L) {
-      var S = z.s * (L === DESK ? KMAX : 1), svg = box.querySelector('.ge-' + L.id);
+      var S = z.s * kmax(L === DESK ? CLIMB.d : CLIMB.m), svg = box.querySelector('.ge-' + L.id);
       svg.style.width = f(L.W * S) + 'px';
       svg.style.height = f(L.H * S) + 'px';
     });
+    layers(z);
+    wu.firstChild.style.height = z.L.H * 3 + 'px';
   }
   function progress() { return run ? clamp(-box.getBoundingClientRect().top / run) : 1; }
   function frame() {
@@ -842,18 +958,27 @@
     // 视框在屏上露出来的那一截：没钉住之前，上头还压着导航，下头可能出了屏
     var top = Math.max(0, HEAD - vr.top), bot = Math.min(z.H, window.innerHeight - vr.top);
     if (bot - top < 40) return;
-    var svg = box.querySelector(z.m ? '.ge-m' : '.ge-d'), k, x, y;
-    // 求场景里 (x, y) 一点落到屏上哪里、放大 k 倍，再换算成 translate + scale
-    if (z.m) {
-      k = 1;
-      x = 200;
-      y = lerp(CLIMB.m.bottom - (bot - top) / z.s, CLIMB.m.top, p);
-      svg.style.transform = 'translate(' + f(z.W / 2 - x * z.s) + 'px,' + f(top - y * z.s) + 'px)';
-    } else {
-      var c = shot(p), s = z.s * c[2];
-      svg.style.transform = 'translate(' + f(z.W / 2 - c[0] * s) + 'px,' + f((top + bot) / 2 - c[1] * s) + 'px) scale(' + (c[2] / KMAX).toFixed(4) + ')';
-    }
-    if (hint) hint.style.opacity = f(clamp(1 - p / .05));
+    var ay = (top + bot) / 2, C = z.C, L = z.L, c = shot(C, p), Y = L.yuan;
+    put(box.querySelector('.ge-' + L.id), 0, 0, c, z, ay, z.s * kmax(C));
+    put(far, Y[1], Y[2], depth(C, c, C.far), z, ay);
+    // 雾沿的正中落在雾线上
+    put(wu, -L.W * .6, c.fog - C.edge / 2 - L.H * 3, c, z, ay);
+    put(qun, 0, 0, c, z, ay);
+    tuan.forEach(function (t) {
+      var u = clamp((p - t.at[0]) / (t.at[1] - t.at[0]));
+      u = Math.round(u * u * (3 - 2 * u) * 200) / 200;
+      if (u === t.u) return;
+      t.u = u;
+      t.el.style.opacity = f(1 - u);
+      t.el.style.transform = 'translateX(' + f(t.dx * u) + 'px) scale(' + f(1 + u * .25) + ')';
+      t.el.style.visibility = u < 1 ? '' : 'hidden';
+    });
+    hid.forEach(function (h) {
+      var on = p < h.at;
+      if (on !== h.on) { h.on = on; h.el.classList.toggle('ge-hid', on); }
+    });
+    put(near, 0, 0, depth(C, c, C.near, 1), z, ay);
+    if (hint) hint.style.opacity = f(clamp(1 - p / .04));
   }
   function climb() {
     var on = drawn && root.classList.contains('qj-ge-on') && !still.matches;
@@ -863,6 +988,7 @@
       if (!on) {
         box.style.height = box.style.marginTop = '';
         box.querySelectorAll('.ge-svg').forEach(function (svg) { svg.style.width = svg.style.height = svg.style.transform = ''; });
+        unlayer();
       }
     }
     if (on) { measure(); frame(); }
@@ -870,22 +996,15 @@
   window.addEventListener('scroll', function () { if (climbing && !tick) tick = requestAnimationFrame(frame); }, { passive: true });
   window.addEventListener('resize', function () { if (climbing) { measure(); frame(); } });
   still.addEventListener('change', climb);
-  // 键盘停到某处：滚到镜头正对着它的那一步
+  // 键盘停到某处：滚到看它的那一站
   box.addEventListener('focusin', function (e) {
     var a = e.target.closest && e.target.closest('.ge-place');
     // 只认键盘：鼠标点下去也会聚焦，那时不能挪镜头
     if (!climbing || !a || !a.matches(':focus-visible')) return;
-    var b = a.getBBox(), cy = b.y + b.height / 2, z = sizes(), p;
-    if (z.m) {
-      var vis = (z.H - HEAD) / z.s;
-      p = (CLIMB.m.bottom - vis / 2 - cy) / (CLIMB.m.bottom - vis - CLIMB.m.top);
-    } else {
-      var lo = 0, hi = 1;
-      for (var k = 0; k < 20; k++) { var mid = (lo + hi) / 2; if (shot(mid)[1] > cy) lo = mid; else hi = mid; }
-      p = lo;
-    }
-    // 浏览器聚焦时自己也会滚一下，等它滚完再挪到该到的那一步
-    requestAnimationFrame(function () { window.scrollTo(0, window.scrollY + box.getBoundingClientRect().top + clamp(p) * run); });
+    var id = a.id.replace('ge-', ''), at = sizes().C.at, p = 0;
+    at.forEach(function (c) { if (c.indexOf(id, 5) > 4) p = c[0]; });
+    // 浏览器聚焦时自己也会滚一下，等它滚完再挪到该到的那一站
+    requestAnimationFrame(function () { window.scrollTo(0, window.scrollY + box.getBoundingClientRect().top + p * run); });
   });
 
   box.addEventListener('click', function (e) {
