@@ -603,30 +603,47 @@
   }
 
   // ---------------- 场所 ----------------
-  // id, 去处, 读屏名, 部件, 名牌 [名, 注], data-act（不跳页、就地做事的）
-  function places(P, S, T) {
+  // id, 去处, 读屏名, 名牌 [名, 注], data-act（不跳页、就地做事的）。线稿与显形（真 3D）共用这一张
+  function meta() {
     var locked = TOOLS.filter(function (t) { return t.seal === '禁'; }).length;
     var shi = SHELVES.filter(function (x) { return x.seal === '文'; })[0];
     var yi = SHELVES.filter(function (x) { return x.seal === '异'; })[0];
-    var row = [
-      ['dou', '#', '北斗：看此刻天时', beidou(P.dou[0], P.dou[1], S), ['北斗', '此刻天时'], 'dou'],
-      ['ge', '/about/', '集云斋（潜蛟阁顶层书斋）：阁主何人', ge(P.ge[0], P.ge[1], P.ge[2]), ['集云斋', '阁主何人']],
-      ['fabao', '/tools/', '法宝库：' + han(TOOLS.length) + '件法宝', fabao(P.fabao[0], P.fabao[1], S), ['法宝库', han(TOOLS.length) + '件' + (locked ? ' · ' + han(locked) + '件有禁制' : '')]],
-      ['qin', '#', '叩云台：轮换音律', qintai(P.qin[0], P.qin[1], S), ['叩云台', '音律 关/磬/琴'], 'qin'],
-      ['fox', yi ? '/posts/#sec-异' : '/posts/', '松下白狐：异闻', fox(P.fox[0], P.fox[1], S * 1.3), null],
-      ['men', '#', '蛰庐', xiaomen(P.men[0], P.men[1], S), null, 'men'],
-      ['cang', '/posts/', '汲玄楼（藏经阁）：万法归一，' + han(POSTS) + '篇', cangjing(P.cang[0], P.cang[1], S), ['汲玄楼', ['藏经阁', han(SHELVES.length) + '架' + han(POSTS) + '卷']]],
-      ['shi', shi ? '/posts/#sec-文' : '/posts/', '听雷亭：' + (shi ? shi.name : '词章'), shiting(P.shi[0], P.shi[1], S), ['听雷亭', shi ? shi.name : '词章']],
-      ['ting', '/wushu/', '五术门庭', ting(P.ting[0], P.ting[1], S, P.ting.length > 4 ? P.ting[2] : 0, P.ting.length > 4 ? P.ting[3] : 0), ['门庭', DOORS.map(function (d) { return d.seal; }).join('')]],
-      ['qian', '#', '签筒：摇一支今日日签', qiantong(P.qian[0], P.qian[1], S), ['签筒', '摇一支日签'], 'qian'],
-      ['shanmen', '/', '云从关（山门）：出阁，回文字版。门联：' + LIAN.join('；'), shanmen(P.shanmen[0], P.shanmen[1], S), ['云从关', LIAN.concat('出阁 · 回文字版')], 'out'],
-      ['wenlu', '/seek/', '问路石：寻物', wenlu(P.wenlu[0], P.wenlu[1], S), ['寻物', '问路']],
-      ['du', '/links/', '渡口：去处，各平台', dukou(P.du[0], P.du[1], S * P.du[2], 1), ['渡口', '去处 · 各平台']]
+    return [
+      ['dou', '#', '北斗：看此刻天时', ['北斗', '此刻天时'], 'dou'],
+      ['ge', '/about/', '集云斋（潜蛟阁顶层书斋）：阁主何人', ['集云斋', '阁主何人']],
+      ['fabao', '/tools/', '法宝库：' + han(TOOLS.length) + '件法宝', ['法宝库', han(TOOLS.length) + '件' + (locked ? ' · ' + han(locked) + '件有禁制' : '')]],
+      ['qin', '#', '叩云台：轮换音律', ['叩云台', '音律 关/磬/琴'], 'qin'],
+      ['fox', yi ? '/posts/#sec-异' : '/posts/', '松下白狐：异闻', null],
+      ['men', '#', '蛰庐', null, 'men'],
+      ['cang', '/posts/', '汲玄楼（藏经阁）：万法归一，' + han(POSTS) + '篇', ['汲玄楼', ['藏经阁', han(SHELVES.length) + '架' + han(POSTS) + '卷']]],
+      ['shi', shi ? '/posts/#sec-文' : '/posts/', '听雷亭：' + (shi ? shi.name : '词章'), ['听雷亭', shi ? shi.name : '词章']],
+      ['ting', '/wushu/', '五术门庭', ['门庭', DOORS.map(function (d) { return d.seal; }).join('')]],
+      ['qian', '#', '签筒：摇一支今日日签', ['签筒', '摇一支日签'], 'qian'],
+      ['shanmen', '/', '云从关（山门）：出阁，回文字版。门联：' + LIAN.join('；'), ['云从关', LIAN.concat('出阁 · 回文字版')], 'out'],
+      ['wenlu', '/seek/', '问路石：寻物', ['寻物', '问路']],
+      ['du', '/links/', '渡口：去处，各平台', ['渡口', '去处 · 各平台']]
     ];
-    return row.map(function (r, i) {
-      var p = P[r[0]], t = r[4] ? tag(p[0] + p[p.length - 2], p[1] + p[p.length - 1], r[4][0], r[4][1], T) : '';
-      return '<a class="ge-place" id="ge-' + r[0] + '" href="' + r[1] + '" aria-label="' + esc(r[2]) + '" data-i="' + i + '"' + (r[5] ? ' data-act="' + r[5] + '" role="button"' : '') + '>' +
-        '<g class="draw" aria-hidden="true">' + r[3] + '</g>' + (t ? '<g aria-hidden="true">' + t + '</g>' : '') + '</a>';
+  }
+  function places(P, S, T) {
+    var art = {
+      dou: function () { return beidou(P.dou[0], P.dou[1], S); },
+      ge: function () { return ge(P.ge[0], P.ge[1], P.ge[2]); },
+      fabao: function () { return fabao(P.fabao[0], P.fabao[1], S); },
+      qin: function () { return qintai(P.qin[0], P.qin[1], S); },
+      fox: function () { return fox(P.fox[0], P.fox[1], S * 1.3); },
+      men: function () { return xiaomen(P.men[0], P.men[1], S); },
+      cang: function () { return cangjing(P.cang[0], P.cang[1], S); },
+      shi: function () { return shiting(P.shi[0], P.shi[1], S); },
+      ting: function () { return ting(P.ting[0], P.ting[1], S, P.ting.length > 4 ? P.ting[2] : 0, P.ting.length > 4 ? P.ting[3] : 0); },
+      qian: function () { return qiantong(P.qian[0], P.qian[1], S); },
+      shanmen: function () { return shanmen(P.shanmen[0], P.shanmen[1], S); },
+      wenlu: function () { return wenlu(P.wenlu[0], P.wenlu[1], S); },
+      du: function () { return dukou(P.du[0], P.du[1], S * P.du[2], 1); }
+    };
+    return meta().map(function (r, i) {
+      var p = P[r[0]], t = r[3] ? tag(p[0] + p[p.length - 2], p[1] + p[p.length - 1], r[3][0], r[3][1], T) : '';
+      return '<a class="ge-place" id="ge-' + r[0] + '" href="' + r[1] + '" aria-label="' + esc(r[2]) + '" data-i="' + i + '"' + (r[4] ? ' data-act="' + r[4] + '" role="button"' : '') + '>' +
+        '<g class="draw" aria-hidden="true">' + art[r[0]]() + '</g>' + (t ? '<g aria-hidden="true">' + t + '</g>' : '') + '</a>';
     }).join('');
   }
 
@@ -793,242 +810,105 @@
     });
   });
 
-  // ---------------- 登山 ----------------
-  // 入阁后画面钉在屏上，往下滚就是一级一级往上爬。2.5D，前后分四层，走的快慢不同：
-  //   远层  即梦远山底图，走得最慢；
-  //   中层  山与楼阁线稿，镜头一站一站停，经过楼阁往左右看；
-  //   雾    开头只露云从关与渡口，其余都在雾里：高处压一整片云海，随站往上退；
-  //         和山门同高的几处另各盖一团云，走到看它的那一站前才散；
-  //   近层  镜头前横过的淡雾带，走得最快，像眼前的景深。
-  // 雾里的地方点不着；键盘停到哪一处，就滚到看它的那一站。
-  // 系统设了「减少动态效果」就不爬，照旧一屏看全山，也没有雾。
-  // 一站 [进度, 中心 x, 中心 y, 倍数, 云海线 y, 这一站看的场所…]
-  // 倍数：桌面 1 = 一屏装下整座山，手机 1 = 整宽。云海线上下各一小截是散开的雾丝，再往上全在雾里。
-  // yun 是一团团云 [场所, 中心 x, 中心 y, 宽, 高]，跟着它那一处一起散。
-  // run 是整段要滚几屏；far / near 是远近两层跟着镜头走的比例（手机一卷高，远山走得少了爬到顶也看不见，故给大些）。
-  var CLIMB = {
-    d: { run: 4.2, far: .3, near: 1.7, edge: 260, at: [
-      [0, 461, 700, 2, 560, 'du', 'shanmen'],
-      [.13, 990, 715, 2.3, 555, 'qian', 'wenlu', 'men'],
-      [.25, 705, 690, 1.65, 545, 'ting'],
-      [.38, 400, 545, 2.3, 400, 'cang'],
-      [.5, 1060, 560, 2.3, 400, 'shi'],
-      [.63, 470, 390, 2.3, 270, 'qin', 'fox'],
-      [.76, 1030, 400, 2.3, 260, 'fabao'],
-      [.89, 738, 200, 2, 10, 'ge'],
-      [1, 720, 300, 1.3, -700, 'dou']
-    ], yun: [
-      ['qian', 891, 680, 230, 170], ['wenlu', 1255, 742, 200, 230], ['men', 1150, 703, 130, 110],
-      ['ting', 430, 755, 500, 170], ['ting', 975, 760, 500, 170],
-      ['cang', 380, 548, 470, 320], ['shi', 1099, 578, 270, 230], ['qin', 462, 377, 400, 200], ['fabao', 1048, 400, 440, 280], ['ge', 738, 250, 380, 240]
-    ] },
-    m: { run: 5, far: .7, near: 1.6, edge: 200, at: [
-      [0, 152, 1385, 1.5, 1200, 'du', 'shanmen'],
-      [.12, 300, 1300, 1.5, 1190, 'qian', 'wenlu'],
-      [.24, 190, 1120, 1.1, 1010, 'ting'],
-      [.36, 300, 975, 1.5, 820, 'shi', 'men'],
-      [.48, 100, 920, 1.5, 800, 'cang'],
-      [.6, 120, 745, 1.5, 650, 'qin', 'fox'],
-      [.72, 290, 640, 1.5, 520, 'fabao'],
-      [.86, 215, 360, 1.25, 190, 'ge'],
-      [1, 200, 330, 1, -1200, 'dou']
-    ], yun: [
-      ['qian', 306, 1240, 190, 120], ['wenlu', 330, 1340, 110, 200], ['men', 372, 1077, 90, 80],
-      ['ting', 185, 1118, 545, 212], ['shi', 335, 937, 200, 250], ['cang', 92, 920, 310, 280],
-      ['qin', 115, 742, 220, 190], ['fabao', 294, 638, 300, 260], ['ge', 215, 420, 300, 200]
-    ] }
-  };
-  var narrow = window.matchMedia('(max-width: 720px), (orientation: portrait) and (max-width: 1100px)');
+  // ---------------- 显形：真 3D ----------------
+  // 线稿是全览，一屏看全山、各处直接点。真 3D 的那座山（assets/js/qj3d.js，源码在 tools/qj3d）入阁后在后台建，
+  // 建好了在角上浮一枚「山已显形 · 入山」：不理它就一直是线稿，点 × 收成一枚小印「显形」，点「入山」才换上。
+  // 显形后画面钉在屏上，往下滚就是沿石阶一站一站登山；角上那枚印换成「线稿」，点了回全览。
+  // 选过入山的，记在 localStorage qj-ge3d，下回建好就直接显形。
+  // 系统设了「减少动态效果」、开了省流量、不支持 WebGL2 的，不建，只看线稿。
   var view = box.querySelector('.qj-ge-view'), hint = box.querySelector('.qj-ge-hint');
-  var stage = box.querySelector('.qj-ge-stage');
-  var HEAD = 64;  // 顶上浮着的导航条，取景让开这一截
-  var climbing = false, run = 0, tick = 0, built = '', far, wu, qun, near, tuan = [], hid = [];
+  var SRC = box.getAttribute('data-shan'), KEY3 = 'qj-ge3d';
+  // 建好的 3D 山叫 yue（岳），别和上面画线稿主山的 shan() 撞名
+  var yue = null, building = false, xian = false, run = 0, tick = 0, seal = null;
 
-  function lerp(a, b, u) { return a + (b - a) * u; }
   function clamp(u) { return u < 0 ? 0 : u > 1 ? 1 : u; }
-  function sizes() {
-    var W = view.clientWidth, H = view.clientHeight, m = narrow.matches;
-    return { W: W, H: H, m: m, L: m ? MOB : DESK, C: m ? CLIMB.m : CLIMB.d, s: m ? Math.min(W, 560) / 400 : Math.min(W / 1440, H / 900) };
+  function pref3() { try { return localStorage.getItem(KEY3); } catch (e) { return null; } }
+  function can3() {
+    if (!SRC || still.matches) return false;
+    if (navigator.connection && navigator.connection.saveData) return false;
+    try {
+      var g = document.createElement('canvas').getContext('webgl2');
+      if (!g) return false;
+      var x = g.getExtension('WEBGL_lose_context');
+      if (x) x.loseContext();
+      return true;
+    } catch (e) { return false; }
   }
-  function kmax(C) { return Math.max.apply(null, C.at.map(function (c) { return c[3]; })); }
-  // 某一进度的镜头：站与站之间插值，到站前后放慢，像停下来看一眼；倍数按对数插值
-  function shot(C, p) {
-    var at = C.at, i = 1;
-    while (i < at.length - 1 && at[i][0] < p) i++;
-    var a = at[i - 1], b = at[i], u = clamp((p - a[0]) / (b[0] - a[0]));
-    u += (u * u * (3 - 2 * u) - u) * .7;
-    return { x: lerp(a[1], b[1], u), y: lerp(a[2], b[2], u), k: Math.exp(lerp(Math.log(a[3]), Math.log(b[3]), u)), fog: lerp(a[4], b[4], u) };
+  function load3() {
+    if (yue || building || !can3()) return;
+    building = true;
+    var go = function () {
+      import(SRC).then(function (m) {
+        var list = meta().map(function (r, i) { return { id: r[0], href: r[1], aria: r[2], name: r[3] ? r[3][0] : '', note: r[3] ? r[3][1] : null, act: r[4], i: i }; });
+        return m.build({ host: view, places: list, data: D, font: getComputedStyle(root).getPropertyValue('--font-title').trim() || 'serif' });
+      }).then(function (api) {
+        yue = api;
+        if (!root.classList.contains('qj-ge-on')) return;
+        if (pref3() === '1') xianxing(true); else offer();
+      }).catch(function (e) {
+        building = false;
+        if (window.console) console.warn('入阁：山未能显形，仍看线稿', e);
+      });
+    };
+    // 等线稿画完、页面空下来再建，不和它抢
+    if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 2500 }); else setTimeout(go, 800);
   }
-  // 远近两层的镜头：离开起点的位移按比例放缩，远层几乎不放大，近层比中层再大一圈
-  function depth(C, c, d, near) {
-    var o = C.at[0];
-    return { x: o[1] + (c.x - o[1]) * d, y: o[2] + (c.y - o[2]) * d, k: near ? c.k * 1.2 : Math.pow(c.k, .3) };
-  }
-  // 把一层摆到镜头下：层里 (ox, oy) 是它左上角，元素按 1 单位 = 1px 排，放大交给 scale
-  // lean 是这一层跟着鼠标错开多少像素（越近越多）
-  function put(el, ox, oy, c, z, ay, base, lean) {
-    var S = z.s * c.k, dx = -mx * (lean || 0), dy = -my * (lean || 0) * .6;
-    el.style.transform = 'translate(' + f(z.W / 2 - (c.x - ox) * S + dx) + 'px,' + f(ay - (c.y - oy) * S + dy) + 'px) scale(' + (S / (base || 1)).toFixed(4) + ')';
-  }
-  // 鼠标视差：桌面上指针一动，远近各层按深浅错开，像探头往画里看；松开慢慢回正
-  var LEAN = { far: 8, mid: 18, wu: 22, near: 44 };
-  var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
-  var mx = 0, my = 0, gx = 0, gy = 0, glide = 0;
-  function drift() {
-    glide = 0;
-    mx += (gx - mx) * .1; my += (gy - my) * .1;
-    if (Math.abs(gx - mx) + Math.abs(gy - my) > .003) glide = requestAnimationFrame(drift);
-    else { mx = gx; my = gy; }
-    frame();
-  }
-  function aim(x, y) {
-    gx = x; gy = y;
-    if (climbing && !glide) glide = requestAnimationFrame(drift);
-  }
-  view.addEventListener('pointermove', function (e) {
-    if (e.pointerType !== 'mouse' || !fine.matches) return;
-    var r = view.getBoundingClientRect();
-    aim(clamp((e.clientX - r.left) / r.width) * 2 - 1, clamp((e.clientY - r.top) / r.height) * 2 - 1);
-  });
-  view.addEventListener('pointerleave', function () { aim(0, 0); });
-
-  // 某一处在第几站看：散云、能不能点都按它
-  function stopOf(C, id) {
-    for (var i = 0; i < C.at.length; i++) if (C.at[i].indexOf(id, 5) > 4) return i;
-    return 0;
-  }
-  // 那一处的云从上一站走到六成时开始散，快到站时散尽；第一站的两处本来就在雾外
-  function opens(C, id) {
-    var i = stopOf(C, id);
-    if (!i) return [-1, -1];
-    var P = C.at[i][0], d = P - C.at[i - 1][0];
-    return [P - d * .6, P - d * .1];
-  }
-  // 近层：每两站之间横过一道雾带，左右错开
-  function nearSvg(z) {
-    var C = z.C, L = z.L, r = rng(L.W + 9), hw0 = L.W / 2, hh0 = (z.m ? 780 : 836) / 2, g = '';
-    for (var i = 0; i < C.at.length - 2; i++) {
-      var c = depth(C, shot(C, (C.at[i][0] + C.at[i + 1][0]) / 2), C.near, 1), hw = hw0 / c.k, hh = hh0 / c.k, side = i % 2 ? 1 : -1;
-      g += '<ellipse class="near-mist" cx="' + f(c.x + side * hw * (.3 + r() * .4)) + '" cy="' + f(c.y + hh * (.35 + r() * .3)) + '" rx="' + f(hw * (.9 + r() * .4)) + '" ry="' + f(hh * .12) + '"/>';
+  // 角上那一枚：offer = 「山已显形 · 入山 ×」，mini = 小印「显形」，back = 显形后的「线稿」
+  function stamp(state) {
+    if (!seal) {
+      seal = document.createElement('div');
+      seal.className = 'qj-ge-xian';
+      seal.innerHTML = '<span class="xian-t" role="status">山已显形</span><button type="button" class="xian-go"></button><button type="button" class="xian-x" aria-label="收起，先看线稿">×</button>';
+      view.appendChild(seal);
+      seal.querySelector('.xian-go').addEventListener('click', function () { xianxing(!xian); });
+      seal.querySelector('.xian-x').addEventListener('click', function () { stamp('mini'); });
     }
-    return '<svg class="qj-ge-near" width="' + L.W + '" height="' + L.H + '" aria-hidden="true" focusable="false"><defs>' +
-      '<radialGradient id="ge-nm"><stop offset="0" stop-color="#A49AC4" stop-opacity=".22"/><stop offset="1" stop-color="#A49AC4" stop-opacity="0"/></radialGradient></defs>' + g + '</svg>';
+    seal.className = 'qj-ge-xian ' + state;
+    var b = seal.querySelector('.xian-go');
+    b.textContent = state === 'offer' ? '入山' : state === 'mini' ? '显形' : '线稿';
+    b.title = state === 'back' ? '回线稿全览' : '换上真 3D 的山，往下滚登山';
+    // 浮出来要有一下过渡，先挂上再亮
+    if (state === 'offer') requestAnimationFrame(function () { requestAnimationFrame(function () { seal.classList.add('up'); }); });
+    else seal.classList.add('up');
   }
-  // 远、雾、近三层按当下的排布（桌面 / 手机）现做；换了排布就重做
-  function layers(z) {
-    var key = z.L.id;
-    if (built === key) return;
-    built = key;
-    [far, wu, qun, near].forEach(function (el) { if (el) el.remove(); });
-    hid.forEach(function (h) { h.el.classList.remove('ge-hid'); });
-    var Y = z.L.yuan, v = Y[5], C = z.C;
-    // 远山四边淡进底色：用底色渐变压在图上，不用 mask，滚起来省一层合成
-    far = document.createElement('div');
-    far.className = 'qj-ge-far';
-    far.style.width = Y[3] + 'px'; far.style.height = Y[4] + 'px';
-    far.style.backgroundImage = 'linear-gradient(90deg, var(--ge-bg), transparent 14%, transparent 86%, var(--ge-bg)),' +
-      'linear-gradient(var(--ge-bg) ' + v[0] * 100 + '%, transparent ' + v[1] * 100 + '%, transparent ' + v[2] * 100 + '%, var(--ge-bg) ' + v[3] * 100 + '%),' +
-      'url(' + Y[0] + ')';
-    stage.insertBefore(far, stage.firstChild);
-    // 雾：上面一整片雾身，下沿一截散开的雾丝；左右多铺出去，镜头往两边看也不露边
-    wu = document.createElement('div');
-    wu.className = 'qj-ge-wu';
-    wu.style.width = z.L.W * 2.2 + 'px';
-    wu.innerHTML = '<div class="wu-body"></div><div class="wu-edge" style="height:' + C.edge + 'px"></div>';
-    stage.appendChild(wu);
-    // 一团团云：飘走的方向背着这一站镜头的中心
-    qun = document.createElement('div');
-    qun.className = 'qj-ge-yun';
-    tuan = C.yun.map(function (b) {
-      var i = document.createElement('i');
-      i.style.cssText = 'left:' + (b[1] - b[3] / 2) + 'px;top:' + (b[2] - b[4] / 2) + 'px;width:' + b[3] + 'px;height:' + b[4] + 'px';
-      qun.appendChild(i);
-      return { el: i, at: opens(C, b[0]), dx: (b[1] < C.at[stopOf(C, b[0])][1] ? -.4 : .4) * b[3], u: -1 };
-    });
-    stage.appendChild(qun);
-    stage.insertAdjacentHTML('beforeend', nearSvg(z));
-    near = stage.lastChild;
-    // 每处要到哪儿才点得着：云散过半
-    hid = [].map.call(box.querySelectorAll('.ge-' + key + ' .ge-place'), function (a) {
-      var w = opens(C, a.id.replace('ge-', ''));
-      return { el: a, at: (w[0] + w[1]) / 2, on: null };
-    });
+  function offer() { stamp('offer'); }
+  function xianxing(on, keep) {
+    if (!yue || on === xian) return;
+    xian = on;
+    if (!keep) { try { localStorage.setItem(KEY3, on ? '1' : '0'); } catch (e) {} }
+    box.classList.toggle('qj-ge-3d', on);
+    if (on) { measure(); yue.jump(0); yue.show(true); window.scrollTo(0, 0); }
+    else {
+      yue.show(false);
+      box.style.height = box.style.marginTop = '';
+      window.scrollTo(0, 0);
+    }
+    stamp(on ? 'back' : 'mini');
   }
-  function unlayer() {
-    [far, wu, qun, near].forEach(function (el) { if (el) el.remove(); });
-    hid.forEach(function (h) { h.el.classList.remove('ge-hid'); });
-    far = wu = qun = near = null; tuan = []; hid = []; built = '';
-  }
-  // 整段 .qj-ge 的高 = 一屏 + 爬山要滚的路；顶边提到页首，一进来就钉住，画面上沿不会被切一刀
+  // 整段 .qj-ge 的高 = 一屏 + 登山要滚的路；顶边提到页首，一进来就钉住
   function measure() {
     box.style.marginTop = '';
     var gap = box.getBoundingClientRect().top + window.scrollY;
     box.style.marginTop = (parseFloat(getComputedStyle(box).marginTop) - gap) + 'px';
-    var z = sizes();
-    run = z.H * z.C.run;
-    box.style.height = Math.round(z.H + run) + 'px';
-    // 线稿按这套排布最近一站的倍数画一次，之后只平移、缩小，交给合成层，滚起来不重画也不糊
-    [DESK, MOB].forEach(function (L) {
-      var S = z.s * kmax(L === DESK ? CLIMB.d : CLIMB.m), svg = box.querySelector('.ge-' + L.id);
-      svg.style.width = f(L.W * S) + 'px';
-      svg.style.height = f(L.H * S) + 'px';
-    });
-    layers(z);
-    wu.firstChild.style.height = z.L.H * 3 + 'px';
+    var H = view.clientHeight;
+    run = H * yue.stations * .9;
+    box.style.height = Math.round(H + run) + 'px';
   }
-  function progress() { return run ? clamp(-box.getBoundingClientRect().top / run) : 1; }
+  function progress() { return run ? clamp(-box.getBoundingClientRect().top / run) : 0; }
   function frame() {
     tick = 0;
-    var z = sizes(), vr = view.getBoundingClientRect(), p = progress();
-    // 视框在屏上露出来的那一截：没钉住之前，上头还压着导航，下头可能出了屏
-    var top = Math.max(0, HEAD - vr.top), bot = Math.min(z.H, window.innerHeight - vr.top);
-    if (bot - top < 40) return;
-    var ay = (top + bot) / 2, C = z.C, L = z.L, c = shot(C, p), Y = L.yuan;
-    put(box.querySelector('.ge-' + L.id), 0, 0, c, z, ay, z.s * kmax(C), LEAN.mid);
-    put(far, Y[1], Y[2], depth(C, c, C.far), z, ay, 1, LEAN.far);
-    // 雾沿的正中落在雾线上
-    put(wu, -L.W * .6, c.fog - C.edge / 2 - L.H * 3, c, z, ay, 1, LEAN.wu);
-    put(qun, 0, 0, c, z, ay, 1, LEAN.wu);
-    tuan.forEach(function (t) {
-      var u = clamp((p - t.at[0]) / (t.at[1] - t.at[0]));
-      u = Math.round(u * u * (3 - 2 * u) * 200) / 200;
-      if (u === t.u) return;
-      t.u = u;
-      t.el.style.opacity = f(1 - u);
-      t.el.style.transform = 'translateX(' + f(t.dx * u) + 'px) scale(' + f(1 + u * .25) + ')';
-      t.el.style.visibility = u < 1 ? '' : 'hidden';
-    });
-    hid.forEach(function (h) {
-      var on = p < h.at;
-      if (on !== h.on) { h.on = on; h.el.classList.toggle('ge-hid', on); }
-    });
-    put(near, 0, 0, depth(C, c, C.near, 1), z, ay, 1, LEAN.near);
+    var p = progress();
+    yue.go(p);
     if (hint) hint.style.opacity = f(clamp(1 - p / .04));
   }
-  function climb() {
-    var on = drawn && root.classList.contains('qj-ge-on') && !still.matches;
-    if (on !== climbing) {
-      climbing = on;
-      box.classList.toggle('qj-ge-climb', on);
-      if (!on) {
-        box.style.height = box.style.marginTop = '';
-        box.querySelectorAll('.ge-svg').forEach(function (svg) { svg.style.width = svg.style.height = svg.style.transform = ''; });
-        unlayer();
-      }
-    }
-    if (on) { measure(); frame(); }
-  }
-  window.addEventListener('scroll', function () { if (climbing && !tick) tick = requestAnimationFrame(frame); }, { passive: true });
-  window.addEventListener('resize', function () { if (climbing) { measure(); frame(); } });
-  still.addEventListener('change', climb);
-  // 键盘停到某处：滚到看它的那一站
+  window.addEventListener('scroll', function () { if (xian && !tick) tick = requestAnimationFrame(frame); }, { passive: true });
+  window.addEventListener('resize', function () { if (xian) { measure(); frame(); } });
+  still.addEventListener('change', function () { if (still.matches && xian) xianxing(false, true); });
+  // 键盘停到某处的名牌：滚到看它的那一站
   box.addEventListener('focusin', function (e) {
-    var a = e.target.closest && e.target.closest('.ge-place');
-    // 只认键盘：鼠标点下去也会聚焦，那时不能挪镜头
-    if (!climbing || !a || !a.matches(':focus-visible')) return;
-    var id = a.id.replace('ge-', ''), at = sizes().C.at, p = 0;
-    at.forEach(function (c) { if (c.indexOf(id, 5) > 4) p = c[0]; });
-    // 浏览器聚焦时自己也会滚一下，等它滚完再挪到该到的那一站
+    var a = e.target.closest && e.target.closest('.ge3-tag');
+    if (!xian || !a || !a.matches(':focus-visible')) return;
+    var p = yue.stationOf(a.id.replace('ge3-', ''));
     requestAnimationFrame(function () { window.scrollTo(0, window.scrollY + box.getBoundingClientRect().top + p * run); });
   });
 
@@ -1042,26 +922,21 @@
     ring(i, .55);
     a.classList.add('go');
     var href = a.getAttribute('href');
-    if (climbing) dive(a);
-    setTimeout(function () { location.href = href; }, still.matches ? 0 : climbing ? 520 : 260);
+    // 显形时点下一处：镜头朝它推近、画面淡去，像走进去
+    if (xian) { yue.dive(a.id.replace(/^ge3?-/, '')); view.classList.add('dive'); }
+    setTimeout(function () { location.href = href; }, still.matches ? 0 : xian ? 520 : 260);
   });
-  // 登山时点下一处：整幅画以它为心推近、淡去，像走进去
-  function dive(a) {
-    var r = (a.querySelector('.draw') || a).getBoundingClientRect(), v = view.getBoundingClientRect();
-    view.style.transformOrigin = f(r.left + r.width / 2 - v.left) + 'px ' + f(r.top + r.height / 2 - v.top) + 'px';
-    view.classList.add('dive');
-  }
   // 从下一页按返回回来（页面从缓存里恢复）时，把推近和描金收回
   window.addEventListener('pageshow', function () {
     view.classList.remove('dive');
-    view.style.transformOrigin = '';
+    if (yue) yue.undive();
     box.querySelectorAll('.ge-place.go').forEach(function (a) { a.classList.remove('go'); });
   });
 
   // 听雷：隔八到十五秒，听雷亭后面的云里闪一下
   (function lei() {
     setTimeout(function () {
-      if (climbing && !document.hidden) box.querySelectorAll('.lei').forEach(function (el) {
+      if (root.classList.contains('qj-ge-on') && !xian && !document.hidden) box.querySelectorAll('.lei').forEach(function (el) {
         el.classList.remove('on');
         void el.getBoundingClientRect();
         el.classList.add('on');
@@ -1076,9 +951,9 @@
 
   function mode(on, keep) {
     try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+    if (!on && xian) xianxing(false, true);
     root.classList.toggle('qj-ge-on', on);
-    if (on) draw();
-    climb();
+    if (on) { draw(); if (yue) { if (pref3() === '1') xianxing(true, true); else stamp(seal ? 'mini' : 'offer'); } else load3(); }
     if (!keep) {
       window.scrollTo(0, 0);
       var to = on ? box.querySelector('.qj-ge-out') : document.querySelector('.qj-ge-in');
@@ -1093,5 +968,5 @@
     var u = new URL(location.href);
     if (u.searchParams.has('ge')) { u.searchParams.delete('ge'); history.replaceState(null, '', u.pathname + u.search + u.hash); }
   } catch (e) {}
-  if (root.classList.contains('qj-ge-on')) { draw(); climb(); }
+  if (root.classList.contains('qj-ge-on')) { draw(); load3(); }
 })();

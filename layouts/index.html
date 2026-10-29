@@ -116,8 +116,10 @@ try{var g=new URLSearchParams(location.search).get('ge');if(g==='1'||g==='0')loc
   {{- end }}{{ end -}}
 {{- end -}}
 {{- if not $tools }}{{ $tools = $wtools }}{{ end }}
-<section class="qj-ge" id="qj-ge" aria-label="入阁 · 潜蛟阁全景">
-  {{- /* 登山时 .qj-ge-view 钉在屏上，整段 .qj-ge 的高度就是爬山要滚的路 */}}
+{{- /* 真 3D 的山（tools/qj3d 打包出来的），入阁后 ge.js 才去拉，文字版不下载 */ -}}
+{{- $shan := resources.Get "js/qj3d.js" | fingerprint "sha512" }}
+<section class="qj-ge" id="qj-ge" aria-label="入阁 · 潜蛟阁全景" data-shan="{{ $shan.RelPermalink }}">
+  {{- /* 线稿是一屏全览；显形（真 3D）后 .qj-ge-view 钉在屏上，整段 .qj-ge 的高度就是登山要滚的路 */}}
   <div class="qj-ge-view">
     <nav class="qj-ge-stage" aria-label="潜蛟阁各处"></nav>
     <button type="button" class="qj-ge-out" title="出阁，回文字版">出阁</button>
