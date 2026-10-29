@@ -1833,43 +1833,165 @@ html.qj-ge-on body { overflow-x: clip; }
 .qj-ge-view { position: relative; }
 .qj-ge-hint { display: none; }
 
-/* 登山：.qj-ge 由 ge.js 拉长成要滚的路，.qj-ge-view 钉在屏上，镜头靠 transform 平移缩放。
+/* 显形：真 3D（assets/js/qj3d.js，源码 tools/qj3d）。入阁先是线稿全览；3D 在后台建好，ge.js 在右下角浮一枚「山已显形 · 入山」。
+   入山后 .qj-ge 加 .qj-ge-3d，由 ge.js 拉长成要滚的路，.qj-ge-view 钉在屏上，往下滚镜头沿石阶一站一站上山。
    overflow 用 clip 不用 hidden，hidden 会让 sticky 认它当滚动容器而钉不住 */
-.qj-ge.qj-ge-climb { overflow: clip; }
-/* 视框也用 clip：hidden 的框键盘聚焦时会被浏览器自己卷动，楼就跑出画面 */
-.qj-ge-climb .qj-ge-view { position: sticky; top: 0; height: 100svh; overflow: clip; }
-.qj-ge-climb .qj-ge-stage { position: relative; height: 100%; min-height: 0; }
-/* 宽高由 ge.js 按最近一幕的倍数给，镜头只平移缩放 */
-.qj-ge-climb .ge-svg { position: absolute; z-index: 1; left: 0; top: 0; min-height: 0; max-width: none; margin: 0; transform-origin: 0 0; will-change: transform; }
-.qj-ge-climb .qj-ge-out { top: 5.5rem; }
-/* 2.5D 四层：远山（即梦底图）< 线稿 < 云雾 < 近处雾带。stage 自成一叠，顶上的夜色、提示、出阁都压在四层之上 */
-.qj-ge-climb .qj-ge-stage { z-index: 0; }
-.qj-ge-climb .ge-yuan { display: none; }
-.qj-ge-far, .qj-ge-wu, .qj-ge-yun, .qj-ge-near { display: none; }
-.qj-ge-climb .qj-ge-far,
-.qj-ge-climb .qj-ge-wu,
-.qj-ge-climb .qj-ge-yun,
-.qj-ge-climb .qj-ge-near { display: block; position: absolute; left: 0; top: 0; max-width: none; margin: 0; transform-origin: 0 0; will-change: transform; pointer-events: none; }
-.qj-ge-climb .qj-ge-far { z-index: 0; opacity: .9; background-size: 100% 100%; }
-.qj-ge-climb .qj-ge-wu, .qj-ge-climb .qj-ge-yun { z-index: 2; }
-.qj-ge-climb .qj-ge-near { z-index: 3; overflow: visible; }
-.wu-body { background: url(/img/ge/wu-body.webp) 0 0 / 512px 512px repeat; }
-.wu-edge { background: url(/img/ge/wu-edge.webp) 0 0 / 100% 100% no-repeat; }
-.qj-ge-yun i { position: absolute; background: url(/img/ge/wu-tuan.webp) 0 0 / 100% 100% no-repeat; will-change: transform, opacity; }
-.qj-ge-near .near-mist { fill: url(#ge-nm); }
-/* 还在雾里的地方点不着（键盘仍停得到，停到就爬过去） */
-.qj-ge-climb .ge-place.ge-hid { pointer-events: none; }
-/* 顶上压一层夜色，浮着的导航字不和线稿缠在一起 */
-.qj-ge-climb .qj-ge-view::before {
+.qj-ge.qj-ge-3d { overflow: clip; }
+.qj-ge-3d .qj-ge-view { position: sticky; top: 0; height: 100svh; overflow: clip; background: #0b0a14; }
+.qj-ge-3d .qj-ge-out { top: 5.5rem; }
+/* 线稿退到后面藏起来，不占地方、点不着 */
+.qj-ge-3d .qj-ge-stage { position: absolute; inset: 0; min-height: 0; opacity: 0; visibility: hidden; }
+.ge3-canvas, .ge3-tags {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .9s ease, visibility 0s linear .9s;
+}
+.ge3-canvas { display: block; width: 100%; height: 100%; }
+.qj-ge-3d .ge3-canvas, .qj-ge-3d .ge3-tags { opacity: 1; visibility: visible; transition: opacity .9s ease; }
+/* 名牌：锚在楼上，底下一根细线垂到楼顶。全景时只露名，到了那一站名描金、注也展开 */
+.ge3-tags { z-index: 1; overflow: hidden; pointer-events: none; }
+.ge3-tag { position: absolute; left: 0; top: 0; width: 0; height: 0; text-decoration: none; outline: none; pointer-events: auto; will-change: transform; transition: opacity .3s linear; }
+.ge3-tag.off { pointer-events: none; }
+.ge3-tag:focus-visible { opacity: 1 !important; }
+.ge3-box {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 1.15rem;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+.ge3-box::after {
   content: "";
   position: absolute;
-  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  width: 1px;
+  height: 1.15rem;
+  background: linear-gradient(rgba(217, 174, 78, .55), rgba(217, 174, 78, 0));
+}
+.ge3-name {
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: .95rem;
+  letter-spacing: .28em;
+  padding: .28em .32em .28em .6em;
+  color: var(--ge-fg);
+  background: rgba(14, 11, 22, .66);
+  border: 1px solid rgba(217, 174, 78, .32);
+  border-radius: 2px;
+  text-shadow: 0 0 6px rgba(0, 0, 0, .7);
+  transition: color .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.ge3-notes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height .35s ease, opacity .3s ease, margin .35s ease;
+}
+.ge3-note {
+  font-family: var(--font-body);
+  font-size: .78rem;
+  line-height: 1.6;
+  letter-spacing: .08em;
+  color: var(--ge-fg-2);
+  text-shadow: 0 1px 3px #000, 0 0 10px rgba(0, 0, 0, .9);
+}
+.ge3-tag.here .ge3-name, .ge3-tag.hot .ge3-name, .ge3-tag.go .ge3-name, .ge3-tag:focus-visible .ge3-name {
+  color: var(--jin);
+  border-color: var(--jin);
+  box-shadow: 0 0 14px rgba(217, 174, 78, .28);
+}
+.ge3-tag.here .ge3-notes, .ge3-tag.hot .ge3-notes, .ge3-tag:focus-visible .ge3-notes { max-height: 5rem; margin-bottom: .3rem; opacity: 1; }
+@media (hover: hover) {
+  .ge3-tag:hover .ge3-name { color: var(--jin); border-color: var(--jin); box-shadow: 0 0 14px rgba(217, 174, 78, .28); }
+  .ge3-tag:hover .ge3-notes { max-height: 5rem; margin-bottom: .3rem; opacity: 1; }
+}
+/* 白狐、蛰庐不挂名牌，只点一粒灯 */
+.ge3-bare .ge3-box { padding-bottom: .5rem; }
+.ge3-bare .ge3-box::before {
+  content: "";
+  width: .55rem;
+  height: .55rem;
+  border-radius: 50%;
+  background: rgba(240, 216, 160, .85);
+  box-shadow: 0 0 0 3px rgba(217, 174, 78, .18), 0 0 12px rgba(217, 174, 78, .6);
+  transition: transform .3s ease, background .3s ease;
+}
+.ge3-bare .ge3-box::after { height: .5rem; }
+.ge3-bare.hot .ge3-box::before, .ge3-bare:focus-visible .ge3-box::before { transform: scale(1.35); background: var(--jin); }
+@media (hover: hover) { .ge3-bare:hover .ge3-box::before { transform: scale(1.35); background: var(--jin); } }
+@media (max-width: 720px) {
+  .ge3-name { font-size: .82rem; letter-spacing: .2em; }
+  .ge3-note { font-size: .72rem; }
+}
+/* 点下一处：镜头朝它推近（qj3d.js），画面一起淡去，再进页面 */
+.qj-ge-3d .qj-ge-view.dive .ge3-canvas, .qj-ge-3d .qj-ge-view.dive .ge3-tags { opacity: 0; transition: opacity .42s ease .1s; }
+
+/* 「山已显形」：只在右下角浮一下，不挡、不催。× 收成一枚小印「显形」；显形后换成「线稿」，点了回全览 */
+.qj-ge-xian {
+  position: fixed;
+  z-index: 60;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1.2rem, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: .15rem;
+  font-family: var(--font-title);
+  color: var(--ge-fg);
+  background: rgba(17, 14, 26, .86);
+  border: 1px solid var(--ge-rule);
+  border-radius: 3px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .35);
+  opacity: 0;
+  transform: translateX(.8rem);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.qj-ge-xian.up { opacity: 1; transform: none; }
+.qj-ge-xian button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.xian-t { padding: .55rem 0 .55rem .9rem; font-size: .9rem; letter-spacing: .25em; color: var(--ge-fg-2); }
+.xian-t::after { content: "·"; margin-left: .2em; color: var(--ge-muted); }
+.xian-go { padding: .55rem .5rem .55rem .2rem; font-weight: 600; font-size: .95rem; letter-spacing: .3em; color: var(--jin) !important; }
+.xian-x { padding: .55rem .75rem .55rem .35rem; font-size: 1.05rem; line-height: 1; color: var(--ge-muted) !important; }
+.qj-ge-xian button:hover, .qj-ge-xian button:focus-visible { color: var(--jin) !important; }
+.xian-x:hover, .xian-x:focus-visible { color: var(--ge-fg) !important; }
+.qj-ge-xian button:focus-visible { outline: 1px dashed var(--jin); outline-offset: -3px; }
+/* 收起后、显形后：只剩一枚竖印，样子同「入阁」「出阁」 */
+.qj-ge-xian.mini, .qj-ge-xian.back { background: rgba(23, 19, 31, .78); box-shadow: none; }
+.qj-ge-xian.mini .xian-t, .qj-ge-xian.mini .xian-x,
+.qj-ge-xian.back .xian-t, .qj-ge-xian.back .xian-x { display: none; }
+.qj-ge-xian.mini .xian-go, .qj-ge-xian.back .xian-go { writing-mode: vertical-rl; padding: .6em .35em; font-size: .9rem; color: var(--ge-fg) !important; }
+.qj-ge-xian.mini .xian-go:hover, .qj-ge-xian.back .xian-go:hover,
+.qj-ge-xian.mini .xian-go:focus-visible, .qj-ge-xian.back .xian-go:focus-visible { color: var(--jin) !important; }
+.qj-ge-xian.mini:hover, .qj-ge-xian.back:hover { border-color: var(--jin); }
+
+/* 顶上压一层夜色，浮着的导航字不和山缠在一起 */
+.qj-ge-3d .qj-ge-view::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
   inset: 0 0 auto;
   height: 6.5rem;
-  background: linear-gradient(var(--ge-bg) 25%, rgba(23, 19, 31, 0));
+  background: linear-gradient(rgba(11, 10, 20, .85) 20%, rgba(11, 10, 20, 0));
   pointer-events: none;
 }
-.qj-ge-climb .qj-ge-hint {
+.qj-ge-3d .qj-ge-hint {
   display: block;
   position: absolute;
   z-index: 2;
@@ -1880,23 +2002,24 @@ html.qj-ge-on body { overflow-x: clip; }
   font-family: var(--font-title);
   font-size: .85rem;
   letter-spacing: .4em;
-  color: var(--ge-muted);
+  color: var(--ge-fg-2);
+  text-shadow: 0 0 8px #000;
   pointer-events: none;
   transition: opacity .2s linear;
 }
 /* 字底下一道细线往下流，示意往下滚 */
-.qj-ge-climb .qj-ge-hint::after {
+.qj-ge-3d .qj-ge-hint::after {
   content: "";
   position: absolute;
   top: calc(100% + .5rem);
   left: 50%;
   width: 1px;
   height: 2.2rem;
-  background: linear-gradient(var(--ge-muted), transparent);
+  background: linear-gradient(var(--ge-fg-2), transparent);
   animation: ge-hint 2.4s ease-in-out infinite;
 }
 @media (max-width: 720px), (orientation: portrait) and (max-width: 1100px) {
-  .qj-ge-climb .qj-ge-hint { left: auto; right: 1.1rem; transform: none; }
+  .qj-ge-3d .qj-ge-hint { left: 1.1rem; transform: none; }
 }
 @keyframes ge-hint {
   0%   { transform: scaleY(0); transform-origin: top; }
@@ -2046,8 +2169,6 @@ html.qj-ge-on body { overflow-x: clip; }
 .ge-svg .lei { opacity: 0; pointer-events: none; }
 .ge-d .lei { fill: url(#ge-glow-d); }
 .ge-m .lei { fill: url(#ge-glow-m); }
-/* 点下一处：整幅推近淡去，再进页面 */
-.qj-ge-climb .qj-ge-view.dive { transform: scale(2.2); opacity: 0; transition: transform .52s cubic-bezier(.55, 0, .8, .35), opacity .4s ease .12s; }
 
 @media (prefers-reduced-motion: no-preference) {
   .ge-svg .lei.on { animation: ge-lei 1.1s ease-out; }
@@ -2056,10 +2177,6 @@ html.qj-ge-on body { overflow-x: clip; }
   .ge-svg .star:nth-of-type(3n) { animation-duration: 2.6s; animation-delay: -2.1s; }
   .ge-svg .lantern-g { transform-box: fill-box; transform-origin: 50% 0; animation: ge-sway 3.6s ease-in-out infinite alternate; }
   .ge-svg .lantern-g:nth-child(2n) { animation-delay: -1.8s; animation-duration: 4.2s; }
-  /* 云海和一团团云慢慢流；云团的散开由 ge.js 写 transform，这里只动 translate，两不相扰 */
-  .qj-ge-climb .wu-body, .qj-ge-climb .wu-edge { animation: ge-wu 46s ease-in-out infinite alternate; will-change: transform; }
-  .qj-ge-climb .qj-ge-yun i { animation: ge-tuan 13s ease-in-out infinite alternate; }
-  .qj-ge-climb .qj-ge-yun i:nth-child(2n) { animation-duration: 17s; animation-direction: alternate-reverse; }
   .ge-svg .yun { animation: ge-yun 22s ease-in-out infinite alternate; }
   .ge-svg .yun:nth-of-type(2n) { animation-duration: 28s; animation-direction: alternate-reverse; }
   .ge-svg .smoke { stroke-dasharray: 3 3; animation: ge-smoke 3.2s linear infinite; }
@@ -2068,6 +2185,8 @@ html.qj-ge-on body { overflow-x: clip; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ge-place .draw, .ge-svg .ink, .ge-svg .tag, .ge-svg .note { transition: none; }
+  .ge3-canvas, .ge3-tags, .ge3-tag, .ge3-name, .ge3-notes, .qj-ge-xian { transition: none !important; }
+  .qj-ge-3d .qj-ge-hint::after { animation: none; }
   .ge-place.go .draw, .ge-place:hover .draw, .ge-place.go:hover .draw { transform: none; }
 }
 @keyframes ge-yun { to { transform: translateX(14px); } }
@@ -2077,5 +2196,3 @@ html.qj-ge-on body { overflow-x: clip; }
 @keyframes ge-lei { 0% { opacity: 0; } 5% { opacity: .75; } 11% { opacity: .1; } 17% { opacity: .55; } 45% { opacity: 0; } 100% { opacity: 0; } }
 @keyframes ge-star { from { opacity: 1; } to { opacity: .45; } }
 @keyframes ge-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
-@keyframes ge-wu { to { transform: translateX(-6%); } }
-@keyframes ge-tuan { to { translate: 4% 1%; } }

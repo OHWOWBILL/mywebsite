@@ -1,0 +1,13 @@
+{
+  "name": "qj3d",
+  "private": true,
+  "description": "入阁 · 显形（真 3D）的源码；npm run build 打包到 assets/js/qj3d.js",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0",
+    "three": "0.170.0"
+  }
+}
