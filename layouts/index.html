@@ -10,8 +10,10 @@
 
 {{- /* 开阁动效只在本次会话第一次进首页时放；再回来直接静态呈现 */}}
 <script>try{if(sessionStorage.getItem('qj-opened'))document.documentElement.classList.add('qj-opened');sessionStorage.setItem('qj-opened','1')}catch(e){}
-{{- /* 入阁：localStorage qj-ge 为 '1' 时首页换成全景图（assets/js/qj/ge.js），网址 ?ge=1 / ?ge=0 可直接指定 */ -}}
-try{var g=new URLSearchParams(location.search).get('ge');if(g==='1'||g==='0')localStorage.setItem('qj-ge',g);if(localStorage.getItem('qj-ge')==='1')document.documentElement.classList.add('qj-ge-on')}catch(e){}</script>
+{{- /* 入阁：首页打开总是文字版，点「入阁」才换全景（assets/js/qj/ge.js）。
+     网址 ?ge=1 直接入阁（内页的「回阁」用它）；从下一页按返回回来时，本标签页里刚才在阁中（sessionStorage qj-ge）就仍在阁中。
+     旧版记在 localStorage 的 qj-ge / qj-ge3d 顺手清掉 */ -}}
+try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=new URLSearchParams(location.search).get('ge'),n=performance.getEntriesByType('navigation')[0];if(g==='1'||g==='0')sessionStorage.setItem('qj-ge',g);if(g==='1'||(g!=='0'&&n&&n.type==='back_forward'&&sessionStorage.getItem('qj-ge')==='1'))document.documentElement.classList.add('qj-ge-on')}catch(e){}</script>
 <section class="qj-hero" aria-label="潜蛟阁">
   {{- with $hero }}
   <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="雾中杉林，石阶通往亮着灯的社殿" fetchpriority="high"/>

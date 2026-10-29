@@ -55,6 +55,7 @@ const STA = [
 ];
 const NS = STA.length - 1;
 const DIP = new V3(.42, .55, -.8).normalize();   // 北斗那一片天
+const DOU_P = [34, 137, -137];                    // 竖屏最后一站看的地方：偏右 20°、仰 22°
 const MOON = new V3(-.36, .40, -.84).normalize();
 
 export async function build(o) {
@@ -494,12 +495,14 @@ export async function build(o) {
   // ---------- 镜头 ----------
   const camC = new THREE.CatmullRomCurve3(STA.map(s => new V3(...s[0])), false, 'centripetal');
   const lookC = new THREE.CatmullRomCurve3(STA.map(s => new V3(...s[1])), false, 'centripetal');
+  // 竖屏视角窄，北斗在镜头右上方二十多度，照横屏的朝向会出画：最后一站往右上转，把北斗收进来
+  const lookP = new THREE.CatmullRomCurve3(STA.map((s, i) => new V3(...(i === NS ? DOU_P : s[1]))), false, 'centripetal');
   // 到站多停一会：每段前后各留 18% 不动
   const ease = p => { const f = Math.min(1, Math.max(0, p)) * NS, i = Math.min(NS - 1, Math.floor(f)), r = f - i, k = Math.min(1, Math.max(0, (r - .18) / .64)); return (i + k * k * (3 - 2 * k)) / NS; };
   const look = new V3(), right = new V3(), upv = new V3(), tmp = new V3();
   let cur = 0, goal = 0, mx = 0, my = 0, gx = 0, gy = 0, diveTo = null, diveT = 0;
   function place(t) {
-    camC.getPoint(t, camera.position); lookC.getPoint(t, look);
+    camC.getPoint(t, camera.position); (W() < H() ? lookP : lookC).getPoint(t, look);
     camera.fov = 40 * (W() < H() ? 1.55 : 1); camera.aspect = W() / H(); camera.updateProjectionMatrix();
     camera.lookAt(look);
     right.setFromMatrixColumn(camera.matrix, 0); upv.setFromMatrixColumn(camera.matrix, 1);
