@@ -135,5 +135,5 @@
 <template id="qj-mark-tpl">{{ partial "qj-mark.html" . }}</template>
 {{ partial "qj-yin.html" . }}
 {{- /* 入阁的人进了内页，左下角留一枚「回阁」，一点回全景 */}}
-<script>try{if(localStorage.getItem('qj-ge')==='1'&&location.pathname!=='/'){var a=document.createElement('a');a.className='qj-ge-back';a.href='/';a.textContent='回阁';a.title='回潜蛟阁全景';document.body.appendChild(a)}}catch(e){}</script>
+<script>try{if(sessionStorage.getItem('qj-ge')==='1'&&location.pathname!=='/'){var a=document.createElement('a');a.className='qj-ge-back';a.href='/?ge=1';a.textContent='回阁';a.title='回潜蛟阁全景';document.body.appendChild(a)}}catch(e){}</script>
 {{ partial "qj-compass-live.html" . }}

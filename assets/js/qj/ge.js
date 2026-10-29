@@ -11,8 +11,8 @@
 // 构图照即梦参考图 A1：楼阁各坐一方山岩台地，一道宽石阶从驳岸直上阁顶，云雾带横过山腰。
 // 远山和雾垫一张即梦生的水墨底图（B1 第三张，static/img/ge/），楼阁仍全是线稿，才能一处一处点、一处一处描金。
 // 线条用雾色，只有指到的那一处描金（一屏一处金）。
-// 选择记在 localStorage qj-ge（'1' 入阁 / '0' 文字版），
-// 网址带 ?ge=1 / ?ge=0 也行；首页 head 那段小脚本在画面出来前就读。
+// 首页打开总是文字版，点「入阁」才换上。在不在阁中只记在本标签页（sessionStorage qj-ge），
+// 从下一页返回、点内页「回阁」（?ge=1）时接着在阁中；首页 head 那段小脚本在画面出来前就读。
 // =========================================================
 
 (function () {
@@ -814,15 +814,18 @@
   // 线稿是全览，一屏看全山、各处直接点。真 3D 的那座山（assets/js/qj3d.js，源码在 tools/qj3d）入阁后在后台建，
   // 建好了在角上浮一枚「山已显形 · 入山」：不理它就一直是线稿，点 × 收成一枚小印「显形」，点「入山」才换上。
   // 显形后画面钉在屏上，往下滚就是沿石阶一站一站登山；角上那枚印换成「线稿」，点了回全览。
-  // 选过入山的，记在 localStorage qj-ge3d，下回建好就直接显形。
+  // 每次入阁都先看线稿，要点了「入山」才显形。只有从下一页按返回、或点内页「回阁」回来，
+  // 而本标签页里刚才是在 3D 里（sessionStorage qj-ge3d），建好才直接显形，接着逛。
   // 系统设了「减少动态效果」、开了省流量、不支持 WebGL2 的，不建，只看线稿。
   var view = box.querySelector('.qj-ge-view'), hint = box.querySelector('.qj-ge-hint');
   var SRC = box.getAttribute('data-shan'), KEY3 = 'qj-ge3d';
+  var RESUME = /[?&]ge=1/.test(location.search);
+  try { var nav = performance.getEntriesByType('navigation')[0]; if (nav && nav.type === 'back_forward') RESUME = true; } catch (e) {}
   // 建好的 3D 山叫 yue（岳），别和上面画线稿主山的 shan() 撞名
   var yue = null, building = false, xian = false, run = 0, tick = 0, seal = null;
 
   function clamp(u) { return u < 0 ? 0 : u > 1 ? 1 : u; }
-  function pref3() { try { return localStorage.getItem(KEY3); } catch (e) { return null; } }
+  function pref3() { try { return sessionStorage.getItem(KEY3); } catch (e) { return null; } }
   function can3() {
     if (!SRC || still.matches) return false;
     if (navigator.connection && navigator.connection.saveData) return false;
@@ -844,7 +847,7 @@
       }).then(function (api) {
         yue = api;
         if (!root.classList.contains('qj-ge-on')) return;
-        if (pref3() === '1') xianxing(true); else offer();
+        if (RESUME && pref3() === '1') xianxing(true); else offer();
       }).catch(function (e) {
         building = false;
         if (window.console) console.warn('入阁：山未能显形，仍看线稿', e);
@@ -872,10 +875,10 @@
     else seal.classList.add('up');
   }
   function offer() { stamp('offer'); }
-  function xianxing(on, keep) {
+  function xianxing(on) {
     if (!yue || on === xian) return;
     xian = on;
-    if (!keep) { try { localStorage.setItem(KEY3, on ? '1' : '0'); } catch (e) {} }
+    try { sessionStorage.setItem(KEY3, on ? '1' : '0'); } catch (e) {}
     box.classList.toggle('qj-ge-3d', on);
     if (on) { measure(); yue.jump(0); yue.show(true); window.scrollTo(0, 0); }
     else {
@@ -903,7 +906,7 @@
   }
   window.addEventListener('scroll', function () { if (xian && !tick) tick = requestAnimationFrame(frame); }, { passive: true });
   window.addEventListener('resize', function () { if (xian) { measure(); frame(); } });
-  still.addEventListener('change', function () { if (still.matches && xian) xianxing(false, true); });
+  still.addEventListener('change', function () { if (still.matches && xian) xianxing(false); });
   // 键盘停到某处的名牌：滚到看它的那一站
   box.addEventListener('focusin', function (e) {
     var a = e.target.closest && e.target.closest('.ge3-tag');
@@ -950,10 +953,10 @@
   });
 
   function mode(on, keep) {
-    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
-    if (!on && xian) xianxing(false, true);
+    try { sessionStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+    if (!on && xian) xianxing(false);
     root.classList.toggle('qj-ge-on', on);
-    if (on) { draw(); if (yue) { if (pref3() === '1') xianxing(true, true); else stamp(seal ? 'mini' : 'offer'); } else load3(); }
+    if (on) { draw(); if (yue) stamp(seal ? 'mini' : 'offer'); else load3(); }
     if (!keep) {
       window.scrollTo(0, 0);
       var to = on ? box.querySelector('.qj-ge-out') : document.querySelector('.qj-ge-in');
