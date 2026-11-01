@@ -58,6 +58,11 @@
     href = "/bazi/"
     desc = "四柱十神神煞，精确起运，大运流年流月，四柱反推"
   [[door.tools]]
+    seal = "星"
+    name = "星盘"
+    href = "/xingpan/"
+    desc = "本命盘，宫位相位，庙旺陷弱，法达小限"
+  [[door.tools]]
     seal = "紫"
     name = "紫微斗数"
     href = "/ziwei/"
