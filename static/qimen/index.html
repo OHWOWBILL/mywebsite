@@ -96,7 +96,7 @@
 .palace.zhifu{border-color:var(--zhu);box-shadow:0 0 16px -6px rgba(224,122,98,.6)}
 .palace.zhishi{border-color:var(--qing);box-shadow:0 0 16px -6px rgba(143,176,216,.55)}
 .palace.yongshen{outline:1.5px dashed var(--zi-2);outline-offset:-5px}
-.palace.yongshen::before{content:"用";position:absolute;left:50%;transform:translateX(-50%);bottom:5px;font-size:.6rem;color:var(--zi-2);border:1px solid var(--zi-2);padding:0 4px;border-radius:2px;background:var(--bg-3);z-index:2}
+.palace .ys{position:absolute;left:50%;transform:translateX(-50%);bottom:5px;font-size:.58rem;line-height:1.5;color:var(--zi-2);border:1px solid var(--zi-2);padding:0 4px;border-radius:2px;background:var(--bg-3);z-index:2;white-space:nowrap;letter-spacing:.05em}
 .palace.center{display:flex;flex-direction:column;justify-content:center;align-items:center;background:none;border-style:dashed}
 .palace.center .hid{position:absolute;left:8px;top:7px}
 .palace.center .earthstem .stm{font-size:1.4rem;color:var(--fg)}
@@ -143,6 +143,21 @@
 .ge-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius:999px;padding:0 7px;margin-right:6px;font-family:var(--font-title)}
 .ge-item .tx{font-size:13px;color:var(--fg-2)}
 .ge-none{font-size:13px;color:var(--faint);padding:8px 2px}
+.ys-box .ge-h:first-child{margin-top:4px}
+.ys-item{display:block;width:100%;text-align:left;border-top:1px solid var(--rule);padding:9px 2px;line-height:1.65}
+.ys-item:hover{background:rgba(122,91,192,.08)}
+.ys-item .lb{display:inline-block;min-width:1.6em;text-align:center;font-family:var(--font-title);font-size:12px;color:var(--bg);background:var(--zi-2);border-radius:3px;padding:0 4px;margin-right:6px}
+.ys-item b{font-family:var(--font-title);font-weight:600;letter-spacing:.06em;margin-right:6px}
+.ys-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius:999px;padding:0 7px;margin-right:6px;font-family:var(--font-title)}
+.ys-item .rel{font-size:12px;color:var(--qing);margin-left:4px}
+.ys-item .br{display:block;font-size:13px;color:var(--fg-2)}
+.ys-item .fl{color:var(--zhu);margin-left:6px;font-size:12px}
+.yq{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.7}
+.yq em{font-style:normal;color:var(--zi-2);font-family:var(--font-title)}
+.yq .sp{color:var(--zhu);margin-right:6px}
+.wx-auto{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.7}
+.wx-auto a{color:var(--faint)}
+.wx-auto.err{color:var(--zhu)}
 .ze-item{display:block;width:100%;text-align:left;border-top:1px solid var(--rule);padding:9px 2px;line-height:1.7}
 .ze-item:hover{background:rgba(122,91,192,.08)}
 .ze-item .when{font-family:var(--font-title);font-size:13px;color:var(--fg);letter-spacing:.05em;margin-right:8px}
@@ -285,19 +300,25 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
       <details class="qm-set" id="setBox">
         <summary>盘面设置 · <b id="setSum"></b></summary>
         <div class="set-row">
+          <label>所在地</label>
+          <select id="lonCity" aria-label="城市"></select>
+          <button type="button" class="fb-btn ghost" id="geoBtn">定位</button>
+        </div>
+        <div class="set-row">
+          <label></label>
+          <span>东经</span><input type="number" id="lonIn" step="0.01" min="-180" max="180" inputmode="decimal" aria-label="东经">
+          <span>北纬</span><input type="number" id="latIn" step="0.01" min="-90" max="90" inputmode="decimal" aria-label="北纬">
+        </div>
+        <div class="set-row">
           <label>真太阳时</label>
           <button type="button" class="qm-tg" id="solarTg">关</button>
-          <select id="lonCity" aria-label="城市"></select>
-          <input type="number" id="lonIn" step="0.01" min="-180" max="180" inputmode="decimal" aria-label="东经">
-          <span>°E</span>
-          <button type="button" class="fb-btn ghost" id="geoBtn">定位</button>
         </div>
         <div class="set-row">
           <label>年命</label>
           <input type="number" id="mingIn" min="1900" max="2100" inputmode="numeric" placeholder="出生年" aria-label="出生年">
           <span class="out" id="mingOut"></span>
         </div>
-        <p class="hint">真太阳时按经度与均时差校正钟点，只影响日柱、时柱（换时辰、换日）；节气、年月柱照真实时刻。年命填公历出生年，立春前出生的填上一年；盘上标「命」的就是年命干所落之宫。</p>
+        <p class="hint">所在地用于真太阳时和天气题复盘时取实际天气。真太阳时按经度与均时差校正钟点，只影响日柱、时柱（换时辰、换日）；节气、年月柱照真实时刻。年命填公历出生年，立春前出生的填上一年；盘上标「命」的就是年命干所落之宫。</p>
       </details>
     </div>
 
@@ -314,6 +335,14 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
         <div class="field"><label>题型</label>
           <div class="chips" id="typeChips">
             <button class="chip on" data-t="天气">天气</button>
+            <button class="chip" data-t="求财">求财</button>
+            <button class="chip" data-t="婚姻">婚姻</button>
+            <button class="chip" data-t="考试">考试</button>
+            <button class="chip" data-t="疾病">疾病</button>
+            <button class="chip" data-t="官司">官司</button>
+            <button class="chip" data-t="出行">出行</button>
+            <button class="chip" data-t="失物">失物</button>
+            <button class="chip" data-t="寻人">寻人</button>
             <button class="chip" data-t="自由">自由</button>
           </div>
         </div>
@@ -336,8 +365,8 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
         <div id="freeForm" hidden>
           <div class="field"><label>所问何事</label><input id="fQ" placeholder="例：下周三考试结果"></div>
           <div class="grid2">
-            <div class="field"><label>用神（谁/何宫）</label><input id="fYs" placeholder="例：日干＋景门"></div>
-            <div class="field"><label>应期</label><input id="fTime" placeholder="例：三日内 / 申日"></div>
+            <div class="field"><label>用神（谁/何宫）</label><input id="fYs" placeholder="留空则按题型自动填"></div>
+            <div class="field"><label>应期</label><input id="fTime" placeholder="例：三日内 / 申日（格局页有候选）"></div>
           </div>
           <div class="field"><label>预断（主体·事件·程度，写到可证伪）</label><textarea id="fPred"></textarea></div>
         </div>
@@ -347,6 +376,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
 
       <!-- 格局 -->
       <section id="sec-ge" class="qm-sec">
+        <div class="ys-box" id="ysBox"></div>
         <div class="card pal-detail" id="palDetail"></div>
         <div id="geList"></div>
         <div class="ge-h">择时 · 往后七日的大吉格时辰</div>
@@ -384,14 +414,14 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
 
 <script src="/fabao/fabao.js?v=6"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
-<script src="/qimen/core.js?v=1"></script>
+<script src="/qimen/core.js?v=3"></script>
 <script>
 /* ================= state ================= */
 const LS='qmsj.v1', LSV='qmsj.view';
 const load=()=>{try{return JSON.parse(localStorage.getItem(LS))||[]}catch(e){return[]}};
 const save=es=>{try{localStorage.setItem(LS,JSON.stringify(es))}catch(e){Fabao.toast('本机存储不可用，未能保存')}};
 let entries=load();
-let view={wx:true,hid:true,dgod:true,solar:false,lon:139.69,ming:''};
+let view={wx:true,hid:true,dgod:true,solar:false,lon:139.69,lat:35.68,ming:''};
 try{Object.assign(view,JSON.parse(localStorage.getItem(LSV))||{})}catch(e){}
 let curDate=new Date(); curDate.setSeconds(0,0);
 let override=null;
@@ -485,17 +515,21 @@ function skyStem(x,c,p){
   const sup=(m.xing.includes(x)?'<sup class="mk">刑</sup>':'')+(m.mu.includes(x)?'<sup class="mk">墓</sup>':'');
   return stem(x,c)+sup;
 }
-function yongshenPalaces(c, type){
-  if(type!=='天气') return [];
-  return [1,2,3,4,6,7,8,9].filter(p=>['天蓬','天英'].includes(c.sky[p].star));
+// 用神落宫 → { 宫: [标签…] }
+function ysMap(list){
+  const m={}; (list||[]).forEach(y=>y.ps.forEach(p=>{(m[p]=m[p]||[]).push(y.label)})); return m;
+}
+// 用神一句话（存入判例、填进用神栏）
+function ysSummary(c,type){
+  return QM.yongshen(c,type).map(y=>`${y.name}(${y.label})落${y.ps.map(p=>PN[p]).join('、')||'—'}`).join('；');
 }
 function chartHTML(c, opts){
-  const ys=(opts&&opts.yongshen)||[];
+  const ys=ysMap(opts&&opts.yongshen);
   return QM.GRID.map(p=>{
     if(p===5) return `<div class="palace center" data-p="5"><span class="hid" title="隐干">${c.hidden[5]}</span><small>中五·寄坤二</small><div class="earthstem">${stem(c.earth[5],c)}</div><div class="pnum">五</div></div>`;
     const s=c.sky[p], m=c.marks[p], god=c.gods[p], door=c.doors[p];
     const hk=c.kongP.includes(p), dk=c.dayKongP.includes(p);
-    const cls=['palace',hk?'kong':'',dk?'dkong':'',p===c.zfPalace?'zhifu':'',p===c.zhishiPalace?'zhishi':'',ys.includes(p)?'yongshen':'',opts&&opts.sel===p?'sel':''].filter(Boolean).join(' ');
+    const cls=['palace',hk?'kong':'',dk?'dkong':'',p===c.zfPalace?'zhifu':'',p===c.zhishiPalace?'zhishi':'',ys[p]?'yongshen':'',opts&&opts.sel===p?'sel':''].filter(Boolean).join(' ');
     const badges=(c.ming&&c.ming.skyP.includes(p)?'<i class="b-ming" title="年命">命</i>':'')+(p===c.horseP?'<i class="b-ma" title="驿马">马</i>':'')+(dk?'<i class="b-kong d" title="日空">空</i>':'')+(hk?'<i class="b-kong h" title="时空">空</i>':'');
     return `<div class="${cls}" data-p="${p}"${opts&&opts.live?` role="button" tabindex="0" aria-label="${PN[p]}宫"`:''}>
       <div class="pc-top"><span class="hid" title="隐干">${c.hidden[p]}</span><span class="god" data-w="${QM.GOD_WX[god]}">${god}</span><span class="badges">${badges}</span></div>
@@ -503,6 +537,7 @@ function chartHTML(c, opts){
       <div class="pc-door">${m.po?'<sup class="mk">迫</sup>':''}<span class="door${p===c.zhishiPalace?' zs':''}" data-w="${QM.DOOR_WX[door]}">${door}</span></div>
       <div class="pc-bot"><span class="dgod" title="地盘八神">${QM.GOD_SHORT[c.diGods[p]]}</span><span class="earth">${stem(c.earth[p],c)}</span></div>
       <div class="pnum">${PNUM[p]}</div>
+      ${ys[p]?`<span class="ys" title="用神">${ys[p].join('·')}</span>`:''}
     </div>`;
   }).join('');
 }
@@ -556,7 +591,7 @@ function renderHeader(){
   if(!QM.inRange(curDate)){ toast('只能排 1900–2100 年'); curDate=new Date(); curDate.setSeconds(0,0); $('dtInput').value=Fabao.toLocalInput(curDate); }
   const c0=QM.computeChart(curDate,override,chartOpts());
   const prev=cur;
-  const c=renderChart(curDate,override,$('chart'),{yongshen:yongshenPalaces(c0,curType),sel:selP,live:true});
+  const c=renderChart(curDate,override,$('chart'),{yongshen:QM.yongshen(c0,curType),sel:selP,live:true});
   cur=c;
   if(prev) animateTurn(prev,c);
   renderMeihua(c);
@@ -585,6 +620,7 @@ function renderHeader(){
 function renderGe(){
   const c=cur; if(!c) return;
   const all=QM.analyze(c);
+  renderYs(c);
   const det=$('palDetail');
   if(selP==null){
     det.innerHTML=`<h3>宫位详解</h3><p class="hint" style="margin-top:6px">点盘中任一宫，看这一宫的星、门、神、天地盘干与格局。</p>`;
@@ -592,6 +628,7 @@ function renderGe(){
     const d=QM.palaceDetail(c,selP);
     det.innerHTML=`<h3>${d.title}${(d.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</h3>
       <dl>${d.rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+      ${selP!==5?`<div class="ge-h">应期候选</div>${yqHTML(QM.yingqi(c,selP,c.sky[selP].stems[0]))}`:''}
       ${d.ge.length?`<div class="ge-h">本宫格局</div>${d.ge.map(geItem).join('')}`:''}`;
   }
   const ji=all.filter(g=>g.tone==='吉'), xiong=all.filter(g=>g.tone!=='吉');
@@ -624,6 +661,30 @@ function renderZe(){
 document.querySelectorAll('#zeFilter .chip').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#zeFilter .chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');zeF=b.dataset.f;renderZe();
 });
+/* ================= 用神 · 应期 ================= */
+const md=d=>`${d.getMonth()+1}-${pad(d.getDate())}`;
+function yqHTML(y){
+  const sp=y.speed.map(x=>`<span class="sp">${x}</span>`).join('');
+  const rows=y.items.map(i=>`<div>${i.why}：${i.days.map(d=>`<em>${d.b}日</em> ${d.dates.map(md).join('、')}`).join('；')}</div>`).join('');
+  return `<div class="yq">${sp}${rows||'—'}</div>`;
+}
+function palaceBrief(c,p){
+  const s=c.sky[p], m=c.marks[p];
+  const fl=[c.kongP.includes(p)?'时空':'',c.dayKongP.includes(p)?'日空':'',p===c.horseP?'马':'',...m.xing.map(x=>x+'刑'),...m.mu.map(x=>x+'墓'),m.po?'门迫':''].filter(Boolean);
+  return `${c.gods[p]} · ${s.qin?'禽芮':s.star}（${c.ws.star[p]}）· ${c.doors[p]}（${c.ws.door[p]}）· ${s.stems[0]}${s.ji?'/'+s.ji:''}加${c.earth[p]}${fl.length?`<span class="fl">${fl.join(' ')}</span>`:''}`;
+}
+function renderYs(c){
+  const list=QM.yongshen(c,curType);
+  const weather=curType==='天气';
+  $('ysBox').innerHTML=`<div class="ge-h">用神 · ${curType}</div>`+list.map(y=>{
+    if(!y.ps.length) return `<div class="ys-item"><span class="lb">${y.label}</span><b>${y.desc}</b><span class="at">不现</span></div>`;
+    return y.ps.map((p,i)=>`<button type="button" class="ys-item" data-p="${p}"><span class="lb">${y.label}</span><b>${y.desc}</b><span class="at">${PN[p]}</span>${!weather&&y.rel[i]?`<span class="rel">${y.rel[i]}</span>`:''}
+      <span class="br">${palaceBrief(c,p)}</span>
+      ${!weather&&y.k!=='day'?yqHTML(QM.yingqi(c,p,y.stem)):''}</button>`).join('');
+  }).join('')+(weather?'':`<p class="hint">「生日干」「日干克之」等是用神宫与日干宫的五行生克。应期候选按落宫地支、空亡填实或冲空、冲马、冲墓推出，列最近两次的日子；伏吟主迟，反吟、临马主速。</p>`);
+  document.querySelectorAll('#ysBox .ys-item[data-p]').forEach(b=>b.onclick=()=>selectPalace(+b.dataset.p,false));
+}
+
 function geItem(g){
   return `<button type="button" class="ge-item ${g.tone}"${g.p?` data-p="${g.p}"`:''}><b>${g.name}</b>${g.p?`<span class="at">${PN[g.p]}</span>`:''}<span class="tx">${g.text}</span></button>`;
 }
@@ -649,32 +710,35 @@ document.querySelectorAll('#viewTgs .qm-tg').forEach(b=>b.onclick=()=>{
 paintTgs();
 
 /* ================= 盘面设置：真太阳时 · 年命 ================= */
-const CITIES=[['东京',139.69],['大阪',135.50],['名古屋',136.91],['札幌',141.35],['福冈',130.40],['那霸',127.68],
-  ['北京',116.40],['上海',121.47],['广州',113.26],['深圳',114.06],['香港',114.17],['澳门',113.54],['台北',121.56],
-  ['南京',118.80],['杭州',120.16],['武汉',114.31],['成都',104.07],['重庆',106.55],['西安',108.94],['昆明',102.71],
-  ['哈尔滨',126.64],['乌鲁木齐',87.62],['拉萨',91.13],['首尔',126.98],['新加坡',103.82]];
+// [城市, 东经, 北纬]
+const CITIES=[['东京',139.69,35.68],['大阪',135.50,34.69],['名古屋',136.91,35.18],['札幌',141.35,43.06],['福冈',130.40,33.59],['那霸',127.68,26.21],
+  ['北京',116.40,39.90],['上海',121.47,31.23],['广州',113.26,23.13],['深圳',114.06,22.54],['香港',114.17,22.32],['澳门',113.54,22.20],['台北',121.56,25.04],
+  ['南京',118.80,32.06],['杭州',120.16,30.27],['武汉',114.31,30.59],['成都',104.07,30.57],['重庆',106.55,29.56],['西安',108.94,34.34],['昆明',102.71,25.04],
+  ['哈尔滨',126.64,45.76],['乌鲁木齐',87.62,43.83],['拉萨',91.13,29.65],['首尔',126.98,37.57],['新加坡',103.82,1.35]];
 (function(){
   const sel=$('lonCity');
-  sel.innerHTML=CITIES.map(([n,l])=>`<option value="${l}">${n}</option>`).join('')+'<option value="">自定义</option>';
+  sel.innerHTML=CITIES.map(([n],i)=>`<option value="${i}">${n}</option>`).join('')+'<option value="">自定义</option>';
 })();
 function paintSettings(){
   $('solarTg').textContent=view.solar?'开':'关'; $('solarTg').classList.toggle('on',!!view.solar);
-  $('lonIn').value=view.lon; const hit=CITIES.find(([,l])=>Math.abs(l-view.lon)<0.005); $('lonCity').value=hit?String(hit[1]):'';
+  $('lonIn').value=view.lon; $('latIn').value=view.lat;
+  const hi=CITIES.findIndex(([,l,a])=>Math.abs(l-view.lon)<0.005&&Math.abs(a-view.lat)<0.005), hit=CITIES[hi]; $('lonCity').value=hit?String(hi):'';
   $('mingIn').value=view.ming||'';
   const c=cur;
   $('mingOut').textContent=c&&c.ming?`${c.ming.gz}年 · 命干${c.ming.stem} · 天盘落${c.ming.skyP.map(p=>PN[p]).join('、')||'—'}`:'';
-  const sum=[view.solar?'真太阳时 '+(hit?hit[0]:(+view.lon).toFixed(2)+'°E'):'钟点时', c&&c.ming?'年命'+c.ming.gz:''].filter(Boolean).join(' · ');
+  const sum=[hit?hit[0]:`${(+view.lon).toFixed(2)}°E ${(+view.lat).toFixed(2)}°N`, view.solar?'真太阳时':'钟点时', c&&c.ming?'年命'+c.ming.gz:''].filter(Boolean).join(' · ');
   $('setSum').textContent=sum;
 }
 $('solarTg').onclick=()=>{view.solar=!view.solar;saveView();renderHeader()};
-$('lonCity').onchange=()=>{const v=$('lonCity').value;if(v){view.lon=+v;saveView();renderHeader()}else $('lonIn').focus()};
+$('lonCity').onchange=()=>{const v=$('lonCity').value;if(v!==''){const [,l,a]=CITIES[+v];view.lon=l;view.lat=a;saveView();renderHeader()}else $('lonIn').focus()};
+$('latIn').onchange=()=>{const v=parseFloat($('latIn').value);if(isFinite(v)&&v>=-90&&v<=90){view.lat=Math.round(v*100)/100;saveView();renderHeader()}else toast('纬度应在 −90 到 90 之间')};
 $('lonIn').onchange=()=>{const v=parseFloat($('lonIn').value);if(isFinite(v)&&v>=-180&&v<=180){view.lon=Math.round(v*100)/100;saveView();renderHeader()}else toast('经度应在 −180 到 180 之间')};
 $('mingIn').onchange=()=>{const v=$('mingIn').value.trim();if(!v||(+v>=1900&&+v<=2100)){view.ming=v;saveView();renderHeader()}else toast('出生年请填 1900–2100')};
 $('geoBtn').onclick=()=>{
   if(!navigator.geolocation){toast('此浏览器不能定位');return}
   toast('定位中…');
-  navigator.geolocation.getCurrentPosition(pos=>{view.lon=Math.round(pos.coords.longitude*100)/100;view.solar=true;saveView();renderHeader();toast('已取本机经度 '+view.lon+'°')},
-    ()=>toast('没能取得位置，请手动填经度'),{timeout:8000,maximumAge:3600e3});
+  navigator.geolocation.getCurrentPosition(pos=>{view.lon=Math.round(pos.coords.longitude*100)/100;view.lat=Math.round(pos.coords.latitude*100)/100;saveView();renderHeader();toast(`已取本机位置 东经${view.lon}° 北纬${view.lat}°`)},
+    ()=>toast('没能取得位置，请手动填经纬度'),{timeout:8000,maximumAge:3600e3});
 };
 
 /* ================= 时间 · 改局 ================= */
@@ -738,8 +802,9 @@ $('copyLink').onclick=()=>{
 document.querySelectorAll('#typeChips .chip').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#typeChips .chip').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');curType=b.dataset.t;
-  $('wxForm').hidden=curType!=='天气'; $('freeForm').hidden=curType!=='自由';
+  $('wxForm').hidden=curType!=='天气'; $('freeForm').hidden=curType==='天气';
   renderHeader();
+  if(curType!=='天气'&&cur) $('fYs').placeholder=ysSummary(cur,curType)||'留空则按题型自动填';
 });
 function pickGroup(id){ const g=$(id); g.querySelectorAll('button').forEach(b=>b.onclick=()=>{g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}); }
 pickGroup('wxPredict'); pickGroup('wxWind');
@@ -753,15 +818,15 @@ $('saveBtn').onclick=()=>{
     if(!w){toast('先选一个天气预断');return}
     const wind=picked('wxWind')||'未断风';
     pred=`明日：${w}，${wind}`+($('wxBasis').value.trim()?`\n依据：${$('wxBasis').value.trim()}`:'');
-    extra={wxPred:w,windPred:wind};
+    extra={wxPred:w,windPred:wind,loc:{lat:+view.lat,lon:+view.lon}};
   }else{
     if(!$('fPred').value.trim()){toast('预断不能为空');return}
-    pred=`问：${$('fQ').value.trim()||'（未填）'}\n用神：${$('fYs').value.trim()||'（未填）'}\n应期：${$('fTime').value.trim()||'（未填）'}\n预断：${$('fPred').value.trim()}`;
+    pred=`问：${$('fQ').value.trim()||'（未填）'}\n用神：${$('fYs').value.trim()||ysSummary(c,curType)||'（未填）'}\n应期：${$('fTime').value.trim()||'（未填）'}\n预断：${$('fPred').value.trim()}`;
   }
   entries.unshift({id:Date.now(), t:curDate.getTime(), type:curType, pred, ...extra,
     ov:override, opts:chartOpts(), pan:{dun:c.dun,ju:c.ju,yuan:c.yuan,term:c.term,zf:c.zhifuStar+'落'+c.zfPalace,zs:c.zhishiDoor+'落'+c.zhishiPalace,
       pillars:c.pillars, kong:c.kong.join(''), dayKong:c.dayKong.join(''),
-      ge:QM.analyze(c).map(g=>g.name+(g.p?'('+PN[g.p]+')':''))},
+      ge:QM.analyze(c).map(g=>g.name+(g.p?'('+PN[g.p]+')':'')), ys:ysSummary(c,curType)},
     status:'open', attr:null, actual:null, note:''});
   save(entries);
   ['wxBasis','fQ','fYs','fTime','fPred'].forEach(i=>$(i).value='');
@@ -776,6 +841,52 @@ function refreshBadge(){
   const due=entries.filter(e=>e.status==='open'&&e.t<Date.now()-12*3600e3);
   const b=$('revBadge'); if(due.length){b.hidden=false;b.textContent=due.length}else b.hidden=true;
 }
+/* ================= 实际天气（Open-Meteo） ================= */
+// 预断的是「明日」：取封盘次日、所在地当地的日值
+const ymdOf=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+async function fetchDaily(lat,lon,ymd){
+  const ago=(Date.now()-new Date(ymd+'T12:00').getTime())/864e5;
+  const host=ago>80?'https://archive-api.open-meteo.com/v1/archive':'https://api.open-meteo.com/v1/forecast';
+  const url=v=>`${host}?latitude=${lat}&longitude=${lon}&start_date=${ymd}&end_date=${ymd}&timezone=auto&daily=${v}`;
+  let r=await fetch(url('weather_code,precipitation_sum,snowfall_sum,wind_speed_10m_max,cloud_cover_mean'));
+  if(r.status===400) r=await fetch(url('weather_code,precipitation_sum,snowfall_sum,wind_speed_10m_max'));   // 旧接口没有日均云量时退一步
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const d=(await r.json()).daily||{}, g=k=>d[k]&&d[k][0]!=null?d[k][0]:null;
+  return {code:g('weather_code'),rain:g('precipitation_sum'),snow:g('snowfall_sum'),wind:g('wind_speed_10m_max'),cloud:g('cloud_cover_mean')};
+}
+function classifyWx(w){
+  let wx=null;
+  if(w.snow!=null&&w.snow>=0.5) wx='雪';
+  else if(w.rain!=null&&w.rain>=1) wx='雨';
+  else if(w.cloud!=null) wx=w.cloud<25?'晴':w.cloud<65?'多云':'阴';
+  else if(w.code!=null) wx=w.code<=1?'晴':w.code===2?'多云':[3,45,48].includes(w.code)?'阴':((w.code>=71&&w.code<=77)||w.code===85||w.code===86)?'雪':w.rain!=null&&w.rain<1?'阴':'雨';
+  const wind=w.wind==null?null:w.wind<20?'无风/微风':w.wind<39?'有风':'大风';
+  return {wx,wind};
+}
+function wxDetail(w){
+  return [w.rain!=null?`降水 ${w.rain.toFixed(1)}mm`:'',w.snow?`降雪 ${w.snow.toFixed(1)}cm`:'',w.cloud!=null?`云量 ${Math.round(w.cloud)}%`:'',w.wind!=null?`最大风速 ${Math.round(w.wind)}km/h`:''].filter(Boolean).join(' · ');
+}
+function autoWeather(e,card){
+  const box=card.querySelector('[data-role="wxauto"]'); if(!box) return;
+  const target=new Date(e.t+86400e3), end=new Date(target.getFullYear(),target.getMonth(),target.getDate()+1);
+  const loc=e.loc||{lat:+view.lat,lon:+view.lon};
+  const pick=(role,v)=>{const g=card.querySelector(`[data-role="${role}"]`);if(!g||!v)return;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))};
+  const apply=w=>{
+    const k=classifyWx(w);
+    pick('actualwx',k.wx); pick('actualwind',k.wind);
+    if(k.wx&&k.wx===e.wxPred&&(e.windPred==='未断风'||!k.wind||k.wind===e.windPred)){
+      const a=card.querySelector('.attr button[data-a="验中"]'); if(a&&!card.querySelector('.attr .on')) a.click();
+    }
+    box.className='wx-auto';
+    box.innerHTML=`已按所在地（${loc.lat}°N ${loc.lon}°E）${ymdOf(target)} 的实测自动选好：<b>${k.wx||'—'}${k.wind?'，'+k.wind:''}</b>（${wxDetail(w)}），不对可手动改。<a href="https://open-meteo.com/" target="_blank" rel="noopener">数据：Open-Meteo</a>`;
+  };
+  if(e.wxAuto){apply(e.wxAuto);return}
+  if(Date.now()<end.getTime()){box.textContent=`${ymdOf(target)} 还没过完，过了这一天再来，会自动取当天实测天气。`;return}
+  box.textContent='正在取实际天气…';
+  fetchDaily(loc.lat,loc.lon,ymdOf(target)).then(w=>{e.wxAuto=w;save(entries);apply(w)})
+    .catch(()=>{box.className='wx-auto err';box.textContent='没能取到实际天气（网络或接口问题），请手动选。'});
+}
+
 function renderReview(){
   const list=$('reviewList'); const open=dueEntries();
   if(!open.length){list.innerHTML='<div class="empty">无待复盘之局<br>去起一局吧</div>';return}
@@ -787,7 +898,7 @@ function renderReview(){
         ${['晴','多云','阴','雨','雪'].map(v=>`<button data-v="${v}">${v}</button>`).join('')}
       </div><div class="wx" data-role="actualwind">
         ${['无风/微风','有风','大风'].map(v=>`<button data-v="${v}">${v}</button>`).join('')}
-      </div></div>`:'';
+      </div><div class="wx-auto" data-role="wxauto"></div></div>`:'';
     card.innerHTML=`
       <div class="meta"><span>${fmt(new Date(e.t))} · ${e.type}</span><span>${e.pan.dun}${e.pan.ju}局 ${e.pan.term}</span></div>
       <div class="pansum">值符${e.pan.zf}宫 · 值使${e.pan.zs}宫 · 空${e.pan.kong}${e.ov?' · 手动局':''}</div>
@@ -820,6 +931,7 @@ function renderReview(){
       save(entries); toast('已入判例库'); renderReview(); refreshBadge(); renderLib();
     };
     list.appendChild(card);
+    if(e.type==='天气') autoWeather(e,card);
   });
 }
 
@@ -833,7 +945,7 @@ function mdOf(e){
 
 - **四柱**：${e.pan.pillars.year}年 ${e.pan.pillars.month}月 ${e.pan.pillars.day}日 ${e.pan.pillars.hour}时
 - **局**：${e.pan.term} · ${e.pan.dun}${e.pan.ju}局（${e.pan.yuan}）${e.ov?' · 手动改局':''}${e.opts&&typeof e.opts.solarLon==='number'?' · 真太阳时（东经'+e.opts.solarLon+'°）':''}${e.opts&&e.opts.mingYear?' · 年命'+e.opts.mingYear:''}
-- **值符**：${e.pan.zf}宫｜**值使**：${e.pan.zs}宫｜**空亡**：${e.pan.dayKong?'日'+e.pan.dayKong+' 时'+e.pan.kong:e.pan.kong}${e.pan.ge&&e.pan.ge.length?'\n- **格局**：'+e.pan.ge.join('、'):''}
+${e.pan.ys?'- **用神**：'+e.pan.ys+'\n':''}- **值符**：${e.pan.zf}宫｜**值使**：${e.pan.zs}宫｜**空亡**：${e.pan.dayKong?'日'+e.pan.dayKong+' 时'+e.pan.kong:e.pan.kong}${e.pan.ge&&e.pan.ge.length?'\n- **格局**：'+e.pan.ge.join('、'):''}
 
 ### 预断（预注册）
 ${e.pred}

@@ -7,6 +7,8 @@
    analyze(chart)                列出本盘格局（全盘 + 各宫）。
    palaceDetail(chart, p)        一宫的逐项解读。
    solarClock(date, lon)         真太阳时：按经度与均时差校正后的钟点。
+   yongshen(chart, topic)        按题型取用神，标出各自落宫及与日干宫的生克。
+   yingqi(chart, p, stem)        某宫的应期候选：落宫地支、空亡填实冲空、马星、冲墓。
 
    口径（流派不同处都写在这里，要改只改这里）：
    · 隐干：地盘干随八门同转（值使门从本宫转到哪，原宫地盘干就跟到哪）。
@@ -406,6 +408,98 @@
     return { title: PALACE_NAME[p] + '宫', tags: tags, rows: rows, ge: ge };
   }
 
+  /* ================= 用神 · 应期 ================= */
+  // 题型 → 用神。k: door 门 / star 星 / god 神 / stem 天盘干 / day 日干 / hour 时干 / horse 马星
+  var TOPICS = {
+    天气: [{ k: 'star', v: '天蓬', l: '雨', d: '天蓬主雨' }, { k: 'star', v: '天英', l: '晴', d: '天英主晴' },
+      { k: 'star', v: '天辅', l: '风', d: '天辅主风' }, { k: 'star', v: '天冲', l: '雷', d: '天冲主雷' }],
+    求财: [{ k: 'door', v: '生门', l: '利', d: '生门为利润' }, { k: 'stem', v: '戊', l: '本', d: '戊为资本' },
+      { k: 'day', l: '我', d: '日干为求测人' }, { k: 'hour', l: '事', d: '时干为所谋之事' }],
+    婚姻: [{ k: 'stem', v: '乙', l: '女', d: '乙为女方' }, { k: 'stem', v: '庚', l: '男', d: '庚为男方' },
+      { k: 'god', v: '六合', l: '媒', d: '六合为婚姻、媒妁' }, { k: 'day', l: '我', d: '日干为求测人' }],
+    考试: [{ k: 'door', v: '景门', l: '卷', d: '景门为试卷' }, { k: 'stem', v: '丁', l: '榜', d: '丁为成绩、录取文书' },
+      { k: 'star', v: '天辅', l: '学', d: '天辅为学业、考官' }, { k: 'day', l: '我', d: '日干为考生' }],
+    疾病: [{ k: 'star', v: '天芮', l: '病', d: '天芮为病症' }, { k: 'star', v: '天心', l: '医', d: '天心为医生' },
+      { k: 'stem', v: '乙', l: '药', d: '乙为药物' }, { k: 'day', l: '我', d: '日干为病人' }],
+    官司: [{ k: 'door', v: '开门', l: '官', d: '开门为法官' }, { k: 'door', v: '惊门', l: '讼', d: '惊门为诉讼、律师' },
+      { k: 'stem', v: '辛', l: '罪', d: '辛为罪名' }, { k: 'day', l: '我', d: '日干为己方' }, { k: 'hour', l: '彼', d: '时干为对方' }],
+    出行: [{ k: 'door', v: '开门', l: '行', d: '开门为出行' }, { k: 'horse', l: '马', d: '驿马主动、行程' },
+      { k: 'day', l: '我', d: '日干为出行人' }, { k: 'hour', l: '地', d: '时干为目的地、所办之事' }],
+    失物: [{ k: 'hour', l: '物', d: '时干为失物' }, { k: 'god', v: '玄武', l: '贼', d: '玄武为盗贼' },
+      { k: 'day', l: '我', d: '日干为失主' }],
+    寻人: [{ k: 'hour', l: '人', d: '时干为所寻之人' }, { k: 'god', v: '六合', l: '踪', d: '六合为走失、藏匿' },
+      { k: 'horse', l: '马', d: '驿马为动向' }, { k: 'day', l: '我', d: '日干为求测人' }],
+    自由: [{ k: 'day', l: '我', d: '日干为求测人' }, { k: 'hour', l: '事', d: '时干为所问之事' }]
+  };
+  function relPalace(a, b) {        // 宫 a 对宫 b
+    var x = PALACE_WX[a], y = PALACE_WX[b];
+    if (x === y) return '比和';
+    if (SHENG[x] === y) return '生日干';
+    if (SHENG[y] === x) return '日干生之';
+    if (KE[x] === y) return '克日干';
+    return '日干克之';
+  }
+  function yongshen(c, topic) {
+    var rules = TOPICS[topic] || [];
+    var dayP = stemPalaces(c, c.use.day)[0];
+    return rules.map(function (r) {
+      var ps = [];
+      for (var p = 1; p <= 9; p++) {
+        if (p === 5) continue;
+        var hit = r.k === 'door' ? c.doors[p] === r.v
+          : r.k === 'star' ? c.sky[p].star === r.v
+          : r.k === 'god' ? c.gods[p] === r.v
+          : r.k === 'stem' ? stemsOf(c, p).indexOf(r.v) >= 0
+          : r.k === 'day' ? stemsOf(c, p).indexOf(c.use.day) >= 0
+          : r.k === 'hour' ? stemsOf(c, p).indexOf(c.use.hour) >= 0
+          : r.k === 'horse' ? p === c.horseP : false;
+        if (hit) ps.push(p);
+      }
+      var stem = r.k === 'stem' ? r.v : r.k === 'day' ? c.use.day : r.k === 'hour' ? c.use.hour : null;
+      return { k: r.k, name: r.v || { day: '日干', hour: '时干', horse: '驿马' }[r.k], label: r.l, desc: r.d, stem: stem, ps: ps,
+        rel: r.k !== 'day' && dayP ? ps.map(function (p) { return p === dayP ? '同宫' : relPalace(p, dayP); }) : [] };
+    });
+  }
+  function stemPalaces(c, x) { var o = []; for (var p = 1; p <= 9; p++) if (p !== 5 && stemsOf(c, p).indexOf(x) >= 0) o.push(p); return o; }
+
+  var PALACE_BRANCHES = { 1: ['子'], 8: ['丑', '寅'], 3: ['卯'], 4: ['辰', '巳'], 9: ['午'], 2: ['未', '申'], 7: ['酉'], 6: ['戌', '亥'] };
+  var MU_BRANCH = { 乙: '戌', 丙: '戌', 戊: '戌', 丁: '丑', 己: '丑', 庚: '丑', 辛: '辰', 壬: '辰', 癸: '未' };
+  function chong(b) { return BRANCHES[(BRANCHES.indexOf(b) + 6) % 12]; }
+  function dayIndexOf(dt) { return mod(jdn(dt.getFullYear(), dt.getMonth() + 1, dt.getDate()) - 2415021 + 10, 60); }
+  // 从 from 次日起，往后 days 日内日支为 b 的日子
+  function nextDaysOf(from, b, n, days) {
+    var out = [], bi = BRANCHES.indexOf(b);
+    var d0 = new Date(from.getFullYear(), from.getMonth(), from.getDate(), 12);
+    for (var i = 1; i <= (days || 40) && out.length < (n || 2); i++) {
+      var d = new Date(d0.getTime() + i * DAY);
+      if (dayIndexOf(d) % 12 === bi) out.push(d);
+    }
+    return out;
+  }
+  function yingqi(c, p, stem) {
+    var items = [], speed = [];
+    if (c.rot === 0 || c.doorRot === 0) speed.push('伏吟主迟');
+    if (c.rot === 4 || c.doorRot === 4) speed.push('反吟主速');
+    if (p === c.horseP) speed.push('临马主速');
+    if (p === 5 || !PALACE_BRANCHES[p]) return { speed: speed, items: items };
+    var from = c.date;
+    var add = function (why, bs) {
+      var key = bs.slice().sort().join('');
+      for (var i = 0; i < items.length; i++) {                // 同一组地支只列一次，理由并在一起
+        if (items[i].branches.slice().sort().join('') === key) { items[i].why += '、' + why; return; }
+      }
+      items.push({ why: why, branches: bs, days: bs.map(function (b) { return { b: b, dates: nextDaysOf(from, b, 2) }; }) });
+    };
+    add('落宫地支', PALACE_BRANCHES[p]);
+    [['时空', c.kong], ['日空', c.dayKong]].forEach(function (kv) {
+      var here = kv[1].filter(function (b) { return PALACE_BRANCHES[p].indexOf(b) >= 0; });
+      if (here.length) { add(kv[0] + '填实', here); add(kv[0] + '冲空', here.map(chong)); }
+    });
+    if (p === c.horseP) add('冲马', [chong(c.horseBranch)]);
+    if (stem && MU[stem] === p) add(stem + '入墓待冲', [chong(MU_BRANCH[stem])]);
+    return { speed: speed, items: items };
+  }
+
   // —— 择时：从 from 起往后 days 日，逐时辰起盘，挑出有吉格的时辰 ——
   // 择时只挑大吉格；奇仪顺遂之类小吉格太常见，列出来反而无从下手
   var BIG = ['青龙返首', '飞鸟跌穴', '天遁', '地遁', '人遁', '神遁', '鬼遁', '风遁', '云遁', '龙遁', '虎遁', '三奇升殿', '玉女守门'];
@@ -440,7 +534,7 @@
 
   var api = {
     computeChart: computeChart, analyze: analyze, palaceDetail: palaceDetail, inRange: inRange, RANGE: RANGE,
-    solarClock: solarClock, findHours: findHours,
+    solarClock: solarClock, findHours: findHours, yongshen: yongshen, yingqi: yingqi, TOPICS: TOPICS, dayIndexOf: dayIndexOf,
     TERMS: TERMS, STEMS: STEMS, BRANCHES: BRANCHES, GRID: GRID, PNUM: PNUM, PALACE_NAME: PALACE_NAME, GOD_SHORT: GOD_SHORT,
     STEM_WX: STEM_WX, STAR_WX: STAR_WX, DOOR_WX: DOOR_WX, GOD_WX: GOD_WX
   };
