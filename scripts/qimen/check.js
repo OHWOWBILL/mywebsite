@@ -66,5 +66,17 @@ const zs = QM.findHours(new Date(2026, 10, 1, 1, 57), 7, {});
 eq(zs.length > 0 && zs.every(x => x.ji.length && x.end - x.start === 7200e3), true, '择时结果');
 eq(zs[0].start.getHours() % 2, 1, '择时从单数钟点起');
 
+// 用神：样盘求财，生门、戊同落乾六；日干己在坤二，坤土生乾金 → 日干生之
+const ys = QM.yongshen(c, '求财');
+eq(ys.map(y => [y.name, y.ps]), [['生门', [6]], ['戊', [6]], ['日干', [2]], ['时干', [8]]], '求财用神落宫');
+eq(ys[0].rel, ['日干生之'], '用神宫与日干宫生克');
+eq(QM.yongshen(c, '婚姻').map(y => y.ps), [[8], [9], [9], [2]], '婚姻用神（乙、庚、六合、日干）');
+// 应期：乾六（戌亥）临马、时空戌亥；戊入墓（墓戌）待辰日冲
+const yq = QM.yingqi(c, 6, '戊');
+eq(yq.speed, ['临马主速'], '应期快慢');
+eq(yq.items.map(i => i.why + ':' + i.branches.join('')), ['落宫地支、时空填实:戌亥', '时空冲空:辰巳', '冲马:巳', '戊入墓待冲:辰'], '应期条目');
+const fmtD = d => `${d.getMonth() + 1}-${d.getDate()}`;
+eq(yq.items[0].days[0].dates.map(fmtD), ['11-8', '11-20'], '戌日（2026-11-08 丙戌）');
+
 console.log(bad ? `✗ ${bad} 处不符` : '✓ 全部相符');
 process.exit(bad ? 1 : 0);
