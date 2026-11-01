@@ -47,5 +47,24 @@ for (let t = Date.UTC(1900, 1, 1); t < Date.UTC(2100, 11, 1); t += 7.13 * 3600e3
   if (!ok) { bad++; console.log('✗ 排不全', new Date(t).toISOString()); break; }
   QM.analyze(k);
 }
+// 真太阳时：东京经度，11-01 均时差约 +16.4 分，经度 +18.8 分
+const so = QM.computeChart(new Date(2026, 10, 1, 1, 57), null, { solarLon: 139.69 }).solar;
+eq(Math.round(so.shift), 35, '真太阳时校正（东京 11-01）');
+// 子时换日：钟点 22:50、东京真太阳时已过 23:00 → 日柱换到次日
+const z = QM.computeChart(new Date(2026, 10, 1, 22, 50), null, { solarLon: 139.69 });
+eq([z.pillars.day, z.pillars.hour], ['庚辰', '丙子'], '真太阳时过子换日');
+eq(QM.computeChart(new Date(2026, 10, 1, 22, 50)).pillars.day, '己卯', '钟点未过子不换日');
+// 年命：1990 庚午，命干庚，天盘落离九
+const mg = QM.computeChart(new Date(2026, 10, 1, 1, 57), null, { mingYear: 1990 }).ming;
+eq([mg.gz, mg.stem, mg.skyP], ['庚午', '庚', [9]], '年命');
+eq(QM.computeChart(new Date(2026, 10, 1, 1, 57), null, { mingYear: 1984 }).ming.stem, '戊', '甲子年命遁戊');
+// 旺衰：戌月土令
+const w = QM.computeChart(new Date(2026, 10, 1, 1, 57)).ws;
+eq([w.ling, w.door[6], w.door[7], w.star[7], w.star[2], w.stem['庚']], ['戌土', '旺', '死', '旺', '废', '相'], '旺衰');
+// 择时：七日内逐时辰，只收大吉格
+const zs = QM.findHours(new Date(2026, 10, 1, 1, 57), 7, {});
+eq(zs.length > 0 && zs.every(x => x.ji.length && x.end - x.start === 7200e3), true, '择时结果');
+eq(zs[0].start.getHours() % 2, 1, '择时从单数钟点起');
+
 console.log(bad ? `✗ ${bad} 处不符` : '✓ 全部相符');
 process.exit(bad ? 1 : 0);

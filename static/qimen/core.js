@@ -6,6 +6,7 @@
        日空时空、驿马，以及每宫的击刑 / 入墓 / 门迫标记。
    analyze(chart)                列出本盘格局（全盘 + 各宫）。
    palaceDetail(chart, p)        一宫的逐项解读。
+   solarClock(date, lon)         真太阳时：按经度与均时差校正后的钟点。
 
    口径（流派不同处都写在这里，要改只改这里）：
    · 隐干：地盘干随八门同转（值使门从本宫转到哪，原宫地盘干就跟到哪）。
@@ -14,6 +15,10 @@
    · 击刑：戊震、己坤、庚艮、辛离、壬巽、癸巽。
    · 门迫：门的五行克所落宫的五行。
    · 刑、墓只标天盘干（含寄宫干），和常见排盘软件一致。
+   · 旺衰按月令：八门、天干用五行旺相休囚死（当令旺、令生相、生令休、克令囚、令克死）；
+     九星用奇门星法（我生令旺、同令相、令生我休、令克我囚、我克令废）。
+   · 真太阳时只改日柱、时柱（钟点）；节气、年柱、月柱按真实时刻。
+   · 年命：出生年的年干（甲遁旬首六仪），看天盘落宫。
    浏览器里挂 window.QM；node 里 require 即得同一对象。
    ========================================================= */
 (function (root) {
@@ -80,15 +85,52 @@
   var RANGE = { min: TERMS[0].t + 31 * DAY, max: TERMS[TERMS.length - 1].t - 31 * DAY };
   function inRange(dt) { var ms = dt.getTime(); return ms >= RANGE.min && ms <= RANGE.max; }
 
-  function computeChart(dt, juOverride) {
+  // —— 真太阳时 ——
+  // 均时差（分钟），NOAA 分数年公式，误差一分钟内
+  function eqTime(dt) {
+    var start = new Date(dt.getFullYear(), 0, 1);
+    var doy = Math.floor((dt - start) / DAY);
+    var g = 2 * Math.PI / 365 * (doy + (dt.getHours() - 12) / 24);
+    return 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+  }
+  // 返回一个 Date，它的本机钟点就是该经度的真太阳时；shift 为校正分钟数
+  function solarClock(dt, lon) {
+    var meridian = -dt.getTimezoneOffset() / 60 * 15;
+    var lonFix = (lon - meridian) * 4, eot = eqTime(dt);
+    var shift = lonFix + eot;
+    return { date: new Date(dt.getTime() + shift * 60000), shift: shift, lonFix: lonFix, eot: eot, meridian: meridian };
+  }
+
+  // —— 旺衰 ——
+  var MONTH_WX = { 0: '水', 1: '土', 2: '木', 3: '木', 4: '土', 5: '火', 6: '火', 7: '土', 8: '金', 9: '金', 10: '土', 11: '水' };
+  function wsStd(wx, ling) {
+    if (wx === ling) return '旺';
+    if (SHENG[ling] === wx) return '相';
+    if (SHENG[wx] === ling) return '休';
+    if (KE[wx] === ling) return '囚';
+    return '死';
+  }
+  function wsStar(wx, ling) {
+    if (SHENG[wx] === ling) return '旺';
+    if (wx === ling) return '相';
+    if (SHENG[ling] === wx) return '休';
+    if (KE[ling] === wx) return '囚';
+    return '废';
+  }
+
+  // opts: { solarLon: 经度（开真太阳时）, mingYear: 出生年（年命） }
+  function computeChart(dt, juOverride, opts) {
+    opts = opts || {};
     var ms = dt.getTime();
+    var solar = typeof opts.solarLon === 'number' && isFinite(opts.solarLon) ? solarClock(dt, opts.solarLon) : null;
+    var clock = solar ? solar.date : dt;
     var termIdx = termAt(ms);
     if (termIdx < 0) return null;
     var term = TERMS[termIdx], termNext = TERMS[termIdx + 1] || null;
     var nearBoundary = (termNext && termNext.t - ms < 3600e3) || (ms - term.t < 3600e3);
 
     // 四柱：日、时按本机钟点（23 点起换日），年以立春、月以节换
-    var y = dt.getFullYear(), mo = dt.getMonth() + 1, d = dt.getDate(), h = dt.getHours();
+    var y = clock.getFullYear(), mo = clock.getMonth() + 1, d = clock.getDate(), h = clock.getHours();
     var Jd = jdn(y, mo, d); if (h >= 23) Jd += 1;
     var dayIdx = mod(Jd - 2415021 + 10, 60);
     var hb = Math.floor(((h + 1) % 24) / 2);
@@ -181,8 +223,27 @@
       };
     }
 
+    // 月令旺衰
+    var ling = MONTH_WX[monthIdx % 12];
+    var ws = { ling: BRANCHES[monthIdx % 12] + ling, star: {}, door: {}, stem: {} };
+    for (p = 1; p <= 9; p++) {
+      if (p === 5) continue;
+      ws.star[p] = wsStar(STAR_WX[sky[p].star], ling);
+      ws.door[p] = wsStd(DOOR_WX[doors[p]], ling);
+    }
+    STEMS.forEach(function (x) { ws.stem[x] = wsStd(STEM_WX[x], ling); });
+
+    // 年命
+    var ming = null;
+    if (opts.mingYear) {
+      var my = +opts.mingYear, mIdx = mod(my - 1984, 60), mStem = useStem(mIdx);
+      var skyP = [];
+      for (p = 1; p <= 9; p++) { if (p !== 5 && (sky[p].stems[0] === mStem || sky[p].ji === mStem)) skyP.push(p); }
+      ming = { year: my, gz: gzName(mIdx), stem: mStem, skyP: skyP, earthP: palaceOfStem(mStem) };
+    }
+
     return {
-      date: new Date(ms),
+      date: new Date(ms), clock: clock, solar: solar, ming: ming, ws: ws,
       pillars: { year: gzName(yearIdx), month: gzName(monthIdx), day: gzName(dayIdx), hour: gzName(hIdx) },
       idx: { year: yearIdx, month: monthIdx, day: dayIdx, hour: hIdx },
       use: use,
@@ -320,10 +381,12 @@
     if (c.kongP.indexOf(p) >= 0) tags.push('时空');
     if (c.dayKongP.indexOf(p) >= 0) tags.push('日空');
     if (p === c.horseP) tags.push('驿马');
-    rows.push(['九星', starLabel(s) + '（' + STAR_WX[star] + '，' + STAR_TONE[star][1] + '）：' + STAR_XIANG[star] + (s.qin ? '；天禽寄坤随芮同行' : '')]);
-    rows.push(['八门', door + '（' + DOOR_WX[door] + '，' + DOOR_TONE[door][1] + '）：' + DOOR_XIANG[door] + '；' + doorPalace(door, p)]);
+    if (c.ming && c.ming.skyP.indexOf(p) >= 0) tags.push('年命宫');
+    rows.push(['九星', starLabel(s) + '（' + STAR_WX[star] + '，' + STAR_TONE[star][1] + '，' + c.ws.star[p] + '）：' + STAR_XIANG[star] + (s.qin ? '；天禽寄坤随芮同行' : '')]);
+    rows.push(['八门', door + '（' + DOOR_WX[door] + '，' + DOOR_TONE[door][1] + '，' + c.ws.door[p] + '）：' + DOOR_XIANG[door] + '；' + doorPalace(door, p)]);
     rows.push(['八神', god + '（' + GOD_TONE[god][1] + '）：' + GOD_XIANG[god]]);
-    var pair = s.stems[0] + '加' + e + (s.ji ? '，寄干' + s.ji + '加' + e : '');
+    var wsOf = function (x) { return x + '（' + c.ws.stem[x] + '）'; };
+    var pair = wsOf(s.stems[0]) + '加' + wsOf(e) + (s.ji ? '，寄干' + wsOf(s.ji) : '');
     rows.push(['天地盘', pair]);
     rows.push(['隐干', c.hidden[p]]);
     rows.push(['地盘神', c.diGods[p]]);
@@ -334,13 +397,50 @@
       if (stemsOf(c, p).indexOf(u) >= 0) who.push('天盘' + lab[k] + '干' + u);
       if (e === u) who.push('地盘' + lab[k] + '干' + u);
     });
+    if (c.ming) {
+      if (c.ming.skyP.indexOf(p) >= 0) who.push('天盘年命' + c.ming.stem);
+      if (c.ming.earthP === p) who.push('地盘年命' + c.ming.stem);
+    }
     if (who.length) rows.push(['四柱', who.join('、')]);
     var ge = analyze(c).filter(function (g) { return g.p === p; });
     return { title: PALACE_NAME[p] + '宫', tags: tags, rows: rows, ge: ge };
   }
 
+  // —— 择时：从 from 起往后 days 日，逐时辰起盘，挑出有吉格的时辰 ——
+  // 择时只挑大吉格；奇仪顺遂之类小吉格太常见，列出来反而无从下手
+  var BIG = ['青龙返首', '飞鸟跌穴', '天遁', '地遁', '人遁', '神遁', '鬼遁', '风遁', '云遁', '龙遁', '虎遁', '三奇升殿', '玉女守门'];
+  var BAD = ['五不遇时', '伏吟', '星伏吟', '门伏吟', '反吟', '星反吟', '门反吟'];
+  function findHours(from, days, opts) {
+    opts = opts || {};
+    var out = [];
+    var shift = typeof opts.solarLon === 'number' && isFinite(opts.solarLon) ? solarClock(from, opts.solarLon).shift : 0;
+    var start = new Date(from.getTime() + shift * 60000);     // 钟点（真太阳时或本机）
+    var h = start.getHours();
+    start.setMinutes(0, 0, 0);
+    start.setHours(h % 2 === 1 ? h : h - 1);                  // 时辰起于单数钟点
+    for (var i = 0; i < days * 12; i++) {
+      var s0 = start.getTime() + i * 2 * 3600e3 - shift * 60000;   // 回到真实时刻
+      var mid = new Date(s0 + 3600e3);
+      if (!inRange(mid)) break;
+      var c = computeChart(mid, null, opts);
+      var g = analyze(c);
+      var ji = g.filter(function (x) { return BIG.indexOf(x.name) >= 0; });
+      if (!ji.length) continue;
+      ji = ji.map(function (x) {
+        var m = c.marks[x.p], warn = [];
+        if (c.kongP.indexOf(x.p) >= 0 || c.dayKongP.indexOf(x.p) >= 0) warn.push('空');
+        if (m.po) warn.push('迫'); if (m.xing.length) warn.push('刑'); if (m.mu.length) warn.push('墓');
+        return { name: x.name, p: x.p, text: x.text, warn: warn };
+      });
+      out.push({ start: new Date(s0), end: new Date(s0 + 2 * 3600e3), mid: mid, hour: c.pillars.hour, day: c.pillars.day,
+        ji: ji, bad: g.filter(function (x) { return BAD.indexOf(x.name) >= 0; }) });
+    }
+    return out;
+  }
+
   var api = {
     computeChart: computeChart, analyze: analyze, palaceDetail: palaceDetail, inRange: inRange, RANGE: RANGE,
+    solarClock: solarClock, findHours: findHours,
     TERMS: TERMS, STEMS: STEMS, BRANCHES: BRANCHES, GRID: GRID, PNUM: PNUM, PALACE_NAME: PALACE_NAME, GOD_SHORT: GOD_SHORT,
     STEM_WX: STEM_WX, STAR_WX: STAR_WX, DOOR_WX: DOOR_WX, GOD_WX: GOD_WX
   };
