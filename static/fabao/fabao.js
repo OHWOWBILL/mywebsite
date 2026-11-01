@@ -17,6 +17,7 @@
     mingbu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.5l1.4 4.1 4.1 1.4-4.1 1.4-1.4 4.1-1.4-4.1-4.1-1.4 4.1-1.4z"/></svg>',
     bazi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="3.5" height="15" rx="1"/><rect x="8" y="4.5" width="3.5" height="15" rx="1"/><rect x="12.5" y="4.5" width="3.5" height="15" rx="1"/><rect x="17" y="4.5" width="3.5" height="15" rx="1"/><path d="M3.5 12h17"/></svg>',
     liuyao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><rect x="9.6" y="9.6" width="4.8" height="4.8"/><path d="M12 3.5v2.3M12 18.2v2.3M3.5 12h2.3M18.2 12h2.3"/></svg>',
+    kanyu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 19.5l6-10 3.6 5.6 2.6-3.6 6.2 8z"/><path d="M8.8 9.5l1.3 2.1"/><circle cx="17.5" cy="6" r="1.6"/></svg>',
     xiangbu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 12c2.4-4 5.5-6 9.2-6s6.8 2 9.2 6c-2.4 4-5.5 6-9.2 6s-6.8-2-9.2-6z"/><circle cx="12" cy="12" r="2.6"/></svg>'
   };
   const TOOLS = [
@@ -28,6 +29,7 @@
     { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/' },
     { id: 'ziwei', name: '紫微斗数', short: '紫微', href: '/ziwei/' },
     { id: 'bazi', name: '八字排盘', short: '八字', href: '/bazi/' },
+    { id: 'kanyu', name: '堪舆', href: '/kanyu/' },
     { id: 'mingbu', name: '命部', href: '/mingbu/' },  // 口令加密页，未解禁时为锁屏
     { id: 'xiangbu', name: '相部', href: '/xiangbu/' }  // 同上
   ];
