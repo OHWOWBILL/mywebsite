@@ -47,6 +47,11 @@
   categories = ["命", "知识点做题法"]
   lamp = "changsheng"
   [[door.tools]]
+    seal = "紫"
+    name = "紫微斗数"
+    href = "/ziwei/"
+    desc = "十二宫排盘，三方四正、飞化、转宫、大限流年"
+  [[door.tools]]
     seal = "生"
     name = "十二长生"
     href = "/changsheng/"
