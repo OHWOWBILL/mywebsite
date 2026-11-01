@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#17131F">
 <title>奇门手记 · 潜蛟阁法宝库</title>
-<meta name="description" content="奇门起局与判例库：按此刻起局，写下断语封盘，次日复盘归因，判例可导出。">
+<meta name="description" content="时家奇门转盘排盘与判例库：隐干、刑墓迫、日空时空、格局评注；写下断语封盘，次日复盘归因，判例可导出。">
 <link rel="icon" href="/favicon-32x32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +21,8 @@
 .qm-sub{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:center}
 .qm-sub .sep{color:var(--faint)}
 .qm-sub b{color:var(--fg);font-weight:400;font-family:var(--font-title)}
+.qm-jie{display:flex;gap:4px 10px;flex-wrap:wrap;font-size:12px;color:var(--faint);letter-spacing:.05em}
+.qm-jie b{color:var(--muted);font-weight:400;font-family:var(--font-title)}
 .override{display:none;gap:8px;align-items:center}
 .override.on{display:flex}
 .override select{flex:1}
@@ -28,8 +30,15 @@
 /* ---------- 布局：左盘右记 ---------- */
 .qm-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
 .qm-chart-card{padding:14px;position:sticky;top:calc(var(--top-h) + 16px)}
-.qm-key{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;margin-top:10px;font-size:12px;color:var(--faint);letter-spacing:.05em}
+.qm-key{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:center;margin-top:10px;font-size:12px;color:var(--faint);letter-spacing:.05em}
 .qm-key i{font-style:normal;display:inline-block;padding:0 4px;margin-right:4px;border-radius:2px;font-size:11px;line-height:16px}
+.qm-key .u-zf{border-bottom:2px solid var(--zhu);border-radius:0;color:var(--fg-2)}
+.qm-key .u-zs{border-bottom:2px solid var(--qing);border-radius:0;color:var(--fg-2)}
+.qm-key .bx-h{outline:1.5px solid var(--zhu);color:var(--fg-2)}
+.qm-key .bx-d{outline:1.5px dashed var(--jin);color:var(--fg-2)}
+.qm-tgs{display:flex;justify-content:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+.qm-tg{font-size:12px;color:var(--faint);border:1px solid var(--rule-2);border-radius:999px;padding:2px 10px;font-family:var(--font-title);letter-spacing:.08em}
+.qm-tg.on{color:var(--fg-2);border-color:var(--zi-2)}
 .qm-side .fb-seg{display:flex;width:100%}
 .qm-side .fb-seg button{padding:8px 0;font-size:14px}
 
@@ -37,34 +46,77 @@
 .chart{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:520px;margin:0 auto}
 .palace{
   background:var(--bg-3);border:1px solid var(--rule-2);border-radius:8px;
-  aspect-ratio:1;position:relative;padding:8px 9px;
-  display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;
+  aspect-ratio:1;position:relative;padding:7px 8px 6px;
+  display:grid;grid-template-rows:auto 1fr auto auto;overflow:hidden;
   font-family:var(--font-title);
 }
-.palace .god{font-size:.72rem;color:var(--zi-2);letter-spacing:.08em}
-.palace .starline{font-size:1.05rem;line-height:1.25;color:var(--fg)}
-.palace .starline .stem{margin-left:4px;font-weight:600;color:var(--fg)}
-.palace .starline .stem.qi{color:var(--qi)}
-.palace .door{font-size:1rem;color:var(--qing);letter-spacing:.03em}
-.palace .earthstem{position:absolute;right:9px;bottom:7px;font-size:1.05rem;font-weight:600;color:var(--muted)}
-.palace .earthstem.qi{color:var(--qi)}
-.palace .pnum{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:2.4rem;color:rgba(169,148,224,.08);font-weight:900;line-height:1;pointer-events:none}
-.palace .horse{position:absolute;left:8px;top:8px;font-size:.6rem;color:#fff;background:var(--zhu);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center}
-.palace:has(.horse) .god{padding-left:20px}
-.palace.kong{background:repeating-linear-gradient(135deg,transparent 0 12px,rgba(224,122,98,.06) 12px 13px),var(--bg-3)}
-.palace.kong::after{content:"旬空";position:absolute;right:9px;top:26px;font-size:.58rem;color:var(--zhu);letter-spacing:.08em;border:1px solid rgba(224,122,98,.5);padding:0 3px;border-radius:2px;background:var(--bg-3)}
-.palace.kong:not(.zhifu):not(.zhishi)::after{top:7px}
+.chart.live .palace{cursor:pointer}
+.chart.live .palace:hover{border-color:var(--zi-2)}
+.palace.sel{outline:2px solid var(--zi-2);outline-offset:1px}
+.palace > *{position:relative;z-index:1}
+.palace .pc-top{display:flex;align-items:center;gap:5px;min-height:18px}
+.palace .hid{font-size:.72rem;color:var(--faint);font-weight:400}
+.palace .god{font-size:.74rem;color:var(--zi-2);letter-spacing:.06em}
+.palace .badges{margin-left:auto;display:flex;gap:2px}
+.palace .badges i{font-style:normal;width:16px;height:16px;border-radius:50%;font-size:.58rem;display:flex;align-items:center;justify-content:center;line-height:1}
+.palace .b-ma{background:var(--zhu);color:#fff}
+.palace .b-kong.h{background:rgba(224,122,98,.22);color:var(--zhu);border:1px solid rgba(224,122,98,.7)}
+.palace .b-kong.d{color:var(--muted);border:1px dashed var(--faint)}
+.palace .pc-star{display:flex;align-items:center;justify-content:center;gap:3px;font-size:1.05rem;line-height:1.2;white-space:nowrap}
+.palace .star{color:var(--fg)}
+.palace .star.zf,.palace .door.zs{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.palace .star.zf{text-decoration-color:var(--zhu)}
+.palace .door.zs{text-decoration-color:var(--qing)}
+.palace .ji{font-size:.78rem}
+.palace .stm{font-weight:600;color:var(--fg);padding:0 1px;border-radius:3px}
+.palace .stm.qi{color:var(--qi)}
+.palace .stm.hs{outline:1.5px solid var(--zhu);outline-offset:0}
+.palace .stm.ds{outline:1.5px dashed var(--jin);outline-offset:0}
+.palace .stm.hs.ds{outline:1.5px solid var(--zhu);box-shadow:0 0 0 3px rgba(217,174,78,.35)}
+.palace .mk{font-size:.55rem;color:var(--zhu);font-weight:400;vertical-align:super;margin:0 1px;letter-spacing:0}
+.palace .pc-door{text-align:center;font-size:1rem;line-height:1.25;letter-spacing:.03em}
+.palace .door{color:var(--qing)}
+.palace .pc-bot{display:flex;justify-content:space-between;align-items:flex-end;min-height:18px;margin-top:2px}
+.palace .dgod{font-size:.7rem;color:var(--faint)}
+.palace .earth .stm{font-size:1.05rem;color:var(--muted)}
+.palace .earth .stm.qi{color:var(--qi)}
+.palace .pnum{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:2.4rem;color:rgba(169,148,224,.07);font-weight:900;line-height:1;pointer-events:none;z-index:0}
+.palace.kong{background:repeating-linear-gradient(135deg,transparent 0 12px,rgba(224,122,98,.07) 12px 13px),var(--bg-3)}
+.palace.dkong:not(.kong){background:repeating-linear-gradient(135deg,transparent 0 12px,rgba(163,157,176,.06) 12px 13px),var(--bg-3)}
 .palace.zhifu{border-color:var(--zhu);box-shadow:0 0 16px -6px rgba(224,122,98,.6)}
-.palace.zhifu .stamp-fu{position:absolute;right:8px;top:7px;font-size:.62rem;color:#fff;background:var(--zhu);border-radius:2px;padding:1px 4px;font-weight:600}
 .palace.zhishi{border-color:var(--qing);box-shadow:0 0 16px -6px rgba(143,176,216,.55)}
-.palace.zhishi .stamp-shi{position:absolute;right:8px;top:7px;font-size:.62rem;color:var(--bg);background:var(--qing);border-radius:2px;padding:1px 4px;font-weight:600}
-.palace.zhifu.zhishi .stamp-shi{right:32px}
 .palace.yongshen{outline:1.5px dashed var(--zi-2);outline-offset:-5px}
-.palace.yongshen::before{content:"用";position:absolute;left:50%;transform:translateX(-50%);top:4px;font-size:.6rem;color:var(--zi-2);border:1px solid var(--zi-2);padding:0 4px;border-radius:2px;background:var(--bg-3);z-index:2}
-.palace.center{justify-content:center;align-items:center;background:none;border-style:dashed}
-.palace.center .earthstem{position:static;font-size:1.4rem;color:var(--fg)}
+.palace.yongshen::before{content:"用";position:absolute;left:50%;transform:translateX(-50%);bottom:5px;font-size:.6rem;color:var(--zi-2);border:1px solid var(--zi-2);padding:0 4px;border-radius:2px;background:var(--bg-3);z-index:2}
+.palace.center{display:flex;flex-direction:column;justify-content:center;align-items:center;background:none;border-style:dashed}
+.palace.center .hid{position:absolute;left:8px;top:7px}
+.palace.center .earthstem .stm{font-size:1.4rem;color:var(--fg)}
 .palace.center .earthstem::before,.palace.center .earthstem::after{content:"";display:block;width:14px;height:1px;background:var(--zi-2);margin:6px auto;opacity:.5}
 .palace.center small{font-size:.62rem;color:var(--faint);letter-spacing:.15em;writing-mode:vertical-rl;position:absolute;right:8px;top:10px}
+.chart.no-hid .hid,.chart.no-dgod .dgod{visibility:hidden}
+
+/* 五行色：干、星、门、神各按五行 */
+.chart.wuxing [data-w="木"]{color:var(--wx-mu)}
+.chart.wuxing [data-w="火"]{color:var(--wx-huo)}
+.chart.wuxing [data-w="土"]{color:var(--wx-tu)}
+.chart.wuxing [data-w="金"]{color:var(--wx-jin)}
+.chart.wuxing [data-w="水"]{color:var(--wx-shui)}
+.chart.wuxing .earth .stm{opacity:.85}
+
+/* ---------- 格局 ---------- */
+.pal-detail h3{font-family:var(--font-title);font-size:16px;font-weight:600;letter-spacing:.12em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pal-detail .tag{font-size:11px;font-weight:400;color:var(--zi-2);border:1px solid var(--rule-2);border-radius:999px;padding:0 8px;letter-spacing:.05em}
+.pal-detail dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin-top:10px;font-size:14px;line-height:1.65}
+.pal-detail dt{color:var(--faint);font-family:var(--font-title);font-size:12px;letter-spacing:.15em;padding-top:2px}
+.pal-detail dd{color:var(--fg-2)}
+.ge-h{font-family:var(--font-title);font-size:12px;color:var(--muted);letter-spacing:.25em;margin:18px 0 4px}
+.ge-item{display:block;width:100%;text-align:left;border-top:1px solid var(--rule);padding:9px 2px;line-height:1.6}
+.ge-item:hover{background:rgba(122,91,192,.08)}
+.ge-item b{font-family:var(--font-title);font-weight:600;letter-spacing:.08em;margin-right:8px}
+.ge-item.吉 b{color:var(--lv)}
+.ge-item.凶 b{color:var(--zhu)}
+.ge-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius:999px;padding:0 7px;margin-right:6px;font-family:var(--font-title)}
+.ge-item .tx{font-size:13px;color:var(--fg-2)}
+.ge-none{font-size:13px;color:var(--faint);padding:8px 2px}
 
 /* ---------- 分区 ---------- */
 .qm-sec{display:none;animation:fbIn .3s}
@@ -109,9 +161,18 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
   .qm-layout{grid-template-columns:1fr;gap:14px}
   .qm-chart-card{position:static;padding:8px}
   .chart{gap:4px}
-  .palace{padding:6px 7px}
-  .palace .starline{font-size:.95rem}
-  .palace .door{font-size:.9rem}
+  .palace{padding:5px 5px 4px}
+  .palace .pc-star{font-size:.95rem;gap:2px}
+  .palace .pc-door{font-size:.9rem}
+  .palace .god{font-size:.68rem;letter-spacing:0}
+  .palace .hid,.palace .dgod{font-size:.64rem}
+  .palace .earth .stm{font-size:.95rem}
+  .palace .badges i{width:14px;height:14px;font-size:.52rem}
+  .palace .pc-top{gap:3px}
+}
+@media (max-width:380px){
+  .palace .ji{font-size:.68rem}
+  .palace .pc-star{font-size:.88rem}
 }
 </style>
 </head>
@@ -122,7 +183,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
     <div class="fb-seal">奇</div>
     <div>
       <h1 class="fb-title">奇门手记 <span class="en">QI MEN NOTES</span></h1>
-      <div class="fb-sub">起局 · 封盘存断 · 次日复盘归档</div>
+      <div class="fb-sub">起局 · 看格局 · 封盘存断 · 次日复盘归档</div>
     </div>
   </div>
 
@@ -133,40 +194,59 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
       <div class="fb-pillars" id="pillars"></div>
       <div class="fb-key" id="juMain"></div>
       <div class="fb-note qm-sub" id="juSub"></div>
+      <div class="qm-jie" id="juJie"></div>
       <div class="fb-note bad" id="boundaryWarn" hidden>距交气不足一小时，局数可能有出入，建议核对</div>
     </div>
     <div class="fb-now-ctrl">
       <div class="fb-row">
-        <input type="datetime-local" id="dtInput" class="grow" aria-label="起局时间">
+        <input type="datetime-local" id="dtInput" class="grow" min="1900-01-08T00:00" max="2100-12-31T23:59" aria-label="起局时间">
         <button type="button" class="fb-btn" id="nowBtn">此刻</button>
       </div>
       <div class="fb-row">
+        <button type="button" class="fb-btn grow" id="prevH" title="快捷键 ←">‹ 前一时辰</button>
+        <button type="button" class="fb-btn grow" id="nextH" title="快捷键 →">后一时辰 ›</button>
         <button type="button" class="fb-btn grow" id="ovToggle">改局</button>
+      </div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn grow" id="copyPan">复制盘面</button>
+        <button type="button" class="fb-btn grow" id="copyLink">此盘链接</button>
       </div>
       <div class="override" id="overrideRow">
         <select id="ovDun" aria-label="阴阳遁"><option value="yang">阳遁</option><option value="yin">阴遁</option></select>
         <select id="ovJu" aria-label="局数"></select>
         <button type="button" class="fb-btn ghost" id="ovClear">恢复自动</button>
       </div>
-      <div class="fb-fine">按节气与符头自动定局（拆补法）</div>
+      <div class="fb-fine">按节气与符头自动定局（拆补法）· 可排 1900–2100 年</div>
     </div>
   </section>
 
   <div class="qm-layout">
     <div class="fb-card qm-chart-card">
-      <div class="chart" id="chart"></div>
+      <div class="chart live" id="chart"></div>
       <div class="qm-key">
-        <span><i style="background:var(--zhu);color:#fff">符</i>值符</span>
-        <span><i style="background:var(--qing);color:var(--bg)">使</i>值使</span>
-        <span><i style="border:1px solid var(--zi-2);color:var(--zi-2)">用</i>用神</span>
+        <span><i class="u-zf">星</i>值符</span>
+        <span><i class="u-zs">门</i>值使</span>
+        <span><i class="bx-h">干</i>时干</span>
+        <span><i class="bx-d">干</i>日干</span>
         <span><i style="background:var(--zhu);color:#fff;border-radius:50%">马</i>驿马</span>
-        <span><i style="color:var(--qi)">乙丙丁</i>三奇</span>
+        <span><i style="background:rgba(224,122,98,.22);color:var(--zhu);border:1px solid rgba(224,122,98,.7);border-radius:50%">空</i>时空</span>
+        <span><i style="color:var(--muted);border:1px dashed var(--faint);border-radius:50%">空</i>日空</span>
+        <span><i style="color:var(--zhu)">刑墓迫</i>击刑·入墓·门迫</span>
+      </div>
+      <div class="qm-key" style="margin-top:4px">
+        <span>左上灰字＝隐干</span><span>左下＝地盘八神</span><span>点任一宫看详解</span>
+      </div>
+      <div class="qm-tgs" id="viewTgs">
+        <button type="button" class="qm-tg" data-v="wx">五行色</button>
+        <button type="button" class="qm-tg" data-v="hid">隐干</button>
+        <button type="button" class="qm-tg" data-v="dgod">地盘神</button>
       </div>
     </div>
 
     <div class="qm-side">
       <div class="fb-seg" id="secSeg">
         <button type="button" data-s="new" class="on">起局</button>
+        <button type="button" data-s="ge">格局</button>
         <button type="button" data-s="review">待复盘<span class="badge" id="revBadge" hidden></span></button>
         <button type="button" data-s="lib">判例库</button>
       </div>
@@ -179,7 +259,6 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
             <button class="chip" data-t="自由">自由</button>
           </div>
         </div>
-
         <div id="wxForm">
           <div class="field"><label>明日天气 · 预断</label>
             <div class="wx" id="wxPredict">
@@ -196,7 +275,6 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
             <textarea id="wxBasis" placeholder="例：天蓬加壬落坎得地，天英落坎受制——雨方胜"></textarea>
           </div>
         </div>
-
         <div id="freeForm" hidden>
           <div class="field"><label>所问何事</label><input id="fQ" placeholder="例：下周三考试结果"></div>
           <div class="grid2">
@@ -205,9 +283,15 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
           </div>
           <div class="field"><label>预断（主体·事件·程度，写到可证伪）</label><textarea id="fPred"></textarea></div>
         </div>
-
         <button class="fb-btn primary block savebtn" id="saveBtn">封 盘 存 断</button>
         <p class="hint">断语一经保存不可修改（预注册原则）。明日打开本页，待复盘队列会自动浮出。</p>
+      </section>
+
+      <!-- 格局 -->
+      <section id="sec-ge" class="qm-sec">
+        <div class="card pal-detail" id="palDetail"></div>
+        <div id="geList"></div>
+        <p class="hint">口径：十干克应、九遁、三奇升殿等取《烟波钓叟歌》《奇门遁甲统宗》常见说法；入墓按十二长生阳顺阴逆（乙丙戊墓乾，丁己庚墓艮，辛壬墓巽，癸墓坤）；隐干按地盘干随八门同转；刑墓只标天盘干。格局只是提示，断事仍以用神为主。</p>
       </section>
 
       <!-- 待复盘 -->
@@ -233,200 +317,201 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
 </main>
 
 <script src="/fabao/fabao.js?v=6"></script>
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/qimen/core.js?v=1"></script>
 <script>
-const TERM_NAMES=["春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至", "小寒", "大寒", "立春", "雨水", "惊蛰"];
-const TERMS=[[1733497692502, 17], [1734772327405, 18], [1736043878426, 19], [1737316333550, 20], [1738591360741, 21], [1739872726090, 22], [1741161563602, 23], [1742460804153, 0], [1743770425978, 1], [1745092064331, 2], [1746424140743, 3], [1747766790543, 4], [1749116914445, 5], [1750473272640, 6], [1751831859929, 7], [1753190551260, 8], [1754545490556, 9], [1755894432603, 10], [1757234706670, 11], [1758564736698, 12], [1759883633945, 13], [1761191014220, 14], [1762487805886, 15], [1763774911687, 16], [1765054676737, 17], [1766329007634, 18], [1767601039012, 19], [1768873159279, 20], [1770148602305, 21], [1771429586864, 22], [1772718802171, 23], [1774017605009, 0], [1775327635324, 1], [1776648776727, 2], [1777981356517, 3], [1779323454888, 4], [1780674164341, 5], [1782029951980, 6], [1783389112460, 7], [1784747296484, 8], [1786102683020, 9], [1787451255042, 10], [1788791801081, 11], [1790121625282, 12], [1791440658362, 13], [1792747964843, 14], [1794044811501, 15], [1795331893565, 16], [1796611664895, 17], [1797885945880, 18], [1799157954997, 19], [1800429965727, 20], [1801705365976, 21], [1802986202368, 22], [1804275357324, 23], [1805574057106, 0], [1806884007685, 1], [1808205205707, 2], [1809537653759, 3], [1810880049951, 4], [1812230521855, 5], [1813586847551, 6], [1814945643996, 7], [1816304507831, 8], [1817659437721, 9], [1819008684337, 10], [1820348729289, 11], [1821679113064, 12], [1822997628424, 13], [1824305368793, 14], [1825601707682, 15], [1826889173258, 16], [1828168470818, 17], [1829443157805, 18], [1830714721410, 19], [1831987177460, 20], [1833262139289, 21], [1834543437184, 22], [1835832153960, 23], [1837131292309, 0], [1838440835656, 1], [1839762410454, 2], [1841094567824, 3], [1842437226650, 4], [1843787611860, 5], [1845143989293, 6], [1846502916484, 7], [1847861550849, 8], [1849216785454, 9], [1850565562714, 10], [1851906020062, 11], [1853235796303, 12], [1854554771237, 13], [1855861861302, 14], [1857158689268, 15], [1858445528186, 16], [1859725356802, 17], [1860999474463, 18], [1862271623932, 19], [1863543573681, 20], [1864819170540, 21], [1866099996816, 22], [1867389369018, 23], [1868688017084, 0], [1869998196296, 1], [1871319223967, 2], [1872651953472, 3], [1873994041038, 4], [1875344896126, 5], [1876700806503, 6], [1878060067641, 7], [1879418467559, 8], [1880773850090, 9], [1882122643116, 10], [1883463042071, 11], [1884793018946, 12], [1886111773776, 13], [1887419160402, 14], [1888715673183, 15], [1890002835101, 16], [1891282317379, 17], [1892556751272, 18], [1893828559962, 19], [1895100797915, 20], [1896376049620, 21], [1897657132272, 22], [1898946121278, 23], [1900245029101, 0], [1901554747804, 1], [1902876090692, 2], [1904208252921, 3], [1905550750986, 4], [1906900964141, 5], [1908257388828, 6], [1909616046200, 7], [1910975019061, 8], [1912329964736, 9], [1913679305167, 10], [1915019481662, 11], [1916349903340, 12], [1917668587408, 13], [1918976285048, 14], [1920272766481, 15], [1921560116171, 16], [1922839510038, 17], [1924114041565, 18], [1925385672459, 19], [1926657971974, 20], [1927933000176, 21], [1929214153624, 22], [1930502947864, 23], [1931801927154, 0], [1933111549305, 1], [1934432904137, 2], [1935765130526, 3], [1937107499435, 4], [1938457975468, 5], [1939814078776, 6], [1941173196290, 7], [1942531696654, 8], [1943887241772, 9], [1945236050079, 10], [1946576850251, 11], [1947906737737, 12], [1949225981021, 13], [1950533154769, 14], [1951830117139, 15], [1953116934446, 16], [1954396756215, 17], [1955670727184, 18], [1956942769611, 19], [1958214490350, 20], [1959489948745, 21], [1960770542396, 22], [1962059806661, 23], [1963358294302, 0], [1964668417563, 1], [1965989394761, 2], [1967322087130, 3], [1968664228648, 4], [1970015012474, 5], [1971371067136, 6], [1972730213836, 7], [1974088852169, 8], [1975444128945, 9], [1976793252887, 10], [1978133604462, 11], [1979463961463, 12], [1980782709189, 13], [1982090449790, 14], [1983386921650, 15], [1984674342426, 16], [1985953677755, 17], [1987228246238, 18], [1988499787576, 19]].map(([t,i])=>({t,n:TERM_NAMES[i]}));
-const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-const RING = [1,8,3,4,9,2,7,6];
-const STAR_HOME = {1:'天蓬',8:'天任',3:'天冲',4:'天辅',9:'天英',2:'天芮',7:'天柱',6:'天心',5:'天禽'};
-const DOOR_HOME = {1:'休门',8:'生门',3:'伤门',4:'杜门',9:'景门',2:'死门',7:'惊门',6:'开门'};
-const GODS = ['值符','腾蛇','太阴','六合','白虎','玄武','九地','九天'];
-const PALACE_NAME = {1:'坎一',8:'艮八',3:'震三',4:'巽四',9:'离九',2:'坤二',7:'兑七',6:'乾六',5:'中五'};
-const EARTH_SEQ = ['戊','己','庚','辛','壬','癸','丁','丙','乙'];
-const XUN_DUN = {0:'戊',10:'己',20:'庚',30:'辛',40:'壬',50:'癸'};
-const XUN_KONG = {0:['戌','亥'],10:['申','酉'],20:['午','未'],30:['辰','巳'],40:['寅','卯'],50:['子','丑']};
-const JU = {
- '冬至':[1,7,4],'小寒':[2,8,5],'大寒':[3,9,6],'立春':[8,5,2],'雨水':[9,6,3],'惊蛰':[1,7,4],
- '春分':[3,9,6],'清明':[4,1,7],'谷雨':[5,2,8],'立夏':[4,1,7],'小满':[5,2,8],'芒种':[6,3,9],
- '夏至':[9,3,6],'小暑':[8,2,5],'大暑':[7,1,4],'立秋':[2,5,8],'处暑':[1,4,7],'白露':[9,3,6],
- '秋分':[7,1,4],'寒露':[6,9,3],'霜降':[5,8,2],'立冬':[6,9,3],'小雪':[5,8,2],'大雪':[4,7,1]};
-const YANG_TERMS = new Set(['冬至','小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种']);
-const JIE = new Set(['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒']);
-const MONTH_BRANCH_BY_JIE = {'立春':2,'惊蛰':3,'清明':4,'立夏':5,'芒种':6,'小暑':7,'立秋':8,'白露':9,'寒露':10,'立冬':11,'大雪':0,'小寒':1};
-const HORSE = {2:'申',6:'申',10:'申', 8:'寅',0:'寅',4:'寅', 5:'亥',9:'亥',1:'亥', 11:'巳',3:'巳',7:'巳'};
-const BRANCH_PALACE = {0:1, 1:8,2:8, 3:3, 4:4,5:4, 6:9, 7:2,8:2, 9:7, 10:6,11:6};
-
-function jdn(y,m,d){ const a=Math.floor((14-m)/12), yy=y+4800-a, mm=m+12*a-3;
-  return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045; }
-const gzName = i => STEMS[i%10]+BRANCHES[i%12];
-
-function computeChart(dt, TERMS, juOverride){
-  const ms = dt.getTime();
-  let term = TERMS[0], termIdx = 0;
-  for(let i=0;i<TERMS.length;i++){ if(TERMS[i].t<=ms){ term=TERMS[i]; termIdx=i; } else break; }
-  const nearBoundary = (termIdx+1<TERMS.length && TERMS[termIdx+1].t-ms < 3600e3) || (ms-term.t < 3600e3);
-  let y=dt.getFullYear(), mo=dt.getMonth()+1, d=dt.getDate(), h=dt.getHours(), mi=dt.getMinutes();
-  let J = jdn(y,mo,d); if(h>=23) J+=1;
-  const dayIdx = ((J - 2415021 + 10) % 60 + 60) % 60;
-  const hb = Math.floor(((h+1)%24)/2);
-  const hs = ((dayIdx%10)%5*2 + hb) % 10;
-  let hIdx = -1; for(let n=0;n<60;n++) if(n%10===hs && n%12===hb){ hIdx=n; break; }
-  let lastJie = null;
-  for(const t of TERMS){ if(t.t<=ms){ if(JIE.has(t.n)) lastJie=t; } else break; }
-  let civilY = y;
-  let liChunOfY = TERMS.find(t=>t.n==='立春' && new Date(t.t+9*3600e3).getUTCFullYear()===civilY);
-  let yAdj = (liChunOfY && ms < liChunOfY.t) ? civilY-1 : civilY;
-  const yearIdx = ((yAdj - 1984) % 60 + 60) % 60;
-  let monthIdx = null;
-  if(lastJie){
-    const mb = MONTH_BRANCH_BY_JIE[lastJie.n];
-    const monthOffsetFromYin = (mb - 2 + 12) % 12;
-    const mstem = ((yearIdx%10)%5*2 + 2 + monthOffsetFromYin) % 10;
-    for(let n=0;n<60;n++) if(n%10===mstem && n%12===mb){ monthIdx=n; break; }
-  }
-  const dstem = dayIdx%10;
-  const back = dstem%5;
-  const futou = ((dayIdx - back) % 60 + 60) % 60;
-  const fb = futou % 12;
-  const yuan = [0,6,3,9].includes(fb) ? 0 : [2,8,5,11].includes(fb) ? 1 : 2;
-  const yang = YANG_TERMS.has(term.n);
-  let ju = JU[term.n][yuan];
-  if(juOverride){ ju = juOverride.ju; }
-  const isYang = juOverride ? juOverride.yang : yang;
-  const earth = {};
-  for(let i=0;i<9;i++){
-    const p = isYang ? ((ju-1+i)%9)+1 : (((ju-1-i)%9)+9)%9+1;
-    earth[p] = EARTH_SEQ[i];
-  }
-  const palaceOfStem = s => { for(let p=1;p<=9;p++) if(earth[p]===s) return p; };
-  const xun = hIdx - (hIdx%10);
-  const dun = XUN_DUN[xun];
-  const kong = XUN_KONG[xun];
-  const p0raw = palaceOfStem(dun);
-  const zhifuStar = STAR_HOME[p0raw];
-  const zhishiDoor = p0raw===5 ? '死门' : DOOR_HOME[p0raw];
-  const zhishiHomeRingP = p0raw===5 ? 2 : p0raw;
-  const hourStem = STEMS[hs];
-  const anchorStem = hs===0 ? dun : hourStem;
-  let pt = palaceOfStem(anchorStem); if(pt===5) pt=2;
-  const zhifuRingHome = p0raw===5 ? 2 : p0raw;
-  const rpos = p => RING.indexOf(p);
-  const rot = (rpos(pt) - rpos(zhifuRingHome) + 8) % 8;
-  const sky = {};
-  for(let i=0;i<8;i++){
-    const homeP = RING[i];
-    const destP = RING[(i+rot)%8];
-    let star = STAR_HOME[homeP];
-    let stems = [earth[homeP]];
-    if(homeP===2){ star='天芮'; stems=[earth[2], earth[5]]; }
-    sky[destP] = sky[destP]||{};
-    sky[destP].star = star + (homeP===2 ? '·禽' : '');
-    sky[destP].stems = stems;
-  }
-  const n = hIdx - xun;
-  let destNum = isYang ? ((p0raw-1+n)%9)+1 : (((p0raw-1-n)%9)+9)%9+1;
-  if(destNum===5) destNum=2;
-  const doorRot = (rpos(destNum) - rpos(zhishiHomeRingP) + 8) % 8;
-  const doors = {};
-  for(let i=0;i<8;i++){
-    const homeP = RING[i];
-    doors[RING[(i+doorRot)%8]] = DOOR_HOME[homeP];
-  }
-  const gods = {};
-  const zfP = RING[(rpos(zhifuRingHome)+rot)%8];
-  for(let i=0;i<8;i++){
-    const p = isYang ? RING[(rpos(zfP)+i)%8] : RING[(rpos(zfP)-i+8)%8];
-    gods[p] = GODS[i];
-  }
-  const horseBranch = HORSE[hb];
-  const horseP = BRANCH_PALACE[BRANCHES.indexOf(horseBranch)];
-  const kongP = kong.map(k=>BRANCH_PALACE[BRANCHES.indexOf(k)]);
-  return {
-    pillars:{ year:gzName(yearIdx), month:monthIdx==null?'—':gzName(monthIdx), day:gzName(dayIdx), hour:gzName(hIdx) },
-    term: term.n, termNext: TERMS[termIdx+1]||null, nearBoundary,
-    dun: (isYang?'阳遁':'阴遁'), ju, yuan:['上元','中元','下元'][yuan], overridden: !!juOverride,
-    xunShou: '甲'+BRANCHES[xun%12]+'旬（遁'+dun+'）', kong, kongP, horseBranch, horseP,
-    zhifuStar, zhishiDoor, zfPalace: pt, zhishiPalace: destNum,
-    earth, sky, doors, gods, palaceName: PALACE_NAME
-  };
-}
-if(typeof module!=='undefined') module.exports = {computeChart, PALACE_NAME};
-
 /* ================= state ================= */
-const LS='qmsj.v1';
+const LS='qmsj.v1', LSV='qmsj.view';
 const load=()=>{try{return JSON.parse(localStorage.getItem(LS))||[]}catch(e){return[]}};
-const save=es=>localStorage.setItem(LS,JSON.stringify(es));
+const save=es=>{try{localStorage.setItem(LS,JSON.stringify(es))}catch(e){Fabao.toast('本机存储不可用，未能保存')}};
 let entries=load();
+let view={wx:true,hid:true,dgod:true};
+try{Object.assign(view,JSON.parse(localStorage.getItem(LSV))||{})}catch(e){}
 let curDate=new Date(); curDate.setSeconds(0,0);
 let override=null;
 let curType='天气';
+let selP=null;
+let cur=null;     // 当前盘
 const $=id=>document.getElementById(id);
 const toast=Fabao.toast;
-const fmt=d=>{const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())};
+const fmt=Fabao.fmt;
+const PNUM=QM.PNUM, PN=QM.PALACE_NAME;
+const SANQI=new Set(['乙','丙','丁']);
+const WEEK='日一二三四五六';
+const ZHI=QM.BRANCHES;
+
+/* ================= 农历（浏览器内置 chinese 历） ================= */
+const LUNAR_MONTH=['正','二','三','四','五','六','七','八','九','十','冬','腊'];
+function lunarDay(d){ if(d===10)return'初十'; if(d===20)return'二十'; if(d===30)return'三十'; return['初','十','廿','三'][Math.floor(d/10)]+'一二三四五六七八九'[(d%10)-1]; }
+function lunar(date){
+  try{
+    const parts=new Intl.DateTimeFormat('en-u-ca-chinese',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(date);
+    const get=t=>{const p=parts.find(x=>x.type===t);return p?p.value:''};
+    const mraw=get('month'), month=parseInt(mraw,10), day=parseInt(get('day'),10);
+    if(!month||!day) return '';
+    return (/bis/i.test(mraw)?'闰':'')+LUNAR_MONTH[month-1]+'月'+lunarDay(day);
+  }catch(e){return ''}
+}
+const pad=n=>String(n).padStart(2,'0');
+const mdhm=t=>{const d=new Date(t);return `${d.getMonth()+1}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
 
 /* ================= chart render ================= */
-const GRID=[4,9,2,3,5,7,8,1,6];
-const PNUM={1:'一',2:'二',3:'三',4:'四',5:'五',6:'六',7:'七',8:'八',9:'九'};
-const SANQI=new Set(['乙','丙','丁']);
-const qiCls=s=>SANQI.has(s)?'stem qi':'stem';
-const qiStem=s=>SANQI.has(s)?'qi':'';
-function yongshenPalaces(c, type){
-  if(type==='天气'){
-    const out=[];
-    for(let p=1;p<=9;p++){ if(p===5) continue;
-      const st=c.sky[p]&&c.sky[p].star||''; if(st.includes('天蓬')||st.includes('天英')) out.push(p); }
-    return out;
-  }
-  return [];
+function stem(x,c){
+  const cls=['stm']; if(SANQI.has(x)) cls.push('qi'); if(x===c.use.hour) cls.push('hs'); if(x===c.use.day) cls.push('ds');
+  return `<span class="${cls.join(' ')}" data-w="${QM.STEM_WX[x]}">${x}</span>`;
 }
-function renderChart(dt, ov, mountId, opts){
-  const c=computeChart(dt,TERMS,ov);
-  const el=mountId?$(mountId):$('chart');
+function skyStem(x,c,p){
+  const m=c.marks[p];
+  const sup=(m.xing.includes(x)?'<sup class="mk">刑</sup>':'')+(m.mu.includes(x)?'<sup class="mk">墓</sup>':'');
+  return stem(x,c)+sup;
+}
+function yongshenPalaces(c, type){
+  if(type!=='天气') return [];
+  return [1,2,3,4,6,7,8,9].filter(p=>['天蓬','天英'].includes(c.sky[p].star));
+}
+function chartHTML(c, opts){
   const ys=(opts&&opts.yongshen)||[];
-  el.innerHTML=GRID.map(p=>{
-    if(p===5) return `<div class="palace center"><small>中五·寄坤二</small><div class="earthstem">${c.earth[5]}</div><div class="pnum">五</div></div>`;
-    const s=c.sky[p], kong=c.kongP.includes(p);
-    const cls=['palace',kong?'kong':'',p===c.zfPalace?'zhifu':'',p===c.zhishiPalace?'zhishi':'',ys.includes(p)?'yongshen':''].filter(Boolean).join(' ');
-    const stems=s.stems.map(x=>`<span class="${qiCls(x)}">${x}</span>`).join('');
-    return `<div class="${cls}">
-      <div><div class="god">${c.gods[p]}</div>
-      <div class="starline">${s.star}${stems}</div></div>
-      <div class="door">${c.doors[p]}</div>
+  return QM.GRID.map(p=>{
+    if(p===5) return `<div class="palace center" data-p="5"><span class="hid" title="隐干">${c.hidden[5]}</span><small>中五·寄坤二</small><div class="earthstem">${stem(c.earth[5],c)}</div><div class="pnum">五</div></div>`;
+    const s=c.sky[p], m=c.marks[p], god=c.gods[p], door=c.doors[p];
+    const hk=c.kongP.includes(p), dk=c.dayKongP.includes(p);
+    const cls=['palace',hk?'kong':'',dk?'dkong':'',p===c.zfPalace?'zhifu':'',p===c.zhishiPalace?'zhishi':'',ys.includes(p)?'yongshen':'',opts&&opts.sel===p?'sel':''].filter(Boolean).join(' ');
+    const badges=(p===c.horseP?'<i class="b-ma" title="驿马">马</i>':'')+(dk?'<i class="b-kong d" title="日空">空</i>':'')+(hk?'<i class="b-kong h" title="时空">空</i>':'');
+    return `<div class="${cls}" data-p="${p}"${opts&&opts.live?` role="button" tabindex="0" aria-label="${PN[p]}宫"`:''}>
+      <div class="pc-top"><span class="hid" title="隐干">${c.hidden[p]}</span><span class="god" data-w="${QM.GOD_WX[god]}">${god}</span><span class="badges">${badges}</span></div>
+      <div class="pc-star">${s.ji?`<span class="ji">${skyStem(s.ji,c,p)}</span>`:''}<span class="star${p===c.zfPalace?' zf':''}" data-w="${QM.STAR_WX[s.star]}">${s.qin?'禽芮':s.star}</span><span class="sky">${skyStem(s.stems[0],c,p)}</span></div>
+      <div class="pc-door">${m.po?'<sup class="mk">迫</sup>':''}<span class="door${p===c.zhishiPalace?' zs':''}" data-w="${QM.DOOR_WX[door]}">${door}</span></div>
+      <div class="pc-bot"><span class="dgod" title="地盘八神">${QM.GOD_SHORT[c.diGods[p]]}</span><span class="earth">${stem(c.earth[p],c)}</span></div>
       <div class="pnum">${PNUM[p]}</div>
-      ${p===c.zfPalace?'<div class="stamp-fu">符</div>':''}
-      ${p===c.zhishiPalace?'<div class="stamp-shi">使</div>':''}
-      ${p===c.horseP?'<div class="horse">马</div>':''}
-      <div class="earthstem ${qiStem(c.earth[p])}">${c.earth[p]}</div>
     </div>`;
   }).join('');
+}
+function applyView(el){
+  el.classList.toggle('wuxing',view.wx); el.classList.toggle('no-hid',!view.hid); el.classList.toggle('no-dgod',!view.dgod);
+}
+function renderChart(dt, ov, el, opts){
+  const c=QM.computeChart(dt,ov);
+  if(!c) return null;
+  el.innerHTML=chartHTML(c,opts);
+  applyView(el);
   return c;
 }
 function renderHeader(){
-  const c=renderChart(curDate,override,null,{yongshen:[]});
-  const ysReal=yongshenPalaces(c,curType);
-  if(ysReal.length) renderChart(curDate,override,null,{yongshen:ysReal});
+  if(!QM.inRange(curDate)){ toast('只能排 1900–2100 年'); curDate=new Date(); curDate.setSeconds(0,0); $('dtInput').value=Fabao.toLocalInput(curDate); }
+  const c0=QM.computeChart(curDate,override);
+  const c=renderChart(curDate,override,$('chart'),{yongshen:yongshenPalaces(c0,curType),sel:selP,live:true});
+  cur=c;
   $('pillars').innerHTML=[['年',c.pillars.year],['月',c.pillars.month],['日',c.pillars.day],['时',c.pillars.hour]]
     .map(([l,v])=>`<span class="fb-pillar"><small>${l}</small><b>${v}</b></span>`).join('');
   $('juMain').innerHTML=`<strong>${c.dun} ${c.ju} 局</strong><span class="sep">·</span>${c.yuan}`;
-  $('juTerm').textContent=`${fmt(curDate)} · ${c.term}`;
+  const lu=lunar(curDate);
+  $('juTerm').textContent=`${fmt(curDate)} 周${WEEK[curDate.getDay()]}${lu?' · 农历'+lu:''} ${ZHI[c.idx.hour%12]}时`;
   $('juTag').textContent=c.overridden?'手动局':'时家转盘';
-  $('juSub').innerHTML=`<span>值符 <b>${c.zhifuStar}</b>⇢${c.zfPalace}</span><span class="sep">·</span>
-    <span>值使 <b>${c.zhishiDoor}</b>⇢${c.zhishiPalace}</span><span class="sep">·</span>
-    <span>空 <b>${c.kong.join('')}</b></span>`;
+  $('juSub').innerHTML=`<span>值符 <b>${c.zhifuStar}</b>⇢${PN[c.zfPalace]}</span><span class="sep">·</span>
+    <span>值使 <b>${c.zhishiDoor}</b>⇢${PN[c.zhishiPalace]}</span><span class="sep">·</span>
+    <span>旬首 <b>${c.xunShou}</b></span><span class="sep">·</span>
+    <span>日空 <b>${c.dayKong.join('')}</b> 时空 <b>${c.kong.join('')}</b></span><span class="sep">·</span>
+    <span>马 <b>${c.horseBranch}</b></span>`;
+  $('juJie').innerHTML=`<span><b>${c.term}</b> ${mdhm(c.termStart.t)} 交</span><span>下一气 <b>${c.termNext.n}</b> ${mdhm(c.termNext.t)}</span><span>（本机时区）</span>`;
   $('ovToggle').textContent=c.overridden?'手动局 ✎':'改局';
   $('boundaryWarn').hidden=!c.nearBoundary;
+  renderGe();
   return c;
 }
 
-/* ================= override ================= */
+/* ================= 格局 ================= */
+function renderGe(){
+  const c=cur; if(!c) return;
+  const all=QM.analyze(c);
+  const det=$('palDetail');
+  if(selP==null){
+    det.innerHTML=`<h3>宫位详解</h3><p class="hint" style="margin-top:6px">点盘中任一宫，看这一宫的星、门、神、天地盘干与格局。</p>`;
+  }else{
+    const d=QM.palaceDetail(c,selP);
+    det.innerHTML=`<h3>${d.title}${(d.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</h3>
+      <dl>${d.rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+      ${d.ge.length?`<div class="ge-h">本宫格局</div>${d.ge.map(geItem).join('')}`:''}`;
+  }
+  const ji=all.filter(g=>g.tone==='吉'), xiong=all.filter(g=>g.tone!=='吉');
+  $('geList').innerHTML=`<div class="ge-h">全盘吉格 · ${ji.length}</div>${ji.length?ji.map(geItem).join(''):'<div class="ge-none">无</div>'}
+    <div class="ge-h">全盘凶格 · ${xiong.length}</div>${xiong.length?xiong.map(geItem).join(''):'<div class="ge-none">无</div>'}`;
+  document.querySelectorAll('#sec-ge .ge-item[data-p]').forEach(b=>b.onclick=()=>selectPalace(+b.dataset.p,false));
+}
+function geItem(g){
+  return `<button type="button" class="ge-item ${g.tone}"${g.p?` data-p="${g.p}"`:''}><b>${g.name}</b>${g.p?`<span class="at">${PN[g.p]}</span>`:''}<span class="tx">${g.text}</span></button>`;
+}
+function selectPalace(p, jump){
+  selP=p;
+  document.querySelectorAll('#chart .palace').forEach(el=>el.classList.toggle('sel',+el.dataset.p===p));
+  renderGe();
+  if(jump){
+    document.querySelector('#secSeg button[data-s="ge"]').click();
+    if(window.matchMedia('(max-width:860px)').matches) $('palDetail').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+$('chart').addEventListener('click',e=>{const el=e.target.closest('.palace');if(el)selectPalace(+el.dataset.p,true)});
+$('chart').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('palace')){e.preventDefault();selectPalace(+e.target.dataset.p,true)}});
+
+/* ================= 显示开关 ================= */
+function paintTgs(){ document.querySelectorAll('#viewTgs .qm-tg').forEach(b=>b.classList.toggle('on',!!view[b.dataset.v])); }
+document.querySelectorAll('#viewTgs .qm-tg').forEach(b=>b.onclick=()=>{
+  view[b.dataset.v]=!view[b.dataset.v];
+  try{localStorage.setItem(LSV,JSON.stringify(view))}catch(e){}
+  paintTgs(); document.querySelectorAll('.chart').forEach(applyView);
+});
+paintTgs();
+
+/* ================= 时间 · 改局 ================= */
 (function(){
   const sel=$('ovJu'); for(let i=1;i<=9;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'局';sel.appendChild(o)}
   $('ovDun').onchange=$('ovJu').onchange=()=>{override={ju:+$('ovJu').value,yang:$('ovDun').value==='yang'};renderHeader()};
   $('ovClear').onclick=()=>{override=null;$('overrideRow').classList.remove('on');renderHeader()};
 })();
-$('ovToggle').onclick=()=>$('overrideRow').classList.toggle('on');
-Fabao.bindWhen($('dtInput'),$('nowBtn'),d=>{curDate=d;override=null;$('overrideRow').classList.remove('on');renderHeader()});
+$('ovToggle').onclick=()=>{
+  const on=$('overrideRow').classList.toggle('on');
+  if(on&&!override&&cur){$('ovDun').value=cur.yang?'yang':'yin';$('ovJu').value=cur.ju;}
+};
+function setDate(d){
+  if(!QM.inRange(d)){ toast('只能排 1900–2100 年'); $('dtInput').value=Fabao.toLocalInput(curDate); return; }
+  curDate=d; override=null; $('overrideRow').classList.remove('on'); renderHeader();
+}
+curDate=Fabao.bindWhen($('dtInput'),$('nowBtn'),d=>setDate(d));
+function stepShichen(k){
+  const d=new Date(curDate.getTime()+k*2*3600e3);
+  if(!QM.inRange(d)){toast('只能排 1900–2100 年');return}
+  $('dtInput').value=Fabao.toLocalInput(d); setDate(d);
+}
+$('prevH').onclick=()=>stepShichen(-1);
+$('nextH').onclick=()=>stepShichen(1);
+document.addEventListener('keydown',e=>{
+  if(e.target.closest('input,textarea,select')||e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.key==='ArrowLeft'){e.preventDefault();stepShichen(-1)}
+  if(e.key==='ArrowRight'){e.preventDefault();stepShichen(1)}
+});
+
+/* ================= 复制盘面 · 链接 ================= */
+function panText(c){
+  const L=[];
+  L.push(`奇门 · ${fmt(c.date)} 周${WEEK[c.date.getDay()]}${lunar(c.date)?' 农历'+lunar(c.date):''}`);
+  L.push(`${c.pillars.year} ${c.pillars.month} ${c.pillars.day} ${c.pillars.hour}　${c.term} ${c.dun}${c.ju}局（${c.yuan}）${c.overridden?' 手动局':''}`);
+  L.push(`值符 ${c.zhifuStar}落${PN[c.zfPalace]}　值使 ${c.zhishiDoor}落${PN[c.zhishiPalace]}　日空 ${c.dayKong.join('')}　时空 ${c.kong.join('')}　马 ${c.horseBranch}`);
+  L.push('');
+  [4,9,2,3,5,7,8,1,6].forEach(p=>{
+    if(p===5){L.push(`中五　地盘${c.earth[5]}（寄坤二）`);return}
+    const s=c.sky[p], m=c.marks[p];
+    const flag=[...m.xing.map(x=>x+'刑'),...m.mu.map(x=>x+'墓'),m.po?'门迫':'',c.dayKongP.includes(p)?'日空':'',c.kongP.includes(p)?'时空':'',p===c.horseP?'马':''].filter(Boolean).join(' ');
+    L.push(`${PN[p]}　${c.gods[p]} ${s.qin?'禽芮':s.star} ${s.stems[0]}${s.ji?'（寄'+s.ji+'）':''} / ${c.doors[p]} / 地${c.earth[p]} 隐${c.hidden[p]}${flag?'　'+flag:''}`);
+  });
+  const ge=QM.analyze(c);
+  if(ge.length){L.push('');L.push('格局：'+ge.map(g=>g.name+(g.p?'('+PN[g.p]+')':'')).join('、'));}
+  return L.join('\n');
+}
+$('copyPan').onclick=()=>{ if(cur) Fabao.copy(panText(cur),'盘面已复制'); };
+$('copyLink').onclick=()=>{
+  const u=new URL(location.href); u.search=''; u.hash='';
+  u.searchParams.set('t',Fabao.toLocalInput(curDate));
+  Fabao.copy(u.toString(),'此盘链接已复制');
+};
 
 /* ================= new entry form ================= */
 document.querySelectorAll('#typeChips .chip').forEach(b=>b.onclick=()=>{
@@ -440,7 +525,7 @@ pickGroup('wxPredict'); pickGroup('wxWind');
 const picked=id=>{const b=$(id).querySelector('.on');return b?b.dataset.v:null};
 
 $('saveBtn').onclick=()=>{
-  const c=computeChart(curDate,TERMS,override);
+  const c=QM.computeChart(curDate,override);
   let pred='',extra={};
   if(curType==='天气'){
     const w=picked('wxPredict');
@@ -454,7 +539,8 @@ $('saveBtn').onclick=()=>{
   }
   entries.unshift({id:Date.now(), t:curDate.getTime(), type:curType, pred, ...extra,
     ov:override, pan:{dun:c.dun,ju:c.ju,yuan:c.yuan,term:c.term,zf:c.zhifuStar+'落'+c.zfPalace,zs:c.zhishiDoor+'落'+c.zhishiPalace,
-      pillars:c.pillars, kong:c.kong.join('')},
+      pillars:c.pillars, kong:c.kong.join(''), dayKong:c.dayKong.join(''),
+      ge:QM.analyze(c).map(g=>g.name+(g.p?'('+PN[g.p]+')':''))},
     status:'open', attr:null, actual:null, note:''});
   save(entries);
   ['wxBasis','fQ','fYs','fTime','fPred'].forEach(i=>$(i).value='');
@@ -464,7 +550,7 @@ $('saveBtn').onclick=()=>{
 };
 
 /* ================= review ================= */
-function dueEntries(){ const cut=Date.now()-12*3600e3; return entries.filter(e=>e.status==='open'); }
+function dueEntries(){ return entries.filter(e=>e.status==='open'); }
 function refreshBadge(){
   const due=entries.filter(e=>e.status==='open'&&e.t<Date.now()-12*3600e3);
   const b=$('revBadge'); if(due.length){b.hidden=false;b.textContent=due.length}else b.hidden=true;
@@ -500,7 +586,7 @@ function renderReview(){
     const ag=card.querySelector('.attr');ag.querySelectorAll('button').forEach(b=>b.onclick=()=>{ag.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
     card.querySelector('[data-role="showpan"]').onclick=ev=>{
       const pd=card.querySelector('[data-role="pan"]');
-      if(pd.style.display==='none'){pd.style.display='grid';pd.id='pan'+e.id;renderChart(new Date(e.t),e.ov,'pan'+e.id);ev.target.textContent='收起'}
+      if(pd.style.display==='none'){pd.style.display='grid';renderChart(new Date(e.t),e.ov,pd);ev.target.textContent='收起'}
       else{pd.style.display='none';ev.target.textContent='看盘'}
     };
     card.querySelector('[data-role="del"]').onclick=()=>{if(confirm('删除这一局？')){entries=entries.filter(x=>x.id!==e.id);save(entries);renderReview();refreshBadge();renderLib()}};
@@ -526,7 +612,7 @@ function mdOf(e){
 
 - **四柱**：${e.pan.pillars.year}年 ${e.pan.pillars.month}月 ${e.pan.pillars.day}日 ${e.pan.pillars.hour}时
 - **局**：${e.pan.term} · ${e.pan.dun}${e.pan.ju}局（${e.pan.yuan}）${e.ov?' · 手动改局':''}
-- **值符**：${e.pan.zf}宫｜**值使**：${e.pan.zs}宫｜**空亡**：${e.pan.kong}
+- **值符**：${e.pan.zf}宫｜**值使**：${e.pan.zs}宫｜**空亡**：${e.pan.dayKong?'日'+e.pan.dayKong+' 时'+e.pan.kong:e.pan.kong}${e.pan.ge&&e.pan.ge.length?'\n- **格局**：'+e.pan.ge.join('、'):''}
 
 ### 预断（预注册）
 ${e.pred}
@@ -552,11 +638,15 @@ function renderLib(){
   rows.forEach(e=>{
     const card=document.createElement('div');card.className='card';
     card.innerHTML=`
-      <div class="meta"><span>${fmt(new Date(e.t))} · ${e.type}</span><span style="color:${e.attr==='验中'?'var(--ok)':'var(--zhu)'}">${e.attr}</span></div>
+      <div class="meta"><span>${fmt(new Date(e.t))} · ${e.type}</span><span style="color:${e.attr==='验中'?'var(--lv)':'var(--zhu)'}">${e.attr}</span></div>
       <div class="pansum">${e.pan.dun}${e.pan.ju}局 · 值符${e.pan.zf} · 值使${e.pan.zs}</div>
       <div class="pred">${e.pred}${e.actual?'\n—— 实际：'+e.actual:''}${e.note?'\n—— '+e.note:''}</div>
-      <div class="rowbtns"><button class="fb-btn" data-role="copy">复制判例 MD</button></div>`;
+      <div class="rowbtns"><button class="fb-btn" data-role="copy">复制判例 MD</button><button class="fb-btn" data-role="open">回看此盘</button></div>`;
     card.querySelector('[data-role="copy"]').onclick=()=>{Fabao.copy(mdOf(e),'已复制，可贴入 07卜部')};
+    card.querySelector('[data-role="open"]').onclick=()=>{
+      const d=new Date(e.t); $('dtInput').value=Fabao.toLocalInput(d); curDate=d; override=e.ov||null; renderHeader();
+      window.scrollTo({top:0,behavior:'smooth'}); toast('已回到 '+fmt(d)+' 这一盘');
+    };
     list.appendChild(card);
   });
 }
@@ -571,7 +661,7 @@ document.querySelectorAll('#secSeg button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#secSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
   document.querySelectorAll('.qm-sec').forEach(s=>s.classList.remove('on'));
   $('sec-'+b.dataset.s).classList.add('on');
-  if(b.dataset.s==='review')renderReview(); if(b.dataset.s==='lib')renderLib();
+  if(b.dataset.s==='review')renderReview(); if(b.dataset.s==='lib')renderLib(); if(b.dataset.s==='ge')renderGe();
 });
 
 /* ================= boot ================= */
