@@ -35,5 +35,7 @@ for (let Y = 1900; Y <= 2100; Y++) {
 const pre = [ms[1].day - ms[0].day, ms[2].day - ms[1].day];   // 1899 冬月、腊月天数
 const src = fs.readFileSync(path.join(__dirname, 'template.js'), 'utf8')
   .replace('__FIRST__', ms[0].day).replace('__PRE__', JSON.stringify(pre)).replace('__DATA__', enc.match(/.{1,100}/g).map(s => `'${s}'`).join(' +\n    '));
+// 法宝页从 /fabao/lunar.js 引；站内脚本包（日课、日签、五术门庭）从 assets/js/qj/lunar.js 拼进去
 fs.writeFileSync(path.join(__dirname, '../../static/fabao/lunar.js'), src);
-console.log('写入 static/fabao/lunar.js，月数', ms.length - 1);
+fs.writeFileSync(path.join(__dirname, '../../assets/js/qj/lunar.js'), src);
+console.log('写入 static/fabao/lunar.js 与 assets/js/qj/lunar.js，月数', ms.length - 1);
