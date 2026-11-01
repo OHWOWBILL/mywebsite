@@ -72,6 +72,14 @@ eq(LY.cast(LY.fromNumbers(1, 8)).ben.name, '天地否', '报数 1、8 得否');
 eq(LY.fromNumbers(1, 8).map(n => n === 6 || n === 9), [false, false, true, false, false, false], '动三爻');
 eq(LY.fromNumbers(3, 5, 12)[5] === 6 || LY.fromNumbers(3, 5, 12)[5] === 9, true, '第三数十二，余零作六，上爻动');
 
+// —— 六冲卦十、六合卦八 ——
+const chList = t => Object.values(LY.TABLE).filter(x => LY.chongHe(LY.zhuang(x.lines)) === t).map(x => x.name).sort();
+eq(chList('六冲'), ['乾为天', '坤为地', '震为雷', '巽为风', '坎为水', '离为火', '艮为山', '兑为泽', '天雷无妄', '雷天大壮'].sort(), '六冲卦：八纯卦与无妄、大壮');
+eq(chList('六合'), ['天地否', '地天泰', '雷地豫', '地雷复', '水泽节', '泽水困', '山火贲', '火山旅'].sort(), '六合卦：否泰豫复节困贲旅');
+// —— 小六壬：正月初一子时大安；三月初五卯时：月上速喜，日上大安，时上赤口 ——
+eq(LY.xiaoLiuRen(1, 1, 1).hour, '大安', '小六壬 正月初一子时');
+eq(LY.xiaoLiuRen(3, 5, 4), { month: '速喜', day: '大安', hour: '赤口', idx: 3 }, '小六壬 三月初五卯时');
+
 // —— 用神 ——
 eq(LY.yongShen(qian, '妻财'), { yong: '妻财', yongWx: 0, yuan: '子孙', ji: '兄弟', chou: '父母' }, '乾宫求财：财木，原神子孙水、忌神兄弟金、仇神父母土');
 

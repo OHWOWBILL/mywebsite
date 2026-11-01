@@ -378,6 +378,34 @@
     var seg = SILING[P[1].zhi];
     for (var s = 0; s < seg.length; s++) { acc += seg[s][1]; if (daysIn < acc || s === seg.length - 1) { siling = { gan: seg[s][0], segs: seg, day: Math.floor(daysIn) + 1 }; break; } }
 
+    // 十神分布：天干（除日主）与地支藏干
+    var ssCount = {};
+    SS.forEach(function (n) { ssCount[n] = { gan: 0, cang: 0 }; });
+    P.forEach(function (p, i) {
+      if (i !== 2) ssCount[shishen(dg, p.gan)].gan++;
+      CANG[p.zhi].forEach(function (g) { ssCount[shishen(dg, g)].cang++; });
+    });
+
+    // 月令取格（《子平真诠》法，仅供参考）：月令为日主之禄为建禄、阳干帝旺为阳刃；
+    // 余则看月令藏干透出（本气先、中气次、余气后，比劫不取），皆不透取本气
+    var geju = (function () {
+      var mz = P[1].zhi, lu = LU[dg];
+      if (mz === lu) return { name: '建禄格', why: '月令' + ZHI[mz] + '为日主' + GAN[dg] + '之禄' };
+      if (dg % 2 === 0 && mz === mod(lu + 1, 12)) return { name: '阳刃格', why: '月令' + ZHI[mz] + '为日主' + GAN[dg] + '之刃（帝旺）' };
+      var cg = CANG[mz], j, g, ss, at;
+      for (j = 0; j < cg.length; j++) {
+        g = cg[j]; ss = shishen(dg, g);
+        if (ss === '比肩' || ss === '劫财') continue;
+        at = [0, 1, 3].filter(function (i) { return P[i].gan === g; });
+        if (at.length) return { name: ss + '格', why: '月令' + ZHI[mz] + '藏' + GAN[g] + '（' + QI_NAME[j] + '），透于' + at.map(function (i) { return PILLAR_NAME[i] + '干'; }).join('、') };
+      }
+      for (j = 0; j < cg.length; j++) {
+        g = cg[j]; ss = shishen(dg, g);
+        if (ss !== '比肩' && ss !== '劫财') return { name: ss + '格', why: '月令' + ZHI[mz] + '藏干皆不透，取' + QI_NAME[j] + GAN[g] };
+      }
+      return null;
+    })();
+
     // 胎元、命宫、胎息
     var taiyuan = gzIdx(mod(P[1].gan + 1, 10), mod(P[1].zhi + 3, 12));
     var mNum = mod(P[1].zhi - 2, 12) + 1;
@@ -386,7 +414,7 @@
     var taixi = gzIdx(mod(P[2].gan + 5, 10), mod(1 - P[2].zhi, 12));
 
     return {
-      cols: cols, wuxing: wuxing, ling: WX[ling], roots: roots, tou: tou, siling: siling,
+      cols: cols, wuxing: wuxing, ling: WX[ling], roots: roots, tou: tou, siling: siling, ssCount: ssCount, geju: geju,
       dayKong: dayKong, yearKong: yearKong,
       taiyuan: { name: gzName(taiyuan), nayin: nayin(taiyuan) },
       minggong: { name: gzName(minggong), nayin: nayin(minggong) },

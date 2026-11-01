@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=2">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=3">
   <style>
     .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
 
@@ -115,6 +115,16 @@
     .bz-wx .s { font-family: var(--font-title); color: var(--muted); text-align: center; }
     .bz-wx .s.wang { color: var(--jin); }
 
+    .bz-ssc { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; }
+    .bz-ssc .r { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto; gap: 6px; align-items: center; font-size: 12.5px; }
+    .bz-ssc .n { font-family: var(--font-title); color: var(--fg-2); }
+    .bz-ssc .dots { display: flex; gap: 3px; }
+    .bz-ssc .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--zi-2); }
+    .bz-ssc .dots i.c { background: none; box-shadow: inset 0 0 0 1px var(--zi-2); }
+    .bz-ssc .v { font-family: var(--font-mark); font-size: 10.5px; color: var(--faint); }
+    .bz-ssc .r.zero .n { color: var(--faint); }
+    .bz-jump { margin-left: auto; font-size: 12px; font-family: var(--font-title); letter-spacing: .1em; color: var(--zi-2); text-decoration: none; white-space: nowrap; }
+    .bz-jump:hover { color: var(--fg); }
     .bz-rel { display: flex; flex-direction: column; gap: 5px; }
     .bz-rel .r { display: flex; gap: 8px; align-items: baseline; font-size: 13px; line-height: 1.55; }
     .bz-rel .t { flex-shrink: 0; width: 1.6em; height: 1.6em; border-radius: 4px; display: grid; place-items: center; font-family: var(--font-title); font-size: 12px; font-weight: 600; background: var(--tc); color: #17131F; }
@@ -233,6 +243,10 @@
         <div class="bz-wx" id="wxBox"></div>
         <p class="fb-fine" style="margin-top:8px">个数：天干四字、地支本气四字。力量：天干各一，地支按藏干本中余气 0.6 / 0.3 / 0.1 分（二藏 0.7 / 0.3）。右侧为各行在月令的旺相休囚死。</p>
       </section>
+      <section class="fb-card bz-card" aria-label="十神">
+        <h3>十神<small>天干（日主除外）· 地支藏干</small></h3>
+        <div class="bz-ssc" id="ssBox"></div>
+      </section>
     </aside>
   </div>
 
@@ -255,7 +269,7 @@
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/bazi/bazi.js?v=1"></script>
-<script src="/fabao/fabao.js?v=8"></script>
+<script src="/fabao/fabao.js?v=9"></script>
 <script>
 (function () {
 'use strict';
@@ -439,7 +453,7 @@ function render() {
   const gender = C.male ? '乾造' : '坤造';
   const solarTxt = `${B.fmtF(C.wall)}${C.input.dst ? '（夏令时）' : ''}`;
   $('board').innerHTML = `
-    <div class="bz-title"><h2>${gender}${C.name ? ' · ' + esc(C.name) : ''}</h2><small>${solarTxt} · ${tzLabel(C.tz)}${C.solar ? ` · 真太阳时 ${pad(C.clock.h)}:${pad(C.clock.mi)}` : ''}</small></div>
+    <div class="bz-title"><h2>${gender}${C.name ? ' · ' + esc(C.name) : ''}</h2><small>${solarTxt} · ${tzLabel(C.tz)}${C.solar ? ` · 真太阳时 ${pad(C.clock.h)}:${pad(C.clock.mi)}` : ''}</small><a class="bz-jump" href="${ziweiURL()}" title="同一生辰排紫微斗数">同生辰看紫微 →</a></div>
     <table class="bz-t">
       <thead><tr><th class="lab"></th>${head}</tr></thead>
       <tbody>
@@ -454,8 +468,10 @@ function render() {
         ${row('神煞', (c, i) => shaHTML(sha[i]))}
       </tbody>
     </table>`;
-  renderYun(); renderInfo(); renderWX(); renderRel(cols);
+  renderYun(); renderInfo(); renderWX(); renderSS(); renderRel(cols);
 }
+
+$('board').addEventListener('click', e => { const s = e.target.closest('.bz-sha span[title]'); if (s) toast(s.title, 5000); });
 
 /* ================ 大运 · 流年 · 流月 ================ */
 function renderYun() {
@@ -517,6 +533,7 @@ function renderInfo() {
       <div><dt>农历</dt><dd>${lunarTxt}</dd></div>
       <div><dt>节气</dt><dd>${C.qi.prev.n}后 ${since(C.utc, C.qi.prev.t)}<br><span class="fine">${C.jie.prev.n} ${localOf(C.jie.prev.t)} · ${C.jie.next.n} ${localOf(C.jie.next.t)}</span></dd></div>
       <div><dt>司令</dt><dd>${C.jie.prev.n}后第 ${sl.day} 日，<b>${sl.gan}</b>司令<br><span class="fine">${sl.segs.map(s => s[0] + s[1] + '日').join(' · ')}（《渊海子平》）</span></dd></div>
+      ${A.geju ? `<div><dt>取格</dt><dd><b>${A.geju.name}</b> <span class="fine">参考</span><br><span class="fine">${A.geju.why}（《子平真诠》月令取格法）</span></dd></div>` : ''}
       <div><dt>通根</dt><dd>${roots}</dd></div>
       <div><dt>透干</dt><dd>${tou}</dd></div>
       <div><dt>胎元</dt><dd><b>${A.taiyuan.name}</b> <span class="fine">${A.taiyuan.nayin}</span>　命宫 <b>${A.minggong.name}</b> <span class="fine">${A.minggong.nayin}</span><br>胎息 <b>${A.taixi.name}</b> <span class="fine">${A.taixi.nayin}</span></dd></div>
@@ -527,6 +544,22 @@ function renderWX() {
   const max = Math.max(...A.wuxing.map(w => w.weight), 1);
   $('wxNote').textContent = `月令属${A.ling}`;
   $('wxBox').innerHTML = A.wuxing.map((w, i) => `<div class="r wx-${i}"><span class="n">${w.name}</span><span class="bar"><i style="width:${(w.weight / max * 100).toFixed(1)}%"></i></span><span class="v">${w.count} 个 · ${w.weight}</span><span class="s${w.ws === '旺' ? ' wang' : ''}">${w.ws}</span></div>`).join('');
+}
+function renderSS() {
+  const order = ['正官', '七杀', '正印', '偏印', '比肩', '劫财', '食神', '伤官', '正财', '偏财'];
+  $('ssBox').innerHTML = order.map(n => {
+    const c = A.ssCount[n], tot = c.gan + c.cang;
+    return `<div class="r${tot ? '' : ' zero'}"><span class="n">${n}</span><span class="dots">${'<i></i>'.repeat(c.gan)}${'<i class="c"></i>'.repeat(c.cang)}</span><span class="v">${tot ? `干${c.gan} 藏${c.cang}` : '—'}</span></div>`;
+  }).join('');
+}
+// 同一生辰转紫微：传标准时（夏令时已扣），开了真太阳时就连经度时区一并带过去
+function ziweiURL() {
+  const f = C.std, q = new URLSearchParams();
+  q.set('d', `${f.y}-${pad(f.mo)}-${pad(f.d)}T${pad(f.h)}:${pad(f.mi)}`);
+  q.set('g', C.male ? '男' : '女');
+  if (C.solar) { q.set('lon', C.solar.lon); q.set('tz', C.tz); }
+  if (C.name) q.set('n', C.name);
+  return '/ziwei/?' + q.toString();
 }
 function renderRel(cols) {
   const rs = B.relations(cols);

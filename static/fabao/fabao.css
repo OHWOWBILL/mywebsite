@@ -218,7 +218,8 @@ a { color: var(--zi-2); }
 
 .fb-toast {
   position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 8px);
-  background: var(--fg); color: var(--bg); padding: 9px 20px; border-radius: 999px;
+  background: var(--fg); color: var(--bg); padding: 9px 20px; border-radius: 18px;
+  max-width: min(92vw, 560px); width: max-content; text-align: center; line-height: 1.6;
   font-size: 14px; letter-spacing: .08em; opacity: 0; pointer-events: none; z-index: 90;
   transition: opacity .25s, transform .25s;
 }

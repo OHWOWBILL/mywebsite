@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=2">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=3">
   <style>
     .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
     .ly-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -67,6 +67,15 @@
     .ly-heads h2 .jin { color: var(--jin); }
     .ly-heads p { font-size: 12.5px; color: var(--muted); letter-spacing: .06em; }
     .ly-heads .bn { text-align: left; }
+    .ly-tag { display: inline-block; font-family: var(--font-title); font-size: 11.5px; font-weight: 600; padding: 0 7px; margin-left: 6px; border-radius: 4px; line-height: 19px; vertical-align: 3px; letter-spacing: .08em; }
+    .ly-tag.chong { background: rgba(224, 122, 98, .14); color: var(--zhu); }
+    .ly-tag.he { background: rgba(141, 191, 151, .14); color: var(--lv); }
+    .ly-tag.bian { background: var(--bg-3); color: var(--fg-2); }
+    .ly-xlr { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-title); font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .ly-xlr b { font-weight: 600; color: var(--fg-2); }
+    .ly-xlr .fin { font-size: 20px; color: var(--jin); }
+    .ly-xlr i { font-style: normal; color: var(--faint); }
+    .ly-song { font-size: 13px; line-height: 1.9; color: var(--fg-2); }
     table.ly-t { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 640px; }
     .ly-t th { font-family: var(--font-title); font-weight: 400; font-size: 11.5px; color: var(--faint); letter-spacing: .15em; padding: 0 4px 6px; text-align: center; }
     .ly-t td { padding: 7px 4px; text-align: center; border-top: 1px dashed var(--rule); vertical-align: middle; }
@@ -199,6 +208,7 @@
     <aside class="ly-side">
       <section class="fb-card ly-card" id="infoCard" hidden></section>
       <section class="fb-card ly-card" id="yongCard" hidden></section>
+      <section class="fb-card ly-card" id="xlrCard" hidden></section>
       <section class="fb-card ly-card ly-note">
         <h3>断语<small>随卦一并存入卦例</small></h3>
         <textarea id="noteIn" placeholder="写下用神、旺衰、应期的判断，日后复盘对照" aria-label="断语"></textarea>
@@ -225,7 +235,7 @@
 <script src="/bazi/bazi.js?v=1"></script>
 <script src="/liuyao/liuyao.js?v=1"></script>
 <script src="/meihua/data/yao.js"></script>
-<script src="/fabao/fabao.js?v=8"></script>
+<script src="/fabao/fabao.js?v=9"></script>
 <script>
 (function () {
 'use strict';
@@ -367,7 +377,7 @@ function roleOf(qin, isShi) {
 function renderBoard() {
   const B = G.ben, V = G.bian;
   const head = (g, isBen) => g
-    ? `<h2>${isBen ? '' : '之 '}${isBen ? `<span class="jin">${g.name}</span>` : g.name}</h2><p>${g.palace}宫 · ${WX[g.palaceWx]} · ${g.genName}${isBen ? ` · 世${POS[g.shi - 1]}应${POS[g.ying - 1]}` : ''}</p>`
+    ? `<h2>${isBen ? '' : '之 '}${isBen ? `<span class="jin">${g.name}</span>` : g.name}${tagOf(isBen ? G.ch : G.chBian)}${isBen && G.ch && G.chBian ? `<span class="ly-tag bian">${G.ch.slice(1)}变${G.chBian.slice(1)}</span>` : ''}</h2><p>${g.palace}宫 · ${WX[g.palaceWx]} · ${g.genName}${isBen ? ` · 世${POS[g.shi - 1]}应${POS[g.ying - 1]}` : ''}</p>`
     : '<h2 style="color:var(--faint)">静卦</h2><p>六爻不动</p>';
   const rows = [5, 4, 3, 2, 1, 0].map(i => {
     const y = B.yao[i], v = V ? V.yao[i] : null, mv = G.moving[i];
@@ -395,6 +405,31 @@ function renderBoard() {
     </table>
     ${$('yongIn').value ? `<div class="ly-legend"><span><i style="background:var(--jin)"></i>用神</span><span><i style="background:var(--lv)"></i>原神</span><span><i style="background:var(--zhu)"></i>忌神</span><span><i style="background:#D9A06B"></i>仇神</span></div>` : ''}`;
 }
+function tagOf(ch) { return ch ? `<span class="ly-tag ${ch === '六冲' ? 'chong' : 'he'}">${ch}</span>` : ''; }
+
+// —— 小六壬（随起卦时间，不必先起卦） ——
+const XLR_SONG = {
+  大安: '大安事事昌，求财在坤方，失物去不远，宅舍保安康。行人身未动，病者主无妨，将军回田野，仔细更推详。',
+  留连: '留连事难成，求谋日未明，官事只宜缓，去者未回程。失物南方见，急讨方心称，更须防口舌，人口且平平。',
+  速喜: '速喜喜来临，求财向南行，失物申未午，逢人路上寻。官事有福德，病者无祸侵，田宅六畜吉，行人有信音。',
+  赤口: '赤口主口舌，官非切要防，失物速速讨，行人有惊慌。六畜多作怪，病者出西方，更须防咀咒，诚恐染瘟皇。',
+  小吉: '小吉最吉昌，路上好商量，阴人来报喜，失物在坤方。行人即便至，交关甚是强，凡事皆和合，病者叩穹苍。',
+  空亡: '空亡事不祥，阴人多乖张，求财无利益，行人有灾殃。失物寻不见，官事有刑伤，病人逢暗鬼，解禳保安康。'
+};
+function renderXLR() {
+  const w = readWhen(), c = $('xlrCard');
+  if (!w) { c.hidden = true; return; }
+  const dt = new Date(Date.UTC(w.y, w.mo - 1, w.d, w.h, w.mi) + (w.h >= 23 ? 3600e3 : 0));
+  const lu = L.toLunar(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate());
+  if (!lu) { c.hidden = true; return; }
+  const H = Math.floor(((w.h + 1) % 24) / 2) + 1, r = LY.xiaoLiuRen(lu.m, lu.d, H);
+  c.hidden = false;
+  c.innerHTML = `<h3>小六壬<small>${lu.leap ? '闰' : ''}${L.MONTH_CN[lu.m - 1]}月${L.dayCN(lu.d)} ${ZHI[H - 1]}时 · 掐指一算</small></h3>
+    <div class="ly-xlr"><span>月上<b>${r.month}</b></span><i>→</i><span>日上<b>${r.day}</b></span><i>→</i><span>时上 <b class="fin">${r.hour}</b></span></div>
+    <p class="ly-song">${XLR_SONG[r.hour]}</p>
+    <p class="fb-fine" style="margin-top:6px">大安起正月，月上起日，日上起时；歌诀为民间流传本。与六爻无涉，聊备一格。</p>`;
+}
+
 function renderInfo() {
   const c = $('infoCard'); c.hidden = false;
   const d = G.day, w = d && d.w;
@@ -505,8 +540,8 @@ function writeURL() {
 }
 
 /* ================ 绑定 ================ */
-$('whenIn').addEventListener('change', () => { if (G) show(); });
-$('nowBtn').onclick = () => { const d = new Date(); d.setSeconds(0, 0); $('whenIn').value = toLocalInput(d); if (G) show(); };
+$('whenIn').addEventListener('change', () => { renderXLR(); if (G) show(); });
+$('nowBtn').onclick = () => { const d = new Date(); d.setSeconds(0, 0); $('whenIn').value = toLocalInput(d); renderXLR(); if (G) show(); };
 $('yongIn').onchange = () => { if (G) { renderBoard(); renderYong(); writeURL(); } };
 $('qIn').addEventListener('change', () => { if (G) writeURL(); });
 
@@ -514,6 +549,7 @@ renderLib();
 const q = new URLSearchParams(location.search);
 const now = new Date(); now.setSeconds(0, 0);
 $('whenIn').value = q.get('t') || toLocalInput(now);
+renderXLR();
 if (q.get('g')) {
   $('qIn').value = q.get('q') || ''; $('yongIn').value = q.get('y') || '';
   apply({ q: q.get('q'), when: $('whenIn').value, nums: q.get('g'), yong: q.get('y') });

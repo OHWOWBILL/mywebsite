@@ -61,7 +61,7 @@
   }
 
   let toastEl = null, toastTimer = 0;
-  function toast(msg) {
+  function toast(msg, ms) {
     if (!toastEl) {
       toastEl = document.createElement('div');
       toastEl.className = 'fb-toast';
@@ -71,7 +71,7 @@
     toastEl.textContent = msg;
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms || 1800);
   }
 
   // —— 干支 ——

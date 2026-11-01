@@ -134,7 +134,8 @@
     var shenZhi = mod((shiYang ? 0 : 6) + B.shi - 1, 12);
     var shenAt = B.yao.filter(function (y) { return y.zhi === shenZhi; }).map(function (y) { return y.pos; });
 
-    var out = { ben: B, bian: V, hu: hu, nums: nums.slice(), moving: moving, fu: fu, guaShen: { zhi: shenZhi, at: shenAt }, pure: pure };
+    var out = { ben: B, bian: V, hu: hu, nums: nums.slice(), moving: moving, fu: fu, guaShen: { zhi: shenZhi, at: shenAt }, pure: pure,
+      ch: chongHe(B), chBian: V ? chongHe(V) : null };
 
     if (day) {
       var mz = day.monthZhi, dg = day.dayGan, dz = day.dayZhi;
@@ -182,6 +183,22 @@
     return out;
   }
 
+  // 六冲卦（初四、二五、三上地支皆冲）、六合卦（皆六合）
+  function chongHe(g) {
+    var z = g.yao.map(function (y) { return y.zhi; });
+    var pairs = [[0, 3], [1, 4], [2, 5]];
+    if (pairs.every(function (p) { return chong(z[p[0]], z[p[1]]); })) return '六冲';
+    if (pairs.every(function (p) { return LIUHE[z[p[0]]] === z[p[1]]; })) return '六合';
+    return null;
+  }
+
+  // 小六壬：大安起正月，月上起日，日上起时（时以子为一）
+  var XLR = ['大安', '留连', '速喜', '赤口', '小吉', '空亡'];
+  function xiaoLiuRen(m, d, h) {
+    var a = mod(m - 1, 6), b = mod(a + d - 1, 6), c = mod(b + h - 1, 6);
+    return { month: XLR[a], day: XLR[b], hour: XLR[c], idx: c };
+  }
+
   // 用神、原神、忌神、仇神（六亲），以用神所属五行推
   function yongShen(C, pick) {
     var me = C.ben.palaceWx, wxY;
@@ -202,7 +219,8 @@
   var api = {
     GAN: GAN, ZHI: ZHI, WX: WX, ZHI_WX: ZHI_WX, GUA8: GUA8, GUA8_NAMES: GUA8_NAMES, NAJIA: NAJIA, NAMES: NAMES, TABLE: TABLE,
     LIUQIN: LIUQIN, SHEN: SHEN, PALACE_ORDER: PALACE_ORDER,
-    zhuang: zhuang, cast: cast, yongShen: yongShen, fromNumbers: fromNumbers, guaOf: guaOf, kongOf: kongOf, wangshuai: wangshuai
+    zhuang: zhuang, cast: cast, yongShen: yongShen, fromNumbers: fromNumbers, guaOf: guaOf, kongOf: kongOf, wangshuai: wangshuai,
+    chongHe: chongHe, xiaoLiuRen: xiaoLiuRen, XLR: XLR
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.LY = api;
