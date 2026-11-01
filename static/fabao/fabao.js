@@ -15,6 +15,7 @@
     yunqi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M8.5 8.2c1.2-1.3 2.4-1.3 3.5 0s2.3 1.3 3.5 0M8.5 15.8c1.2 1.3 2.4 1.3 3.5 0s2.3-1.3 3.5 0"/></svg>',
     ziwei: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><rect x="8.2" y="8.2" width="7.6" height="7.6"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>',
     mingbu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.5l1.4 4.1 4.1 1.4-4.1 1.4-1.4 4.1-1.4-4.1-4.1-1.4 4.1-1.4z"/></svg>',
+    bazi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="3.5" height="15" rx="1"/><rect x="8" y="4.5" width="3.5" height="15" rx="1"/><rect x="12.5" y="4.5" width="3.5" height="15" rx="1"/><rect x="17" y="4.5" width="3.5" height="15" rx="1"/><path d="M3.5 12h17"/></svg>',
     xiangbu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 12c2.4-4 5.5-6 9.2-6s6.8 2 9.2 6c-2.4 4-5.5 6-9.2 6s-6.8-2-9.2-6z"/><circle cx="12" cy="12" r="2.6"/></svg>'
   };
   const TOOLS = [
@@ -24,6 +25,7 @@
     { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/' },
     { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/' },
     { id: 'ziwei', name: '紫微斗数', short: '紫微', href: '/ziwei/' },
+    { id: 'bazi', name: '八字排盘', short: '八字', href: '/bazi/' },
     { id: 'mingbu', name: '命部', href: '/mingbu/' },  // 口令加密页，未解禁时为锁屏
     { id: 'xiangbu', name: '相部', href: '/xiangbu/' }  // 同上
   ];
@@ -43,10 +45,15 @@
           </a>`).join('')}
       </nav>`;
     document.body.insertBefore(top, document.body.firstChild);
-    // 手机底栏字少一点
-    if (window.matchMedia('(max-width: 860px)').matches) {
+    // 法宝一多，顶栏（与手机底栏）都用两字简称；当前这件滚进视野
+    if (window.matchMedia('(max-width: 1500px)').matches) {
       top.querySelectorAll('.fb-tab .full').forEach((el, i) => { if (TOOLS[i].short) el.textContent = TOOLS[i].short; });
     }
+    const on = top.querySelector('.fb-tab.on');
+    if (on) requestAnimationFrame(() => {
+      const nav = on.parentElement;
+      nav.scrollLeft = on.offsetLeft - (nav.clientWidth - on.offsetWidth) / 2;
+    });
   }
 
   let toastEl = null, toastTimer = 0;

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>八字排盘 · 潜蛟阁法宝库</title>
+  <meta name="description" content="八字排盘：公历、农历、四柱反推皆可起；出生地时区与真太阳时、早晚子时、夏令时提示；四柱十神、藏干、星运自坐、纳音空亡、神煞；精确到分的起运交运，大运流年流月逐层叠看，合冲刑害一目了然。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=1">
+  <style>
+    .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
+
+    /* —— 起盘面板 —— */
+    .bz-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .bz-form .fb-row { gap: 8px 10px; }
+    .bz-form input[type=text] { width: 9em; }
+    .bz-form input[type=number] { width: 5.6em; }
+    .bz-chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
+    .bz-chk input { accent-color: var(--zi); }
+    .bz-place { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .bz-place .lon[aria-disabled=true] { opacity: .45; }
+    .bz-dst { font-size: 12.5px; color: var(--jin); line-height: 1.7; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+    .bz-dst .fb-btn { padding: 3px 10px; font-size: 12px; letter-spacing: .08em; }
+    .bz-sizhu select { width: 5.4em; font-family: var(--font-title); letter-spacing: .1em; }
+    .bz-side-ctrl { display: flex; flex-direction: column; gap: 8px; }
+    .bz-side-ctrl .fb-row .fb-btn { flex: 1; }
+
+    /* —— 主体 —— */
+    .bz-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+    .bz-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .bz-side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: calc(var(--top-h) + 14px); }
+
+    /* 命盘表 */
+    .bz-board { padding: 14px 10px 10px; overflow-x: auto; scrollbar-width: thin; }
+    .bz-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 0 8px 10px; }
+    .bz-title h2 { font-family: var(--font-title); font-weight: 600; font-size: 17px; letter-spacing: .25em; }
+    .bz-title small { color: var(--muted); font-size: 12.5px; letter-spacing: .08em; }
+    table.bz-t { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 360px; table-layout: fixed; }
+    .bz-t th, .bz-t td { text-align: center; padding: 5px 2px; vertical-align: middle; border-top: 1px dashed var(--rule); }
+    .bz-t tr:first-child th, .bz-t tr:first-child td { border-top: none; }
+    .bz-t th.lab { width: 3.4em; font-family: var(--font-title); font-weight: 400; font-size: 11.5px; color: var(--faint); letter-spacing: .15em; text-align: left; padding-left: 6px; position: sticky; left: 0; background: var(--bg-2); z-index: 1; }
+    .bz-t thead th { font-family: var(--font-title); font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: .2em; padding-bottom: 7px; }
+    .bz-t thead th small { display: block; font-family: var(--font-mark); font-size: 10px; letter-spacing: .02em; color: var(--faint); margin-top: 1px; }
+    .bz-t .col-day { background: rgba(122, 91, 192, .07); }
+    .bz-t .col-x { background: rgba(143, 176, 216, .055); }
+    .bz-t .col-x.ln { background: rgba(141, 191, 151, .05); }
+    .bz-t .col-x.ly { background: rgba(201, 165, 120, .05); }
+    .bz-t thead .col-x { color: var(--qing); }
+    .bz-t thead .col-x.ln { color: var(--lv); }
+    .bz-t thead .col-x.ly { color: var(--wx-tu); }
+    .bz-ss { font-family: var(--font-title); font-size: 12.5px; color: var(--fg-2); letter-spacing: .08em; }
+    .bz-ss.zhu { color: var(--jin); font-weight: 600; }
+    .bz-gz { font-family: var(--font-title); font-weight: 600; font-size: 30px; line-height: 1.15; color: var(--wc); }
+    .bz-gz small { display: block; font-size: 10px; font-weight: 400; color: var(--faint); letter-spacing: .1em; line-height: 1.3; }
+    .bz-cang { display: flex; flex-direction: column; gap: 1px; align-items: center; font-size: 12px; line-height: 1.35; }
+    .bz-cang span { white-space: nowrap; }
+    .bz-cang b { font-family: var(--font-title); font-weight: 600; color: var(--wc); margin-right: 2px; }
+    .bz-cang i { font-style: normal; color: var(--muted); font-size: 11px; }
+    .bz-cang .yu { opacity: .7; }
+    .bz-sm { font-size: 12px; color: var(--fg-2); font-family: var(--font-title); letter-spacing: .05em; }
+    .bz-sm.dim { color: var(--muted); }
+    .bz-kong { color: var(--faint); font-size: 11.5px; font-family: var(--font-title); }
+    .bz-kong.hit { color: var(--zhu); }
+    .bz-sha { display: flex; flex-direction: column; gap: 2px; align-items: center; }
+    .bz-sha span { font-size: 11px; font-family: var(--font-title); color: var(--muted); white-space: nowrap; cursor: help; }
+    .bz-sha span.gui { color: #CDBB86; }
+    .bz-sha span.xiong { color: #C99A9A; }
+    .bz-empty-sha { color: var(--faint); font-size: 11px; }
+
+    /* 运限条 */
+    .bz-yun { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .bz-yhead { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+    .bz-yhead h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; }
+    .bz-yhead p { font-size: 12.5px; color: var(--muted); letter-spacing: .05em; }
+    .bz-yhead p b { color: var(--fg); font-weight: 600; font-family: var(--font-title); }
+    .bz-yrow { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 8px; align-items: center; }
+    .bz-yrow > small { font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .2em; }
+    .bz-ybtns { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: thin; padding-bottom: 2px; }
+    .bz-ybtns button {
+      flex: 1 0 auto; min-width: 60px; padding: 5px 6px 4px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent;
+      display: flex; flex-direction: column; align-items: center; line-height: 1.3; color: var(--fg-2); position: relative;
+    }
+    .bz-ybtns button:hover { border-color: var(--rule-2); }
+    .bz-ybtns button.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 26%, var(--bg-3)); color: var(--fg); }
+    .bz-ybtns b { font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .05em; }
+    .bz-ybtns em { font-style: normal; font-family: var(--font-title); font-size: 10.5px; color: var(--muted); }
+    .bz-ybtns span { font-family: var(--font-mark); font-size: 10px; color: var(--faint); }
+    .bz-ybtns button.on span, .bz-ybtns button.on em { color: var(--fg-2); }
+    .bz-ybtns i { position: absolute; top: 2px; right: 3px; font-style: normal; font-size: 9.5px; color: var(--jin); font-family: var(--font-title); }
+    .bz-ybtns .xy b { color: var(--muted); }
+
+    /* 右栏卡片 */
+    .bz-card { padding: 16px 18px; }
+    .bz-card h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+    .bz-card h3 small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
+    .bz-dl { font-size: 13px; line-height: 1.75; color: var(--fg-2); }
+    .bz-dl > div { display: grid; grid-template-columns: 4.4em minmax(0, 1fr); gap: 8px; padding: 4px 0; border-top: 1px dashed var(--rule); }
+    .bz-dl > div:first-child { border-top: none; }
+    .bz-dl dt { font-family: var(--font-title); color: var(--faint); letter-spacing: .1em; font-size: 12px; padding-top: 1px; }
+    .bz-dl dd b { font-family: var(--font-title); color: var(--fg); font-weight: 600; }
+    .bz-dl .fine { color: var(--muted); font-size: 12px; }
+    .bz-key { font-family: var(--font-title); font-size: 16px; letter-spacing: .1em; color: var(--fg); margin-bottom: 8px; line-height: 1.6; }
+    .bz-key .jin { color: var(--jin); font-weight: 600; }
+
+    .bz-wx { display: flex; flex-direction: column; gap: 7px; }
+    .bz-wx .r { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) 4.6em 1.6em; gap: 8px; align-items: center; font-size: 12.5px; }
+    .bz-wx .n { font-family: var(--font-title); font-weight: 600; color: var(--wc); font-size: 15px; }
+    .bz-wx .bar { height: 8px; border-radius: 4px; background: var(--bg-3); overflow: hidden; }
+    .bz-wx .bar i { display: block; height: 100%; background: var(--wc); border-radius: 4px; opacity: .8; }
+    .bz-wx .v { font-family: var(--font-mark); color: var(--muted); font-size: 11px; text-align: right; }
+    .bz-wx .s { font-family: var(--font-title); color: var(--muted); text-align: center; }
+    .bz-wx .s.wang { color: var(--jin); }
+
+    .bz-rel { display: flex; flex-direction: column; gap: 5px; }
+    .bz-rel .r { display: flex; gap: 8px; align-items: baseline; font-size: 13px; line-height: 1.55; }
+    .bz-rel .t { flex-shrink: 0; width: 1.6em; height: 1.6em; border-radius: 4px; display: grid; place-items: center; font-family: var(--font-title); font-size: 12px; font-weight: 600; background: var(--tc); color: #17131F; }
+    .bz-rel .r.x { opacity: .62; }
+    .rt-合 { --tc: var(--lv); } .rt-会 { --tc: var(--jin); } .rt-冲 { --tc: var(--zhu); } .rt-刑 { --tc: #D9A06B; } .rt-害 { --tc: #A39DB0; } .rt-破 { --tc: #8D86A0; }
+    .bz-none { color: var(--faint); font-size: 12.5px; }
+
+    .bz-found { padding: 14px 16px; }
+    .bz-found h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
+    .bz-found ul { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow-y: auto; }
+    .bz-found li { list-style: none; }
+    .bz-found button { width: 100%; text-align: left; padding: 6px 10px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent; font-family: var(--font-mark); font-size: 13px; color: var(--fg-2); }
+    .bz-found button:hover { border-color: var(--zi-2); color: var(--fg); }
+    .bz-found button small { font-family: var(--font-title); color: var(--faint); margin-left: 6px; }
+
+    .bz-help { padding: 16px 20px; }
+    .bz-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
+    .bz-help ul { font-size: 13px; line-height: 1.9; color: var(--fg-2); padding-left: 0; }
+    .bz-help li { list-style: none; padding-left: 14px; position: relative; }
+    .bz-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .bz-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
+
+    @media (max-width: 1100px) {
+      .bz-wrap { grid-template-columns: 1fr; }
+      .bz-side { position: static; display: grid; grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px) {
+      .bz-side { grid-template-columns: 1fr; }
+      .bz-board { margin: 0 -10px; border-radius: var(--r); padding: 12px 4px 8px; }
+      .bz-gz { font-size: 25px; }
+      .bz-t th.lab { width: 2.9em; font-size: 10.5px; letter-spacing: .05em; padding-left: 4px; }
+      .bz-ss { font-size: 11.5px; letter-spacing: 0; }
+      .bz-cang { font-size: 11px; }
+      .bz-cang i { font-size: 10px; }
+      .bz-sha span { font-size: 10px; }
+      .bz-yrow { grid-template-columns: 1fr; gap: 4px; }
+      .bz-form input[type=text] { width: 100%; }
+    }
+  </style>
+</head>
+<body data-tool="bazi">
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">八</div>
+    <div>
+      <h1 class="fb-title">八字排盘<span class="en">BAZI · FOUR PILLARS</span></h1>
+      <p class="fb-sub">四柱十神 · 藏干神煞 · 精确起运 · 大运流年流月 · 四柱反推</p>
+    </div>
+  </header>
+
+  <section class="fb-now" aria-label="起盘">
+    <div class="bz-form">
+      <div class="fb-row">
+        <div class="fb-seg" id="calSeg" role="group" aria-label="起盘方式"><button data-v="solar" class="on">公历</button><button data-v="lunar">农历</button><button data-v="sizhu">四柱反推</button></div>
+        <div class="fb-seg" id="genSeg" role="group" aria-label="性别"><button data-v="1" class="on">乾造</button><button data-v="0">坤造</button></div>
+        <input type="text" id="nameIn" placeholder="姓名或备注" maxlength="24" aria-label="姓名或备注">
+      </div>
+      <div class="fb-row" id="solarRow">
+        <input type="datetime-local" id="whenIn" aria-label="出生时间（出生地钟表时间）">
+        <button class="fb-btn" id="nowBtn" type="button">此刻</button>
+        <span class="fb-note" id="shiNote"></span>
+      </div>
+      <div class="fb-row" id="lunarRow" hidden>
+        <input type="number" id="lyIn" min="1900" max="2100" aria-label="农历年">
+        <select id="lmIn" aria-label="农历月"></select>
+        <select id="ldIn" aria-label="农历日"></select>
+        <input type="time" id="ltIn" value="12:00" aria-label="出生钟点">
+        <span class="fb-note" id="lunarNote"></span>
+      </div>
+      <div class="fb-row bz-sizhu" id="sizhuRow" hidden>
+        <select id="szY" aria-label="年柱"></select><select id="szM" aria-label="月柱"></select><select id="szD" aria-label="日柱"></select><select id="szH" aria-label="时柱"></select>
+        <button class="fb-btn" id="szBtn" type="button">反推</button>
+      </div>
+      <div class="bz-place" id="placeRow">
+        <select id="cityIn" aria-label="出生地"></select>
+        <span class="lon" id="lonBox"><input type="number" id="lonIn" step="0.01" min="-180" max="180" inputmode="decimal" aria-label="东经（西经为负）" title="东经，西经写负数"></span>
+        <select id="tzIn" aria-label="出生地时区"></select>
+        <label class="bz-chk"><input type="checkbox" id="sunIn">真太阳时</label>
+        <label class="bz-chk" title="出生时当地正行夏令时，钟表比标准时快一小时"><input type="checkbox" id="dstIn">夏令时</label>
+        <div class="fb-seg" id="ziSeg" role="group" aria-label="晚子时" title="23:00–24:00 出生者日柱算哪天"><button data-v="next" class="on">子时换日</button><button data-v="same">晚子当日</button></div>
+      </div>
+      <div class="bz-dst" id="dstNote" hidden></div>
+      <span class="fb-fine" id="sunNote"></span>
+    </div>
+    <div class="fb-now-ctrl bz-side-ctrl">
+      <div class="fb-row">
+        <button class="fb-btn primary" id="castBtn" type="button">排盘</button>
+        <button class="fb-btn" id="saveBtn" type="button">存盘</button>
+        <button class="fb-btn" id="copyBtn" type="button">复制</button>
+      </div>
+      <select id="libSel" aria-label="盘库"><option value="">盘库（存过的盘）</option></select>
+      <p class="fb-fine">排盘全在这台设备上算，不上传；存盘只存在本机浏览器。</p>
+    </div>
+  </section>
+
+  <section class="fb-card bz-found" id="foundCard" hidden aria-live="polite"></section>
+
+  <div class="bz-wrap">
+    <div class="bz-main">
+      <section class="fb-card bz-board" id="board" aria-label="命盘"></section>
+      <section class="fb-card bz-yun" aria-label="大运流年">
+        <div class="bz-yhead"><h3>大运 · 流年</h3><p id="yunNote"></p></div>
+        <div class="bz-yrow"><small>大运</small><div class="bz-ybtns" id="dyRow"></div></div>
+        <div class="bz-yrow"><small>流年</small><div class="bz-ybtns" id="lnRow"></div></div>
+        <div class="bz-yrow"><small>流月</small><div class="bz-ybtns" id="lyRow"></div></div>
+      </section>
+      <section class="fb-card bz-card" aria-label="干支关系">
+        <h3>合冲刑害<small id="relNote">原局四柱</small></h3>
+        <div class="bz-rel" id="relBox"></div>
+      </section>
+    </div>
+    <aside class="bz-side">
+      <section class="fb-card bz-card" id="infoCard" aria-live="polite"></section>
+      <section class="fb-card bz-card" aria-label="五行">
+        <h3>五行<small id="wxNote"></small></h3>
+        <div class="bz-wx" id="wxBox"></div>
+        <p class="fb-fine" style="margin-top:8px">个数：天干四字、地支本气四字。力量：天干各一，地支按藏干本中余气 0.6 / 0.3 / 0.1 分（二藏 0.7 / 0.3）。右侧为各行在月令的旺相休囚死。</p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="fb-card bz-help">
+    <h3>用法与口径</h3>
+    <ul>
+      <li><b>出生时间</b>填出生地当时的钟表时间，再选出生地（或填经度、时区）。人在日本给北京出生的人排盘，选「北京」即可，交节时刻不会因为看盘的设备在别的时区而差一小时。</li>
+      <li><b>真太阳时</b>勾上后，日柱、时柱改按出生地真太阳时（经度时差 + 均时差）；年柱、月柱看的是交节的那一刻，不受影响。1986–1991 年大陆夏令时期间出生的，会提示是否减一小时。</li>
+      <li><b>子时</b>默认 23 点即换日（与本库紫微、奇门同）；选「晚子当日」则 23–24 点出生者日柱仍算本日，时柱照五鼠遁接次日子时。</li>
+      <li><b>大运流年</b>点一步大运、一个流年、一个流月，命盘右侧便依次加上这几柱，十神、神煞、合冲刑害一并算上；再点一次收起。当前所行之运、之年标「今」。</li>
+      <li><b>起运</b>以出生到下一节（顺排）或上一节（逆排）的分钟数折算：三日一年、一日四月、一时辰十日。交运日按出生钟点推得。</li>
+      <li><b>神煞</b>只列常用的二三十种，鼠标停在神煞上可看查法。羊刃取「禄前一位」；三合类（驿马、桃花、华盖、将星等）以年支、日支两查；天乙、太极、文昌、国印以日干、年干两查。各家口径不一，以自家所学为准。</li>
+      <li><b>四柱反推</b>选好四柱，列出 1900–2100 年间合得上的时段；点任一条即按那一刻排盘。</li>
+      <li><b>口径</b>节气表与奇门手记同一张（太阳视黄经算出，与寿星万年历相差一分钟内）；农历为寿星万年历口径；人元司令依《渊海子平》分野。仅供学习参考。</li>
+    </ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/bazi/bazi.js?v=1"></script>
+<script src="/fabao/fabao.js?v=8"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const { toast, copy } = window.Fabao;
+const B = window.BZ, L = B.LUNAR;
+const { GAN, ZHI, GAN_WX, ZHI_WX, WX } = B;
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const hanzi = n => String(n);
+
+// 出生地：[名, 东经, 时区]
+const CITIES = [
+  ['中国大陆', [['北京', 116.40, 8], ['上海', 121.47, 8], ['天津', 117.20, 8], ['重庆', 106.55, 8], ['广州', 113.26, 8], ['深圳', 114.06, 8],
+    ['成都', 104.07, 8], ['武汉', 114.31, 8], ['西安', 108.94, 8], ['南京', 118.80, 8], ['杭州', 120.16, 8], ['苏州', 120.62, 8], ['宁波', 121.55, 8],
+    ['温州', 120.70, 8], ['长沙', 112.94, 8], ['郑州', 113.63, 8], ['济南', 117.00, 8], ['青岛', 120.38, 8], ['沈阳', 123.43, 8], ['大连', 121.61, 8],
+    ['长春', 125.32, 8], ['哈尔滨', 126.64, 8], ['石家庄', 114.51, 8], ['太原', 112.55, 8], ['呼和浩特', 111.75, 8], ['合肥', 117.23, 8],
+    ['南昌', 115.86, 8], ['福州', 119.30, 8], ['厦门', 118.09, 8], ['泉州', 118.68, 8], ['汕头', 116.68, 8], ['东莞', 113.75, 8], ['佛山', 113.12, 8],
+    ['珠海', 113.58, 8], ['南宁', 108.37, 8], ['桂林', 110.29, 8], ['海口', 110.32, 8], ['三亚', 109.51, 8], ['贵阳', 106.63, 8], ['昆明', 102.71, 8],
+    ['兰州', 103.83, 8], ['西宁', 101.78, 8], ['银川', 106.23, 8], ['乌鲁木齐', 87.62, 8], ['拉萨', 91.13, 8]]],
+  ['港澳台', [['香港', 114.17, 8], ['澳门', 113.54, 8], ['台北', 121.56, 8], ['台中', 120.68, 8], ['台南', 120.21, 8], ['高雄', 120.31, 8]]],
+  ['日本', [['东京', 139.69, 9], ['横滨', 139.64, 9], ['大阪', 135.50, 9], ['京都', 135.77, 9], ['神户', 135.20, 9], ['名古屋', 136.91, 9],
+    ['札幌', 141.35, 9], ['仙台', 140.87, 9], ['广岛', 132.46, 9], ['福冈', 130.40, 9], ['那霸', 127.68, 9]]],
+  ['亚洲其他', [['首尔', 126.98, 9], ['新加坡', 103.82, 8], ['吉隆坡', 101.69, 8], ['马尼拉', 120.98, 8], ['曼谷', 100.50, 7], ['河内', 105.85, 7],
+    ['胡志明市', 106.70, 7], ['雅加达', 106.85, 7]]],
+  ['欧美澳', [['伦敦', -0.13, 0], ['巴黎', 2.35, 1], ['柏林', 13.40, 1], ['纽约', -74.01, -5], ['多伦多', -79.38, -5], ['洛杉矶', -118.24, -8],
+    ['旧金山', -122.42, -8], ['西雅图', -122.33, -8], ['温哥华', -123.12, -8], ['悉尼', 151.21, 10], ['墨尔本', 144.96, 10], ['奥克兰', 174.76, 12]]]
+];
+const CITY_LIST = CITIES.flatMap(([, list]) => list);
+const TZS = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 8, 8.75, 9, 9.5, 10, 10.5, 11, 12, 13, 14];
+const tzLabel = z => 'UTC' + (z >= 0 ? '+' : '−') + (Math.abs(z) % 1 ? Math.floor(Math.abs(z)) + ':' + pad(Math.round(Math.abs(z) % 1 * 60)) : Math.abs(z));
+const LS_LIB = 'bazi.lib.v1', LS_VIEW = 'bazi.view.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const guessTz = -new Date().getTimezoneOffset() / 60;
+const guessCity = CITY_LIST.find(c => c[2] === guessTz) || CITY_LIST[0];
+let view = Object.assign({ city: guessCity[0], lon: guessCity[1], tz: guessCity[2], sun: false, zi: 'next' }, store.get(LS_VIEW, {}));
+let form = { cal: 'solar', male: true, name: '' };
+let C = null, A = null;          // 当前命盘与分析
+let sel = { dy: null, ln: null, ly: null };   // dy: 大运序号（-1 为童限）, ln: 公历年, ly: 流月序号
+const NOW_Y = new Date().getFullYear();
+
+/* ================ 面板 ================ */
+function seg(el, val, on) {
+  el.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === String(val)));
+  el.onclick = e => { const b = e.target.closest('button'); if (!b) return; seg(el, b.dataset.v, on); on(b.dataset.v); };
+}
+$('cityIn').innerHTML = CITIES.map(([g, list]) => `<optgroup label="${g}">${list.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('') + '<option value="">自定义经度</option>';
+$('tzIn').innerHTML = TZS.map(z => `<option value="${z}">${tzLabel(z)}</option>`).join('');
+const GZ60 = Array.from({ length: 60 }, (_, i) => B.gzName(i));
+['szY', 'szM', 'szD', 'szH'].forEach(id => { $(id).innerHTML = GZ60.map(n => `<option>${n}</option>`).join(''); });
+
+function syncPlaceUI() {
+  $('cityIn').value = CITY_LIST.some(c => c[0] === view.city) ? view.city : '';
+  $('lonIn').value = view.lon;
+  $('tzIn').value = String(view.tz);
+  $('sunIn').checked = view.sun;
+  $('lonBox').setAttribute('aria-disabled', String(!view.sun));
+  seg($('ziSeg'), view.zi, v => { view.zi = v; saveView(); cast(true); });
+}
+function saveView() { store.set(LS_VIEW, view); }
+
+function setCal(v) {
+  form.cal = v; seg($('calSeg'), v, setCal);
+  $('solarRow').hidden = v !== 'solar'; $('lunarRow').hidden = v !== 'lunar'; $('sizhuRow').hidden = v !== 'sizhu';
+  if (v !== 'sizhu') $('foundCard').hidden = true;
+  if (v === 'lunar') fillLunarMonths();
+}
+seg($('calSeg'), 'solar', setCal);
+seg($('genSeg'), '1', v => { form.male = v === '1'; cast(true); });
+
+// 农历：按年列月（含闰月），按月列日
+function fillLunarMonths(keep) {
+  const y = +$('lyIn').value;
+  const ms = y >= 1900 && y <= 2100 ? L.monthsOf(y) : [];
+  const cur = keep || $('lmIn').value;
+  $('lmIn').innerHTML = ms.map(m => `<option value="${m.m}${m.leap ? '+' : ''}">${m.leap ? '闰' : ''}${L.MONTH_CN[m.m - 1]}月</option>`).join('');
+  if (cur && [...$('lmIn').options].some(o => o.value === cur)) $('lmIn').value = cur;
+  fillLunarDays();
+}
+function fillLunarDays(keep) {
+  const y = +$('lyIn').value, v = $('lmIn').value || '1';
+  const m = parseInt(v, 10), leap = v.endsWith('+');
+  const e = L.monthsOf(y).find(x => x.m === m && x.leap === leap);
+  const len = e ? e.len : 30, cur = keep || +$('ldIn').value || 1;
+  $('ldIn').innerHTML = Array.from({ length: len }, (_, i) => `<option value="${i + 1}">${L.dayCN(i + 1)}</option>`).join('');
+  $('ldIn').value = String(Math.min(cur, len));
+}
+
+/* ================ 起盘 ================ */
+function readInput() {
+  form.name = $('nameIn').value.trim();
+  let y, mo, d, h, mi;
+  if (form.cal === 'lunar') {
+    const ly = +$('lyIn').value, v = $('lmIn').value, ld = +$('ldIn').value;
+    const s = L.toSolar(ly, parseInt(v, 10), ld, v.endsWith('+'));
+    if (!s) return null;
+    const t = ($('ltIn').value || '12:00').split(':').map(Number);
+    y = s.y; mo = s.m; d = s.d; h = t[0]; mi = t[1] || 0;
+    $('lunarNote').textContent = `公历 ${y}-${pad(mo)}-${pad(d)}`;
+  } else {
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec($('whenIn').value);
+    if (!m) return null;
+    [y, mo, d, h, mi] = m.slice(1).map(Number);
+  }
+  return { y, mo, d, h, mi, tz: +view.tz, dst: $('dstIn').checked, lon: view.sun && isFinite(+view.lon) ? +view.lon : null, zi: view.zi, male: form.male };
+}
+
+function cast(keepSel) {
+  if (form.cal === 'sizhu') { if (C) render(); return; }
+  const inp = readInput();
+  if (!inp) { toast('日期不对'); return; }
+  if (inp.y < 1900 || inp.y > 2100) { toast('只排 1900–2100 年'); return; }
+  const c = B.chart(inp);
+  if (!c) { toast('这一刻超出节气表范围'); return; }
+  C = c; A = B.analyze(C); C.name = form.name; C.cal = form.cal;
+  if (!keepSel) sel = defaultSel();
+  else if (sel.dy != null && !(sel.dy === -1 ? C.yun.xiaoyun.length : C.yun.dayun[sel.dy])) sel = defaultSel();
+  updateNotes(inp);
+  render(); writeURL();
+}
+
+// 默认选中此刻所行之运与流年
+function defaultSel() {
+  const k = C.yun.dayun.findIndex(d => NOW_Y >= d.startYear && NOW_Y <= d.endYear);
+  if (k >= 0) return { dy: k, ln: NOW_Y, ly: null };
+  if (NOW_Y >= C.std.y && NOW_Y < C.yun.start.y) return { dy: -1, ln: NOW_Y, ly: null };
+  return { dy: null, ln: null, ly: null };
+}
+
+function updateNotes(inp) {
+  const sn = $('shiNote');
+  const hz = Math.floor(((C.clock.h + 1) % 24) / 2);
+  sn.textContent = ZHI[hz] + '时' + (C.late ? (view.zi === 'next' ? '（晚子，已换日）' : '（晚子，日柱仍本日）') : '') + (C.solar ? ` · 真太阳时 ${pad(C.clock.h)}:${pad(C.clock.mi)}` : '');
+  const sg = x => Math.abs(x) < 0.05 ? '0.0' : (x > 0 ? '+' : '−') + Math.abs(x).toFixed(1);
+  $('sunNote').textContent = C.solar ? `真太阳时：经度时差 ${sg(C.solar.lonFix)} 分，均时差 ${sg(C.solar.eot)} 分` : '';
+  const dn = $('dstNote');
+  if (+view.tz === 8 && !inp.dst && B.isChinaDST(inp.y, inp.mo, inp.d)) {
+    dn.hidden = false;
+    dn.innerHTML = `此日在大陆夏令时期间（${inp.y} 年），当时钟表比北京标准时快一小时。若所报为当时钟表读数，应勾「夏令时」。<button class="fb-btn" type="button" id="dstBtn">勾上夏令时</button>`;
+    $('dstBtn').onclick = () => { $('dstIn').checked = true; cast(true); toast('已按夏令时减一小时'); };
+  } else dn.hidden = true;
+}
+
+/* ================ 命盘表 ================ */
+const SS_TONE = { 正官: 'gui', 正印: 'gui', 正财: 'gui', 食神: 'gui' };
+const GUI_SHA = /贵人|德|禄|文昌|将星|金舆|天医|天喜|红鸾|天赦|驿马|华盖/;
+const XIONG_SHA = /刃|劫煞|灾煞|亡神|孤|寡|魁罡|十恶|阴差|红艳|桃花/;
+
+function extraCols() {
+  const xs = [];
+  if (sel.dy != null) {
+    if (sel.dy === -1) {
+      const x = C.yun.xiaoyun.find(q => q.year === sel.ln) || C.yun.xiaoyun[0];
+      if (x) xs.push(Object.assign(B.extraCol(C, x.idx, '小运', '小运'), { cls: 'col-x', sub: x.year + '' }));
+    } else {
+      const d = C.yun.dayun[sel.dy];
+      xs.push(Object.assign(B.extraCol(C, d.idx, '大运', '大运'), { cls: 'col-x', sub: d.startYear + '' }));
+    }
+  }
+  if (sel.ln != null) xs.push(Object.assign(B.extraCol(C, B.yearGZ(sel.ln), '流年', '流年'), { cls: 'col-x ln', sub: sel.ln + '' }));
+  if (sel.ln != null && sel.ly != null) {
+    const m = B.liuyue(sel.ln)[sel.ly];
+    if (m) xs.push(Object.assign(B.extraCol(C, m.idx, '流月', '流月'), { cls: 'col-x ly', sub: m.jie }));
+  }
+  return xs;
+}
+
+function render() {
+  const xs = extraCols();
+  const cols = A.cols.map((c, i) => Object.assign({}, c, { cls: i === 2 ? 'col-day' : '', sub: '' })).concat(xs);
+  const sha = B.shensha(cols);
+  const dayKong = A.dayKong;
+  const head = cols.map((c, i) => `<th class="${c.cls}" scope="col">${i < 4 ? c.role + '柱' : c.role}${c.sub ? `<small>${c.sub}</small>` : ''}</th>`).join('');
+  const row = (label, f, cls) => `<tr><th class="lab" scope="row">${label}</th>${cols.map((c, i) => `<td class="${c.cls} ${cls || ''}">${f(c, i)}</td>`).join('')}</tr>`;
+  const shaHTML = list => list.length
+    ? `<div class="bz-sha">${list.map(s => `<span class="${GUI_SHA.test(s.name) && !XIONG_SHA.test(s.name) ? 'gui' : XIONG_SHA.test(s.name) ? 'xiong' : ''}" title="${esc(s.name)}：${esc(s.how)}${s.why ? '（' + esc(s.why) + '）' : ''}">${s.name}</span>`).join('')}</div>`
+    : '<span class="bz-empty-sha">—</span>';
+  const gender = C.male ? '乾造' : '坤造';
+  const solarTxt = `${B.fmtF(C.wall)}${C.input.dst ? '（夏令时）' : ''}`;
+  $('board').innerHTML = `
+    <div class="bz-title"><h2>${gender}${C.name ? ' · ' + esc(C.name) : ''}</h2><small>${solarTxt} · ${tzLabel(C.tz)}${C.solar ? ` · 真太阳时 ${pad(C.clock.h)}:${pad(C.clock.mi)}` : ''}</small></div>
+    <table class="bz-t">
+      <thead><tr><th class="lab"></th>${head}</tr></thead>
+      <tbody>
+        ${row('十神', (c, i) => `<span class="bz-ss${i === 2 ? ' zhu' : ''}">${i === 2 ? '日主' : c.ganSS}</span>`)}
+        ${row('天干', c => `<span class="bz-gz wx-${GAN_WX[c.gan]}">${GAN[c.gan]}</span>`)}
+        ${row('地支', c => `<span class="bz-gz wx-${ZHI_WX[c.zhi]}">${ZHI[c.zhi]}</span>`)}
+        ${row('藏干', c => `<div class="bz-cang">${c.cang.map((h, j) => `<span class="wx-${GAN_WX[h.gan]}${j ? ' yu' : ''}" title="${h.qi}"><b>${h.name}</b><i>${B.SS_SHORT[h.ss]}</i></span>`).join('')}</div>`)}
+        ${row('星运', c => `<span class="bz-sm">${c.xingyun}</span>`)}
+        ${row('自坐', c => `<span class="bz-sm dim">${c.zizuo}</span>`)}
+        ${row('空亡', (c, i) => `<span class="bz-kong${i !== 2 && dayKong.indexOf(c.zhi) >= 0 ? ' hit' : ''}" title="${i !== 2 && dayKong.indexOf(c.zhi) >= 0 ? '此柱地支落日柱旬空' : '本柱所在旬之空亡'}">${c.kong.map(z => ZHI[z]).join('')}${i !== 2 && dayKong.indexOf(c.zhi) >= 0 ? ' 空' : ''}</span>`)}
+        ${row('纳音', c => `<span class="bz-sm dim">${c.nayin}</span>`)}
+        ${row('神煞', (c, i) => shaHTML(sha[i]))}
+      </tbody>
+    </table>`;
+  renderYun(); renderInfo(); renderWX(); renderRel(cols);
+}
+
+/* ================ 大运 · 流年 · 流月 ================ */
+function renderYun() {
+  const Y = C.yun, sp = Y.span, dg = C.pillars[2].gan;
+  const dir = (C.pillars[0].gan % 2 ? '阴' : '阳') + (C.male ? '男' : '女') + (Y.forward ? '顺排' : '逆排');
+  $('yunNote').innerHTML = `${dir} · 出生后 <b>${sp.y}</b> 年 <b>${sp.m}</b> 个月 <b>${sp.d}</b> 天 <b>${sp.h}</b> 时起运 · <b>${Y.start.y}</b> 年 ${Y.start.mo} 月 ${Y.start.d} 日交运`;
+  let h = '';
+  if (Y.xiaoyun.length) h += `<button class="xy${sel.dy === -1 ? ' on' : ''}" data-dy="-1"><b>童限</b><em>小运</em><span>${C.std.y}–${Y.start.y - 1}</span>${NOW_Y >= C.std.y && NOW_Y < Y.start.y ? '<i>今</i>' : ''}</button>`;
+  h += Y.dayun.map((d, k) => `<button data-dy="${k}" class="${sel.dy === k ? 'on' : ''}"><b>${d.name}</b><em>${B.shishen(dg, d.gan)}</em><span>${d.startYear} · ${d.startAge}岁</span>${NOW_Y >= d.startYear && NOW_Y <= d.endYear ? '<i>今</i>' : ''}</button>`).join('');
+  $('dyRow').innerHTML = h;
+  if (sel.dy == null) { $('lnRow').innerHTML = '<span class="fb-fine">先点一步大运</span>'; $('lyRow').innerHTML = ''; return; }
+  let years;
+  if (sel.dy === -1) years = Y.xiaoyun.map(x => x.year);
+  else { const d = Y.dayun[sel.dy]; years = Array.from({ length: 10 }, (_, i) => d.startYear + i); }
+  $('lnRow').innerHTML = years.map(yr => {
+    const i = B.yearGZ(yr);
+    return `<button data-ln="${yr}" class="${sel.ln === yr ? 'on' : ''}"><b>${B.gzName(i)}</b><em>${B.shishen(dg, i % 10)}</em><span>${yr} · ${yr - C.std.y + 1}岁</span>${yr === NOW_Y ? '<i>今</i>' : ''}</button>`;
+  }).join('');
+  if (sel.ln == null) { $('lyRow').innerHTML = '<span class="fb-fine">再点流年可看流月</span>'; return; }
+  const now = Date.now();
+  $('lyRow').innerHTML = B.liuyue(sel.ln).map((m, k, arr) => {
+    const t = new Date(m.t + C.tz * 3600e3), cur = now >= m.t && (!arr[k + 1] || now < arr[k + 1].t);
+    return `<button data-ly="${k}" class="${sel.ly === k ? 'on' : ''}"><b>${m.name}</b><em>${m.jie}</em><span>${t.getUTCMonth() + 1}/${t.getUTCDate()}</span>${cur ? '<i>今</i>' : ''}</button>`;
+  }).join('');
+}
+$('dyRow').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const k = +b.dataset.dy;
+  if (sel.dy === k) sel = { dy: null, ln: null, ly: null };
+  else {
+    const ys = k === -1 ? C.yun.xiaoyun.map(x => x.year) : Array.from({ length: 10 }, (_, i) => C.yun.dayun[k].startYear + i);
+    sel = { dy: k, ln: ys.includes(NOW_Y) ? NOW_Y : null, ly: null };
+  }
+  render();
+};
+$('lnRow').onclick = e => { const b = e.target.closest('button'); if (!b || !b.dataset.ln) return; const y = +b.dataset.ln; sel.ln = sel.ln === y ? null : y; sel.ly = null; render(); };
+$('lyRow').onclick = e => { const b = e.target.closest('button'); if (!b || !b.dataset.ly) return; const k = +b.dataset.ly; sel.ly = sel.ly === k ? null : k; render(); };
+
+/* ================ 右栏 ================ */
+function since(ms, t) {
+  const m = Math.round(Math.abs(ms - t) / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60);
+  return (d ? d + ' 天 ' : '') + h + ' 小时';
+}
+function localOf(t) { const f = new Date(t + C.tz * 3600e3); return `${f.getUTCMonth() + 1}月${f.getUTCDate()}日 ${pad(f.getUTCHours())}:${pad(f.getUTCMinutes())}`; }
+function renderInfo() {
+  const P = C.pillars, dg = P[2].gan, lu = C.lunar;
+  const dw = WX[GAN_WX[dg]], ling = WX[ZHI_WX[P[1].zhi]];
+  const ws = B.wangshuai(GAN_WX[dg], ZHI_WX[P[1].zhi]);
+  const roots = A.roots.length ? A.roots.map(r => `${r.pillar}支${r.zhi}（${r.qi}${r.gan}）`).join('、') : '四支无根';
+  const tou = A.tou.length ? A.tou.map(t => `${t.gan}（${t.qi}）透${t.pillar}干，为${t.ss}`).join('；') : '月令藏干不透';
+  const lunarTxt = lu ? `${lu.y} 年${L.text(lu)}` : '—';
+  const yangOrYin = P[0].gan % 2 ? '阴' : '阳';
+  const sl = A.siling;
+  $('infoCard').innerHTML = `
+    <h3>命主<small>${C.male ? '乾造' : '坤造'} · ${yangOrYin}年 · 属${B.SX[P[0].zhi]}</small></h3>
+    <p class="bz-key">日主 <span class="jin">${GAN[dg]}${dw}</span>，生于${ZHI[P[1].zhi]}月（${ling}旺），${dw}${ws === '旺' ? '当令而旺' : ws === '相' ? '得月令之生而相' : ws === '休' ? '泄气于月令而休' : ws === '囚' ? '克月令而囚' : '受月令之克而死'}</p>
+    <dl class="bz-dl">
+      <div><dt>公历</dt><dd>${B.fmtF(C.std)}（${tzLabel(C.tz)}）${C.solar ? `<br><span class="fine">真太阳时 ${B.fmtF(C.clock)}</span>` : ''}</dd></div>
+      <div><dt>农历</dt><dd>${lunarTxt}</dd></div>
+      <div><dt>节气</dt><dd>${C.qi.prev.n}后 ${since(C.utc, C.qi.prev.t)}<br><span class="fine">${C.jie.prev.n} ${localOf(C.jie.prev.t)} · ${C.jie.next.n} ${localOf(C.jie.next.t)}</span></dd></div>
+      <div><dt>司令</dt><dd>${C.jie.prev.n}后第 ${sl.day} 日，<b>${sl.gan}</b>司令<br><span class="fine">${sl.segs.map(s => s[0] + s[1] + '日').join(' · ')}（《渊海子平》）</span></dd></div>
+      <div><dt>通根</dt><dd>${roots}</dd></div>
+      <div><dt>透干</dt><dd>${tou}</dd></div>
+      <div><dt>胎元</dt><dd><b>${A.taiyuan.name}</b> <span class="fine">${A.taiyuan.nayin}</span>　命宫 <b>${A.minggong.name}</b> <span class="fine">${A.minggong.nayin}</span><br>胎息 <b>${A.taixi.name}</b> <span class="fine">${A.taixi.nayin}</span></dd></div>
+      <div><dt>空亡</dt><dd>日空 <b>${A.dayKong.map(z => ZHI[z]).join('')}</b>　年空 <b>${A.yearKong.map(z => ZHI[z]).join('')}</b></dd></div>
+    </dl>`;
+}
+function renderWX() {
+  const max = Math.max(...A.wuxing.map(w => w.weight), 1);
+  $('wxNote').textContent = `月令属${A.ling}`;
+  $('wxBox').innerHTML = A.wuxing.map((w, i) => `<div class="r wx-${i}"><span class="n">${w.name}</span><span class="bar"><i style="width:${(w.weight / max * 100).toFixed(1)}%"></i></span><span class="v">${w.count} 个 · ${w.weight}</span><span class="s${w.ws === '旺' ? ' wang' : ''}">${w.ws}</span></div>`).join('');
+}
+function renderRel(cols) {
+  const rs = B.relations(cols);
+  const xs = cols.length > 4;
+  $('relNote').textContent = xs ? '原局 + ' + cols.slice(4).map(c => c.role).join(' + ') : '原局四柱';
+  // 原局内部的先列，牵涉运年的后列；纯运年之间的淡显
+  const order = r => r.members.every(m => m < 4) ? 0 : r.members.some(m => m < 4) ? 1 : 2;
+  rs.sort((a, b) => order(a) - order(b));
+  $('relBox').innerHTML = rs.length
+    ? rs.map(r => `<div class="r rt-${r.type}${order(r) === 2 ? ' x' : ''}"><span class="t">${r.type}</span><span>${r.text}</span></div>`).join('')
+    : '<p class="bz-none">四柱之间无合冲刑害破</p>';
+}
+
+/* ================ 四柱反推 ================ */
+$('szBtn').onclick = () => {
+  const names = ['szY', 'szM', 'szD', 'szH'].map(id => $(id).value);
+  const r = B.fromPillars(names, { tz: +view.tz, zi: view.zi });
+  const box = $('foundCard'); box.hidden = false;
+  if (r.error) { box.innerHTML = `<h3>四柱反推</h3><p class="bz-none">${esc(r.error)}</p>`; return; }
+  box.innerHTML = `<h3>四柱反推 · ${names.join(' ')}<small style="font-weight:400;color:var(--muted);font-size:12px;margin-left:8px">${tzLabel(+view.tz)} · ${r.list.length ? '共 ' + r.list.length + ' 段' : '1900–2100 年间无此四柱'}</small></h3>` +
+    (r.list.length ? `<ul>${r.list.map(w => `<li><button data-at="${w.from}" data-to="${w.to}">${w.from} – ${w.to.slice(11)}<small>${w.cut ? '（交节截断）' : ''}</small></button></li>`).join('')}</ul>` : '');
+};
+$('foundCard').onclick = e => {
+  const b = e.target.closest('button[data-at]'); if (!b) return;
+  // 取该段中间一刻，免得卡在交节或时辰边界
+  const ms = s => Date.parse(s.replace(' ', 'T') + ':00Z');
+  const mid = new Date((ms(b.dataset.at) + ms(b.dataset.to)) / 2);
+  const v = `${mid.getUTCFullYear()}-${pad(mid.getUTCMonth() + 1)}-${pad(mid.getUTCDate())}T${pad(mid.getUTCHours())}:${pad(mid.getUTCMinutes())}`;
+  $('whenIn').value = v; setCal('solar'); cast();
+  toast('已按 ' + v.replace('T', ' ') + ' 排盘');
+};
+
+/* ================ 盘库 · 复制 · 网址 ================ */
+function snapshot() {
+  const s = { cal: form.cal === 'sizhu' ? 'solar' : form.cal, male: form.male, name: form.name, tz: +view.tz, city: view.city, lon: +view.lon, sun: view.sun, zi: view.zi, dst: $('dstIn').checked };
+  if (s.cal === 'lunar') Object.assign(s, { ly: +$('lyIn').value, lm: $('lmIn').value, ld: +$('ldIn').value, lt: $('ltIn').value });
+  else s.when = $('whenIn').value;
+  return s;
+}
+function apply(s) {
+  form.male = s.male !== false; seg($('genSeg'), form.male ? '1' : '0', v => { form.male = v === '1'; cast(true); });
+  $('nameIn').value = s.name || '';
+  Object.assign(view, { tz: s.tz != null ? s.tz : view.tz, lon: s.lon != null ? s.lon : view.lon, city: s.city || '', sun: !!s.sun, zi: s.zi || 'next' });
+  $('dstIn').checked = !!s.dst;
+  syncPlaceUI();
+  if (s.cal === 'lunar') { $('lyIn').value = s.ly; setCal('lunar'); fillLunarMonths(s.lm); fillLunarDays(s.ld); $('ltIn').value = s.lt || '12:00'; }
+  else { $('whenIn').value = s.when; setCal('solar'); }
+  cast();
+}
+function renderLib() {
+  const lib = store.get(LS_LIB, []);
+  $('libSel').innerHTML = `<option value="">盘库（${lib.length ? '存过 ' + lib.length + ' 盘' : '尚无存盘'}）</option>` +
+    lib.map((e, i) => `<option value="${i}">${esc(e.name || '无名')} · ${esc(e.pillars || '')} · ${e.male ? '乾' : '坤'}</option>`).join('') +
+    (lib.length ? '<option value="del">删去当前这盘…</option><option value="export">导出全部（JSON）</option>' : '');
+}
+$('saveBtn').onclick = () => {
+  if (!C) return;
+  const s = snapshot(), lib = store.get(LS_LIB, []);
+  s.pillars = C.pillars.map(p => p.name).join(' ');
+  const sig = e => JSON.stringify(Object.assign({}, e, { name: '', saved: 0 }));
+  const i = lib.findIndex(e => sig(e) === sig(s));
+  s.saved = Date.now();
+  if (i >= 0) lib[i] = s; else lib.unshift(s);
+  store.set(LS_LIB, lib.slice(0, 300)); renderLib(); toast('已存入盘库（只存在这台设备）');
+};
+let libCur = -1;
+$('libSel').onchange = () => {
+  const v = $('libSel').value, lib = store.get(LS_LIB, []);
+  if (v === 'del') {
+    if (libCur >= 0 && lib[libCur] && confirm(`删去「${lib[libCur].name || '无名'}」这盘？`)) { lib.splice(libCur, 1); store.set(LS_LIB, lib); libCur = -1; toast('已删'); }
+    else toast('先从盘库里选一盘');
+    renderLib(); return;
+  }
+  if (v === 'export') { copy(JSON.stringify(lib, null, 1), '盘库已复制为 JSON'); renderLib(); return; }
+  if (v === '') return;
+  libCur = +v; apply(lib[libCur]);
+  renderLib(); $('libSel').value = String(libCur);
+};
+$('copyBtn').onclick = () => {
+  if (!C) return;
+  const P = C.pillars, Lr = [];
+  Lr.push(`八字 · ${C.name || '命盘'} · ${C.male ? '乾造' : '坤造'}`);
+  Lr.push(`公历 ${B.fmtF(C.wall)}${C.input.dst ? '（夏令时）' : ''} ${tzLabel(C.tz)}${C.solar ? ` · 真太阳时 ${B.fmtF(C.clock)}` : ''} · 农历 ${C.lunar ? C.lunar.y + '年' + L.text(C.lunar) : '—'}`);
+  Lr.push('四柱 ' + P.map(p => p.name).join(' '));
+  Lr.push('十神 ' + A.cols.map((c, i) => i === 2 ? '日主' : c.ganSS).join(' '));
+  Lr.push('藏干 ' + A.cols.map(c => ZHI[c.zhi] + '[' + c.cang.map(h => h.name + B.SS_SHORT[h.ss]).join('') + ']').join(' '));
+  Lr.push('星运 ' + A.cols.map(c => c.xingyun).join(' ') + ' · 纳音 ' + A.cols.map(c => c.nayin).join(' '));
+  Lr.push(`胎元 ${A.taiyuan.name} · 命宫 ${A.minggong.name} · 胎息 ${A.taixi.name} · 日空 ${A.dayKong.map(z => ZHI[z]).join('')}`);
+  Lr.push('神煞 ' + A.cols.map((c, i) => B.PILLAR_NAME[i] + '：' + (c.sha.map(s => s.name).join('、') || '—')).join('；'));
+  const Y = C.yun;
+  Lr.push(`起运 出生后${Y.span.y}年${Y.span.m}个月${Y.span.d}天${Y.span.h}时，${Y.start.y}-${pad(Y.start.mo)}-${pad(Y.start.d)} 交运（${Y.forward ? '顺' : '逆'}排）`);
+  Lr.push('大运 ' + Y.dayun.slice(0, 8).map(d => `${d.name}(${d.startYear})`).join(' '));
+  copy(Lr.join('\n'), '命盘已复制');
+};
+function writeURL() {
+  const s = snapshot(), q = new URLSearchParams();
+  if (s.cal === 'lunar') { q.set('l', `${s.ly}-${s.lm}-${s.ld}`); q.set('t', s.lt); }
+  else q.set('d', s.when);
+  q.set('g', s.male ? '1' : '0'); q.set('tz', s.tz);
+  if (s.sun) q.set('lon', s.lon);
+  if (s.zi === 'same') q.set('zi', 'same');
+  if (s.dst) q.set('dst', '1');
+  if (s.name) q.set('n', s.name);
+  history.replaceState(null, '', '?' + q.toString());
+}
+function readURL() {
+  const q = new URLSearchParams(location.search);
+  if (!q.get('d') && !q.get('l')) return null;
+  const s = { male: q.get('g') !== '0', name: q.get('n') || '', tz: q.get('tz') != null ? +q.get('tz') : 8, zi: q.get('zi') === 'same' ? 'same' : 'next', dst: q.get('dst') === '1' };
+  if (q.get('lon')) { s.sun = true; s.lon = +q.get('lon'); const c = CITY_LIST.find(x => Math.abs(x[1] - s.lon) < 0.005 && x[2] === s.tz); s.city = c ? c[0] : ''; }
+  else { const c = CITY_LIST.find(x => x[2] === s.tz); s.sun = false; s.lon = c ? c[1] : s.tz * 15; s.city = c ? c[0] : ''; }
+  if (q.get('l')) { const [y, m, d] = q.get('l').split('-'); Object.assign(s, { cal: 'lunar', ly: +y, lm: m, ld: +d, lt: q.get('t') || '12:00' }); }
+  else Object.assign(s, { cal: 'solar', when: q.get('d') });
+  return s;
+}
+
+/* ================ 绑定 ================ */
+$('whenIn').addEventListener('change', () => cast());
+$('nowBtn').onclick = () => {
+  // 「此刻」按出生地时区取钟点
+  const t = new Date(Date.now() + (+view.tz) * 3600e3);
+  $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`;
+  cast();
+};
+$('lyIn').addEventListener('change', () => { fillLunarMonths(); cast(); });
+$('lmIn').addEventListener('change', () => { fillLunarDays(); cast(); });
+['ldIn', 'ltIn'].forEach(id => $(id).addEventListener('change', () => cast()));
+$('nameIn').addEventListener('change', () => { if (C) { form.name = $('nameIn').value.trim(); C.name = form.name; render(); writeURL(); } });
+$('castBtn').onclick = () => { if (form.cal === 'sizhu') $('szBtn').click(); else cast(); };
+$('dstIn').onchange = () => cast(true);
+$('sunIn').onchange = () => { view.sun = $('sunIn').checked; saveView(); syncPlaceUI(); cast(true); };
+$('cityIn').onchange = () => {
+  const c = CITY_LIST.find(x => x[0] === $('cityIn').value);
+  if (c) { view.city = c[0]; view.lon = c[1]; view.tz = c[2]; saveView(); syncPlaceUI(); cast(true); }
+  else { view.city = ''; view.sun = true; saveView(); syncPlaceUI(); $('lonIn').focus(); }
+};
+$('lonIn').onchange = () => {
+  const v = parseFloat($('lonIn').value);
+  if (isFinite(v) && v >= -180 && v <= 180) { view.lon = Math.round(v * 100) / 100; view.city = ''; view.sun = true; saveView(); syncPlaceUI(); cast(true); }
+  else toast('经度应在 −180 到 180 之间');
+};
+$('tzIn').onchange = () => { view.tz = +$('tzIn').value; saveView(); cast(true); };
+
+$('lyIn').value = NOW_Y;
+syncPlaceUI(); renderLib();
+const fromURL = readURL();
+if (fromURL) apply(fromURL);
+else { $('nowBtn').click(); }
+})();
+</script>
+</body>
+</html>
