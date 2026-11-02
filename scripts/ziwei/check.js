@@ -39,5 +39,19 @@ eq(y.decadal.br, dx.br, '大限宫与宫上岁数一致');
 const z1 = ZW.chart({ cal: 'solar', y: 1990, m: 6, d: 15, t: 12, g: '男' }), z2 = ZW.chart({ cal: 'solar', y: 1990, m: 6, d: 16, t: 0, g: '男' });
 eq(z1.palaces.map(p => p.major.map(s => s.name)), z2.palaces.map(p => p.major.map(s => s.name)), '晚子时 = 次日早子');
 eq(ZW.isChinaDST(1988, 5, 1) && !ZW.isChinaDST(1992, 5, 1), true, '夏令时 1986–1991');
+// 八字年月按节气换（不随农历）：交节前后各一分钟，北京时间
+const bj = (y, m, d, h, mi) => Date.UTC(y, m - 1, d, h, mi) - 8 * 3600000;
+const gzAt = (y, m, d, h, mi) => ZW.chart({ cal: 'solar', y, m, d, t: ZW.timeIndexOf(h), g: '男', ms: bj(y, m, d, h, mi) }).info.gz.slice(0, 2).join(' ');
+eq(gzAt(2024, 2, 4, 16, 26), '癸卯 乙丑', '2024 立春前一分（16:27 交）');
+eq(gzAt(2024, 2, 4, 16, 28), '甲辰 丙寅', '2024 立春后一分');
+eq(gzAt(2024, 2, 8, 12, 0), '甲辰 丙寅', '立春后、春节前：年月按节气，不按农历腊月');
+eq(gzAt(2024, 3, 5, 10, 21), '甲辰 丙寅', '2024 惊蛰前（10:22 交）');
+eq(gzAt(2024, 3, 5, 10, 24), '甲辰 丁卯', '2024 惊蛰后');
+eq(gzAt(2023, 8, 8, 12, 0), '癸卯 庚申', '2023 立秋当天交节后（农历仍六月）');
+eq(gzAt(2025, 1, 5, 12, 0), '甲辰 丁丑', '2025 小寒后（1/5 10:33 交）');
+eq(gzAt(2026, 11, 2, 12, 0), '丙午 戊戌', '2026-11-02 立冬前');
+// 农历入参：按时辰中点、东八区折算
+const lc = ZW.chart({ cal: 'lunar', y: 2023, m: 12, d: 29, t: 6, g: '男' });
+eq(lc.info.gz.slice(0, 2).join(' '), '甲辰 丙寅', '农历腊月廿九（公历 2024-02-08）');
 console.log(bad ? `\n${bad} 项不符` : '\n全部相符');
 process.exit(bad ? 1 : 0);

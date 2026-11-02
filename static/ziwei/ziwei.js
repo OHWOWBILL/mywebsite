@@ -15,7 +15,10 @@
    ========================================================= */
 (function (root) {
   'use strict';
-  var iztro = (typeof module !== 'undefined' && module.exports) ? require('./iztro.min.js') : root.iztro;
+  var NODE = typeof module !== 'undefined' && module.exports;
+  var iztro = NODE ? require('./iztro.min.js') : root.iztro;
+  // 节气表（与奇门手记共用，1899 大雪 至 2101 惊蛰，精确到分）
+  var TERMS = (NODE ? require('../qimen/jieqi.js') : root.QM_JIEQI).terms;
   var astro = iztro.astro;
   astro.config({ yearDivide: 'normal', horoscopeDivide: 'normal' });
 
@@ -68,6 +71,34 @@
     return o;
   }
 
+  // 八字四柱的年、月：年以立春、月以节的交节时刻换（不随农历年月）。
+  // ms = 出生时刻（UTC 毫秒）。超出节气表范围时返回 null，由调用方退回 iztro 的结果。
+  var MONTH_BRANCH_BY_JIE = { 立春: 2, 惊蛰: 3, 清明: 4, 立夏: 5, 芒种: 6, 小暑: 7, 立秋: 8, 白露: 9, 寒露: 10, 立冬: 11, 大雪: 0, 小寒: 1 };
+  function yearMonthGZ(ms) {
+    if (!(ms >= TERMS[0].t && ms < TERMS[TERMS.length - 1].t)) return null;
+    var lo = 0, hi = TERMS.length - 1;
+    while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (TERMS[mid].t <= ms) lo = mid; else hi = mid - 1; }
+    var jie = null, liChun = null;
+    for (var k = lo; k >= 0 && (!jie || !liChun); k--) {
+      if (!jie && MONTH_BRANCH_BY_JIE[TERMS[k].n] != null) jie = TERMS[k];
+      if (!liChun && TERMS[k].n === '立春') liChun = TERMS[k];
+    }
+    if (!jie || !liChun) return null;
+    var y = new Date(liChun.t + 8 * 3600000).getUTCFullYear();     // 立春所在公历年
+    var yi = ((y - 1984) % 60 + 60) % 60;
+    var mb = MONTH_BRANCH_BY_JIE[jie.n];
+    var ms_ = ((yi % 10) % 5 * 2 + 2 + (mb - 2 + 12) % 12) % 10;   // 五虎遁
+    return { year: GAN[yi % 10] + ZHI[yi % 12], month: GAN[ms_] + ZHI[mb], jie: jie, liChun: liChun };
+  }
+  // 出生时刻：公历入参带 ms 就用；否则按 iztro 的公历日期 + 时辰中点，按出生地时区（默认东八区）折成 UTC
+  function birthMs(inp, solarDate) {
+    if (typeof inp.ms === 'number' && isFinite(inp.ms)) return inp.ms;
+    var d = String(solarDate).split('-').map(Number);
+    var hm = inp.t === 0 ? [0, 30] : inp.t === 12 ? [23, 30] : [inp.t * 2, 0];
+    var tz = typeof inp.tz === 'number' && isFinite(inp.tz) ? inp.tz : 8;
+    return Date.UTC(d[0], d[1] - 1, d[2], hm[0], hm[1]) - tz * 3600000;
+  }
+
   // 入参：{ cal:'solar'|'lunar', y, m, d, leap(农历闰月), t(时辰序号 0–12), g:'男'|'女' }
   function chart(inp) {
     var date = inp.y + '-' + inp.m + '-' + inp.d;
@@ -101,11 +132,15 @@
       });
     });
     var yinyang = (GAN.indexOf(yGan) % 2 === 0 ? '阳' : '阴') + inp.g;
+    // 四柱：日、时用 iztro（晚子作次日）；年、月按节气换，iztro 的 chineseDate 在「正月初一换年」口径下给的是农历年月
+    var gz = [raw.chineseDate.yearly, raw.chineseDate.monthly, raw.chineseDate.daily, raw.chineseDate.hourly].map(function (x) { return x.join(''); });
+    var ym = yearMonthGZ(birthMs(inp, a.solarDate));
+    if (ym) { gz[0] = ym.year; gz[1] = ym.month; }
     return {
       input: inp, astro: a, palaces: pal, ming: ming, shen: shen,
       info: {
         solar: a.solarDate, lunar: a.lunarDate + ' ' + a.time, lunarRaw: raw.lunarDate,
-        gz: [raw.chineseDate.yearly, raw.chineseDate.monthly, raw.chineseDate.daily, raw.chineseDate.hourly].map(function (x) { return x.join(''); }),
+        gz: gz,
         time: a.time, timeRange: a.timeRange, ju: a.fiveElementsClass,
         soul: a.soul, body: a.body, zodiac: a.zodiac, sign: a.sign,
         yinyang: yinyang, yGan: yGan, yZhi: yZhi
@@ -196,7 +231,7 @@
 
   var ZW = {
     GAN: GAN, ZHI: ZHI, HUA: HUA, SIHUA: SIHUA, PALACES: PALACES, SHORT: SHORT, TIMES: TIMES, TIME_RANGE: TIME_RANGE,
-    chart: chart, fly: fly, flyByGan: flyByGan, sanfang: sanfang, relFrom: relFrom, zhuanName: zhuanName,
+    chart: chart, yearMonthGZ: yearMonthGZ, fly: fly, flyByGan: flyByGan, sanfang: sanfang, relFrom: relFrom, zhuanName: zhuanName,
     yun: yun, lunarToSolar: lunarToSolar, nominalAge: nominalAge, timeIndexOf: timeIndexOf, brightOf: brightOf, starBranch: starBranch,
     isChinaDST: isChinaDST, solarClock: solarClock
   };

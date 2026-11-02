@@ -26,7 +26,7 @@
     .zw-chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
     .zw-chk input { accent-color: var(--zi); }
     .zw-sun { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .zw-sun[aria-disabled=true] > :not(.zw-chk) { opacity: .4; pointer-events: none; }
+    .zw-sun[aria-disabled=true] > :not(.zw-chk):not(#tzIn):not(.fb-fine) { opacity: .4; pointer-events: none; }
     .zw-dst { font-size: 12.5px; color: var(--jin); line-height: 1.7; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
     .zw-dst .fb-btn { padding: 3px 10px; font-size: 12px; letter-spacing: .08em; }
     .zw-side-ctrl { display: flex; flex-direction: column; gap: 8px; }
@@ -246,7 +246,7 @@
         <label class="zw-chk"><input type="checkbox" id="sunIn">真太阳时</label>
         <select id="cityIn" aria-label="出生城市"></select>
         <input type="number" id="lonIn" step="0.01" min="-180" max="180" inputmode="decimal" aria-label="东经">
-        <select id="tzIn" aria-label="出生地时区"></select>
+        <select id="tzIn" aria-label="出生地时区" title="出生地时区：真太阳时与交节换月都按它算"></select>
         <span class="fb-fine" id="sunNote"></span>
       </div>
       <div class="zw-dst" id="dstNote" hidden></div>
@@ -288,14 +288,15 @@
       <li><b>转宫</b>点宫右上角的小圈，以该宫为太极立「命」，各宫便标出「夫之命、夫之兄、夫之夫……」；再点一次复原。</li>
       <li><b>运限</b>点大限、流年、流月，宫底依次标出「限命、年财、月官」，星旁标出该层四化：实线框为大限、虚线框为流年、点线框为流月。</li>
       <li><b>四化色</b>禄绿、权紫、科青、忌朱；实心为生年四化，<i>↑</i>为离心自化（本宫干化本宫星）。</li>
-      <li><b>口径</b>正月初一换年；闰月以十五为界，前半归本月、后半归下月；晚子时作次日子时；庚干阳武阴同；庙旺依《斗数全书》。安星引擎为开源的 iztro。真太阳时只改钟点；1986–1991 年大陆夏令时只提示，不自动扣。</li>
+      <li><b>口径</b>安星正月初一换年；中宫四柱是八字口径，年以立春、月以节的交节时刻换（按出生地时区）；闰月以十五为界，前半归本月、后半归下月；晚子时作次日子时；庚干阳武阴同；庙旺依《斗数全书》。安星引擎为开源的 iztro。真太阳时只改钟点；1986–1991 年大陆夏令时只提示，不自动扣。</li>
     </ul>
   </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
 <script src="/ziwei/iztro.min.js?v=2.6.3"></script>
-<script src="/ziwei/ziwei.js?v=1"></script>
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/ziwei/ziwei.js?v=2"></script>
 <script src="/fabao/fabao.js?v=11"></script>
 <script>
 (function () {
@@ -367,12 +368,14 @@ function solarInput() {
   let clock = d, sun = null;
   if (view.sun && isFinite(+view.lon)) { sun = Z.solarClock(d, +view.lon, +view.tz); clock = sun.date; }
   const h = clock.getHours();
-  return { inp: { cal: 'solar', y: clock.getFullYear(), m: clock.getMonth() + 1, d: clock.getDate(), t: Z.timeIndexOf(h), g: form.g }, clock, sun, raw: d };
+  // 出生时刻（UTC）：钟点按出生地时区折算，交节换年月用它，不受真太阳时影响
+  const ms = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()) - (+view.tz) * 3600000;
+  return { inp: { cal: 'solar', y: clock.getFullYear(), m: clock.getMonth() + 1, d: clock.getDate(), t: Z.timeIndexOf(h), g: form.g, ms }, clock, sun, raw: d };
 }
 function lunarInput() {
   const y = +$('lyIn').value;
   if (!(y >= 1900 && y <= 2100)) return null;
-  return { inp: { cal: 'lunar', y, m: +$('lmIn').value, d: +$('ldIn').value, leap: $('leapIn').checked, t: +$('ltIn').value, g: form.g } };
+  return { inp: { cal: 'lunar', y, m: +$('lmIn').value, d: +$('ldIn').value, leap: $('leapIn').checked, t: +$('ltIn').value, g: form.g, tz: +view.tz } };
 }
 function readForm() { form.name = $('nameIn').value.trim(); return form.cal === 'solar' ? solarInput() : lunarInput(); }
 
