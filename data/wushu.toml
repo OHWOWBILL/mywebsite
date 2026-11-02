@@ -84,7 +84,7 @@
     seal = "奇"
     name = "奇门手记"
     href = "/qimen/"
-    desc = "起局、封盘存断、次日复盘"
+    desc = "起局、记反馈、写复盘"
 
 [[door]]
   seal = "相"

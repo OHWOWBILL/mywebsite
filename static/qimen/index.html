@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#17131F">
 <title>奇门手记 · 潜蛟阁法宝库</title>
-<meta name="description" content="时家奇门转盘排盘与判例库：隐干、刑墓迫、日空时空、格局评注；写下断语封盘，次日复盘归因，判例可导出。">
+<meta name="description" content="时家奇门转盘排盘与判例库：隐干、刑墓迫、日空时空、格局评注；记下断语、反馈与复盘，随时可补可改，判例可导出。">
 <link rel="icon" href="/favicon-32x32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -200,7 +200,23 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
 .attr button.on{color:var(--bg)!important}
 .attr button[data-a="验中"].on{background:var(--lv);border-color:var(--lv)}
 .attr button:not([data-a="验中"]).on{background:var(--zhu);border-color:var(--zhu)}
-.rowbtns{display:flex;gap:8px;margin-top:12px}
+.card .meta .todo{color:var(--faint)}
+.card .fbsum{margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule);font-size:14px;line-height:1.75;color:var(--fg-2)}
+.card .fbsum p{margin:2px 0;white-space:pre-wrap}
+.card .fbsum b{font-family:var(--font-title);font-weight:400;font-size:12px;color:var(--muted);letter-spacing:.15em;margin-right:8px}
+.card.editing .view{display:none}
+.card .editor{border-top:1px solid var(--rule);margin-top:12px}
+.card .editor .field:first-child{margin-top:12px}
+.qm-fold{margin-top:16px;border:1px solid var(--rule);border-radius:var(--r);padding:0 12px;background:var(--bg-2)}
+.qm-fold[open]{padding-bottom:12px}
+.qm-fold>summary{cursor:pointer;list-style:none;padding:10px 0;font-family:var(--font-title);font-size:13px;letter-spacing:.15em;color:var(--fg-2);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.qm-fold>summary::-webkit-details-marker{display:none}
+.qm-fold>summary::before{content:"＋";color:var(--zi-2);font-size:12px;letter-spacing:0}
+.qm-fold[open]>summary::before{content:"－"}
+.qm-fold>summary small{font-size:11px;color:var(--faint);letter-spacing:.05em}
+.qm-fold .field:first-child{margin-top:2px}
+#geStats .qm-fold{margin-top:10px}
+.rowbtns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .rowbtns .primary{flex:1}
 .empty{text-align:center;color:var(--faint);padding:44px 0;font-family:var(--font-title);font-size:13px;letter-spacing:.25em;line-height:2.2}
 
@@ -208,6 +224,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
 .stats{display:flex;gap:8px;margin-top:14px}
 .stat{flex:1;background:var(--bg-2);border:1px solid var(--rule);border-radius:var(--r);padding:10px;text-align:center}
 .stat b{display:block;font-family:var(--font-title);font-size:1.3rem;font-weight:600}
+.stat b small{font-size:.8rem;font-weight:400;color:var(--faint);margin-left:1px}
 .stat span{font-size:11px;color:var(--muted);letter-spacing:.1em}
 .filterrow{margin-top:12px}
 
@@ -237,7 +254,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
     <div class="fb-seal">奇</div>
     <div>
       <h1 class="fb-title">奇门手记 <span class="en">QI MEN NOTES</span></h1>
-      <div class="fb-sub">起局 · 看格局 · 封盘存断 · 次日复盘归档</div>
+      <div class="fb-sub">起局 · 看格局 · 记反馈 · 复盘归档</div>
     </div>
   </div>
 
@@ -326,11 +343,10 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
       <div class="fb-seg" id="secSeg">
         <button type="button" data-s="new" class="on">起局</button>
         <button type="button" data-s="ge">格局</button>
-        <button type="button" data-s="review">待复盘<span class="badge" id="revBadge" hidden></span></button>
-        <button type="button" data-s="lib">判例库</button>
+        <button type="button" data-s="lib">复盘</button>
       </div>
 
-      <!-- 起局 -->
+      <!-- 起局：记下这一局 -->
       <section id="sec-new" class="qm-sec on">
         <div class="field"><label>题型</label>
           <div class="chips" id="typeChips">
@@ -368,10 +384,14 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
             <div class="field"><label>用神（谁/何宫）</label><input id="fYs" placeholder="留空则按题型自动填"></div>
             <div class="field"><label>应期</label><input id="fTime" placeholder="例：三日内 / 申日（格局页有候选）"></div>
           </div>
-          <div class="field"><label>预断（主体·事件·程度，写到可证伪）</label><textarea id="fPred"></textarea></div>
+          <div class="field"><label>断语（主体·事件·程度）</label><textarea id="fPred" placeholder="可空：事后起局复盘的，只记反馈与复盘也行"></textarea></div>
         </div>
-        <button class="fb-btn primary block savebtn" id="saveBtn">封 盘 存 断</button>
-        <p class="hint">断语一经保存不可修改（预注册原则）。明日打开本页，待复盘队列会自动浮出。</p>
+        <details class="qm-fold" id="newFbBox">
+          <summary>反馈 · 复盘<small>已有结果就一并记下，也可以之后再补</small></summary>
+          <div id="newFb"></div>
+        </details>
+        <button class="fb-btn primary block savebtn" id="saveBtn">记 下 此 局</button>
+        <p class="hint">断语、反馈、复盘都能空着，记下后随时到「复盘」里补写、修改，不限时日。天气题过了次日，复盘时会自动取当地实测天气。</p>
       </section>
 
       <!-- 格局 -->
@@ -389,22 +409,18 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
         <p class="hint">口径：十干克应、九遁、三奇升殿等取《烟波钓叟歌》《奇门遁甲统宗》常见说法；入墓按十二长生阳顺阴逆（乙丙戊墓乾，丁己庚墓艮，辛壬墓巽，癸墓坤）；隐干按地盘干随八门同转；刑墓只标天盘干。格局只是提示，断事仍以用神为主。</p>
       </section>
 
-      <!-- 待复盘 -->
-      <section id="sec-review" class="qm-sec">
-        <div id="reviewList"></div>
-      </section>
-
-      <!-- 判例库 -->
+      <!-- 复盘：全部判例，随时补反馈、改复盘 -->
       <section id="sec-lib" class="qm-sec">
         <div class="stats" id="statsRow"></div>
+        <div id="geStats"></div>
         <div class="filterrow chips" id="libFilter">
           <button class="chip on" data-f="全部">全部</button>
+          <button class="chip" data-f="未复盘">未复盘</button>
           <button class="chip" data-f="验中">验中</button>
           <button class="chip" data-f="用神错">用神错</button>
           <button class="chip" data-f="象意错">象意错</button>
           <button class="chip" data-f="应期错">应期错</button>
         </div>
-        <div id="geStats"></div>
         <div id="libList"></div>
         <div class="rowbtns"><button class="fb-btn primary" id="exportAll">导出全部判例 (Markdown)</button></div>
       </section>
@@ -802,51 +818,101 @@ $('copyLink').onclick=()=>{
   Fabao.copy(u.toString(),'此盘链接已复制');
 };
 
-/* ================= new entry form ================= */
+/* ================= 反馈 · 归因 · 复盘（起局表单与复盘卡片共用） ================= */
+const ATTRS=['验中','用神错','象意错','应期错'];
+const WXS=['晴','多云','阴','雨','雪'], WINDS=['无风/微风','有风','大风'];
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+// 记了反馈、归因、复盘任一项，就算复盘过
+const reviewed=e=>!!(e.attr||e.actual||(e.note&&e.note.trim()));
+function fbHTML(type,e){
+  e=e||{};
+  const btns=(role,vs)=>`<div class="wx" data-role="${role}">${vs.map(v=>`<button type="button" data-v="${v}">${v}</button>`).join('')}</div>`;
+  const fb=type==='天气'
+    ? `<div class="field"><label>反馈 · 实际天气</label>${btns('actualwx',WXS)}${btns('actualwind',WINDS)}<div class="wx-auto" data-role="wxauto"></div></div>`
+    : `<div class="field"><label>反馈 · 实际如何</label><textarea data-role="actual" placeholder="发生了什么、何时应的">${esc(e.actual)}</textarea></div>`;
+  return fb+`
+    <div class="field"><label>归因 · 可不选</label><div class="attr">${ATTRS.map(a=>`<button type="button" data-a="${a}">${a}</button>`).join('')}</div></div>
+    <div class="field"><label>复盘</label><textarea data-role="note" placeholder="对在哪 / 错在哪 / 学到什么">${esc(e.note)}</textarea></div>`;
+}
+// 一组按钮单选，再点一下取消
+function toggleGroup(g){
+  g.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const was=b.classList.contains('on');
+    g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    if(!was) b.classList.add('on');
+  });
+}
+function fbWire(root,e){
+  e=e||{};
+  root.querySelectorAll('.wx[data-role],.attr').forEach(toggleGroup);
+  const on=(g,v)=>{const b=g&&[...g.querySelectorAll('button')].find(x=>(x.dataset.v||x.dataset.a)===v); if(b) b.classList.add('on');};
+  if(e.attr) on(root.querySelector('.attr'),e.attr);
+  if(e.actual&&root.querySelector('[data-role="actualwx"]'))
+    String(e.actual).split(/[，,]/).map(x=>x.trim()).forEach(v=>on(root.querySelector(WXS.includes(v)?'[data-role="actualwx"]':'[data-role="actualwind"]'),v));
+}
+function fbRead(root){
+  const sel=q=>{const b=root.querySelector(q+' .on');return b?(b.dataset.v||b.dataset.a):null};
+  const actual=root.querySelector('[data-role="actualwx"]')
+    ? [sel('[data-role="actualwx"]'),sel('[data-role="actualwind"]')].filter(Boolean).join('，')
+    : ((root.querySelector('[data-role="actual"]')||{}).value||'').trim();
+  return {actual:actual||null, attr:sel('.attr'), note:((root.querySelector('[data-role="note"]')||{}).value||'').trim()};
+}
+// 天气题断语首行「明日：雨，有风」→ 供自动对照实测
+function wxPredOf(pred){
+  const m=/^明日：([^，\n]*)(?:，([^\n]*))?/.exec(pred||'');
+  return {wxPred:m&&WXS.includes(m[1])?m[1]:null, windPred:m&&WINDS.includes(m[2])?m[2]:'未断风'};
+}
+
+/* ================= 起局：记下这一局 ================= */
+function renderNewFb(keep){
+  const box=$('newFb'), prev=keep&&box.firstElementChild?fbRead(box):{};
+  box.innerHTML=fbHTML(curType,{note:prev.note});
+  fbWire(box,{attr:prev.attr});
+}
 document.querySelectorAll('#typeChips .chip').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#typeChips .chip').forEach(x=>x.classList.remove('on'));
+  const wasWx=curType==='天气';
   b.classList.add('on');curType=b.dataset.t;
   $('wxForm').hidden=curType!=='天气'; $('freeForm').hidden=curType==='天气';
+  if(wasWx!==(curType==='天气')) renderNewFb(true);   // 天气题的反馈是按钮，其余是文字
   renderHeader();
   if(curType!=='天气'&&cur) $('fYs').placeholder=ysSummary(cur,curType)||'留空则按题型自动填';
 });
-function pickGroup(id){ const g=$(id); g.querySelectorAll('button').forEach(b=>b.onclick=()=>{g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}); }
-pickGroup('wxPredict'); pickGroup('wxWind');
+toggleGroup($('wxPredict')); toggleGroup($('wxWind'));
 const picked=id=>{const b=$(id).querySelector('.on');return b?b.dataset.v:null};
+$('newFbBox').open=!!view.fbOpen;
+$('newFbBox').addEventListener('toggle',()=>{view.fbOpen=$('newFbBox').open;saveView()});
 
 $('saveBtn').onclick=()=>{
   const c=QM.computeChart(curDate,override,chartOpts());
+  const fb=fbRead($('newFb'));
   let pred='',extra={};
   if(curType==='天气'){
-    const w=picked('wxPredict');
-    if(!w){toast('先选一个天气预断');return}
-    const wind=picked('wxWind')||'未断风';
-    pred=`明日：${w}，${wind}`+($('wxBasis').value.trim()?`\n依据：${$('wxBasis').value.trim()}`:'');
-    extra={wxPred:w,windPred:wind,loc:{lat:+view.lat,lon:+view.lon}};
+    const w=picked('wxPredict'), wind=picked('wxWind'), basis=$('wxBasis').value.trim();
+    pred=(w||wind?`明日：${w||'未断天气'}，${wind||'未断风'}`:'明日：未预断')+(basis?`\n依据：${basis}`:'');
+    extra={wxPred:w,windPred:wind||'未断风',loc:{lat:+view.lat,lon:+view.lon}};
   }else{
-    if(!$('fPred').value.trim()){toast('预断不能为空');return}
-    pred=`问：${$('fQ').value.trim()||'（未填）'}\n用神：${$('fYs').value.trim()||ysSummary(c,curType)||'（未填）'}\n应期：${$('fTime').value.trim()||'（未填）'}\n预断：${$('fPred').value.trim()}`;
+    const q=$('fQ').value.trim(), tm=$('fTime').value.trim(), pd=$('fPred').value.trim();
+    if(!q&&!pd&&!reviewed(fb)){toast('至少写下所问何事，或断语、反馈、复盘之一');return}
+    const ys=$('fYs').value.trim()||ysSummary(c,curType);
+    pred=[`问：${q||'（未填）'}`,ys&&`用神：${ys}`,tm&&`应期：${tm}`,pd&&`断语：${pd}`].filter(Boolean).join('\n');
   }
-  entries.unshift({id:Date.now(), t:curDate.getTime(), type:curType, pred, ...extra,
+  const now=Date.now();
+  entries.unshift({id:now, t:curDate.getTime(), type:curType, pred, ...extra,
     ov:override, opts:chartOpts(), pan:{dun:c.dun,ju:c.ju,yuan:c.yuan,term:c.term,zf:c.zhifuStar+'落'+c.zfPalace,zs:c.zhishiDoor+'落'+c.zhishiPalace,
       pillars:c.pillars, kong:c.kong.join(''), dayKong:c.dayKong.join(''),
       ge:QM.analyze(c).map(g=>g.name+(g.p?'('+PN[g.p]+')':'')), ys:ysSummary(c,curType)},
-    status:'open', attr:null, actual:null, note:''});
+    attr:fb.attr, actual:fb.actual, note:fb.note, ...(reviewed(fb)?{rt:now}:{})});
   save(entries);
   ['wxBasis','fQ','fYs','fTime','fPred'].forEach(i=>$(i).value='');
   document.querySelectorAll('#wxPredict .on,#wxWind .on').forEach(b=>b.classList.remove('on'));
-  toast('已封盘。明日见分晓');
-  refreshBadge();
+  renderNewFb();
+  renderLib();
+  toast(reviewed(fb)?'已记下，反馈与复盘一并存好':'已记下 · 有了结果到「复盘」里补');
 };
 
-/* ================= review ================= */
-function dueEntries(){ return entries.filter(e=>e.status==='open'); }
-function refreshBadge(){
-  const due=entries.filter(e=>e.status==='open'&&e.t<Date.now()-12*3600e3);
-  const b=$('revBadge'); if(due.length){b.hidden=false;b.textContent=due.length}else b.hidden=true;
-}
 /* ================= 实际天气（Open-Meteo） ================= */
-// 预断的是「明日」：取封盘次日、所在地当地的日值
+// 天气题问的是「明日」：取起局次日、所在地当地的日值
 const ymdOf=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 async function fetchDaily(lat,lon,ymd){
   const ago=(Date.now()-new Date(ymd+'T12:00').getTime())/864e5;
@@ -870,19 +936,25 @@ function classifyWx(w){
 function wxDetail(w){
   return [w.rain!=null?`降水 ${w.rain.toFixed(1)}mm`:'',w.snow?`降雪 ${w.snow.toFixed(1)}cm`:'',w.cloud!=null?`云量 ${Math.round(w.cloud)}%`:'',w.wind!=null?`最大风速 ${Math.round(w.wind)}km/h`:''].filter(Boolean).join(' · ');
 }
-function autoWeather(e,card){
-  const box=card.querySelector('[data-role="wxauto"]'); if(!box) return;
+// 复盘天气题：取实测。还没选实际天气的才代为选上，已选的只作参照
+function autoWeather(e,root){
+  const box=root.querySelector('[data-role="wxauto"]'); if(!box) return;
   const target=new Date(e.t+86400e3), end=new Date(target.getFullYear(),target.getMonth(),target.getDate()+1);
   const loc=e.loc||{lat:+view.lat,lon:+view.lon};
-  const pick=(role,v)=>{const g=card.querySelector(`[data-role="${role}"]`);if(!g||!v)return;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))};
   const apply=w=>{
     const k=classifyWx(w);
-    pick('actualwx',k.wx); pick('actualwind',k.wind);
-    if(k.wx&&k.wx===e.wxPred&&(e.windPred==='未断风'||!k.wind||k.wind===e.windPred)){
-      const a=card.querySelector('.attr button[data-a="验中"]'); if(a&&!card.querySelector('.attr .on')) a.click();
+    const gx=root.querySelector('[data-role="actualwx"]'), gw=root.querySelector('[data-role="actualwind"]');
+    const fresh=!gx.querySelector('.on')&&!gw.querySelector('.on');
+    if(fresh){
+      [[gx,k.wx],[gw,k.wind]].forEach(([g,v])=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',!!v&&b.dataset.v===v)));
+      if(k.wx&&k.wx===e.wxPred&&(e.windPred==='未断风'||!k.wind||k.wind===e.windPred)){
+        const a=root.querySelector('.attr button[data-a="验中"]'); if(a&&!root.querySelector('.attr .on')) a.classList.add('on');
+      }
     }
+    const said=`<b>${k.wx||'—'}${k.wind?'，'+k.wind:''}</b>（${wxDetail(w)}）`;
     box.className='wx-auto';
-    box.innerHTML=`已按所在地（${loc.lat}°N ${loc.lon}°E）${ymdOf(target)} 的实测自动选好：<b>${k.wx||'—'}${k.wind?'，'+k.wind:''}</b>（${wxDetail(w)}），不对可手动改。<a href="https://open-meteo.com/" target="_blank" rel="noopener">数据：Open-Meteo</a>`;
+    box.innerHTML=(fresh?`已按所在地（${loc.lat}°N ${loc.lon}°E）${ymdOf(target)} 的实测自动选好：${said}，不对可手动改。`
+      :`所在地（${loc.lat}°N ${loc.lon}°E）${ymdOf(target)} 实测：${said}。`)+`<a href="https://open-meteo.com/" target="_blank" rel="noopener">数据：Open-Meteo</a>`;
   };
   if(e.wxAuto){apply(e.wxAuto);return}
   if(Date.now()<end.getTime()){box.textContent=`${ymdOf(target)} 还没过完，过了这一天再来，会自动取当天实测天气。`;return}
@@ -891,118 +963,109 @@ function autoWeather(e,card){
     .catch(()=>{box.className='wx-auto err';box.textContent='没能取到实际天气（网络或接口问题），请手动选。'});
 }
 
-function renderReview(){
-  const list=$('reviewList'); const open=dueEntries();
-  if(!open.length){list.innerHTML='<div class="empty">无待复盘之局<br>去起一局吧</div>';return}
-  list.innerHTML='';
-  open.forEach(e=>{
-    const card=document.createElement('div');card.className='card';
-    const wxRow = e.type==='天气' ? `
-      <div class="field"><label>实际天气</label><div class="wx" data-role="actualwx">
-        ${['晴','多云','阴','雨','雪'].map(v=>`<button data-v="${v}">${v}</button>`).join('')}
-      </div><div class="wx" data-role="actualwind">
-        ${['无风/微风','有风','大风'].map(v=>`<button data-v="${v}">${v}</button>`).join('')}
-      </div><div class="wx-auto" data-role="wxauto"></div></div>`:'';
-    card.innerHTML=`
-      <div class="meta"><span>${fmt(new Date(e.t))} · ${e.type}</span><span>${e.pan.dun}${e.pan.ju}局 ${e.pan.term}</span></div>
-      <div class="pansum">值符${e.pan.zf}宫 · 值使${e.pan.zs}宫 · 空${e.pan.kong}${e.ov?' · 手动局':''}</div>
-      <div class="pred">${e.pred}</div>
-      ${wxRow}
-      <div class="field"><label>归因</label><div class="attr">
-        ${['验中','用神错','象意错','应期错'].map(a=>`<button data-a="${a}">${a}</button>`).join('')}
-      </div></div>
-      <div class="field"><input data-role="note" placeholder="复盘一句话（可空）：错在哪 / 学到什么"></div>
-      <div class="rowbtns">
-        <button class="fb-btn primary" data-role="done">存入判例</button>
-        <button class="fb-btn" data-role="showpan">看盘</button>
-        <button class="fb-btn ghost" data-role="del">删</button>
-      </div>
-      <div class="chart" data-role="pan" style="display:none"></div>`;
-    ['actualwx','actualwind'].forEach(r=>{const g=card.querySelector(`[data-role="${r}"]`);if(g)g.querySelectorAll('button').forEach(b=>b.onclick=()=>{g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')})});
-    const ag=card.querySelector('.attr');ag.querySelectorAll('button').forEach(b=>b.onclick=()=>{ag.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
-    card.querySelector('[data-role="showpan"]').onclick=ev=>{
-      const pd=card.querySelector('[data-role="pan"]');
-      if(pd.style.display==='none'){pd.style.display='grid';renderChart(new Date(e.t),e.ov,pd,null,e.opts||{});ev.target.textContent='收起'}
-      else{pd.style.display='none';ev.target.textContent='看盘'}
-    };
-    card.querySelector('[data-role="del"]').onclick=()=>{if(confirm('删除这一局？')){entries=entries.filter(x=>x.id!==e.id);save(entries);renderReview();refreshBadge();renderLib()}};
-    card.querySelector('[data-role="done"]').onclick=()=>{
-      const a=ag.querySelector('.on'); if(!a){toast('先选归因');return}
-      e.attr=a.dataset.a; e.status='done';
-      e.note=card.querySelector('[data-role="note"]').value.trim();
-      const awx=card.querySelector('[data-role="actualwx"] .on'), awd=card.querySelector('[data-role="actualwind"] .on');
-      if(awx||awd) e.actual=[awx&&awx.dataset.v, awd&&awd.dataset.v].filter(Boolean).join('，');
-      save(entries); toast('已入判例库'); renderReview(); refreshBadge(); renderLib();
-    };
-    list.appendChild(card);
-    if(e.type==='天气') autoWeather(e,card);
-  });
-}
-
-/* ================= library ================= */
+/* ================= 复盘 · 判例库 ================= */
 let libF='全部';
 document.querySelectorAll('#libFilter .chip').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#libFilter .chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');libF=b.dataset.f;renderLib();
 });
 function mdOf(e){
+  const fb=reviewed(e)
+    ? [e.actual&&`**实际**：${e.actual}`, `**归因**：${e.attr||'—'}`, e.note&&`**复盘**：${e.note}`, e.rt&&`*复盘于 ${fmt(new Date(e.rt))}*`].filter(Boolean).join('\n')
+    : '（尚未复盘）';
   return `## 奇门判例 · ${e.type} · ${fmt(new Date(e.t))}
 
 - **四柱**：${e.pan.pillars.year}年 ${e.pan.pillars.month}月 ${e.pan.pillars.day}日 ${e.pan.pillars.hour}时
 - **局**：${e.pan.term} · ${e.pan.dun}${e.pan.ju}局（${e.pan.yuan}）${e.ov?' · 手动改局':''}${e.opts&&typeof e.opts.solarLon==='number'?' · 真太阳时（东经'+e.opts.solarLon+'°）':''}${e.opts&&e.opts.mingYear?' · 年命'+e.opts.mingYear:''}
 ${e.pan.ys?'- **用神**：'+e.pan.ys+'\n':''}- **值符**：${e.pan.zf}宫｜**值使**：${e.pan.zs}宫｜**空亡**：${e.pan.dayKong?'日'+e.pan.dayKong+' 时'+e.pan.kong:e.pan.kong}${e.pan.ge&&e.pan.ge.length?'\n- **格局**：'+e.pan.ge.join('、'):''}
 
-### 预断（预注册）
+### 断语
 ${e.pred}
 
-### 结果
-${e.actual?('实际：'+e.actual+'\n'):''}**归因**：${e.attr||'—'}${e.note?('\n复盘：'+e.note):''}
+### 反馈与复盘
+${fb}
 
-#卜部/奇门判例 #${e.attr||'待复盘'}
+#卜部/奇门判例${e.attr?' #'+e.attr:reviewed(e)?'':' #未复盘'}
 `;
 }
+function caseCard(e){
+  const card=document.createElement('div'); card.className='card';
+  const done=reviewed(e);
+  const st=e.attr?`<span style="color:${e.attr==='验中'?'var(--lv)':'var(--zhu)'}">${e.attr}</span>`:`<span class="todo">${done?'已复盘':'未复盘'}</span>`;
+  const sum=[e.actual&&`<p><b>反馈</b>${esc(e.actual)}</p>`,e.note&&`<p><b>复盘</b>${esc(e.note)}</p>`].filter(Boolean).join('');
+  card.innerHTML=`
+    <div class="meta"><span>${fmt(new Date(e.t))} · ${e.type}</span>${st}</div>
+    <div class="pansum">${e.pan.dun}${e.pan.ju}局 ${e.pan.term} · 值符${e.pan.zf}宫 · 值使${e.pan.zs}宫${e.ov?' · 手动局':''}</div>
+    <div class="view"><div class="pred">${esc(e.pred)}</div>${sum?`<div class="fbsum">${sum}</div>`:''}</div>
+    <div class="rowbtns">
+      <button type="button" class="fb-btn${done?'':' primary'}" data-role="edit">${done?'修改':'复盘'}</button>
+      <button type="button" class="fb-btn" data-role="open">回看此盘</button>
+      <button type="button" class="fb-btn" data-role="copy">复制 MD</button>
+    </div>
+    <div class="editor" hidden></div>`;
+  const ed=card.querySelector('.editor'), eb=card.querySelector('[data-role="edit"]');
+  eb.onclick=()=>{
+    if(!ed.hidden){ed.hidden=true;card.classList.remove('editing');eb.textContent=done?'修改':'复盘';return}
+    if(!ed.firstElementChild){   // 头一回展开才搭表单；收起再展开，没存的字还在
+      ed.innerHTML=`<div class="field"><label>断语</label><textarea data-role="pred">${esc(e.pred)}</textarea></div>
+        ${fbHTML(e.type,e)}
+        <div class="rowbtns"><button type="button" class="fb-btn primary" data-role="save">保存</button><button type="button" class="fb-btn" data-role="showpan">看盘</button><button type="button" class="fb-btn ghost" data-role="del">删</button></div>
+        <div class="chart" data-role="pan" style="display:none"></div>`;
+      fbWire(ed,e);
+      ed.querySelector('[data-role="showpan"]').onclick=ev=>{
+        const pd=ed.querySelector('[data-role="pan"]'), btn=ev.currentTarget;
+        if(pd.style.display==='none'){pd.style.display='grid';renderChart(new Date(e.t),e.ov,pd,null,e.opts||{});btn.textContent='收起盘面'}
+        else{pd.style.display='none';btn.textContent='看盘'}
+      };
+      ed.querySelector('[data-role="del"]').onclick=()=>{if(confirm('删除这一局？')){entries=entries.filter(x=>x.id!==e.id);save(entries);renderLib();toast('已删除')}};
+      ed.querySelector('[data-role="save"]').onclick=()=>{
+        const v=fbRead(ed), p=ed.querySelector('[data-role="pred"]').value.trim();
+        e.pred=p||(e.type==='天气'?'明日：未预断':'问：（未填）');
+        if(e.type==='天气') Object.assign(e,wxPredOf(e.pred));
+        e.actual=v.actual; e.attr=v.attr; e.note=v.note;
+        if(reviewed(e)) e.rt=Date.now(); else delete e.rt;
+        delete e.status;   // 旧版的「待复盘 / 已入库」状态不再用
+        save(entries); renderLib(); toast('已保存');
+      };
+      if(e.type==='天气') autoWeather(e,ed);
+    }
+    ed.hidden=false; card.classList.add('editing'); eb.textContent='收起';
+  };
+  card.querySelector('[data-role="copy"]').onclick=()=>{Fabao.copy(mdOf(e),'已复制，可贴入 07卜部')};
+  card.querySelector('[data-role="open"]').onclick=()=>{
+    const d=new Date(e.t); $('dtInput').value=Fabao.toLocalInput(d); curDate=d; override=e.ov||null;
+    if(e.opts){view.solar=typeof e.opts.solarLon==='number'; if(view.solar) view.lon=e.opts.solarLon; view.ming=e.opts.mingYear?String(e.opts.mingYear):view.ming;}
+    renderHeader();
+    window.scrollTo({top:0,behavior:'smooth'}); toast('已回到 '+fmt(d)+' 这一盘');
+  };
+  return card;
+}
 function renderLib(){
-  const done=entries.filter(e=>e.status==='done');
-  const n=done.length, hit=done.filter(e=>e.attr==='验中').length;
-  const cnt=a=>done.filter(e=>e.attr===a).length;
+  const rv=entries.filter(reviewed), jd=entries.filter(e=>e.attr);
+  const hit=jd.filter(e=>e.attr==='验中').length, cnt=a=>jd.filter(e=>e.attr===a).length;
   $('statsRow').innerHTML=`
-    <div class="stat"><b>${n}</b><span>已复盘</span></div>
-    <div class="stat"><b>${n?Math.round(hit/n*100)+'%':'—'}</b><span>验中率</span></div>
+    <div class="stat"><b>${rv.length}<small>/${entries.length}</small></b><span>已复盘/共记</span></div>
+    <div class="stat"><b>${jd.length?Math.round(hit/jd.length*100)+'%':'—'}</b><span>验中率</span></div>
     <div class="stat"><b>${cnt('用神错')}/${cnt('象意错')}/${cnt('应期错')}</b><span>用神/象意/应期</span></div>`;
-  // 按格局统计验中率：同一格局在一盘里出现几次只算一次
-  const tally={};
-  done.forEach(e=>{
-    const names=new Set((e.pan.ge||[]).map(x=>x.replace(/\(.*\)$/,'')));
+  // 按格局统计验中率：只算已归因的；同一格局在一盘里出现几次只算一次
+  const tally={}, withGe=jd.filter(e=>e.pan.ge&&e.pan.ge.length);
+  withGe.forEach(e=>{
+    const names=new Set(e.pan.ge.map(x=>x.replace(/\(.*\)$/,'')));
     names.forEach(nm=>{const t=tally[nm]||(tally[nm]={n:0,hit:0});t.n++;if(e.attr==='验中')t.hit++;});
   });
   const top=Object.entries(tally).sort((a,b)=>b[1].n-a[1].n||b[1].hit/b[1].n-a[1].hit/a[1].n).slice(0,12);
-  $('geStats').innerHTML=top.length?`<div class="card"><div class="meta"><span>格局 · 验中率</span><span>只统计 ${done.filter(e=>e.pan.ge).length} 条带格局的判例</span></div>
+  const geOpen=!!($('geStats').querySelector('details')||{}).open;
+  $('geStats').innerHTML=top.length?`<details class="qm-fold"${geOpen?' open':''}><summary>格局 · 验中率<small>${withGe.length} 条有格局、已归因的判例</small></summary>
     <table class="ge-tbl"><tr><th>格局</th><th style="text-align:right">次数</th><th>验中</th></tr>
-    ${top.map(([nm,t])=>`<tr><td>${nm}</td><td class="n">${t.n}</td><td><span class="bar" style="width:${Math.round(t.hit/t.n*60)}px"></span>${Math.round(t.hit/t.n*100)}%</td></tr>`).join('')}</table></div>`:'';
+    ${top.map(([nm,t])=>`<tr><td>${nm}</td><td class="n">${t.n}</td><td><span class="bar" style="width:${Math.round(t.hit/t.n*60)}px"></span>${Math.round(t.hit/t.n*100)}%</td></tr>`).join('')}</table></details>`:'';
   const list=$('libList');
-  const rows=done.filter(e=>libF==='全部'||e.attr===libF);
-  if(!rows.length){list.innerHTML='<div class="empty">尚无判例</div>';return}
+  const rows=entries.filter(e=>libF==='全部'||(libF==='未复盘'?!reviewed(e):e.attr===libF));
+  if(!rows.length){list.innerHTML=entries.length?'<div class="empty">这一类还没有</div>':'<div class="empty">尚无判例<br>起一局，记几句</div>';return}
   list.innerHTML='';
-  rows.forEach(e=>{
-    const card=document.createElement('div');card.className='card';
-    card.innerHTML=`
-      <div class="meta"><span>${fmt(new Date(e.t))} · ${e.type}</span><span style="color:${e.attr==='验中'?'var(--lv)':'var(--zhu)'}">${e.attr}</span></div>
-      <div class="pansum">${e.pan.dun}${e.pan.ju}局 · 值符${e.pan.zf} · 值使${e.pan.zs}</div>
-      <div class="pred">${e.pred}${e.actual?'\n—— 实际：'+e.actual:''}${e.note?'\n—— '+e.note:''}</div>
-      <div class="rowbtns"><button class="fb-btn" data-role="copy">复制判例 MD</button><button class="fb-btn" data-role="open">回看此盘</button></div>`;
-    card.querySelector('[data-role="copy"]').onclick=()=>{Fabao.copy(mdOf(e),'已复制，可贴入 07卜部')};
-    card.querySelector('[data-role="open"]').onclick=()=>{
-      const d=new Date(e.t); $('dtInput').value=Fabao.toLocalInput(d); curDate=d; override=e.ov||null;
-      if(e.opts){view.solar=typeof e.opts.solarLon==='number'; if(view.solar) view.lon=e.opts.solarLon; view.ming=e.opts.mingYear?String(e.opts.mingYear):view.ming;}
-      renderHeader();
-      window.scrollTo({top:0,behavior:'smooth'}); toast('已回到 '+fmt(d)+' 这一盘');
-    };
-    list.appendChild(card);
-  });
+  rows.forEach(e=>list.appendChild(caseCard(e)));
 }
 $('exportAll').onclick=()=>{
-  const done=entries.filter(e=>e.status==='done');
-  if(!done.length){toast('还没有可导出的判例');return}
-  Fabao.copy(done.map(mdOf).join('\n---\n\n'),'全部判例已复制');
+  if(!entries.length){toast('还没有可导出的判例');return}
+  Fabao.copy(entries.map(mdOf).join('\n---\n\n'),`全部 ${entries.length} 条判例已复制`);
 };
 
 /* ================= tabs ================= */
@@ -1010,14 +1073,11 @@ document.querySelectorAll('#secSeg button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#secSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
   document.querySelectorAll('.qm-sec').forEach(s=>s.classList.remove('on'));
   $('sec-'+b.dataset.s).classList.add('on');
-  if(b.dataset.s==='review')renderReview(); if(b.dataset.s==='lib')renderLib(); if(b.dataset.s==='ge')renderGe();
+  if(b.dataset.s==='lib')renderLib(); if(b.dataset.s==='ge')renderGe();
 });
 
 /* ================= boot ================= */
-renderHeader(); refreshBadge(); renderLib();
-if(entries.some(e=>e.status==='open'&&e.t<Date.now()-12*3600e3)){
-  document.querySelector('#secSeg button[data-s="review"]').click();
-}
+renderHeader(); renderNewFb(); renderLib();
 </script>
 </body>
 </html>
