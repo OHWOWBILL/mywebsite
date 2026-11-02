@@ -260,8 +260,11 @@
     return tens + digits[(d % 10) - 1];
   }
 
-  // 用浏览器内置的农历（Intl chinese calendar）取农历年月日
+  // 农历年月日：先查站内农历月表（/fabao/lunar.js，寿星万年历口径），表外才用浏览器内置的 Intl 中国历
+  // （Intl 在 2027、2030 春节等十余处差一天，时间起卦会因此换卦）
   function lunarDate(date) {
+    const T = window.QJ_LUNAR, r = T && T.toLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    if (r) return { year: r.y, month: r.m, day: r.d, leap: r.leap };
     try {
       const parts = new Intl.DateTimeFormat('en-u-ca-chinese', { year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(date);
       const get = type => (parts.find(p => p.type === type) || {}).value;

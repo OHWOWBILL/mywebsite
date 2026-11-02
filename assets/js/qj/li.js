@@ -96,8 +96,18 @@
     return JIANCHU[mod(dayGZ(d).zhi - (m + 2), 12)];
   }
 
-  // —— 农历（浏览器内置 chinese 历） ——
+  // —— 农历 ——
+  // 先查站内农历月表（assets/js/qj/lunar.js，寿星万年历口径）；浏览器的 Intl 中国历
+  // 在 2027、2030 春节与 1987 闰月等十余处差一天或一月，只在月表范围外兜底。
   function lunar(date) {
+    var T = window.QJ_LUNAR, r = T && T.toLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    if (r) {
+      var yy = mod(r.y - 4, 60);
+      return {
+        year: r.y, month: r.m, day: r.d, leap: r.leap, yearZhi: yy % 12,
+        text: GAN[yy % 10] + ZHI[yy % 12] + '年' + (r.leap ? '闰' : '') + LUNAR_MONTH[r.m - 1] + '月' + lunarDay(r.d)
+      };
+    }
     try {
       var parts = new Intl.DateTimeFormat('en-u-ca-chinese', { year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(date);
       var get = function (t) { var p = parts.find(function (x) { return x.type === t; }); return p ? p.value : ''; };

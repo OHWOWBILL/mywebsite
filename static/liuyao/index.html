@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>六爻纳甲 · 潜蛟阁法宝库</title>
+  <meta name="description" content="六爻纳甲装卦：三钱摇卦、手动录爻、报数与时间起卦；京房八宫、纳甲六亲、六神世应、伏神卦身，月建日辰旬空、月破暗动、进退回头逐爻标注，用神原忌仇一眼可见，附卦辞爻辞，卦例可存可复制。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=3">
+  <style>
+    .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
+    .ly-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .ly-form .fb-row { gap: 8px 10px; }
+    .ly-form input[type=text].q { flex: 1; min-width: 12em; }
+    .ly-form input[type=number] { width: 5.2em; }
+    .ly-side-ctrl { display: flex; flex-direction: column; gap: 8px; max-width: 340px; }
+    .ly-side-ctrl .fb-row .fb-btn { flex: 1; }
+
+    /* 摇卦 */
+    .ly-toss { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+    .ly-coins { display: flex; gap: 12px; perspective: 600px; }
+    .ly-coin {
+      width: 54px; height: 54px; border-radius: 50%; position: relative; transform-style: preserve-3d;
+      transition: transform .7s cubic-bezier(.3, 1.4, .5, 1);
+    }
+    .ly-coin .f, .ly-coin .b {
+      position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; backface-visibility: hidden;
+      font-family: var(--font-title); font-weight: 900; font-size: 15px; letter-spacing: .05em;
+      background: radial-gradient(circle at 35% 30%, #E8C878, #B88A3A 70%, #8A6424);
+      box-shadow: inset 0 0 0 2px rgba(255, 240, 200, .35), inset 0 0 0 6px rgba(0, 0, 0, .12), 0 4px 10px -4px rgba(0, 0, 0, .6);
+      color: #4A3410;
+    }
+    .ly-coin .f::after, .ly-coin .b::after { content: ""; position: absolute; width: 11px; height: 11px; background: var(--bg-2); box-shadow: inset 0 0 0 1.5px rgba(74, 52, 16, .6); }
+    .ly-coin .f span { position: absolute; font-size: 11px; }
+    .ly-coin .f .t { top: 5px; } .ly-coin .f .bt { bottom: 5px; } .ly-coin .f .l { left: 7px; } .ly-coin .f .r { right: 7px; }
+    .ly-coin .b { transform: rotateY(180deg); }
+    .ly-coin .b::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; border: 1px dashed rgba(74, 52, 16, .45); }
+    .ly-coin.bei { transform: rotateY(180deg); }
+    .ly-coin.spin { animation: lySpin .7s ease-out; }
+    @keyframes lySpin { 0% { transform: translateY(0) rotateY(0); } 40% { transform: translateY(-26px) rotateY(540deg); } 100% { transform: translateY(0) rotateY(var(--end, 720deg)); } }
+    .ly-toss-ctrl { display: flex; flex-direction: column; gap: 6px; }
+    .ly-toss-ctrl .fb-btn { min-width: 9em; }
+    .ly-stack { display: flex; flex-direction: column-reverse; gap: 4px; min-width: 120px; }
+    .ly-stack div { display: grid; grid-template-columns: 2.6em 64px 1.4em; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); font-family: var(--font-title); }
+    .ly-stack svg { width: 64px; height: 8px; }
+    .ly-stack rect { fill: var(--fg-2); }
+    .ly-stack .mv { color: var(--zhu); }
+    .ly-stack div.m rect { fill: var(--zhu); }
+
+    /* 手动 */
+    .ly-manual { display: flex; flex-direction: column; gap: 5px; }
+    .ly-manual .r { display: grid; grid-template-columns: 2.6em auto; gap: 8px; align-items: center; }
+    .ly-manual .r > small { font-family: var(--font-title); color: var(--muted); font-size: 12px; letter-spacing: .1em; }
+    .ly-manual .fb-seg button { padding: 4px 10px; font-size: 12.5px; letter-spacing: .08em; }
+
+    /* 卦盘 */
+    .ly-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+    .ly-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .ly-side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: calc(var(--top-h) + 14px); }
+    .ly-board { padding: 16px 12px 12px; overflow-x: auto; scrollbar-width: thin; }
+    .ly-heads { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .62fr); gap: 12px; padding: 0 6px 10px; }
+    .ly-heads h2 { font-family: var(--font-title); font-weight: 600; font-size: 20px; letter-spacing: .2em; line-height: 1.3; }
+    .ly-heads h2 .jin { color: var(--jin); }
+    .ly-heads p { font-size: 12.5px; color: var(--muted); letter-spacing: .06em; }
+    .ly-heads .bn { text-align: left; }
+    .ly-tag { display: inline-block; font-family: var(--font-title); font-size: 11.5px; font-weight: 600; padding: 0 7px; margin-left: 6px; border-radius: 4px; line-height: 19px; vertical-align: 3px; letter-spacing: .08em; }
+    .ly-tag.chong { background: rgba(224, 122, 98, .14); color: var(--zhu); }
+    .ly-tag.he { background: rgba(141, 191, 151, .14); color: var(--lv); }
+    .ly-tag.bian { background: var(--bg-3); color: var(--fg-2); }
+    .ly-xlr { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-title); font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .ly-xlr b { font-weight: 600; color: var(--fg-2); }
+    .ly-xlr .fin { font-size: 20px; color: var(--jin); }
+    .ly-xlr i { font-style: normal; color: var(--faint); }
+    .ly-song { font-size: 13px; line-height: 1.9; color: var(--fg-2); }
+    table.ly-t { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 640px; }
+    .ly-t th { font-family: var(--font-title); font-weight: 400; font-size: 11.5px; color: var(--faint); letter-spacing: .15em; padding: 0 4px 6px; text-align: center; }
+    .ly-t td { padding: 7px 4px; text-align: center; border-top: 1px dashed var(--rule); vertical-align: middle; }
+    .ly-t tbody tr:first-child td { border-top: none; }
+    .ly-t tr.yong td { background: rgba(217, 174, 78, .09); }
+    .ly-t tr.yong td:first-child { box-shadow: inset 3px 0 0 var(--jin); }
+    .ly-t tr.yuan td:first-child { box-shadow: inset 3px 0 0 var(--lv); }
+    .ly-t tr.ji td:first-child { box-shadow: inset 3px 0 0 var(--zhu); }
+    .ly-t tr.chou td:first-child { box-shadow: inset 3px 0 0 #D9A06B; }
+    .ly-shen { font-family: var(--font-title); font-size: 13px; color: var(--fg-2); letter-spacing: .08em; white-space: nowrap; }
+    .ly-fu { font-size: 12px; color: var(--muted); font-family: var(--font-title); white-space: nowrap; line-height: 1.35; }
+    .ly-fu small { display: block; font-size: 10.5px; color: var(--faint); }
+    .ly-qz { font-family: var(--font-title); white-space: nowrap; font-size: 14px; letter-spacing: .06em; color: var(--fg-2); }
+    .ly-qz b { font-weight: 600; color: var(--wc); }
+    .ly-qz em { font-style: normal; font-size: 11px; color: var(--faint); margin-left: 2px; }
+    .ly-yao svg { width: 86px; height: 12px; display: block; margin: 0 auto; }
+    .ly-yao rect { fill: var(--fg-2); }
+    .ly-yao.mv rect { fill: var(--zhu); }
+    .ly-yao.b rect { fill: var(--muted); }
+    .ly-sy { font-family: var(--font-title); font-weight: 600; font-size: 13px; width: 1.8em; }
+    .ly-sy.shi { color: var(--jin); }
+    .ly-sy.ying { color: var(--qing); }
+    .ly-mv { font-family: var(--font-title); color: var(--zhu); font-size: 14px; width: 1.4em; }
+    .ly-marks { display: flex; flex-wrap: wrap; gap: 3px; justify-content: flex-start; text-align: left; }
+    .ly-marks span { font-size: 10.5px; padding: 0 5px; border-radius: 3px; font-family: var(--font-title); white-space: nowrap; background: var(--bg-3); color: var(--muted); line-height: 17px; }
+    .ly-marks .ws-旺, .ly-marks .ws-相 { color: var(--lv); }
+    .ly-marks .ws-休, .ly-marks .ws-囚, .ly-marks .ws-死 { color: var(--faint); }
+    .ly-marks .bad { color: var(--zhu); background: rgba(224, 122, 98, .1); }
+    .ly-marks .good { color: var(--lv); background: rgba(141, 191, 151, .1); }
+    .ly-marks .hl { color: var(--jin); background: rgba(217, 174, 78, .1); }
+    .ly-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--faint); padding: 10px 6px 0; }
+    .ly-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+
+    .ly-card { padding: 16px 18px; }
+    .ly-card h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+    .ly-card h3 small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
+    .ly-dl { font-size: 13px; line-height: 1.75; color: var(--fg-2); }
+    .ly-dl > div { display: grid; grid-template-columns: 4em minmax(0, 1fr); gap: 8px; padding: 4px 0; border-top: 1px dashed var(--rule); }
+    .ly-dl > div:first-child { border-top: none; }
+    .ly-dl dt { font-family: var(--font-title); color: var(--faint); letter-spacing: .1em; font-size: 12px; padding-top: 1px; }
+    .ly-dl b { font-family: var(--font-title); font-weight: 600; color: var(--fg); }
+    .ly-dl .fine { color: var(--muted); font-size: 12px; }
+    .ly-text h4 { font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .15em; margin: 10px 0 4px; color: var(--fg); }
+    .ly-text h4:first-of-type { margin-top: 0; }
+    .ly-text p { font-size: 13.5px; line-height: 1.85; color: var(--fg-2); }
+    .ly-text p.bai { font-size: 12.5px; color: var(--muted); }
+    .ly-text .yt { font-family: var(--font-title); color: var(--zhu); margin-right: 6px; }
+    .ly-note textarea { width: 100%; min-height: 96px; resize: vertical; line-height: 1.7; }
+
+    .ly-help { padding: 16px 20px; }
+    .ly-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
+    .ly-help ul { font-size: 13px; line-height: 1.9; color: var(--fg-2); padding-left: 0; }
+    .ly-help li { list-style: none; padding-left: 14px; position: relative; }
+    .ly-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .ly-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
+
+    @media (max-width: 1100px) {
+      .ly-wrap { grid-template-columns: 1fr; }
+      .ly-side { position: static; display: grid; grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px) {
+      .ly-side { grid-template-columns: 1fr; }
+      .ly-board { margin: 0 -10px; border-radius: var(--r); padding: 14px 6px 10px; }
+      .ly-heads { grid-template-columns: 1fr; gap: 4px; }
+      .ly-heads h2 { font-size: 17px; }
+      table.ly-t { min-width: 560px; }
+      .ly-coin { width: 48px; height: 48px; }
+    }
+  </style>
+</head>
+<body data-tool="liuyao">
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">爻</div>
+    <div>
+      <h1 class="fb-title">六爻纳甲<span class="en">LIUYAO · NAJIA</span></h1>
+      <p class="fb-sub">三钱摇卦 · 纳甲六亲 · 六神世应 · 伏神卦身 · 月建日辰 · 动变</p>
+    </div>
+  </header>
+
+  <section class="fb-now" aria-label="起卦">
+    <div class="ly-form">
+      <div class="fb-row">
+        <input type="text" class="q" id="qIn" placeholder="所问何事（先默念所问，再起卦）" maxlength="60" aria-label="所问何事">
+        <select id="yongIn" aria-label="用神">
+          <option value="">用神：不标</option><option>世爻</option><option>父母</option><option>兄弟</option><option>子孙</option><option>妻财</option><option>官鬼</option>
+        </select>
+      </div>
+      <div class="fb-row">
+        <div class="fb-seg" id="modeSeg" role="group" aria-label="起卦方式"><button data-v="toss" class="on">摇卦</button><button data-v="manual">手动</button><button data-v="num">报数</button><button data-v="time">时间</button></div>
+        <input type="datetime-local" id="whenIn" aria-label="起卦时间（定月建日辰）">
+        <button class="fb-btn" id="nowBtn" type="button">此刻</button>
+      </div>
+      <div id="tossBox" class="ly-toss">
+        <div class="ly-coins" id="coins" aria-hidden="true"></div>
+        <div class="ly-toss-ctrl">
+          <button class="fb-btn primary" id="tossBtn" type="button">摇第一爻</button>
+          <div class="fb-row"><button class="fb-btn ghost" id="tossAll" type="button">一气摇完</button><button class="fb-btn ghost" id="tossReset" type="button">重来</button></div>
+        </div>
+        <div class="ly-stack" id="stack" aria-live="polite"></div>
+      </div>
+      <div id="manualBox" class="ly-manual" hidden></div>
+      <div id="numBox" class="fb-row" hidden>
+        <input type="number" id="n1" min="0" inputmode="numeric" aria-label="第一数（上卦）" placeholder="上卦数">
+        <input type="number" id="n2" min="0" inputmode="numeric" aria-label="第二数（下卦）" placeholder="下卦数">
+        <input type="number" id="n3" min="0" inputmode="numeric" aria-label="第三数（动爻，可空）" placeholder="动爻数">
+        <button class="fb-btn" id="numBtn" type="button">起卦</button>
+        <span class="fb-fine">上下卦取先天数（乾一兑二离三震四巽五坎六艮七坤八），除八取余；动爻取第三数（不填则用两数之和）除六取余。</span>
+      </div>
+      <div id="timeBox" class="fb-row" hidden>
+        <button class="fb-btn" id="timeBtn" type="button">按起卦时间起卦</button>
+        <span class="fb-fine" id="timeNote">农历年支、月、日、时支相加：年月日之和除八为上卦，加时数除八为下卦，总和除六为动爻（与梅花同法）。</span>
+      </div>
+    </div>
+    <div class="fb-now-ctrl ly-side-ctrl">
+      <div class="fb-row">
+        <button class="fb-btn primary" id="saveBtn" type="button">存卦</button>
+        <button class="fb-btn" id="copyBtn" type="button">复制</button>
+      </div>
+      <select id="libSel" aria-label="卦例"><option value="">卦例（存过的卦）</option></select>
+      <p class="fb-fine">摇卦用浏览器的密码学随机数，每爻三钱：背三、字二，合六为交（老阴）、七为单、八为拆、九为重（老阳）。</p>
+    </div>
+  </section>
+
+  <div class="ly-wrap">
+    <div class="ly-main">
+      <section class="fb-card ly-board" id="board" aria-label="卦盘"><p class="fb-empty">先默念所问之事，再摇卦<br>或改用手动、报数、时间起卦</p></section>
+      <section class="fb-card ly-card ly-text" id="textCard" hidden></section>
+    </div>
+    <aside class="ly-side">
+      <section class="fb-card ly-card" id="infoCard" hidden></section>
+      <section class="fb-card ly-card" id="yongCard" hidden></section>
+      <section class="fb-card ly-card" id="xlrCard" hidden></section>
+      <section class="fb-card ly-card ly-note">
+        <h3>断语<small>随卦一并存入卦例</small></h3>
+        <textarea id="noteIn" placeholder="写下用神、旺衰、应期的判断，日后复盘对照" aria-label="断语"></textarea>
+      </section>
+    </aside>
+  </div>
+
+  <section class="fb-card ly-help">
+    <h3>用法与口径</h3>
+    <ul>
+      <li><b>摇卦</b>心里默念所问，点「摇第一爻」，三钱落定即记一爻，自下而上摇满六次；也可「一气摇完」。手上有铜钱的，改用「手动」照实录入：一背为单、二背为拆、三背为重、三字为交。</li>
+      <li><b>起卦时间</b>决定月建、日辰与旬空：月以节换，日于 23 点换（子时作次日）。补录旧卦时，把时间改成当时即可。</li>
+      <li><b>装卦</b>京房八宫定卦宫与世应，纳甲配干支，六亲以卦宫五行为我；六神按日干自初爻起；本卦缺的六亲，取本宫纯卦同位之爻为伏神，并注飞伏生克；卦身阳世从子、阴世从午数至世爻。</li>
+      <li><b>标注</b>每爻注月令旺相休囚死、临月建日辰、月破、日冲（静爻旺相为暗动、休囚为日破）、日合月合、旬空、入日墓、日绝；动爻再注化进退神、回头生克、化空化破化墓化绝、伏吟反吟。</li>
+      <li><b>用神</b>选定后，用神行描金，原神绿、忌神朱、仇神橙，伏神里的也一并标出。断卦仍以用神旺衰、动静、生克为纲，此处只把盘面摆清楚。</li>
+      <li><b>卦辞爻辞</b>取自梅花法宝同一份《周易》原文与白话。仅供学习参考。</li>
+    </ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/bazi/bazi.js?v=1"></script>
+<script src="/liuyao/liuyao.js?v=1"></script>
+<script src="/meihua/data/yao.js"></script>
+<script src="/fabao/fabao.js?v=10"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const { toast, copy, toLocalInput } = window.Fabao;
+const LY = window.LY, BZ = window.BZ, L = window.QJ_LUNAR, TXT = window.YAO_TEXT || {};
+const { GAN, ZHI, WX } = LY;
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const POS = ['初', '二', '三', '四', '五', '上'];
+const VAL = { 6: '交', 7: '单', 8: '拆', 9: '重' };
+const LS_LIB = 'liuyao.lib.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+
+let mode = 'toss', nums = [], G = null, day = null;
+
+/* ================ 时间 → 四柱、月建日辰 ================ */
+function readWhen() {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec($('whenIn').value);
+  if (!m) return null;
+  const [y, mo, d, h, mi] = m.slice(1).map(Number);
+  const tz = -new Date(y, mo - 1, d, h, mi).getTimezoneOffset() / 60;
+  const c = BZ.chart({ y, mo, d, h, mi, tz, male: true });
+  return c ? { c, y, mo, d, h, mi, tz } : null;
+}
+function calcDay() {
+  const w = readWhen();
+  if (!w) { day = null; return null; }
+  const P = w.c.pillars;
+  day = { monthZhi: P[1].zhi, dayGan: P[2].gan, dayZhi: P[2].zhi, w };
+  return day;
+}
+
+/* ================ 爻象 SVG ================ */
+function yaoSVG(yang, w, h) {
+  w = w || 86; h = h || 12;
+  return yang
+    ? `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><rect x="0" y="0" width="${w}" height="${h}" rx="2"/></svg>`
+    : `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><rect x="0" y="0" width="${w * 0.43}" height="${h}" rx="2"/><rect x="${w * 0.57}" y="0" width="${w * 0.43}" height="${h}" rx="2"/></svg>`;
+}
+
+/* ================ 起卦方式 ================ */
+function setMode(v) {
+  mode = v;
+  $('modeSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $('tossBox').hidden = v !== 'toss'; $('manualBox').hidden = v !== 'manual'; $('numBox').hidden = v !== 'num'; $('timeBox').hidden = v !== 'time';
+  if (v === 'manual') { if (nums.length !== 6) nums = [7, 7, 7, 7, 7, 7]; renderManual(); show(); }
+}
+$('modeSeg').onclick = e => { const b = e.target.closest('button'); if (b) setMode(b.dataset.v); };
+
+// —— 摇卦 ——
+const COIN = '<div class="ly-coin"><div class="f"><span class="t">通</span><span class="bt">宝</span><span class="r">潜</span><span class="l">蛟</span></div><div class="b"></div></div>';
+$('coins').innerHTML = COIN + COIN + COIN;
+function rand3() {
+  const a = new Uint8Array(3);
+  (window.crypto || window.msCrypto).getRandomValues(a);
+  return [...a].map(x => x & 1);    // 1 为背
+}
+function tossOne(quick) {
+  if (nums.length >= 6) nums = [];
+  const r = rand3(), v = r.reduce((s, x) => s + (x ? 3 : 2), 0);
+  [...$('coins').children].forEach((c, i) => {
+    c.classList.remove('spin', 'bei'); void c.offsetWidth;
+    if (!quick) { c.style.setProperty('--end', r[i] ? '900deg' : '720deg'); c.classList.add('spin'); }
+    setTimeout(() => c.classList.toggle('bei', !!r[i]), quick ? 0 : 680);
+  });
+  nums.push(v);
+  renderStack();
+  if (nums.length === 6) { calcDay(); show(); }
+  $('tossBtn').textContent = nums.length >= 6 ? '再摇一卦' : `摇第${'一二三四五六'[nums.length]}爻`;
+}
+function renderStack() {
+  $('stack').innerHTML = nums.map((v, i) => `<div class="${v === 6 || v === 9 ? 'm' : ''}"><span>${POS[i]}爻</span>${yaoSVG(v % 2, 64, 8)}<span class="${v === 6 || v === 9 ? 'mv' : ''}">${VAL[v]}</span></div>`).join('');
+}
+let busy = false;
+$('tossBtn').onclick = () => { if (busy) return; busy = true; tossOne(false); setTimeout(() => { busy = false; }, 720); };
+$('tossAll').onclick = () => { if (nums.length >= 6) nums = []; while (nums.length < 6) tossOne(true); };
+$('tossReset').onclick = () => { nums = []; renderStack(); $('tossBtn').textContent = '摇第一爻'; G = null; show(); };
+
+// —— 手动 ——
+function renderManual() {
+  $('manualBox').innerHTML = [5, 4, 3, 2, 1, 0].map(i => `<div class="r"><small>${POS[i]}爻</small><div class="fb-seg" data-i="${i}">${[7, 8, 9, 6].map(v => `<button data-v="${v}" class="${nums[i] === v ? 'on' : ''}">${{ 7: '⚊ 单', 8: '⚋ 拆', 9: '○ 重', 6: '✕ 交' }[v]}</button>`).join('')}</div></div>`).join('');
+}
+$('manualBox').onclick = e => {
+  const b = e.target.closest('button'), s = e.target.closest('.fb-seg');
+  if (!b || !s) return;
+  if (nums.length !== 6) nums = [7, 7, 7, 7, 7, 7];
+  nums[+s.dataset.i] = +b.dataset.v; renderManual(); show();
+};
+
+// —— 报数 ——
+$('numBtn').onclick = () => {
+  const a = parseInt($('n1').value, 10), b = parseInt($('n2').value, 10), c = $('n3').value === '' ? null : parseInt($('n3').value, 10);
+  if (!(a >= 0) || !(b >= 0) || (c != null && !(c >= 0))) { toast('先报两个数'); return; }
+  nums = LY.fromNumbers(a, b, c); show();
+};
+
+// —— 时间（梅花法） ——
+$('timeBtn').onclick = () => {
+  const w = readWhen(); if (!w) { toast('时间不对'); return; }
+  // 23 点起为子时，按次日算农历日
+  const dt = new Date(Date.UTC(w.y, w.mo - 1, w.d, w.h, w.mi) + (w.h >= 23 ? 3600e3 : 0));
+  const lu = L.toLunar(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate());
+  if (!lu) { toast('超出农历表范围'); return; }
+  const Y = ((lu.y - 4) % 12 + 12) % 12 + 1, M = lu.m, D = lu.d, H = Math.floor(((w.h + 1) % 24) / 2) + 1;
+  nums = LY.fromNumbers(Y + M + D, Y + M + D + H, Y + M + D + H);
+  $('timeNote').textContent = `${ZHI[Y - 1]}年（${Y}）${lu.leap ? '闰' : ''}${L.MONTH_CN[M - 1]}月（${M}）${L.dayCN(D)}（${D}）${ZHI[H - 1]}时（${H}）：上卦 ${Y + M + D}，下卦 ${Y + M + D + H}，动爻 ${Y + M + D + H}。`;
+  show();
+};
+
+/* ================ 装卦与盘面 ================ */
+function show() {
+  if (nums.length !== 6) {
+    $('board').innerHTML = '<p class="fb-empty">先默念所问之事，再摇卦<br>或改用手动、报数、时间起卦</p>';
+    $('infoCard').hidden = $('yongCard').hidden = $('textCard').hidden = true; return;
+  }
+  calcDay();
+  G = LY.cast(nums, day);
+  if (G.day) G.day.w = day.w;
+  renderBoard(); renderInfo(); renderYong(); renderText(); writeURL();
+}
+
+function markHTML(y, i) {
+  const out = [];
+  if (y.ws) out.push(`<span class="ws-${y.ws}">${y.ws}</span>`);
+  (y.marks || []).forEach(t => out.push(`<span class="${/破|空|墓|绝/.test(t) ? 'bad' : /临|暗动|合/.test(t) ? 'good' : ''}">${t}</span>`));
+  (y.hua || []).forEach(t => out.push(`<span class="${/进|生/.test(t) ? 'good' : /退|克|空|破|墓|绝|反吟/.test(t) ? 'bad' : 'hl'}">${t}</span>`));
+  return `<div class="ly-marks">${out.join('')}</div>`;
+}
+function roleOf(qin, isShi) {
+  const pick = $('yongIn').value; if (!pick) return '';
+  const r = LY.yongShen(G, pick);
+  if (pick === '世爻') return isShi ? 'yong' : qin === r.yuan ? 'yuan' : qin === r.ji ? 'ji' : qin === r.chou ? 'chou' : '';
+  return qin === r.yong ? 'yong' : qin === r.yuan ? 'yuan' : qin === r.ji ? 'ji' : qin === r.chou ? 'chou' : '';
+}
+function renderBoard() {
+  const B = G.ben, V = G.bian;
+  const head = (g, isBen) => g
+    ? `<h2>${isBen ? '' : '之 '}${isBen ? `<span class="jin">${g.name}</span>` : g.name}${tagOf(isBen ? G.ch : G.chBian)}${isBen && G.ch && G.chBian ? `<span class="ly-tag bian">${G.ch.slice(1)}变${G.chBian.slice(1)}</span>` : ''}</h2><p>${g.palace}宫 · ${WX[g.palaceWx]} · ${g.genName}${isBen ? ` · 世${POS[g.shi - 1]}应${POS[g.ying - 1]}` : ''}</p>`
+    : '<h2 style="color:var(--faint)">静卦</h2><p>六爻不动</p>';
+  const rows = [5, 4, 3, 2, 1, 0].map(i => {
+    const y = B.yao[i], v = V ? V.yao[i] : null, mv = G.moving[i];
+    const fus = G.fu.filter(f => f.pos === i + 1);
+    const isShi = B.shi === i + 1, isYing = B.ying === i + 1;
+    const role = roleOf(y.qin, isShi);
+    const fuRole = fus.length && $('yongIn').value && $('yongIn').value !== '世爻' ? roleOf(fus[0].qin, false) : '';
+    return `<tr class="${role}">
+      <td><span class="ly-shen">${y.shen || ''}</span></td>
+      <td><span class="ly-fu">${fus.map(f => `<span class="wx-${f.wx}" ${fuRole === 'yong' ? 'style="color:var(--jin)"' : ''}>${f.qin}${GAN[f.gan]}${ZHI[f.zhi]}${WX[f.wx]}</span><small>${f.rel || ''}${f.kong ? ' · 空' : ''}</small>`).join('')}</span></td>
+      <td><span class="ly-qz wx-${y.wx}">${y.qin}<b>${GAN[y.gan]}${ZHI[y.zhi]}</b><em>${WX[y.wx]}</em></span>${G.guaShen.at.includes(i + 1) ? '<em style="font-style:normal;font-size:10.5px;color:var(--jin);margin-left:3px">身</em>' : ''}</td>
+      <td><span class="ly-yao${mv ? ' mv' : ''}">${yaoSVG(y.yang)}</span></td>
+      <td><span class="ly-sy ${isShi ? 'shi' : isYing ? 'ying' : ''}">${isShi ? '世' : isYing ? '应' : ''}</span></td>
+      <td><span class="ly-mv">${mv ? (nums[i] === 9 ? '○' : '✕') : ''}</span></td>
+      <td>${v ? `<span class="ly-qz wx-${v.wx}">${v.qin}<b>${GAN[v.gan]}${ZHI[v.zhi]}</b><em>${WX[v.wx]}</em></span>` : ''}</td>
+      <td>${v ? `<span class="ly-yao b">${yaoSVG(v.yang)}</span>` : ''}</td>
+      <td>${markHTML(y, i)}</td>
+    </tr>`;
+  }).join('');
+  $('board').innerHTML = `
+    <div class="ly-heads"><div>${head(B, true)}</div><div class="bn">${head(V, false)}</div></div>
+    <table class="ly-t">
+      <thead><tr><th>六神</th><th>伏神</th><th>本卦</th><th></th><th>世应</th><th>动</th><th>变卦</th><th></th><th style="text-align:left">日月 · 动变</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${$('yongIn').value ? `<div class="ly-legend"><span><i style="background:var(--jin)"></i>用神</span><span><i style="background:var(--lv)"></i>原神</span><span><i style="background:var(--zhu)"></i>忌神</span><span><i style="background:#D9A06B"></i>仇神</span></div>` : ''}`;
+}
+function tagOf(ch) { return ch ? `<span class="ly-tag ${ch === '六冲' ? 'chong' : 'he'}">${ch}</span>` : ''; }
+
+// —— 小六壬（随起卦时间，不必先起卦） ——
+const XLR_SONG = {
+  大安: '大安事事昌，求财在坤方，失物去不远，宅舍保安康。行人身未动，病者主无妨，将军回田野，仔细更推详。',
+  留连: '留连事难成，求谋日未明，官事只宜缓，去者未回程。失物南方见，急讨方心称，更须防口舌，人口且平平。',
+  速喜: '速喜喜来临，求财向南行，失物申未午，逢人路上寻。官事有福德，病者无祸侵，田宅六畜吉，行人有信音。',
+  赤口: '赤口主口舌，官非切要防，失物速速讨，行人有惊慌。六畜多作怪，病者出西方，更须防咀咒，诚恐染瘟皇。',
+  小吉: '小吉最吉昌，路上好商量，阴人来报喜，失物在坤方。行人即便至，交关甚是强，凡事皆和合，病者叩穹苍。',
+  空亡: '空亡事不祥，阴人多乖张，求财无利益，行人有灾殃。失物寻不见，官事有刑伤，病人逢暗鬼，解禳保安康。'
+};
+function renderXLR() {
+  const w = readWhen(), c = $('xlrCard');
+  if (!w) { c.hidden = true; return; }
+  const dt = new Date(Date.UTC(w.y, w.mo - 1, w.d, w.h, w.mi) + (w.h >= 23 ? 3600e3 : 0));
+  const lu = L.toLunar(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate());
+  if (!lu) { c.hidden = true; return; }
+  const H = Math.floor(((w.h + 1) % 24) / 2) + 1, r = LY.xiaoLiuRen(lu.m, lu.d, H);
+  c.hidden = false;
+  c.innerHTML = `<h3>小六壬<small>${lu.leap ? '闰' : ''}${L.MONTH_CN[lu.m - 1]}月${L.dayCN(lu.d)} ${ZHI[H - 1]}时 · 掐指一算</small></h3>
+    <div class="ly-xlr"><span>月上<b>${r.month}</b></span><i>→</i><span>日上<b>${r.day}</b></span><i>→</i><span>时上 <b class="fin">${r.hour}</b></span></div>
+    <p class="ly-song">${XLR_SONG[r.hour]}</p>
+    <p class="fb-fine" style="margin-top:6px">大安起正月，月上起日，日上起时；歌诀为民间流传本。与六爻无涉，聊备一格。</p>`;
+}
+
+function renderInfo() {
+  const c = $('infoCard'); c.hidden = false;
+  const d = G.day, w = d && d.w;
+  if (!d) { c.innerHTML = '<h3>日月</h3><p class="fb-fine">起卦时间不对，月建日辰未定</p>'; return; }
+  const P = w.c.pillars.map(p => p.name).join(' ');
+  const shen = G.guaShen;
+  c.innerHTML = `<h3>日月<small>${w.y}-${pad(w.mo)}-${pad(w.d)} ${pad(w.h)}:${pad(w.mi)}</small></h3>
+    <dl class="ly-dl">
+      <div><dt>四柱</dt><dd><b>${P}</b></dd></div>
+      <div><dt>月建</dt><dd><b>${ZHI[d.monthZhi]}</b>${WX[LY.ZHI_WX[d.monthZhi]]} <span class="fine">（${w.c.jie.prev.n}后）</span></dd></div>
+      <div><dt>日辰</dt><dd><b>${GAN[d.dayGan]}${ZHI[d.dayZhi]}</b> <span class="fine">${WX[LY.ZHI_WX[d.dayZhi]]}</span></dd></div>
+      <div><dt>旬空</dt><dd><b>${d.kong.map(z => ZHI[z]).join('')}</b></dd></div>
+      <div><dt>卦身</dt><dd><b>${ZHI[shen.zhi]}</b> <span class="fine">${shen.at.length ? '在' + shen.at.map(p => POS[p - 1]).join('、') + '爻' : '不上卦'}（${G.ben.yao[G.ben.shi - 1].yang ? '阳世从子' : '阴世从午'}）</span></dd></div>
+      <div><dt>互卦</dt><dd><b>${G.hu.name}</b> <span class="fine">${G.hu.palace}宫</span></dd></div>
+      <div><dt>伏神</dt><dd>${G.fu.length ? G.fu.map(f => `${f.qin}${ZHI[f.zhi]}${WX[f.wx]}伏${POS[f.pos - 1]}爻 <span class="fine">${f.rel}</span>`).join('<br>') : '<span class="fine">六亲俱全，无伏</span>'}</dd></div>
+    </dl>`;
+}
+function renderYong() {
+  const c = $('yongCard'), pick = $('yongIn').value;
+  if (!pick) { c.hidden = true; return; }
+  c.hidden = false;
+  const r = LY.yongShen(G, pick), B = G.ben;
+  const where = q => {
+    const ys = q === '世爻' ? [B.yao[B.shi - 1]] : B.yao.filter(y => y.qin === q);
+    const fs = q === '世爻' ? [] : G.fu.filter(f => f.qin === q);
+    const a = ys.map(y => `${POS[y.pos - 1]}爻${ZHI[y.zhi]}${WX[y.wx]}${G.moving[y.pos - 1] ? '（动）' : ''}${y.ws ? ' ' + y.ws : ''}`);
+    const b = fs.map(f => `伏${POS[f.pos - 1]}爻${ZHI[f.zhi]}${WX[f.wx]}`);
+    return a.concat(b).join('、') || '<span class="fine">不现</span>';
+  };
+  c.innerHTML = `<h3>用神<small>${pick === '世爻' ? '自占以世爻为用' : '所问取' + pick}</small></h3>
+    <dl class="ly-dl">
+      <div><dt style="color:var(--jin)">用神</dt><dd><b>${r.yong}</b>（${WX[r.yongWx]}） ${where(r.yong)}</dd></div>
+      <div><dt style="color:var(--lv)">原神</dt><dd><b>${r.yuan}</b> ${where(r.yuan)}</dd></div>
+      <div><dt style="color:var(--zhu)">忌神</dt><dd><b>${r.ji}</b> ${where(r.ji)}</dd></div>
+      <div><dt style="color:#D9A06B">仇神</dt><dd><b>${r.chou}</b> ${where(r.chou)}</dd></div>
+    </dl>`;
+}
+function renderText() {
+  const c = $('textCard'), B = G.ben, V = G.bian, T = TXT[B.name];
+  if (!T) { c.hidden = true; return; }
+  c.hidden = false;
+  const mv = G.moving.map((m, i) => m ? i : -1).filter(i => i >= 0);
+  let h = `<h3>卦辞爻辞<small>${B.name}${V ? ' 之 ' + V.name : ''}</small></h3><h4>${B.name}</h4><p>${esc(T.gua)}</p>`;
+  mv.forEach(i => { const y = T.yao[i]; if (y) h += `<p><span class="yt">${y[0]}</span>${esc(y[1])}</p><p class="bai">${esc(y[2])}</p>`; });
+  if (mv.length === 6 && T.extra) h += `<p><span class="yt">${T.extra[0]}</span>${esc(T.extra[1])}</p><p class="bai">${esc(T.extra[2])}</p>`;
+  if (V && TXT[V.name]) h += `<h4>${V.name}</h4><p>${esc(TXT[V.name].gua)}</p>`;
+  c.innerHTML = h;
+}
+
+/* ================ 卦例 · 复制 · 网址 ================ */
+function snap() { return { q: $('qIn').value.trim(), when: $('whenIn').value, nums: nums.join(''), yong: $('yongIn').value, note: $('noteIn').value }; }
+function apply(s) {
+  $('qIn').value = s.q || ''; $('whenIn').value = s.when || $('whenIn').value; $('yongIn').value = s.yong || ''; $('noteIn').value = s.note || '';
+  nums = String(s.nums || '').split('').map(Number).filter(v => v >= 6 && v <= 9);
+  if (nums.length !== 6) nums = [];
+  renderStack(); if (mode === 'manual') renderManual();
+  $('tossBtn').textContent = nums.length >= 6 ? '再摇一卦' : '摇第一爻';
+  show();
+}
+function renderLib() {
+  const lib = store.get(LS_LIB, []);
+  $('libSel').innerHTML = `<option value="">卦例（${lib.length ? '存过 ' + lib.length + ' 卦' : '尚无存卦'}）</option>` +
+    lib.map((e, i) => `<option value="${i}">${esc((e.when || '').replace('T', ' '))} · ${esc(e.name || '')} · ${esc(e.q || '无题')}</option>`).join('') +
+    (lib.length ? '<option value="del">删去当前这卦…</option><option value="export">导出全部（JSON）</option>' : '');
+}
+$('saveBtn').onclick = () => {
+  if (!G) { toast('先起一卦'); return; }
+  const s = snap(), lib = store.get(LS_LIB, []);
+  s.name = G.ben.name + (G.bian ? '之' + G.bian.name : '');
+  const i = lib.findIndex(e => e.when === s.when && e.nums === s.nums);
+  s.saved = Date.now();
+  if (i >= 0) lib[i] = s; else lib.unshift(s);
+  store.set(LS_LIB, lib.slice(0, 500)); renderLib(); toast('已存入卦例（只存在这台设备）');
+};
+let libCur = -1;
+$('libSel').onchange = () => {
+  const v = $('libSel').value, lib = store.get(LS_LIB, []);
+  if (v === 'del') {
+    if (libCur >= 0 && lib[libCur] && confirm('删去这一卦？')) { lib.splice(libCur, 1); store.set(LS_LIB, lib); libCur = -1; toast('已删'); }
+    else toast('先从卦例里选一卦');
+    renderLib(); return;
+  }
+  if (v === 'export') { copy(JSON.stringify(lib, null, 1), '卦例已复制为 JSON'); renderLib(); return; }
+  if (v === '') return;
+  libCur = +v; apply(lib[libCur]); renderLib(); $('libSel').value = String(libCur);
+};
+$('copyBtn').onclick = () => {
+  if (!G) { toast('先起一卦'); return; }
+  const B = G.ben, V = G.bian, d = G.day, out = [];
+  out.push('六爻 · ' + ($('qIn').value.trim() || '所问未记'));
+  if (d) out.push(`时间 ${d.w.y}-${pad(d.w.mo)}-${pad(d.w.d)} ${pad(d.w.h)}:${pad(d.w.mi)} · ${d.w.c.pillars.map(p => p.name).join(' ')} · 月建${ZHI[d.monthZhi]} 日辰${GAN[d.dayGan]}${ZHI[d.dayZhi]} · 旬空${d.kong.map(z => ZHI[z]).join('')}`);
+  out.push(`本卦 ${B.name}（${B.palace}宫·${WX[B.palaceWx]}·${B.genName}）${V ? ' 之 ' + V.name + '（' + V.palace + '宫）' : ' 静卦'}`);
+  [5, 4, 3, 2, 1, 0].forEach(i => {
+    const y = B.yao[i], v = V ? V.yao[i] : null, mv = G.moving[i];
+    const fu = G.fu.filter(f => f.pos === i + 1).map(f => `伏${f.qin}${ZHI[f.zhi]}${WX[f.wx]}`).join('');
+    const line = y.yang ? '▅▅▅▅▅' : '▅▅ ▅▅';
+    out.push(`${(y.shen || '').padEnd(2, '　')} ${y.qin}${GAN[y.gan]}${ZHI[y.zhi]}${WX[y.wx]} ${line} ${B.shi === i + 1 ? '世' : B.ying === i + 1 ? '应' : '　'}${mv ? (nums[i] === 9 ? '○' : '✕') : '　'}${v ? ' → ' + v.qin + GAN[v.gan] + ZHI[v.zhi] + WX[v.wx] : ''}${fu ? ' ' + fu : ''}`);
+  });
+  if ($('noteIn').value.trim()) out.push('断语 ' + $('noteIn').value.trim());
+  copy(out.join('\n'), '卦已复制');
+};
+function writeURL() {
+  const q = new URLSearchParams();
+  q.set('g', nums.join('')); q.set('t', $('whenIn').value);
+  if ($('qIn').value.trim()) q.set('q', $('qIn').value.trim());
+  if ($('yongIn').value) q.set('y', $('yongIn').value);
+  history.replaceState(null, '', '?' + q.toString());
+}
+
+/* ================ 绑定 ================ */
+$('whenIn').addEventListener('change', () => { renderXLR(); if (G) show(); });
+$('nowBtn').onclick = () => { const d = new Date(); d.setSeconds(0, 0); $('whenIn').value = toLocalInput(d); renderXLR(); if (G) show(); };
+$('yongIn').onchange = () => { if (G) { renderBoard(); renderYong(); writeURL(); } };
+$('qIn').addEventListener('change', () => { if (G) writeURL(); });
+
+renderLib();
+const q = new URLSearchParams(location.search);
+const now = new Date(); now.setSeconds(0, 0);
+$('whenIn').value = q.get('t') || toLocalInput(now);
+renderXLR();
+if (q.get('g')) {
+  $('qIn').value = q.get('q') || ''; $('yongIn').value = q.get('y') || '';
+  apply({ q: q.get('q'), when: $('whenIn').value, nums: q.get('g'), yong: q.get('y') });
+  if (nums.length === 6) setMode('manual');
+}
+})();
+</script>
+</body>
+</html>

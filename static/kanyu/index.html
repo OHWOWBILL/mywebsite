@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>堪舆 · 玄空飞星 · 潜蛟阁法宝库</title>
+  <meta name="description" content="玄空飞星排盘：二十四山坐向（可填度数，自动判兼向与空亡），元运下卦替卦，山星向星运星九宫一图，旺山旺向、上山下水、合十、三般卦、伏吟反吟自动标出，叠流年流月紫白；附八宅命卦游年与手机罗盘。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=3">
+  <style>
+    .q-旺 { --qc: var(--jin); } .q-生 { --qc: var(--lv); } .q-退 { --qc: var(--muted); } .q-死 { --qc: #9B8FA6; } .q-煞 { --qc: var(--zhu); }
+    .ky-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .ky-form .fb-row { gap: 8px 10px; }
+    .ky-form input[type=number] { width: 6.4em; }
+    .ky-form input[type=text] { width: 9em; }
+    .ky-read { font-family: var(--font-title); font-size: 13.5px; color: var(--fg-2); letter-spacing: .06em; }
+    .ky-read b { color: var(--fg); font-weight: 600; }
+    .ky-read .warn { color: var(--jin); } .ky-read .bad { color: var(--zhu); }
+    .ky-side-ctrl { display: flex; flex-direction: column; gap: 8px; max-width: 340px; }
+    .ky-side-ctrl .fb-row .fb-btn { flex: 1; }
+    .ky-chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
+    .ky-chk input { accent-color: var(--zi); }
+
+    .ky-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+    .ky-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .ky-side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: calc(var(--top-h) + 14px); }
+
+    /* 九宫 */
+    .ky-board { padding: 16px; }
+    .ky-bhead { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .ky-bhead h2 { font-family: var(--font-title); font-weight: 600; font-size: 19px; letter-spacing: .2em; }
+    .ky-bhead h2 .jin { color: var(--jin); }
+    .ky-bhead p { font-size: 12.5px; color: var(--muted); letter-spacing: .06em; }
+    .ky-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: var(--r-lg); overflow: hidden; max-width: 620px; margin: 0 auto; }
+    .ky-cell { position: relative; background: var(--bg-2); aspect-ratio: 1 / .86; padding: 8px 10px; cursor: pointer; display: grid; grid-template-rows: auto 1fr auto; transition: background .2s; min-width: 0; }
+    .ky-cell:hover { background: #211a2c; }
+    .ky-cell.sel { background: color-mix(in oklab, var(--zi) 18%, var(--bg-2)); box-shadow: inset 0 0 0 1px var(--zi-2); }
+    .ky-cell.zuo::after, .ky-cell.xiang::after { position: absolute; top: 6px; right: 8px; font-family: var(--font-title); font-size: 11px; font-weight: 600; padding: 0 6px; border-radius: 3px; line-height: 18px; }
+    .ky-cell.zuo::after { content: "坐"; background: rgba(169, 148, 224, .2); color: var(--zi-2); }
+    .ky-cell.xiang::after { content: "向"; background: rgba(217, 174, 78, .18); color: var(--jin); }
+    .ky-cell .pn { font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .1em; }
+    .ky-cell .pn b { color: var(--fg-2); font-weight: 600; margin-right: 4px; }
+    .ky-stars { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; }
+    .ky-stars .s { font-family: var(--font-title); font-weight: 600; font-size: clamp(26px, 5.4vw, 40px); line-height: 1; color: var(--qc); }
+    .ky-stars .s small { display: block; text-align: center; font-size: 10px; font-weight: 400; color: var(--faint); letter-spacing: .1em; margin-top: 3px; }
+    .ky-yun { text-align: center; font-family: var(--font-title); font-size: 16px; color: var(--fg-2); }
+    .ky-yun small { font-size: 10px; color: var(--faint); margin-left: 2px; }
+    .ky-flow { position: absolute; left: 8px; bottom: 6px; display: flex; gap: 4px; }
+    .ky-flow span { font-family: var(--font-title); font-size: 11px; padding: 0 5px; border-radius: 3px; line-height: 17px; }
+    .ky-flow .fy { background: rgba(141, 191, 151, .14); color: var(--lv); }
+    .ky-flow .fm { background: rgba(201, 165, 120, .14); color: var(--wx-tu); }
+    .ky-cell.center { background: var(--bg); }
+    .ky-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 10px; font-size: 11.5px; color: var(--faint); }
+    .ky-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--qc); margin-right: 4px; vertical-align: 0; }
+
+    .ky-card { padding: 16px 18px; }
+    .ky-card h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+    .ky-card h3 small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
+    .ky-ge { display: flex; flex-direction: column; gap: 8px; }
+    .ky-ge .g { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 13px; line-height: 1.7; color: var(--fg-2); }
+    .ky-ge .g b { font-family: var(--font-title); font-weight: 600; font-size: 14px; padding: 0 8px; border-radius: 4px; white-space: nowrap; background: var(--bg-3); color: var(--fg); }
+    .ky-ge .g.good b { background: rgba(141, 191, 151, .16); color: var(--lv); }
+    .ky-ge .g.bad b { background: rgba(224, 122, 98, .14); color: var(--zhu); }
+    .ky-ge .g.mid b { background: rgba(217, 174, 78, .14); color: var(--jin); }
+    .ky-dl { font-size: 13px; line-height: 1.75; color: var(--fg-2); }
+    .ky-dl > div { display: grid; grid-template-columns: 4em minmax(0, 1fr); gap: 8px; padding: 4px 0; border-top: 1px dashed var(--rule); }
+    .ky-dl > div:first-child { border-top: none; }
+    .ky-dl dt { font-family: var(--font-title); color: var(--faint); letter-spacing: .1em; font-size: 12px; padding-top: 1px; }
+    .ky-dl b { font-family: var(--font-title); font-weight: 600; color: var(--fg); }
+    .ky-dl .q { font-family: var(--font-title); font-size: 12px; color: var(--qc); margin-left: 4px; }
+    .ky-dl .fine { color: var(--muted); font-size: 12px; }
+
+    /* 八宅 */
+    .ky-bz { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; margin-top: 10px; }
+    .ky-bz div { background: var(--bg-2); padding: 7px 4px; text-align: center; font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .ky-bz b { display: block; font-family: var(--font-title); font-size: 14px; font-weight: 600; }
+    .ky-bz .ji b { color: var(--lv); } .ky-bz .xiong b { color: var(--zhu); }
+    .ky-bz .mid { background: var(--bg); color: var(--fg-2); font-family: var(--font-title); }
+
+    /* 罗盘 */
+    .ky-luopan { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 18px; align-items: center; }
+    .ky-dial { position: relative; width: 100%; aspect-ratio: 1; }
+    .ky-dial svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .ky-dial .rot { transition: transform .12s linear; transform-origin: 150px 150px; }
+    .ky-dial .ring { fill: none; stroke: var(--rule-2); stroke-width: 1; }
+    .ky-dial .tick { stroke: var(--muted); stroke-width: .6; opacity: .6; }
+    .ky-dial .tick.big { stroke-width: 1; opacity: .9; }
+    .ky-dial .shan { font-family: var(--font-title); font-size: 13px; text-anchor: middle; dominant-baseline: central; }
+    .ky-dial .shan.yang { fill: var(--fg); font-weight: 600; }
+    .ky-dial .shan.yin { fill: var(--muted); }
+    .ky-dial .gua { font-size: 17px; fill: var(--zi-2); text-anchor: middle; dominant-baseline: central; }
+    .ky-dial .deg { font-family: var(--font-mark); font-size: 8px; fill: var(--faint); text-anchor: middle; dominant-baseline: central; }
+    .ky-dial .ptr { stroke: var(--zhu); stroke-width: 2; }
+    .ky-dial .ptr-h { fill: var(--zhu); }
+    .ky-dial .core { fill: var(--bg-3); stroke: var(--rule-2); }
+    .ky-dial .hd { font-family: var(--font-mark); font-size: 22px; font-weight: 800; fill: var(--fg); text-anchor: middle; dominant-baseline: central; }
+    .ky-dial .hs { font-family: var(--font-title); font-size: 12px; fill: var(--muted); text-anchor: middle; dominant-baseline: central; }
+    .ky-lp-ctrl { display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--fg-2); line-height: 1.7; }
+    .ky-lp-ctrl input[type=range] { width: 100%; accent-color: var(--zi); }
+
+    .ky-help { padding: 16px 20px; }
+    .ky-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
+    .ky-help ul { font-size: 13px; line-height: 1.9; color: var(--fg-2); padding-left: 0; }
+    .ky-help li { list-style: none; padding-left: 14px; position: relative; }
+    .ky-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .ky-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
+
+    @media (max-width: 1100px) {
+      .ky-wrap { grid-template-columns: 1fr; }
+      .ky-side { position: static; display: grid; grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px) {
+      .ky-side { grid-template-columns: 1fr; }
+      .ky-board { padding: 12px 8px; margin: 0 -10px; border-radius: var(--r); }
+      .ky-cell { padding: 5px 6px; aspect-ratio: 1 / .95; }
+      .ky-cell .pn { font-size: 10.5px; letter-spacing: .02em; }
+      .ky-yun { font-size: 13px; }
+      .ky-luopan { grid-template-columns: 1fr; }
+      .ky-dial { max-width: 320px; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body data-tool="kanyu">
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">山</div>
+    <div>
+      <h1 class="fb-title">堪舆<span class="en">XUANKONG · FEIXING</span></h1>
+      <p class="fb-sub">玄空飞星 · 下卦替卦 · 格局 · 流年流月 · 八宅命卦 · 罗盘</p>
+    </div>
+  </header>
+
+  <section class="fb-now" aria-label="立向">
+    <div class="ky-form">
+      <div class="fb-row">
+        <select id="zuoIn" aria-label="坐山"></select>
+        <label class="ky-chk">向度 <input type="number" id="degIn" min="0" max="359.9" step="0.1" inputmode="decimal" aria-label="向首度数"></label>
+        <button class="fb-btn" id="lpJump" type="button">罗盘量向</button>
+        <input type="text" id="nameIn" placeholder="宅名或备注" maxlength="24" aria-label="宅名">
+      </div>
+      <div class="fb-row">
+        <label class="ky-chk">建成 / 入住年 <input type="number" id="yearIn" min="1800" max="2200" inputmode="numeric" aria-label="建成或入住年份"></label>
+        <select id="yunIn" aria-label="元运"></select>
+        <div class="fb-seg" id="tiSeg" role="group" aria-label="下卦替卦"><button data-v="0" class="on">下卦</button><button data-v="1">替卦</button></div>
+        <div class="fb-seg" id="oriSeg" role="group" aria-label="盘面方位"><button data-v="s" class="on">南上</button><button data-v="n">北上</button></div>
+      </div>
+      <div class="fb-row">
+        <label class="ky-chk"><input type="checkbox" id="flowIn" checked>叠流年流月</label>
+        <input type="date" id="flowDate" aria-label="流年流月所看之日">
+        <span class="ky-read" id="readOut"></span>
+      </div>
+    </div>
+    <div class="fb-now-ctrl ky-side-ctrl">
+      <div class="fb-row">
+        <button class="fb-btn primary" id="saveBtn" type="button">存盘</button>
+        <button class="fb-btn" id="copyBtn" type="button">复制</button>
+      </div>
+      <select id="libSel" aria-label="宅库"><option value="">宅库（存过的盘）</option></select>
+      <p class="fb-fine">向度为罗盘所量向首之度（磁北为零，顺时针）。偏离本山中线三度以上为兼向，可改用替卦；近两山交界为空亡。</p>
+    </div>
+  </section>
+
+  <div class="ky-wrap">
+    <div class="ky-main">
+      <section class="fb-card ky-board" aria-label="飞星盘">
+        <div class="ky-bhead"><h2 id="title"></h2><p id="subtitle"></p></div>
+        <div class="ky-grid" id="grid"></div>
+        <div class="ky-legend"><span class="q-旺"><i></i>当运旺星</span><span class="q-生"><i></i>生气</span><span class="q-退"><i></i>退气</span><span class="q-死"><i></i>死气</span><span class="q-煞"><i></i>五黄</span><span>左山星 · 右向星 · 下运星</span></div>
+      </section>
+      <section class="fb-card ky-card" aria-label="格局">
+        <h3>格局<small id="geNote"></small></h3>
+        <div class="ky-ge" id="geBox"></div>
+      </section>
+      <section class="fb-card ky-card" id="lpCard" aria-label="罗盘">
+        <h3>罗盘<small id="lpNote">手机上可开指南针；电脑上拖动滑杆</small></h3>
+        <div class="ky-luopan">
+          <div class="ky-dial" id="dial"></div>
+          <div class="ky-lp-ctrl">
+            <div class="fb-row"><button class="fb-btn primary" id="lpStart" type="button">开启指南针</button><button class="fb-btn" id="lpLock" type="button">以此为向</button></div>
+            <input type="range" id="lpRange" min="0" max="359.5" step="0.5" value="180" aria-label="手动转盘">
+            <p id="lpRead" class="ky-read"></p>
+            <p class="fb-fine">站在门内或宅中，手机顶端朝外（朝向首），读数即向度。指南针读的是磁北，与传统罗盘同一口径，不必改正磁偏角；但离铁器、电器远些，手机放平，先画「8」字校准。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+    <aside class="ky-side">
+      <section class="fb-card ky-card" id="cellCard" aria-live="polite"></section>
+      <section class="fb-card ky-card" aria-label="八宅">
+        <h3>八宅<small>命卦与宅卦</small></h3>
+        <div class="fb-row" style="gap:8px">
+          <input type="date" id="birthIn" aria-label="宅主生日">
+          <div class="fb-seg" id="sexSeg" role="group" aria-label="性别"><button data-v="1" class="on">男</button><button data-v="0">女</button></div>
+        </div>
+        <div id="bzBox"></div>
+      </section>
+    </aside>
+  </div>
+
+  <section class="fb-card ky-help">
+    <h3>用法与口径</h3>
+    <ul>
+      <li><b>立向</b>选坐山，或直接填罗盘量得的向首度数（手机可在下方开指南针量）。度数离本山中线三度以内为正向，三至六度为兼向（会提示改用替卦），再偏就近交界，称空亡：同卦两山之间为小空亡，两卦之间为大空亡，一般不立。</li>
+      <li><b>元运</b>按建成或入住之年定三元九运（八运 2004–2023，九运 2024–2043），也可直接改。下卦：坐、向两宫的运盘数入中，顺逆看该数所在宫里与坐山（向首）同元龙之山的阴阳；五黄入中，以坐山（向首）本身阴阳定。替卦：改以那座山的替星入中（挨星诀），顺逆不变；五黄无替。依沈氏玄空。</li>
+      <li><b>看盘</b>每宫左为山星、右为向星、下为运星；数字颜色按当运旺衰：当令金、生气绿、退气灰、死气暗、五黄朱。叠流年流月时，左下角绿为年星、褐为月星（年以立春、月以节换）。点任一宫看九星与同宫组合。</li>
+      <li><b>格局</b>自动标出旺山旺向、上山下水、双星到坐到向、山星向星合十、父母三般与连珠三般、伏吟反吟。盘只说理气，吉凶还要配合峦头：旺山宜见山、旺向宜见水。</li>
+      <li><b>八宅</b>按三元命卦（男五寄坤、女五寄艮，年以立春换）排游年八方：生气、天医、延年、伏位为吉，祸害、六煞、五鬼、绝命为凶；宅卦以坐山论，东四命宜东四宅。仅供学习参考。</li>
+    </ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/kanyu/kanyu.js?v=1"></script>
+<script src="/fabao/fabao.js?v=10"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const { toast, copy } = window.Fabao;
+const KY = window.KY, TERMS = window.QM_JIEQI.terms;
+const { SHAN, PALACE, STAR, mod } = KY;
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CN = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+const LS_LIB = 'kanyu.lib.v1', LS_VIEW = 'kanyu.view.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const NOW = new Date();
+let view = Object.assign({ ori: 's', flow: true }, store.get(LS_VIEW, {}));
+let st = { deg: 180, yun: KY.yunOf(NOW.getFullYear()), year: NOW.getFullYear(), ti: false, tiAuto: true, name: '' };
+let C = null, sel = null;
+
+/* ================ 面板 ================ */
+function seg(el, val, on) {
+  el.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === String(val)));
+  el.onclick = e => { const b = e.target.closest('button'); if (!b) return; seg(el, b.dataset.v, on); on(b.dataset.v); };
+}
+$('zuoIn').innerHTML = SHAN.map(s => `<option value="${s.n}">${s.n}山${KY.opposite(s).n}向</option>`).join('');
+$('yunIn').innerHTML = Array.from({ length: 9 }, (_, i) => `<option value="${i + 1}">${CN[i + 1]}运</option>`).join('');
+
+// 干支年与月序（立春、节换）
+function ganzhiYM(date) {
+  const t = date.getTime();
+  let k = TERMS.length - 1;
+  while (k > 0 && TERMS[k].t > t) k--;
+  const JIE = { 立春: 2, 惊蛰: 3, 清明: 4, 立夏: 5, 芒种: 6, 小暑: 7, 立秋: 8, 白露: 9, 寒露: 10, 立冬: 11, 大雪: 0, 小寒: 1 };
+  let j = k; while (j > 0 && JIE[TERMS[j].n] === undefined) j--;
+  let l = j; while (l > 0 && TERMS[l].n !== '立春') l--;
+  const Y = new Date(TERMS[l].t + 8 * 3600e3).getUTCFullYear();
+  return { Y, k: mod(JIE[TERMS[j].n] - 2, 12), jie: TERMS[j].n };
+}
+const ZHI = '子丑寅卯辰巳午未申酉戌亥', GAN = '甲乙丙丁戊己庚辛壬癸';
+const gzYear = Y => GAN[mod(Y - 4, 10)] + ZHI[mod(Y - 4, 12)];
+const MONTH_CN = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
+
+/* ================ 起盘 ================ */
+function cast() {
+  const r = KY.shanAt(mod(st.deg + 180, 360));
+  if (st.tiAuto) st.ti = r.kind === '兼';
+  C = KY.chart(r.shan, st.yun, st.ti);
+  C.read = r;
+  syncForm();
+  render(); writeURL();
+}
+function syncForm() {
+  $('zuoIn').value = C.zuo.n;
+  $('degIn').value = String(Math.round(st.deg * 10) / 10);
+  $('yunIn').value = String(st.yun);
+  $('yearIn').value = st.year || '';
+  $('nameIn').value = st.name || '';
+  seg($('tiSeg'), st.ti ? '1' : '0', v => { st.ti = v === '1'; st.tiAuto = false; cast(); });
+  const r = C.read, side = r.off >= 0 ? '右' : '左';
+  const kindTxt = r.kind === '正' ? '正向' : r.kind === '兼' ? `兼${r.toward.n}${KY.opposite(r.toward).n}（偏 ${Math.abs(r.off).toFixed(1)}°）` : `${r.kind}（偏 ${Math.abs(r.off).toFixed(1)}°，近${r.toward.n}山）`;
+  const cls = r.kind === '正' ? '' : r.kind === '兼' ? 'warn' : 'bad';
+  const span = KY.yunSpan(st.yun, st.year || NOW.getFullYear());
+  $('readOut').innerHTML = `坐<b>${C.zuo.n}</b>向<b>${C.xiang.n}</b> · <span class="${cls}">${kindTxt}</span> · ${CN[st.yun]}运（${span[0]}–${span[1]}）${r.kind === '兼' && !st.ti ? ' · <span class="warn">兼向宜用替卦</span>' : ''}`;
+}
+
+/* ================ 盘面 ================ */
+const ORDER = { s: [4, 9, 2, 3, 5, 7, 8, 1, 6], n: [6, 1, 8, 7, 5, 3, 2, 9, 4] };
+function palaceShan(p) { return SHAN.filter(s => s.gua === p).map(s => s.n).join(''); }
+function render() {
+  const fl = view.flow && $('flowDate').value ? ganzhiYM(new Date($('flowDate').value + 'T12:00:00')) : null;
+  const yearPan = fl ? KY.fly(KY.yearStar(fl.Y), 1) : null, monthPan = fl ? KY.fly(KY.monthStar(fl.Y, fl.k), 1) : null;
+  C.flow = fl ? { Y: fl.Y, k: fl.k, yearPan, monthPan } : null;
+  const n = C.yun;
+  $('title').innerHTML = `${C.zuo.n}山${C.xiang.n}向 · <span class="jin">${CN[n]}运</span>${C.ti ? '替卦' : '下卦'}`;
+  $('subtitle').textContent = `运星${CN[n]}入中 · 山星${CN[C.sa.center]}${C.sa.dir > 0 ? '顺' : '逆'}飞 · 向星${CN[C.xa.center]}${C.xa.dir > 0 ? '顺' : '逆'}飞${fl ? ` · ${gzYear(fl.Y)}年${MONTH_CN[fl.k]}月` : ''}`;
+  $('grid').innerHTML = ORDER[view.ori].map(p => {
+    const s = C.shan[p], x = C.xiangPan[p], y = C.yunPan[p];
+    const cls = ['ky-cell', p === 5 ? 'center' : '', p === C.zp ? 'zuo' : '', p === C.xp ? 'xiang' : '', p === sel ? 'sel' : ''].join(' ');
+    return `<div class="${cls}" data-p="${p}" tabindex="0" role="button" aria-label="${PALACE[p].n}宫">
+      <span class="pn"><b>${PALACE[p].n}</b>${p === 5 ? '' : PALACE[p].dir + ' · ' + palaceShan(p)}</span>
+      <div class="ky-stars"><span class="s q-${KY.qiOf(s, n)}">${s}<small>山</small></span><span class="s q-${KY.qiOf(x, n)}">${x}<small>向</small></span></div>
+      <div class="ky-yun">${CN[y]}<small>运</small></div>
+      ${fl ? `<div class="ky-flow"><span class="fy" title="流年">${yearPan[p]}</span><span class="fm" title="流月">${monthPan[p]}</span></div>` : ''}
+    </div>`;
+  }).join('');
+  renderGe(); renderCell(); renderBazhai();
+}
+function renderGe() {
+  $('geNote').textContent = `${C.zuo.n}山${C.xiang.n}向 · ${CN[C.yun]}运${C.ti ? '替卦' : '下卦'}`;
+  $('geBox').innerHTML = C.ge.map(g => `<div class="g ${g.good === true ? 'good' : g.good === false ? 'bad' : 'mid'}"><b>${g.k}</b><span>${g.d}</span></div>`).join('');
+}
+function renderCell() {
+  const p = sel || C.xp, n = C.yun, s = C.shan[p], x = C.xiangPan[p], y = C.yunPan[p];
+  const line = (k, v) => `<b>${STAR[v].n}${STAR[v].s}</b> <span class="fine">${STAR[v].wx}</span><span class="q q-${KY.qiOf(v, n)}">${KY.qiOf(v, n)}</span>`;
+  const cb = KY.combo(s, x);
+  const fl = C.flow;
+  $('cellCard').innerHTML = `<h3>${PALACE[p].n}宫<small>${p === 5 ? '中宫' : PALACE[p].dir + ' · ' + palaceShan(p)}${p === C.zp ? ' · 坐山' : p === C.xp ? ' · 向首' : ''}</small></h3>
+    <dl class="ky-dl">
+      <div><dt>山星</dt><dd>${line('山', s)}</dd></div>
+      <div><dt>向星</dt><dd>${line('向', x)}</dd></div>
+      <div><dt>运星</dt><dd>${line('运', y)}</dd></div>
+      ${fl ? `<div><dt>流年</dt><dd>${line('年', fl.yearPan[p])}</dd></div><div><dt>流月</dt><dd>${line('月', fl.monthPan[p])}</dd></div>` : ''}
+      <div><dt>山向</dt><dd>${cb ? cb : `<span class="fine">${s}${x}同宫，${STAR[s].wx}${STAR[x].wx}${rel(STAR[s].wx, STAR[x].wx)}</span>`}</dd></div>
+    </dl>`;
+}
+const WX5 = ['木', '火', '土', '金', '水'];
+function rel(a, b) {
+  const d = mod(WX5.indexOf(b) - WX5.indexOf(a), 5);
+  return ['比和', '相生（山生向）', '相克（山克向）', '相克（向克山）', '相生（向生山）'][d];
+}
+$('grid').addEventListener('click', e => { const c = e.target.closest('.ky-cell'); if (!c) return; sel = +c.dataset.p; render(); });
+$('grid').addEventListener('keydown', e => { const c = e.target.closest('.ky-cell'); if (!c || (e.key !== 'Enter' && e.key !== ' ')) return; e.preventDefault(); sel = +c.dataset.p; render(); const a = $('grid').querySelector(`[data-p="${sel}"]`); if (a) a.focus(); });
+
+/* ================ 八宅 ================ */
+let male = true;
+seg($('sexSeg'), '1', v => { male = v === '1'; renderBazhai(); saveView(); });
+function renderBazhai() {
+  const b = $('birthIn').value;
+  const zhai = C.zuo.gua, zhaiEast = [1, 3, 4, 9].includes(zhai);
+  let h = `<p class="ky-read" style="margin-top:8px">宅卦：坐${C.zuo.n}为<b>${KY.GUA_NAME[zhai]}宅</b>（${zhaiEast ? '东四宅' : '西四宅'}）</p>`;
+  if (b) {
+    const d = new Date(b + 'T12:00:00+08:00');
+    const lc = TERMS.find(t => t.n === '立春' && new Date(t.t + 8 * 3600e3).getUTCFullYear() === d.getUTCFullYear());
+    const Y = lc && d.getTime() < lc.t ? d.getUTCFullYear() - 1 : d.getUTCFullYear();
+    const g = KY.mingGua(Y, male), yn = KY.youNian(g.num);
+    const match = g.east === zhaiEast;
+    h += `<p class="ky-read">命卦：${Y} ${gzYear(Y)}年${male ? '男' : '女'}命 <b>${g.name}</b>（${g.east ? '东四命' : '西四命'}）· <span class="${match ? '' : 'warn'}">${match ? '宅命相配' : '宅命不配，宜以门、床、灶取本命吉方'}</span></p>`;
+    h += `<div class="ky-bz">${ORDER[view.ori].map(p => p === 5 ? `<div class="mid">${g.name}命<br>${KY.GUA_NAME[zhai]}宅</div>` : `<div class="${yn[p].luck === '吉' ? 'ji' : 'xiong'}"><b>${yn[p].name}</b>${PALACE[p].n} · ${PALACE[p].dir}</div>`).join('')}</div>`;
+  } else h += '<p class="fb-fine" style="margin-top:6px">填宅主生日，排命卦与八方吉凶。</p>';
+  $('bzBox').innerHTML = h;
+}
+$('birthIn').addEventListener('change', () => { renderBazhai(); saveView(); });
+
+/* ================ 罗盘 ================ */
+const R = 150;
+function pt(a, r) { const t = a * Math.PI / 180; return [R + r * Math.sin(t), R - r * Math.cos(t)]; }
+function dialSVG() {
+  let s = `<svg viewBox="0 0 300 300" role="img" aria-label="罗盘"><g class="rot" id="rot">`;
+  s += `<circle cx="150" cy="150" r="146" class="ring"/><circle cx="150" cy="150" r="126" class="ring"/><circle cx="150" cy="150" r="96" class="ring"/><circle cx="150" cy="150" r="66" class="ring"/>`;
+  for (let a = 0; a < 360; a += 2.5) {
+    const big = a % 15 === 0, mid = a % 5 === 0;
+    const [x1, y1] = pt(a, 146), [x2, y2] = pt(a, big ? 134 : mid ? 138 : 141);
+    s += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="tick${big ? ' big' : ''}"/>`;
+    if (a % 30 === 0) { const [tx, ty] = pt(a, 129); s += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" class="deg" transform="rotate(${a} ${tx.toFixed(1)} ${ty.toFixed(1)})">${a}</text>`; }
+  }
+  SHAN.forEach(m => {
+    const [b1, b2] = pt(m.deg + 7.5, 126), [b3, b4] = pt(m.deg + 7.5, 96);
+    s += `<line x1="${b1.toFixed(1)}" y1="${b2.toFixed(1)}" x2="${b3.toFixed(1)}" y2="${b4.toFixed(1)}" class="tick"/>`;
+    const [x, y] = pt(m.deg, 111);
+    s += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" class="shan ${m.yy > 0 ? 'yang' : 'yin'}" transform="rotate(${m.deg} ${x.toFixed(1)} ${y.toFixed(1)})">${m.n}</text>`;
+  });
+  [['☵', 0], ['☶', 45], ['☳', 90], ['☴', 135], ['☲', 180], ['☷', 225], ['☱', 270], ['☰', 315]].forEach(([g, a]) => {
+    const [x, y] = pt(a, 81); s += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" class="gua" transform="rotate(${a} ${x.toFixed(1)} ${y.toFixed(1)})">${g}︎</text>`;
+  });
+  s += `</g><circle cx="150" cy="150" r="52" class="core"/><text x="150" y="143" class="hd" id="hd">180°</text><text x="150" y="168" class="hs" id="hs">午</text>`;
+  s += `<line x1="150" y1="2" x2="150" y2="62" class="ptr"/><path d="M150 0 l-6 -10 h12 z" class="ptr-h" transform="translate(0 8)"/></svg>`;
+  return s;
+}
+$('dial').innerHTML = dialSVG();
+let heading = 180, smooth = null, live = false;
+function setHeading(h, fromSensor) {
+  if (fromSensor) {
+    smooth = smooth == null ? h : mod(smooth + ((mod(h - smooth + 180, 360) - 180) * 0.25), 360);
+    h = smooth;
+  }
+  heading = mod(h, 360);
+  $('rot').style.transform = `rotate(${-heading}deg)`;
+  const r = KY.shanAt(heading);
+  $('hd').textContent = heading.toFixed(1) + '°';
+  $('hs').textContent = r.shan.n + (r.kind === '正' ? '' : ' · ' + r.kind);
+  $('lpRead').innerHTML = `手机所指 <b>${heading.toFixed(1)}°</b> · ${r.shan.n}山（${r.kind === '正' ? '正' : r.kind === '兼' ? '兼' + r.toward.n : r.kind}）· 若以此为向，则坐${KY.opposite(r.shan).n}向${r.shan.n}`;
+  if (!fromSensor) $('lpRange').value = String(heading);
+}
+$('lpRange').addEventListener('input', () => setHeading(+$('lpRange').value));
+$('lpLock').onclick = () => { st.deg = Math.round(heading * 10) / 10; st.tiAuto = true; cast(); toast(`已立向：${KY.shanAt(st.deg).shan.n}向，${st.deg}°`); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+$('lpJump').onclick = () => $('lpCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+$('lpStart').onclick = async () => {
+  if (live) return;
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const p = await DeviceOrientationEvent.requestPermission();
+      if (p !== 'granted') { toast('未获方向感应授权'); return; }
+    }
+  } catch (e) { toast('无法取得方向感应'); return; }
+  let got = false;
+  const on = e => {
+    let h = null;
+    if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) h = e.webkitCompassHeading;
+    else if (e.absolute && typeof e.alpha === 'number') h = 360 - e.alpha;
+    if (h == null) return;
+    const so = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+    got = true; setHeading(mod(h + so, 360), true);
+  };
+  if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', on);
+  window.addEventListener('deviceorientation', on);
+  live = true; $('lpStart').textContent = '指南针已开'; $('lpNote').textContent = '指南针读数（磁北）';
+  setTimeout(() => { if (!got) { live = false; $('lpStart').textContent = '开启指南针'; toast('这台设备没有指南针，请拖动滑杆或直接填度数'); } }, 2500);
+};
+
+/* ================ 宅库 · 复制 · 网址 ================ */
+function snap() { return { deg: st.deg, yun: st.yun, year: st.year, ti: st.ti, tiAuto: st.tiAuto, name: $('nameIn').value.trim() }; }
+function renderLib() {
+  const lib = store.get(LS_LIB, []);
+  $('libSel').innerHTML = `<option value="">宅库（${lib.length ? '存过 ' + lib.length + ' 盘' : '尚无存盘'}）</option>` +
+    lib.map((e, i) => { const r = KY.shanAt(mod(e.deg + 180, 360)); return `<option value="${i}">${esc(e.name || '无名')} · ${r.shan.n}山${KY.opposite(r.shan).n}向 · ${CN[e.yun]}运${e.ti ? '替' : ''}</option>`; }).join('') +
+    (lib.length ? '<option value="del">删去当前这盘…</option>' : '');
+}
+$('saveBtn').onclick = () => {
+  const s = snap(), lib = store.get(LS_LIB, []);
+  const i = lib.findIndex(e => e.deg === s.deg && e.yun === s.yun && e.ti === s.ti && e.name === s.name);
+  if (i >= 0) lib[i] = s; else lib.unshift(s);
+  store.set(LS_LIB, lib.slice(0, 200)); renderLib(); toast('已存入宅库（只存在这台设备）');
+};
+let libCur = -1;
+$('libSel').onchange = () => {
+  const v = $('libSel').value, lib = store.get(LS_LIB, []);
+  if (v === 'del') {
+    if (libCur >= 0 && lib[libCur] && confirm('删去这一盘？')) { lib.splice(libCur, 1); store.set(LS_LIB, lib); libCur = -1; toast('已删'); }
+    else toast('先从宅库里选一盘');
+    renderLib(); return;
+  }
+  if (v === '') return;
+  libCur = +v; Object.assign(st, lib[libCur]); sel = null; cast(); renderLib(); $('libSel').value = String(libCur);
+};
+$('copyBtn').onclick = () => {
+  const L = [], n = C.yun, row = ps => ps.map(p => `${PALACE[p].n}${C.shan[p]}${C.xiangPan[p]}/${C.yunPan[p]}`).join('  ');
+  L.push(`玄空飞星 · ${$('nameIn').value.trim() || '某宅'} · ${C.zuo.n}山${C.xiang.n}向（向 ${st.deg}°，${C.read.kind === '正' ? '正向' : C.read.kind}） · ${CN[n]}运${C.ti ? '替卦' : '下卦'}`);
+  L.push('（每宫：山星向星/运星）');
+  L.push(row([4, 9, 2])); L.push(row([3, 5, 7])); L.push(row([8, 1, 6]));
+  L.push('格局 ' + C.ge.map(g => g.k).join('、'));
+  copy(L.join('\n'), '飞星盘已复制');
+};
+function writeURL() {
+  const q = new URLSearchParams();
+  q.set('x', st.deg); q.set('y', st.yun); if (st.ti) q.set('t', '1'); if (!st.tiAuto) q.set('m', '1');
+  if (st.year) q.set('yr', st.year);
+  if ($('nameIn').value.trim()) q.set('n', $('nameIn').value.trim());
+  history.replaceState(null, '', '?' + q.toString());
+}
+function saveView() { view.birth = $('birthIn').value; view.male = male; store.set(LS_VIEW, view); }
+
+/* ================ 绑定 ================ */
+$('zuoIn').onchange = () => { const s = KY.SHAN_BY[$('zuoIn').value]; st.deg = KY.opposite(s).deg; st.tiAuto = true; sel = null; cast(); };
+$('degIn').onchange = () => { const v = parseFloat($('degIn').value); if (isFinite(v)) { st.deg = mod(v, 360); st.tiAuto = true; sel = null; cast(); } else toast('度数不对'); };
+$('yearIn').onchange = () => { const v = parseInt($('yearIn').value, 10); if (v >= 1800 && v <= 2200) { st.year = v; st.yun = KY.yunOf(v); cast(); } };
+$('yunIn').onchange = () => { st.yun = +$('yunIn').value; if (st.year && KY.yunOf(st.year) !== st.yun) st.year = null; cast(); };
+$('nameIn').addEventListener('change', () => { st.name = $('nameIn').value.trim(); writeURL(); });
+seg($('oriSeg'), view.ori, v => { view.ori = v; saveView(); render(); });
+$('flowIn').checked = view.flow !== false;
+$('flowIn').onchange = () => { view.flow = $('flowIn').checked; saveView(); render(); };
+$('flowDate').value = `${NOW.getFullYear()}-${pad(NOW.getMonth() + 1)}-${pad(NOW.getDate())}`;
+$('flowDate').addEventListener('change', render);
+if (view.birth) $('birthIn').value = view.birth;
+if (view.male === false) { male = false; seg($('sexSeg'), '0', v => { male = v === '1'; renderBazhai(); saveView(); }); }
+
+renderLib();
+const q = new URLSearchParams(location.search);
+if (q.get('x')) {
+  st.deg = mod(parseFloat(q.get('x')) || 0, 360); st.yun = +q.get('y') || st.yun; st.ti = q.get('t') === '1'; st.tiAuto = q.get('m') !== '1';
+  st.year = +q.get('yr') || (q.get('y') ? null : st.year); st.name = q.get('n') || '';
+}
+cast();
+setHeading(st.deg);
+})();
+</script>
+</body>
+</html>

@@ -92,7 +92,7 @@ a { color: var(--zi-2); }
   border-bottom: 1px solid var(--rule);
 }
 .fb-back {
-  display: inline-flex; align-items: baseline; gap: 10px;
+  display: inline-flex; align-items: baseline; gap: 10px; flex-shrink: 0;
   text-decoration: none; color: var(--fg); white-space: nowrap;
 }
 .fb-back .mark { font-family: var(--font-mark); font-weight: 800; font-stretch: 125%; font-size: 15px; letter-spacing: .02em; }
@@ -101,9 +101,11 @@ a { color: var(--zi-2); }
 .fb-back .ku::before { content: "·"; margin-right: 10px; color: var(--faint); }
 .fb-back:hover .ku { color: var(--fg); }
 
-.fb-tabs { margin-left: auto; display: flex; gap: 4px; }
+/* 法宝多了：不换行，放不下就横向滑动（滚动条藏起） */
+.fb-tabs { margin-left: auto; display: flex; gap: 4px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.fb-tabs::-webkit-scrollbar { display: none; }
 .fb-tab {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; white-space: nowrap;
   padding: 7px 14px; border-radius: 999px;
   text-decoration: none; color: var(--muted);
   font-family: var(--font-title); font-size: 14px; letter-spacing: .15em;
@@ -216,7 +218,8 @@ a { color: var(--zi-2); }
 
 .fb-toast {
   position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 8px);
-  background: var(--fg); color: var(--bg); padding: 9px 20px; border-radius: 999px;
+  background: var(--fg); color: var(--bg); padding: 9px 20px; border-radius: 18px;
+  max-width: min(92vw, 560px); width: max-content; text-align: center; line-height: 1.6;
   font-size: 14px; letter-spacing: .08em; opacity: 0; pointer-events: none; z-index: 90;
   transition: opacity .25s, transform .25s;
 }
@@ -238,7 +241,7 @@ a { color: var(--zi-2); }
     background: rgba(30, 24, 40, .96); border-top: 1px solid var(--rule);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
-  .fb-tab { flex: 1; flex-direction: column; justify-content: center; gap: 3px; border-radius: 0; font-size: 12px; letter-spacing: .1em; padding: 6px 0; }
+  .fb-tab { flex: 1 0 56px; flex-direction: column; justify-content: center; gap: 3px; border-radius: 0; font-size: 12px; letter-spacing: .1em; padding: 6px 0; }
   .fb-tab svg { width: 20px; height: 20px; }
   .fb-tab:hover, .fb-tab.on { background: none; box-shadow: none; }
   .fb-tab.on { color: var(--fg); }

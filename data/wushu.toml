@@ -11,16 +11,22 @@
 #
 # order = 门里文章排序，"desc" 新在前（默认）／"asc" 旧在前（成系列的）
 # lamp = 门里那盏灯：开页时按此刻现算的一行字（assets/js/qj/wushu.js），
-#        可选 moon / liuzhu / changsheng / gua，留空就不点灯。
+#        可选 moon / liuzhu / changsheng / gua / feixing，留空就不点灯。
 # ===========================================================
 
-# 山＝堪舆风水。此门尚封：分类只认「山」，现在没有文章、也没有法宝，门就合着贴封条。
+# 山＝堪舆风水。分类只认「山」；有了「堪舆」这件法宝，门就开了。
 [[door]]
   seal = "山"
   name = "堪舆"
-  blurb = "堪舆风水"
+  blurb = "堪舆风水：玄空飞星、八宅、罗盘"
   categories = ["山"]
+  lamp = "feixing"
   shut = "此门尚封，时至自开。"
+  [[door.tools]]
+    seal = "玄"
+    name = "堪舆"
+    href = "/kanyu/"
+    desc = "玄空飞星下卦替卦、流年流月、八宅命卦、手机罗盘"
 
 [[door]]
   seal = "医"
@@ -47,6 +53,16 @@
   categories = ["命", "知识点做题法"]
   lamp = "changsheng"
   [[door.tools]]
+    seal = "八"
+    name = "八字排盘"
+    href = "/bazi/"
+    desc = "四柱十神神煞，精确起运，大运流年流月，四柱反推"
+  [[door.tools]]
+    seal = "星"
+    name = "星盘"
+    href = "/xingpan/"
+    desc = "本命盘，宫位相位，庙旺陷弱，法达小限"
+  [[door.tools]]
     seal = "紫"
     name = "紫微斗数"
     href = "/ziwei/"
@@ -65,7 +81,7 @@
 [[door]]
   seal = "卜"
   name = "占断"
-  blurb = "以梅花易数为主，兼及奇门"
+  blurb = "以梅花易数为主，兼及六爻、奇门"
   categories = ["卜"]
   lamp = "gua"
   [[door.tools]]
@@ -73,6 +89,11 @@
     name = "梅花"
     href = "/meihua/"
     desc = "此刻起卦，本互变卦并排"
+  [[door.tools]]
+    seal = "爻"
+    name = "六爻纳甲"
+    href = "/liuyao/"
+    desc = "三钱摇卦，纳甲装卦，月建日辰逐爻标注"
   [[door.tools]]
     seal = "奇"
     name = "奇门手记"

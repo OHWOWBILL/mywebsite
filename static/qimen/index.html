@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-<link rel="stylesheet" href="/fabao/fabao.css?v=1">
+<link rel="stylesheet" href="/fabao/fabao.css?v=3">
 <style>
 /* 奇门手记 · 盘面与表单（外框见 /fabao/fabao.css） */
 :root{ --qi:#E7C77E; }  /* 三奇：淡金，比局数那一处金轻一档 */
@@ -412,8 +412,9 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
   </div>
 </main>
 
-<script src="/fabao/fabao.js?v=7"></script>
+<script src="/fabao/fabao.js?v=10"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
 <script src="/qimen/core.js?v=3"></script>
 <script>
 /* ================= state ================= */
@@ -443,6 +444,9 @@ const ZHI=QM.BRANCHES;
 const LUNAR_MONTH=['正','二','三','四','五','六','七','八','九','十','冬','腊'];
 function lunarDay(d){ if(d===10)return'初十'; if(d===20)return'二十'; if(d===30)return'三十'; return['初','十','廿','三'][Math.floor(d/10)]+'一二三四五六七八九'[(d%10)-1]; }
 function lunarParts(date){
+  // 先查站内农历月表（/fabao/lunar.js），表外才用 Intl 中国历（后者在 2027、2030 春节等处差一天）
+  const T=window.QJ_LUNAR, r=T&&T.toLunar(date.getFullYear(),date.getMonth()+1,date.getDate());
+  if(r) return {year:r.y,month:r.m,day:r.d,leap:r.leap};
   try{
     const parts=new Intl.DateTimeFormat('en-u-ca-chinese',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(date);
     const get=t=>{const p=parts.find(x=>x.type===t);return p?p.value:''};
