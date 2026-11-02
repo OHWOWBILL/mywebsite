@@ -454,21 +454,25 @@
 
   /* =========================================================
      四柱反推：给四柱干支，列出 1900–2100 年间合得上的时段
+     names[3]（时柱）可空：时辰不详时列出合年月日三柱的整日
      zi: 'next' | 'same'，tz 为出生地时区（用来把交节时刻换成当地钟点）
      ========================================================= */
   function fromPillars(names, opts) {
     opts = opts || {};
     var tz = isFinite(+opts.tz) ? +opts.tz : 8, zi = opts.zi === 'same' ? 'same' : 'next';
-    var I = names.map(parseGZ);
+    var noHour = !names[3];
+    var I = names.map(function (n, k) { return k === 3 && noHour ? 0 : parseGZ(n); });
     if (I.some(function (x) { return x < 0; })) return { error: '干支写得不对' };
     var yi = I[0], mi = I[1], di = I[2], hi = I[3];
     var mb = mi % 12;
     if (((yi % 10) % 5 * 2 + 2 + mod(mb - 2, 12)) % 10 !== mi % 10) return { error: '月干与年干不合五虎遁：' + names[0] + '年无' + names[1] + '月' };
     var hz = hi % 12;
-    // 时干照五鼠遁接日干；「当日」派的晚子时，时干接的是次日
-    var okDirect = ((di % 10) % 5 * 2 + hz) % 10 === hi % 10;
-    var okLate = hz === 0 && zi === 'same' && (((di + 1) % 10) % 5 * 2) % 10 === hi % 10;
-    if (!okDirect && !okLate) return { error: '时干与日干不合五鼠遁：' + names[2] + '日无' + names[3] + '时' };
+    if (!noHour) {
+      // 时干照五鼠遁接日干；「当日」派的晚子时，时干接的是次日
+      var okDirect = ((di % 10) % 5 * 2 + hz) % 10 === hi % 10;
+      var okLate = hz === 0 && zi === 'same' && (((di + 1) % 10) % 5 * 2) % 10 === hi % 10;
+      if (!okDirect && !okLate) return { error: '时干与日干不合五鼠遁：' + names[2] + '日无' + names[3] + '时' };
+    }
     var res = [];
     for (var k = 0; k < TERMS.length - 1; k++) {
       var t = TERMS[k];
@@ -484,6 +488,14 @@
       var la = a + tz * 3600e3, lb = b + tz * 3600e3;   // 换成当地钟点（UTC 字段表示）
       for (var d0 = Math.floor(la / DAY) * DAY - DAY; d0 < lb + DAY; d0 += DAY) {
         var f = fields(d0), Jd = jdn(f.y, f.mo, f.d);
+        if (noHour) {
+          // 一个干支日：「次日」派自前一日 23 点起至本日 23 点，「当日」派即本日 0 至 24 点
+          if (mod(Jd - 2415021 + 10, 60) !== di) continue;
+          var ds = zi === 'next' ? d0 - 3600e3 : d0, de = ds + DAY;
+          var fr = Math.max(ds, la), tt = Math.min(de, lb);
+          if (fr < tt) res.push({ from: fmtF(fields(fr)), to: fmtF(fields(tt)), cut: fr > ds || tt < de, day: true });
+          continue;
+        }
         // 时辰 hz 在钟点上的区间；子时跨两日
         var spans = hz === 0 ? [[-1, 1]] : [[hz * 2 - 1, hz * 2 + 1]];
         spans.forEach(function (sp) {

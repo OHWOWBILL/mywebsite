@@ -28,16 +28,78 @@
     { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/' },
     { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/' },
     { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/' },
-    { id: 'ziwei', name: '紫微斗数', short: '紫微', href: '/ziwei/' },
-    { id: 'bazi', name: '八字排盘', short: '八字', href: '/bazi/' },
-    { id: 'xingpan', name: '星盘', href: '/xingpan/' },
+    { id: 'mingbu', name: '命部', href: '/bazi/' },     // 星命同参：八字、紫微、占星、读盘四件都在命部里切换
     { id: 'kanyu', name: '堪舆', href: '/kanyu/' },
-    { id: 'mingbu', name: '命部', href: '/mingbu/' },  // 口令加密页，未解禁时为锁屏
-    { id: 'xiangbu', name: '相部', href: '/xiangbu/' }  // 同上
+    { id: 'xiangbu', name: '相部', href: '/xiangbu/' }  // 口令加密页，未解禁时为锁屏
   ];
+
+  // 命部 · 星命同参：顶栏只留「命部」一个标签，进来后在这一排里切换。
+  // 八字、紫微、占星公开；读盘是口令加密页（/mingbu/），未解禁时为锁屏。
+  const MINGBU = [
+    { id: 'bazi', name: '八字', href: '/bazi/' },
+    { id: 'ziwei', name: '紫微', href: '/ziwei/' },
+    { id: 'xingpan', name: '占星', href: '/xingpan/' },
+    { id: 'mingbu', name: '读盘', href: '/mingbu/', lock: true }
+  ];
+  const LS_LAST = 'mingbu.last', LS_BIRTH = 'mingbu.birth.v1';
+  const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* 无痕模式 */ } };
+
+  // —— 共享生辰：命部三件谁起了盘就记下来，换一件时带过去，同一个人三种看法 ——
+  // { when: 出生地钟表时间 'YYYY-MM-DDTHH:MM', male, name, tz, lon, lat, sun（真太阳时）, dst（夏令时）, city }
+  function loadBirth() { try { return JSON.parse(lsGet(LS_BIRTH)) || null; } catch (e) { return null; } }
+  function saveBirth(b) {
+    const old = loadBirth() || {}, nb = Object.assign({}, old);
+    Object.keys(b).forEach(k => { if (b[k] !== undefined && b[k] !== null && b[k] !== '') nb[k] = b[k]; });
+    if (b.name === '') delete nb.name;
+    // 换了地方又没给纬度（八字自定义经度、紫微），旧纬度作废
+    if (b.lon != null && old.lon != null && Math.abs(b.lon - old.lon) > 0.005 && b.lat == null) delete nb.lat;
+    lsSet(LS_BIRTH, JSON.stringify(nb));
+    refreshMingbuLinks();
+  }
+  const pad2 = n => String(n).padStart(2, '0');
+  function minusHour(when) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(when || '');
+    if (!m) return when;
+    const t = new Date(Date.UTC(+m[1], m[2] - 1, +m[3], +m[4] - 1, +m[5]));
+    return `${t.getUTCFullYear()}-${pad2(t.getUTCMonth() + 1)}-${pad2(t.getUTCDate())}T${pad2(t.getUTCHours())}:${pad2(t.getUTCMinutes())}`;
+  }
+  // 把共享生辰写成某件法宝认得的网址参数
+  function birthQuery(id, b) {
+    if (!b || !b.when || id === 'mingbu') return '';
+    const q = new URLSearchParams();
+    if (id === 'bazi') {
+      q.set('d', b.when); q.set('g', b.male === false ? '0' : '1');
+      if (b.tz != null) q.set('tz', b.tz);
+      if (b.sun && b.lon != null) q.set('lon', b.lon);
+      if (b.dst) q.set('dst', '1');
+    } else if (id === 'ziwei') {
+      q.set('d', b.dst ? minusHour(b.when) : b.when);       // 紫微不认夏令时，先扣回标准时
+      q.set('g', b.male === false ? '女' : '男');
+      if (b.sun && b.lon != null) { q.set('lon', b.lon); q.set('tz', b.tz != null ? b.tz : 8); }
+    } else if (id === 'xingpan') {
+      q.set('d', b.when);
+      if (b.lat != null) q.set('lat', b.lat);
+      if (b.lon != null) q.set('lon', b.lon);
+      if (b.tz != null) q.set('tz', b.tz);
+      if (b.dst) q.set('dst', '1');
+    }
+    if (b.name) q.set('n', b.name);
+    return '?' + q.toString();
+  }
+  function mingbuHref(id) { const t = MINGBU.find(x => x.id === id) || MINGBU[0]; return t.href + birthQuery(t.id, loadBirth()); }
+  function refreshMingbuLinks() {
+    document.querySelectorAll('[data-mingbu]').forEach(a => { a.href = mingbuHref(a.dataset.mingbu); });
+    const tab = document.querySelector('.fb-tab[data-tab="mingbu"]');
+    if (tab) tab.href = mingbuHref(lsGet(LS_LAST) || 'bazi');
+  }
 
   function mountShell() {
     const cur = document.body.dataset.tool;
+    const fam = MINGBU.find(t => t.id === cur);
+    const curTab = fam ? 'mingbu' : cur;
+    // 记下上次用的是哪件；读盘只在真解开了才记（锁屏页上有 .lock-wrap），免得访客每次点「命部」都落到锁屏
+    if (fam && !(fam.lock && document.querySelector('.lock-wrap'))) lsSet(LS_LAST, fam.id);
     const top = document.createElement('header');
     top.className = 'fb-top';
     top.innerHTML = `
@@ -46,11 +108,26 @@
       </a>
       <nav class="fb-tabs" aria-label="法宝">
         ${TOOLS.map(t => `
-          <a class="fb-tab${t.id === cur ? ' on' : ''}" href="${t.href}"${t.id === cur ? ' aria-current="page"' : ''}>
+          <a class="fb-tab${t.id === curTab ? ' on' : ''}" href="${t.href}" data-tab="${t.id}"${t.id === curTab ? ' aria-current="page"' : ''}>
             ${ICONS[t.id]}<span class="full">${t.name}</span>
           </a>`).join('')}
       </nav>`;
     document.body.insertBefore(top, document.body.firstChild);
+    // 命部四件：顶栏下加一排「星命同参」切换
+    if (fam) {
+      const bar = document.createElement('nav');
+      bar.className = 'fb-mingbu';
+      bar.setAttribute('aria-label', '命部 · 星命同参');
+      bar.innerHTML = `
+        <span class="lab">命部<small>星命同参</small></span>
+        <span class="seg">${MINGBU.map(t => `
+          <a data-mingbu="${t.id}" href="${t.href}" class="${t.id === cur ? 'on' : ''}"${t.id === cur ? ' aria-current="page"' : ''}>
+            ${ICONS[t.id] || ''}<span>${t.name}</span>${t.lock ? '<i title="此宝被阁主下了禁制">禁</i>' : ''}
+          </a>`).join('')}</span>
+        <span class="hint">同一生辰，三种看法；换一件，人跟着走</span>`;
+      top.after(bar);
+    }
+    refreshMingbuLinks();
     // 法宝一多，顶栏（与手机底栏）都用两字简称；当前这件滚进视野
     if (window.matchMedia('(max-width: 1500px)').matches) {
       top.querySelectorAll('.fb-tab .full').forEach((el, i) => { if (TOOLS[i].short) el.textContent = TOOLS[i].short; });
@@ -141,6 +218,6 @@
     }
   }
 
-  window.Fabao = { GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy };
+  window.Fabao = { GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy, birth: { save: saveBirth, load: loadBirth, query: birthQuery, minusHour } };
   mountShell();
 })();

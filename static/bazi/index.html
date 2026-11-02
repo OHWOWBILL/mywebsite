@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=3">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=4">
   <style>
     .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
 
@@ -25,7 +25,28 @@
     .bz-place .lon[aria-disabled=true] { opacity: .45; }
     .bz-dst { font-size: 12.5px; color: var(--jin); line-height: 1.7; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
     .bz-dst .fb-btn { padding: 3px 10px; font-size: 12px; letter-spacing: .08em; }
-    .bz-sizhu select { width: 5.4em; font-family: var(--font-title); letter-spacing: .1em; }
+    /* 四柱反推：逐级点选 */
+    .bz-pick { display: flex; flex-direction: column; gap: 10px; }
+    .bz-pick-sum { display: flex; gap: 6px; flex-wrap: wrap; align-items: stretch; }
+    .bz-slot { min-width: 4.6em; padding: 4px 10px 5px; border-radius: var(--r-sm); border: 1px dashed var(--rule-2); background: none; text-align: center; font-family: var(--font-title); font-size: 17px; font-weight: 600; letter-spacing: .08em; color: var(--faint); line-height: 1.25; }
+    .bz-slot small { display: block; font-size: 10.5px; font-weight: 400; letter-spacing: .25em; color: var(--faint); }
+    .bz-slot.on { border-style: solid; color: var(--fg); cursor: pointer; }
+    .bz-slot.on:hover { border-color: var(--zi-2); }
+    .bz-slot.cur { border-color: var(--jin); color: var(--jin); }
+    .bz-pick-reset { align-self: center; font-size: 12.5px; color: var(--muted); padding: 4px 8px; }
+    .bz-pick-reset:hover { color: var(--fg); }
+    .bz-pick-step { display: flex; flex-direction: column; gap: 6px; }
+    .bz-pick-lab { font-family: var(--font-title); font-size: 12.5px; color: var(--muted); letter-spacing: .15em; }
+    .bz-pick-lab b { color: var(--jin); font-weight: 600; }
+    .bz-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .bz-chips button {
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 3.2em; padding: 6px 10px 5px;
+      border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid var(--rule-2); line-height: 1.25;
+      font-family: var(--font-title); font-size: 16px; font-weight: 600; color: var(--wc, var(--fg-2)); letter-spacing: .06em;
+    }
+    .bz-chips button small { font-family: var(--font-mark); font-weight: 500; font-size: 10.5px; color: var(--faint); letter-spacing: .02em; margin-top: 1px; white-space: nowrap; }
+    .bz-chips button:hover { border-color: var(--zi-2); }
+    .bz-chips button.wide { flex-direction: row; gap: 6px; font-size: 13.5px; font-weight: 400; color: var(--muted); }
     .bz-side-ctrl { display: flex; flex-direction: column; gap: 8px; max-width: 340px; }
     .bz-side-ctrl .fb-row .fb-btn { flex: 1; }
 
@@ -123,8 +144,6 @@
     .bz-ssc .dots i.c { background: none; box-shadow: inset 0 0 0 1px var(--zi-2); }
     .bz-ssc .v { font-family: var(--font-mark); font-size: 10.5px; color: var(--faint); }
     .bz-ssc .r.zero .n { color: var(--faint); }
-    .bz-jump { margin-left: auto; font-size: 12px; font-family: var(--font-title); letter-spacing: .1em; color: var(--zi-2); text-decoration: none; white-space: nowrap; }
-    .bz-jump:hover { color: var(--fg); }
     .bz-rel { display: flex; flex-direction: column; gap: 5px; }
     .bz-rel .r { display: flex; gap: 8px; align-items: baseline; font-size: 13px; line-height: 1.55; }
     .bz-rel .t { flex-shrink: 0; width: 1.6em; height: 1.6em; border-radius: 4px; display: grid; place-items: center; font-family: var(--font-title); font-size: 12px; font-weight: 600; background: var(--tc); color: #17131F; }
@@ -162,6 +181,9 @@
       .bz-sha span { font-size: 10px; }
       .bz-yrow { grid-template-columns: 1fr; gap: 4px; }
       .bz-form input[type=text] { width: 100%; }
+      .bz-pick-sum .bz-slot { flex: 1 1 0; min-width: 0; padding: 4px 2px 5px; font-size: 16px; }
+      .bz-pick-reset { flex-basis: 100%; text-align: right; padding: 0 2px; }
+      .bz-chips button { padding: 6px 8px 5px; }
     }
   </style>
 </head>
@@ -194,9 +216,9 @@
         <input type="time" id="ltIn" value="12:00" aria-label="出生钟点">
         <span class="fb-note" id="lunarNote"></span>
       </div>
-      <div class="fb-row bz-sizhu" id="sizhuRow" hidden>
-        <select id="szY" aria-label="年柱"></select><select id="szM" aria-label="月柱"></select><select id="szD" aria-label="日柱"></select><select id="szH" aria-label="时柱"></select>
-        <button class="fb-btn" id="szBtn" type="button">反推</button>
+      <div class="bz-pick" id="sizhuRow" hidden>
+        <div class="bz-pick-sum" id="pickSum" aria-label="已选四柱"></div>
+        <div class="bz-pick-step"><span class="bz-pick-lab" id="pickLab"></span><div class="bz-chips" id="pickChips" role="group"></div></div>
       </div>
       <div class="bz-place" id="placeRow">
         <select id="cityIn" aria-label="出生地"></select>
@@ -259,7 +281,7 @@
       <li><b>大运流年</b>点一步大运、一个流年、一个流月，命盘右侧便依次加上这几柱，十神、神煞、合冲刑害一并算上；再点一次收起。当前所行之运、之年标「今」。</li>
       <li><b>起运</b>以出生到下一节（顺排）或上一节（逆排）的分钟数折算：三日一年、一日四月、一时辰十日。交运日按出生钟点推得。</li>
       <li><b>神煞</b>只列常用的二三十种，鼠标停在神煞上可看查法。羊刃取「禄前一位」；三合类（驿马、桃花、华盖、将星等）以年支、日支两查；天乙、太极、文昌、国印以日干、年干两查。各家口径不一，以自家所学为准。</li>
-      <li><b>四柱反推</b>选好四柱，列出 1900–2100 年间合得上的时段；点任一条即按那一刻排盘。</li>
+      <li><b>四柱反推</b>逐级点选：先选年干，年支只剩同阴阳的六个（下注对应的公历年）；月干由五虎遁定出，直接选月；再选日干、日支；时干由五鼠遁定出，直接选时，记不清时辰就选「时辰不详」。选齐即列出 1900–2100 年间合得上的时段，点任一条即按那一刻排盘；点上面已选的一柱可从那一柱改起。</li>
       <li><b>口径</b>节气表与奇门手记同一张（太阳视黄经算出，与寿星万年历相差一分钟内）；农历为寿星万年历口径；人元司令依《渊海子平》分野。仅供学习参考。</li>
     </ul>
   </section>
@@ -269,7 +291,8 @@
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/bazi/bazi.js?v=1"></script>
-<script src="/fabao/fabao.js?v=10"></script>
+<script src="/fabao/cities.js?v=1"></script>
+<script src="/fabao/fabao.js?v=11"></script>
 <script>
 (function () {
 'use strict';
@@ -281,34 +304,17 @@ const pad = n => String(n).padStart(2, '0');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const hanzi = n => String(n);
 
-// 出生地：[名, 东经, 时区]
-const CITIES = [
-  ['中国大陆', [['北京', 116.40, 8], ['上海', 121.47, 8], ['天津', 117.20, 8], ['重庆', 106.55, 8], ['广州', 113.26, 8], ['深圳', 114.06, 8],
-    ['成都', 104.07, 8], ['武汉', 114.31, 8], ['西安', 108.94, 8], ['南京', 118.80, 8], ['杭州', 120.16, 8], ['苏州', 120.62, 8], ['宁波', 121.55, 8],
-    ['温州', 120.70, 8], ['长沙', 112.94, 8], ['郑州', 113.63, 8], ['济南', 117.00, 8], ['青岛', 120.38, 8], ['沈阳', 123.43, 8], ['大连', 121.61, 8],
-    ['长春', 125.32, 8], ['哈尔滨', 126.64, 8], ['石家庄', 114.51, 8], ['太原', 112.55, 8], ['呼和浩特', 111.75, 8], ['合肥', 117.23, 8],
-    ['南昌', 115.86, 8], ['福州', 119.30, 8], ['厦门', 118.09, 8], ['泉州', 118.68, 8], ['汕头', 116.68, 8], ['东莞', 113.75, 8], ['佛山', 113.12, 8],
-    ['珠海', 113.58, 8], ['南宁', 108.37, 8], ['桂林', 110.29, 8], ['海口', 110.32, 8], ['三亚', 109.51, 8], ['贵阳', 106.63, 8], ['昆明', 102.71, 8],
-    ['兰州', 103.83, 8], ['西宁', 101.78, 8], ['银川', 106.23, 8], ['乌鲁木齐', 87.62, 8], ['拉萨', 91.13, 8]]],
-  ['港澳台', [['香港', 114.17, 8], ['澳门', 113.54, 8], ['台北', 121.56, 8], ['台中', 120.68, 8], ['台南', 120.21, 8], ['高雄', 120.31, 8]]],
-  ['日本', [['东京', 139.69, 9], ['横滨', 139.64, 9], ['大阪', 135.50, 9], ['京都', 135.77, 9], ['神户', 135.20, 9], ['名古屋', 136.91, 9],
-    ['札幌', 141.35, 9], ['仙台', 140.87, 9], ['广岛', 132.46, 9], ['福冈', 130.40, 9], ['那霸', 127.68, 9]]],
-  ['亚洲其他', [['首尔', 126.98, 9], ['新加坡', 103.82, 8], ['吉隆坡', 101.69, 8], ['马尼拉', 120.98, 8], ['曼谷', 100.50, 7], ['河内', 105.85, 7],
-    ['胡志明市', 106.70, 7], ['雅加达', 106.85, 7]]],
-  ['欧美澳', [['伦敦', -0.13, 0], ['巴黎', 2.35, 1], ['柏林', 13.40, 1], ['纽约', -74.01, -5], ['多伦多', -79.38, -5], ['洛杉矶', -118.24, -8],
-    ['旧金山', -122.42, -8], ['西雅图', -122.33, -8], ['温哥华', -123.12, -8], ['悉尼', 151.21, 10], ['墨尔本', 144.96, 10], ['奥克兰', 174.76, 12]]]
-];
-const CITY_LIST = CITIES.flatMap(([, list]) => list);
-const TZS = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 8, 8.75, 9, 9.5, 10, 10.5, 11, 12, 13, 14];
-const tzLabel = z => 'UTC' + (z >= 0 ? '+' : '−') + (Math.abs(z) % 1 ? Math.floor(Math.abs(z)) + ':' + pad(Math.round(Math.abs(z) % 1 * 60)) : Math.abs(z));
+// 出生地：共用 /fabao/cities.js（[名, 东经, 北纬, 时区]），与占星同一张
+const CITIES = window.QJ_CITIES.GROUPS, CITY_LIST = window.QJ_CITIES.LIST, TZS = window.QJ_CITIES.TZS, tzLabel = window.QJ_CITIES.tzLabel;
 const LS_LIB = 'bazi.lib.v1', LS_VIEW = 'bazi.view.v1';
 const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
 };
 const guessTz = -new Date().getTimezoneOffset() / 60;
-const guessCity = CITY_LIST.find(c => c[2] === guessTz) || CITY_LIST[0];
-let view = Object.assign({ city: guessCity[0], lon: guessCity[1], tz: guessCity[2], sun: false, zi: 'next' }, store.get(LS_VIEW, {}));
+const guessCity = CITY_LIST.find(c => c[3] === guessTz) || CITY_LIST[0];
+let view = Object.assign({ city: guessCity[0], lon: guessCity[1], lat: guessCity[2], tz: guessCity[3], sun: false, zi: 'next' }, store.get(LS_VIEW, {}));
+if (view.lat == null) { const c0 = CITY_LIST.find(c => c[0] === view.city); view.lat = c0 ? c0[2] : null; }
 let form = { cal: 'solar', male: true, name: '' };
 let C = null, A = null;          // 当前命盘与分析
 let sel = { dy: null, ln: null, ly: null };   // dy: 大运序号（-1 为童限）, ln: 公历年, ly: 流月序号
@@ -321,8 +327,68 @@ function seg(el, val, on) {
 }
 $('cityIn').innerHTML = CITIES.map(([g, list]) => `<optgroup label="${g}">${list.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('') + '<option value="">自定义经度</option>';
 $('tzIn').innerHTML = TZS.map(z => `<option value="${z}">${tzLabel(z)}</option>`).join('');
-const GZ60 = Array.from({ length: 60 }, (_, i) => B.gzName(i));
-['szY', 'szM', 'szD', 'szH'].forEach(id => { $(id).innerHTML = GZ60.map(n => `<option>${n}</option>`).join(''); });
+// —— 四柱反推：年干 → 年支（只剩同阴阳的六个）→ 月（五虎遁定月干）→ 日干 → 日支 → 时（五鼠遁定时干） ——
+const MONTH_LAB = { 2: '正月 立春', 3: '二月 惊蛰', 4: '三月 清明', 5: '四月 立夏', 6: '五月 芒种', 7: '六月 小暑', 8: '七月 立秋', 9: '八月 白露', 10: '九月 寒露', 11: '十月 立冬', 0: '冬月 大雪', 1: '腊月 小寒' };
+const HOUR_LAB = ['23–1', '1–3', '3–5', '5–7', '7–9', '9–11', '11–13', '13–15', '15–17', '17–19', '19–21', '21–23'];
+let pick = {};
+const parity = g => [0, 2, 4, 6, 8, 10].map(z => (z + g % 2) % 12);            // 阳干配阳支、阴干配阴支
+const monthGan = (yg, mz) => ((yg % 5) * 2 + 2 + B.mod(mz - 2, 12)) % 10;
+const hourGan = (dg, hz) => ((dg % 5) * 2 + hz) % 10;
+const yearsOf = idx => { const out = []; for (let y = 1900 + B.mod(1984 + idx - 1900, 60); y <= 2100; y += 60) out.push(y); return out; };
+const STEPS = [
+  { key: 'yg', lab: '年干', slot: '年', opts: () => [...Array(10).keys()].map(g => ({ v: g, t: GAN[g], wx: GAN_WX[g] })) },
+  { key: 'yz', lab: '年支', slot: '年', opts: () => parity(pick.yg).map(z => ({ v: z, t: GAN[pick.yg] + ZHI[z], sub: yearsOf(B.gzIdx(pick.yg, z)).join(' · '), wx: ZHI_WX[z] })) },
+  { key: 'mz', lab: '月', slot: '月', opts: () => [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1].map(z => ({ v: z, t: GAN[monthGan(pick.yg, z)] + ZHI[z], sub: MONTH_LAB[z], wx: ZHI_WX[z] })) },
+  { key: 'dg', lab: '日干', slot: '日', opts: () => [...Array(10).keys()].map(g => ({ v: g, t: GAN[g], wx: GAN_WX[g] })) },
+  { key: 'dz', lab: '日支', slot: '日', opts: () => parity(pick.dg).map(z => ({ v: z, t: GAN[pick.dg] + ZHI[z], wx: ZHI_WX[z] })) },
+  { key: 'hz', lab: '时', slot: '时', opts: () => {
+    const same = view.zi === 'same';
+    const list = [...Array(12).keys()].map(z => ({ v: z, t: GAN[hourGan(pick.dg, z)] + ZHI[z], sub: z === 0 && same ? '早子 0–1' : HOUR_LAB[z], wx: ZHI_WX[z] }));
+    if (same) list.push({ v: 'late', t: GAN[hourGan((pick.dg + 1) % 10, 0)] + '子', sub: '晚子 23–24', wx: 4 });
+    list.push({ v: 'none', t: '时辰不详', wide: true });
+    return list;
+  } }
+];
+function pickNames() {
+  const h = pick.hz === 'none' ? null : pick.hz === 'late' ? GAN[hourGan((pick.dg + 1) % 10, 0)] + '子' : GAN[hourGan(pick.dg, pick.hz)] + ZHI[pick.hz];
+  return [GAN[pick.yg] + ZHI[pick.yz], GAN[monthGan(pick.yg, pick.mz)] + ZHI[pick.mz], GAN[pick.dg] + ZHI[pick.dz], h];
+}
+function renderPick() {
+  const cur = STEPS.findIndex(st => pick[st.key] === undefined);
+  const has = k => pick[k] !== undefined;
+  const slot = (lab, text, k, on) => `<button type="button" class="bz-slot${on ? ' on' : ''}${!on && STEPS[cur] && STEPS[cur].slot === lab ? ' cur' : ''}" data-reset="${k}"${on ? '' : ' disabled'}><small>${lab}柱</small>${text}</button>`;
+  const yT = has('yg') ? GAN[pick.yg] + (has('yz') ? ZHI[pick.yz] : '·') : '··';
+  const mT = has('mz') ? GAN[monthGan(pick.yg, pick.mz)] + ZHI[pick.mz] : '··';
+  const dT = has('dg') ? GAN[pick.dg] + (has('dz') ? ZHI[pick.dz] : '·') : '··';
+  const hT = !has('hz') ? '··' : pick.hz === 'none' ? '不详' : pickNames()[3];
+  $('pickSum').innerHTML = slot('年', yT, 'yg', has('yg')) + slot('月', mT, 'mz', has('mz')) + slot('日', dT, 'dg', has('dg')) + slot('时', hT, 'hz', has('hz')) +
+    (has('yg') ? '<button type="button" class="bz-pick-reset" data-reset="yg">重选</button>' : '');
+  if (cur < 0) {
+    $('pickLab').innerHTML = '四柱已齐。点上面任一柱可从那一柱改起。';
+    $('pickChips').innerHTML = '';
+    runPick();
+    return;
+  }
+  const st = STEPS[cur];
+  const hint = { yz: '只列与年干同阴阳的六支，下注 1900–2100 年间对应的公历年', mz: '月干由年干按五虎遁定出，直接选月；下注所交之节', dz: '只列与日干同阴阳的六支', hz: '时干由日干按五鼠遁定出' }[st.key] || '';
+  $('pickLab').innerHTML = `第 ${cur + 1} 步 · 选<b>${st.lab}</b>${hint ? '　' + hint : ''}`;
+  $('pickChips').innerHTML = st.opts().map(o => `<button type="button" data-v="${o.v}" class="${o.wide ? 'wide' : ''}${o.wx != null ? ' wx-' + o.wx : ''}">${o.t}${o.sub ? `<small>${o.sub}</small>` : ''}</button>`).join('');
+  $('foundCard').hidden = true;
+}
+$('pickChips').onclick = e => {
+  const b = e.target.closest('button[data-v]'); if (!b) return;
+  const st = STEPS.find(x => pick[x.key] === undefined); if (!st) return;
+  const v = b.dataset.v;
+  pick[st.key] = v === 'late' || v === 'none' ? v : +v;
+  renderPick();
+};
+$('pickSum').onclick = e => {
+  const b = e.target.closest('[data-reset]'); if (!b || b.disabled) return;
+  const from = STEPS.findIndex(x => x.key === b.dataset.reset);
+  STEPS.slice(from).forEach(x => { delete pick[x.key]; });
+  renderPick();
+};
+renderPick();
 
 function syncPlaceUI() {
   $('cityIn').value = CITY_LIST.some(c => c[0] === view.city) ? view.city : '';
@@ -330,7 +396,7 @@ function syncPlaceUI() {
   $('tzIn').value = String(view.tz);
   $('sunIn').checked = view.sun;
   $('lonBox').setAttribute('aria-disabled', String(!view.sun));
-  seg($('ziSeg'), view.zi, v => { view.zi = v; saveView(); cast(true); });
+  seg($('ziSeg'), view.zi, v => { view.zi = v; saveView(); if (pick.hz === 'late' && v !== 'same') delete pick.hz; if (form.cal === 'sizhu') renderPick(); cast(true); });
 }
 function saveView() { store.set(LS_VIEW, view); }
 
@@ -338,6 +404,7 @@ function setCal(v) {
   form.cal = v; seg($('calSeg'), v, setCal);
   $('solarRow').hidden = v !== 'solar'; $('lunarRow').hidden = v !== 'lunar'; $('sizhuRow').hidden = v !== 'sizhu';
   if (v !== 'sizhu') $('foundCard').hidden = true;
+  else { $('dstNote').hidden = true; $('sunNote').textContent = ''; renderPick(); }
   if (v === 'lunar') fillLunarMonths();
 }
 seg($('calSeg'), 'solar', setCal);
@@ -392,6 +459,11 @@ function cast(keepSel) {
   else if (sel.dy != null && !(sel.dy === -1 ? C.yun.xiaoyun.length : C.yun.dayun[sel.dy])) sel = defaultSel();
   updateNotes(inp);
   render(); writeURL();
+  const w = C.wall;
+  Fabao.birth.save({
+    when: `${w.y}-${pad(w.mo)}-${pad(w.d)}T${pad(w.h)}:${pad(w.mi)}`, male: C.male, name: C.name,
+    tz: +view.tz, lon: +view.lon, lat: view.city ? view.lat : null, sun: !!view.sun, dst: !!C.input.dst, city: view.city || ''
+  });
 }
 
 // 默认选中此刻所行之运与流年
@@ -453,7 +525,7 @@ function render() {
   const gender = C.male ? '乾造' : '坤造';
   const solarTxt = `${B.fmtF(C.wall)}${C.input.dst ? '（夏令时）' : ''}`;
   $('board').innerHTML = `
-    <div class="bz-title"><h2>${gender}${C.name ? ' · ' + esc(C.name) : ''}</h2><small>${solarTxt} · ${tzLabel(C.tz)}${C.solar ? ` · 真太阳时 ${pad(C.clock.h)}:${pad(C.clock.mi)}` : ''}</small><a class="bz-jump" href="${ziweiURL()}" title="同一生辰排紫微斗数">同生辰看紫微 →</a></div>
+    <div class="bz-title"><h2>${gender}${C.name ? ' · ' + esc(C.name) : ''}</h2><small>${solarTxt} · ${tzLabel(C.tz)}${C.solar ? ` · 真太阳时 ${pad(C.clock.h)}:${pad(C.clock.mi)}` : ''}</small></div>
     <table class="bz-t">
       <thead><tr><th class="lab"></th>${head}</tr></thead>
       <tbody>
@@ -552,15 +624,6 @@ function renderSS() {
     return `<div class="r${tot ? '' : ' zero'}"><span class="n">${n}</span><span class="dots">${'<i></i>'.repeat(c.gan)}${'<i class="c"></i>'.repeat(c.cang)}</span><span class="v">${tot ? `干${c.gan} 藏${c.cang}` : '—'}</span></div>`;
   }).join('');
 }
-// 同一生辰转紫微：传标准时（夏令时已扣），开了真太阳时就连经度时区一并带过去
-function ziweiURL() {
-  const f = C.std, q = new URLSearchParams();
-  q.set('d', `${f.y}-${pad(f.mo)}-${pad(f.d)}T${pad(f.h)}:${pad(f.mi)}`);
-  q.set('g', C.male ? '男' : '女');
-  if (C.solar) { q.set('lon', C.solar.lon); q.set('tz', C.tz); }
-  if (C.name) q.set('n', C.name);
-  return '/ziwei/?' + q.toString();
-}
 function renderRel(cols) {
   const rs = B.relations(cols);
   const xs = cols.length > 4;
@@ -574,14 +637,16 @@ function renderRel(cols) {
 }
 
 /* ================ 四柱反推 ================ */
-$('szBtn').onclick = () => {
-  const names = ['szY', 'szM', 'szD', 'szH'].map(id => $(id).value);
+function runPick() {
+  const names = pickNames();
   const r = B.fromPillars(names, { tz: +view.tz, zi: view.zi });
   const box = $('foundCard'); box.hidden = false;
-  if (r.error) { box.innerHTML = `<h3>四柱反推</h3><p class="bz-none">${esc(r.error)}</p>`; return; }
-  box.innerHTML = `<h3>四柱反推 · ${names.join(' ')}<small style="font-weight:400;color:var(--muted);font-size:12px;margin-left:8px">${tzLabel(+view.tz)} · ${r.list.length ? '共 ' + r.list.length + ' 段' : '1900–2100 年间无此四柱'}</small></h3>` +
-    (r.list.length ? `<ul>${r.list.map(w => `<li><button data-at="${w.from}" data-to="${w.to}">${w.from} – ${w.to.slice(11)}<small>${w.cut ? '（交节截断）' : ''}</small></button></li>`).join('')}</ul>` : '');
-};
+  const title = names.map(n => n || '时辰不详').join(' ');
+  if (r.error) { box.innerHTML = `<h3>四柱反推 · ${title}</h3><p class="bz-none">${esc(r.error)}</p>`; return; }
+  const span = w => w.day ? `${w.from} – ${w.to.slice(0, 10) === w.from.slice(0, 10) ? w.to.slice(11) : w.to}` : `${w.from} – ${w.to.slice(11)}`;
+  box.innerHTML = `<h3>四柱反推 · ${title}<small style="font-weight:400;color:var(--muted);font-size:12px;margin-left:8px">${tzLabel(+view.tz)} · ${view.zi === 'next' ? '子时换日' : '晚子当日'} · ${r.list.length ? '共 ' + r.list.length + ' 段' : '1900–2100 年间无此四柱'}</small></h3>` +
+    (r.list.length ? `<ul>${r.list.map(w => `<li><button data-at="${w.from}" data-to="${w.to}">${span(w)}<small>${w.day ? '（全日，时辰不详）' : ''}${w.cut ? '（交节截断）' : ''}</small></button></li>`).join('')}</ul>` : '');
+}
 $('foundCard').onclick = e => {
   const b = e.target.closest('button[data-at]'); if (!b) return;
   // 取该段中间一刻，免得卡在交节或时辰边界
@@ -594,7 +659,7 @@ $('foundCard').onclick = e => {
 
 /* ================ 盘库 · 复制 · 网址 ================ */
 function snapshot() {
-  const s = { cal: form.cal === 'sizhu' ? 'solar' : form.cal, male: form.male, name: form.name, tz: +view.tz, city: view.city, lon: +view.lon, sun: view.sun, zi: view.zi, dst: $('dstIn').checked };
+  const s = { cal: form.cal === 'sizhu' ? 'solar' : form.cal, male: form.male, name: form.name, tz: +view.tz, city: view.city, lon: +view.lon, lat: view.lat, sun: view.sun, zi: view.zi, dst: $('dstIn').checked };
   if (s.cal === 'lunar') Object.assign(s, { ly: +$('lyIn').value, lm: $('lmIn').value, ld: +$('ldIn').value, lt: $('ltIn').value });
   else s.when = $('whenIn').value;
   return s;
@@ -602,7 +667,7 @@ function snapshot() {
 function apply(s) {
   form.male = s.male !== false; seg($('genSeg'), form.male ? '1' : '0', v => { form.male = v === '1'; cast(true); });
   $('nameIn').value = s.name || '';
-  Object.assign(view, { tz: s.tz != null ? s.tz : view.tz, lon: s.lon != null ? s.lon : view.lon, city: s.city || '', sun: !!s.sun, zi: s.zi || 'next' });
+  Object.assign(view, { tz: s.tz != null ? s.tz : view.tz, lon: s.lon != null ? s.lon : view.lon, lat: s.lat != null ? s.lat : (CITY_LIST.find(c => c[0] === s.city) || [])[2], city: s.city || '', sun: !!s.sun, zi: s.zi || 'next' });
   $('dstIn').checked = !!s.dst;
   syncPlaceUI();
   if (s.cal === 'lunar') { $('lyIn').value = s.ly; setCal('lunar'); fillLunarMonths(s.lm); fillLunarDays(s.ld); $('ltIn').value = s.lt || '12:00'; }
@@ -669,8 +734,8 @@ function readURL() {
   const q = new URLSearchParams(location.search);
   if (!q.get('d') && !q.get('l')) return null;
   const s = { male: q.get('g') !== '0', name: q.get('n') || '', tz: q.get('tz') != null ? +q.get('tz') : 8, zi: q.get('zi') === 'same' ? 'same' : 'next', dst: q.get('dst') === '1' };
-  if (q.get('lon')) { s.sun = true; s.lon = +q.get('lon'); const c = CITY_LIST.find(x => Math.abs(x[1] - s.lon) < 0.005 && x[2] === s.tz); s.city = c ? c[0] : ''; }
-  else { const c = CITY_LIST.find(x => x[2] === s.tz); s.sun = false; s.lon = c ? c[1] : s.tz * 15; s.city = c ? c[0] : ''; }
+  if (q.get('lon')) { s.sun = true; s.lon = +q.get('lon'); const c = CITY_LIST.find(x => Math.abs(x[1] - s.lon) < 0.005 && x[3] === s.tz); s.city = c ? c[0] : ''; s.lat = c ? c[2] : null; }
+  else { const c = CITY_LIST.find(x => x[3] === s.tz); s.sun = false; s.lon = c ? c[1] : s.tz * 15; s.city = c ? c[0] : ''; s.lat = c ? c[2] : null; }
   if (q.get('l')) { const [y, m, d] = q.get('l').split('-'); Object.assign(s, { cal: 'lunar', ly: +y, lm: m, ld: +d, lt: q.get('t') || '12:00' }); }
   else Object.assign(s, { cal: 'solar', when: q.get('d') });
   return s;
@@ -688,12 +753,15 @@ $('lyIn').addEventListener('change', () => { fillLunarMonths(); cast(); });
 $('lmIn').addEventListener('change', () => { fillLunarDays(); cast(); });
 ['ldIn', 'ltIn'].forEach(id => $(id).addEventListener('change', () => cast()));
 $('nameIn').addEventListener('change', () => { if (C) { form.name = $('nameIn').value.trim(); C.name = form.name; render(); writeURL(); } });
-$('castBtn').onclick = () => { if (form.cal === 'sizhu') $('szBtn').click(); else cast(); };
+$('castBtn').onclick = () => {
+  if (form.cal !== 'sizhu') { cast(); return; }
+  if (STEPS.every(st => pick[st.key] !== undefined)) runPick(); else toast('先把四柱逐一选齐');
+};
 $('dstIn').onchange = () => cast(true);
 $('sunIn').onchange = () => { view.sun = $('sunIn').checked; saveView(); syncPlaceUI(); cast(true); };
 $('cityIn').onchange = () => {
   const c = CITY_LIST.find(x => x[0] === $('cityIn').value);
-  if (c) { view.city = c[0]; view.lon = c[1]; view.tz = c[2]; saveView(); syncPlaceUI(); cast(true); }
+  if (c) { view.city = c[0]; view.lon = c[1]; view.lat = c[2]; view.tz = c[3]; saveView(); syncPlaceUI(); cast(true); }
   else { view.city = ''; view.sun = true; saveView(); syncPlaceUI(); $('lonIn').focus(); }
 };
 $('lonIn').onchange = () => {
@@ -701,7 +769,7 @@ $('lonIn').onchange = () => {
   if (isFinite(v) && v >= -180 && v <= 180) { view.lon = Math.round(v * 100) / 100; view.city = ''; view.sun = true; saveView(); syncPlaceUI(); cast(true); }
   else toast('经度应在 −180 到 180 之间');
 };
-$('tzIn').onchange = () => { view.tz = +$('tzIn').value; saveView(); cast(true); };
+$('tzIn').onchange = () => { view.tz = +$('tzIn').value; saveView(); if (form.cal === 'sizhu' && STEPS.every(st => pick[st.key] !== undefined)) runPick(); cast(true); };
 
 $('lyIn').value = NOW_Y;
 syncPlaceUI(); renderLib();

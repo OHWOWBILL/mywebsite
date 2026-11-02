@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=3">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=4">
   <style>
     :root {
       --h-lu: #8DBF97; --h-quan: #C79BEA; --h-ke: #8FB0D8; --h-ji: #E07A62;
@@ -296,7 +296,7 @@
 
 <script src="/ziwei/iztro.min.js?v=2.6.3"></script>
 <script src="/ziwei/ziwei.js?v=1"></script>
-<script src="/fabao/fabao.js?v=10"></script>
+<script src="/fabao/fabao.js?v=11"></script>
 <script>
 (function () {
 'use strict';
@@ -397,7 +397,24 @@ function cast(keep) {
   C.name = form.name; C.form = r;
   updateNotes(r);
   if (!keep) { sel = C.ming; taiji = null; yunSel = { dx: null, ln: null, ly: null }; }
-  calcYun(); renderAll(); writeURL();
+  calcYun(); renderAll(); writeURL(); shareBirth(r);
+}
+// 命部 · 星命同参：起盘后把生辰记下，切到八字、占星时同一个人跟着走（fabao.js 的共享生辰）。
+// 只看带过来的盘时不动出生地；开了真太阳时，或换了一个人，才把这里的经度、时区一并记下（紫微不认夏令时，新人记为标准时）。
+function shareBirth(r) {
+  if (!window.Fabao || !Fabao.birth) return;
+  let when = $('whenIn').value;
+  if (form.cal === 'lunar') {
+    const m = /^(\d+)-(\d+)-(\d+)/.exec(C.info.solar || ''); if (!m) return;
+    const t = r.inp.t, hh = t === 0 ? 0 : t === 12 ? 23 : t * 2;      // 取时辰中点
+    when = `${m[1]}-${pad(+m[2])}-${pad(+m[3])}T${pad(hh)}:${t === 0 || t === 12 ? '30' : '00'}`;
+  }
+  const Bh = Fabao.birth, prev = Bh.load() || {};
+  const base = { male: form.g === '男', name: form.name };
+  // 带过来的若有夏令时，这里看到的是扣过一小时的标准时，仍算同一个人
+  const prevStd = prev.dst ? Bh.minusHour(prev.when) : prev.when;
+  if (prevStd === when) { Bh.save(Object.assign(base, view.sun ? { sun: true, lon: +view.lon, tz: +view.tz } : {})); return; }
+  Bh.save(Object.assign(base, { when, dst: false, sun: !!view.sun, lon: +view.lon, tz: +view.tz }));
 }
 
 /* ================ 运限 ================ */

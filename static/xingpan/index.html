@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=3">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=4">
   <style>
     :root { --el-fire: #E07A62; --el-earth: #C9A578; --el-air: #8FB0D8; --el-water: #7FA3D6; --glyph: "Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", "Symbola", serif; }
     .el-0 { --ec: var(--el-fire); } .el-1 { --ec: var(--el-earth); } .el-2 { --ec: var(--el-air); } .el-3 { --ec: var(--el-water); }
@@ -208,7 +208,8 @@
 </main>
 
 <script src="/xingpan/xingpan.js?v=1"></script>
-<script src="/fabao/fabao.js?v=10"></script>
+<script src="/fabao/cities.js?v=1"></script>
+<script src="/fabao/fabao.js?v=11"></script>
 <script>
 (function () {
 'use strict';
@@ -222,24 +223,8 @@ const BODY = {}; XP.BODIES.forEach(b => { BODY[b.id] = b; });
 BODY.snode = { id: 'snode', n: '南交点', g: '☋' };
 const G = id => BODY[id].g + T;
 
-// 出生地：[名, 东经, 北纬, 时区]
-const CITIES = [
-  ['中国大陆', [['北京', 116.40, 39.90, 8], ['上海', 121.47, 31.23, 8], ['天津', 117.20, 39.13, 8], ['重庆', 106.55, 29.56, 8], ['广州', 113.26, 23.13, 8], ['深圳', 114.06, 22.54, 8],
-    ['成都', 104.07, 30.67, 8], ['武汉', 114.31, 30.59, 8], ['西安', 108.94, 34.26, 8], ['南京', 118.80, 32.06, 8], ['杭州', 120.16, 30.27, 8], ['苏州', 120.62, 31.30, 8],
-    ['长沙', 112.94, 28.23, 8], ['郑州', 113.63, 34.75, 8], ['济南', 117.00, 36.65, 8], ['青岛', 120.38, 36.07, 8], ['沈阳', 123.43, 41.80, 8], ['大连', 121.61, 38.91, 8],
-    ['长春', 125.32, 43.82, 8], ['哈尔滨', 126.64, 45.80, 8], ['石家庄', 114.51, 38.04, 8], ['太原', 112.55, 37.87, 8], ['合肥', 117.23, 31.82, 8], ['南昌', 115.86, 28.68, 8],
-    ['福州', 119.30, 26.07, 8], ['厦门', 118.09, 24.48, 8], ['南宁', 108.37, 22.82, 8], ['海口', 110.32, 20.04, 8], ['贵阳', 106.63, 26.65, 8], ['昆明', 102.71, 25.04, 8],
-    ['兰州', 103.83, 36.06, 8], ['乌鲁木齐', 87.62, 43.83, 8], ['拉萨', 91.13, 29.65, 8]]],
-  ['港澳台', [['香港', 114.17, 22.32, 8], ['澳门', 113.54, 22.20, 8], ['台北', 121.56, 25.03, 8], ['台中', 120.68, 24.15, 8], ['高雄', 120.31, 22.63, 8]]],
-  ['日本', [['东京', 139.69, 35.68, 9], ['横滨', 139.64, 35.44, 9], ['大阪', 135.50, 34.69, 9], ['京都', 135.77, 35.01, 9], ['名古屋', 136.91, 35.18, 9], ['札幌', 141.35, 43.06, 9],
-    ['福冈', 130.40, 33.59, 9], ['那霸', 127.68, 26.21, 9]]],
-  ['亚洲其他', [['首尔', 126.98, 37.57, 9], ['新加坡', 103.82, 1.35, 8], ['吉隆坡', 101.69, 3.14, 8], ['曼谷', 100.50, 13.76, 7]]],
-  ['欧美澳', [['伦敦', -0.13, 51.51, 0], ['巴黎', 2.35, 48.86, 1], ['纽约', -74.01, 40.71, -5], ['洛杉矶', -118.24, 34.05, -8], ['旧金山', -122.42, 37.77, -8],
-    ['温哥华', -123.12, 49.28, -8], ['多伦多', -79.38, 43.65, -5], ['悉尼', 151.21, -33.87, 10], ['墨尔本', 144.96, -37.81, 10]]]
-];
-const CITY_LIST = CITIES.flatMap(([, l]) => l);
-const TZS = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 8, 8.75, 9, 9.5, 10, 10.5, 11, 12, 13, 14];
-const tzLabel = z => 'UTC' + (z >= 0 ? '+' : '−') + (Math.abs(z) % 1 ? Math.floor(Math.abs(z)) + ':' + pad(Math.round(Math.abs(z) % 1 * 60)) : Math.abs(z));
+// 出生地：共用 /fabao/cities.js（[名, 东经, 北纬, 时区]），与八字同一张
+const CITIES = window.QJ_CITIES.GROUPS, CITY_LIST = window.QJ_CITIES.LIST, TZS = window.QJ_CITIES.TZS, tzLabel = window.QJ_CITIES.tzLabel;
 const LS_LIB = 'xingpan.lib.v1', LS_VIEW = 'xingpan.view.v1';
 const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
@@ -277,6 +262,7 @@ function cast() {
     $('dstBtn').onclick = () => { $('dstIn').checked = true; cast(); toast('已按夏令时减一小时'); };
   } else dn.hidden = true;
   render(); writeURL();
+  Fabao.birth.save({ when: $('whenIn').value, name: C.name, tz: +view.tz, lon: +view.lon, lat: +view.lat, dst: $('dstIn').checked, city: view.city || '' });
 }
 
 /* ================ 星盘轮 ================ */

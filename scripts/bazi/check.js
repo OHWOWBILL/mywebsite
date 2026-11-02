@@ -158,6 +158,19 @@ for (let k = 0; k < 60; k++) {
   if (!hit) { eq(me, (r.list || []).map(w => w.from + '~' + w.to), '四柱反推 ' + names(c) + ' ' + zi); break; } else ok++;
 }
 eq(B.fromPillars(['甲子', '甲子', '甲子', '甲子']).error, '月干与年干不合五虎遁：甲子年无甲子月', '反推：五虎遁不合');
+// 时辰不详：只给年月日三柱，列出的整日必含出生时刻，且每段不超过一日
+for (let k = 0; k < 40; k++) {
+  const t = Date.UTC(1950, 0, 1) + Math.floor(rnd() * (Date.UTC(2050, 0, 1) - Date.UTC(1950, 0, 1)));
+  const f = new Date(t + 8 * 3600e3), zi = rnd() < 0.5 ? 'next' : 'same';
+  const c = at(f.getUTCFullYear(), f.getUTCMonth() + 1, f.getUTCDate(), f.getUTCHours(), f.getUTCMinutes(), { zi });
+  const r = B.fromPillars(c.pillars.slice(0, 3).map(p => p.name).concat([null]), { tz: 8, zi });
+  const me = B.fmtF(c.std);
+  if (!(r.list || []).some(w => w.from <= me && me < w.to) || r.list.some(w => Date.parse(w.to.replace(' ', 'T') + 'Z') - Date.parse(w.from.replace(' ', 'T') + 'Z') > 864e5)) {
+    eq(me, r.list, '时辰不详反推 ' + names(c) + ' ' + zi); break;
+  } else ok++;
+}
+const r90 = B.fromPillars(['庚午', '壬午', '辛亥', null], { tz: 8, zi: 'next' }).list.map(w => w.from);
+eq(r90.includes('1990-06-14 23:00'), true, '庚午 壬午 辛亥：1990-06-14 23:00 起（子时换日）');
 
 console.log(bad ? `\n${bad} 项不合，${ok} 项相合` : `全部相合（${ok} 项）`);
 process.exit(bad ? 1 : 0);
