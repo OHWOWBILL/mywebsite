@@ -52,31 +52,17 @@
   blurb = "八字、紫微、星盘诸法互证"
   categories = ["命", "知识点做题法"]
   lamp = "changsheng"
+  # 八字、紫微、占星（与禁制的读盘）都并在命部里切换，这里只挂一件
   [[door.tools]]
-    seal = "八"
-    name = "八字排盘"
+    seal = "参"
+    name = "命部 · 星命同参"
     href = "/bazi/"
-    desc = "四柱十神神煞，精确起运，大运流年流月，四柱反推"
-  [[door.tools]]
-    seal = "星"
-    name = "星盘"
-    href = "/xingpan/"
-    desc = "本命盘，宫位相位，庙旺陷弱，法达小限"
-  [[door.tools]]
-    seal = "紫"
-    name = "紫微斗数"
-    href = "/ziwei/"
-    desc = "十二宫排盘，三方四正、飞化、转宫、大限流年"
+    desc = "八字、紫微、占星一处切换，同一生辰三种看法；读盘持诀可开"
   [[door.tools]]
     seal = "生"
     name = "十二长生"
     href = "/changsheng/"
     desc = "天干 × 地支旺衰速查"
-  [[door.tools]]
-    seal = "禁"
-    name = "命部"
-    href = "/mingbu/"
-    desc = "占星与八字读盘，持诀者可开"
 
 [[door]]
   seal = "卜"
