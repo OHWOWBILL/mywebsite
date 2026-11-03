@@ -482,6 +482,7 @@
     document.getElementById('castBtn').addEventListener('click', cast);
     document.getElementById('clearBtn').addEventListener('click', clearAll);
     document.getElementById('copyBtn').addEventListener('click', () => Fabao.copy(caseMarkdown(), '卦例已复制，可贴入笔记'));
+    window.MeihuaCase = caseMarkdown;     // 「问 AI」取卦例文字用
 
     // 旧版把十二长生放在本页的分页里，现已独立成页
     try { localStorage.removeItem('meihua.tab'); localStorage.removeItem('meihua.theme'); } catch (e) { /* 无痕模式 */ }

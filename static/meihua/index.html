@@ -98,7 +98,7 @@
 <script src="data/hexagrams.js?v=3"></script>
 <script src="data/yao.js?v=3"></script>
 <script src="/fabao/lunar.js?v=1"></script>
-<script src="js/app.js?v=6"></script>
+<script src="js/app.js?v=7"></script>
 <script>
 // 问 AI：借「复制」的卦例文字（app.js 的 caseMarkdown），再补卦辞与动爻爻辞，连同本页口径一并复制
 (function () {
@@ -113,8 +113,9 @@
   ].join('\n');
   // 某张卦卡上配出的卦名（未配齐为空）
   const nameOf = type => { const el = document.querySelector(`[data-card="${type}"] .matched-name`); return el && el.classList.contains('ok') ? el.textContent.replace('✓', '').trim() : ''; };
-  // 临时接住 Fabao.copy，点一下「复制」取到卦例文字，再原样放回
+  // 卦例文字取 app.js 的 caseMarkdown；万一没挂出来，就临时接住 Fabao.copy、点一下「复制」取到，再原样放回
   function caseText() {
+    if (typeof window.MeihuaCase === 'function') return window.MeihuaCase();
     let got = null;
     const orig = Fabao.copy;
     Fabao.copy = t => { got = t; };
