@@ -180,6 +180,16 @@
     .zw-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
     .zw-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
 
+    /* 白话：盘上几句大白话，随盘重画（八字、占星同式） */
+    .bh { padding: 13px 18px 12px; margin-bottom: 14px; }
+    .bh-h { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 6px; }
+    .bh-h small { font-size: 11.5px; color: var(--faint); letter-spacing: .12em; }
+    .bh .r { display: flex; gap: 8px; padding: 3px 0; font-size: 14px; line-height: 1.75; color: var(--fg-2); letter-spacing: .02em; }
+    .bh .r > i { flex: 0 0 3.6em; font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 23px; color: var(--faint); letter-spacing: .12em; white-space: nowrap; }
+    .bh .r > span { min-width: 0; }
+    .bh .r b { font-family: var(--font-title); font-weight: 600; color: var(--fg); }
+    .bh .fb-fine { margin-top: 6px; }
+
     @media (max-width: 1100px) {
       .zw-wrap { grid-template-columns: 1fr; }
       .zw-side { position: static; display: grid; grid-template-columns: 1fr 1fr; }
@@ -210,6 +220,9 @@
       .zw-yrow { grid-template-columns: 1fr; gap: 4px; }
       .zw-ybtns button { min-width: 52px; }
       .zw-form input[type=text] { width: 100%; }
+      .bh { padding: 12px 14px 11px; }
+      .bh .r { font-size: 13.5px; gap: 6px; }
+      .bh .r > i { font-size: 11.5px; }
     }
   </style>
 </head>
@@ -256,6 +269,7 @@
         <button class="fb-btn primary" id="castBtn" type="button">排盘</button>
         <button class="fb-btn" id="saveBtn" type="button">存盘</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
+        <button class="fb-btn" id="aiBtn" type="button" title="把命盘连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
       </div>
       <select id="libSel" class="zw-lib" aria-label="盘库"><option value="">盘库（存过的盘）</option></select>
       <div class="zw-opts">
@@ -268,6 +282,7 @@
 
   <div class="zw-wrap">
     <div>
+      <section class="fb-card bh" id="bhCard" aria-label="白话" hidden></section>
       <div class="zw-board" id="board" aria-label="命盘"></div>
       <section class="fb-card zw-yun" aria-label="运限">
         <div class="zw-yrow"><small>大限</small><div class="zw-ybtns" id="dxRow"></div></div>
@@ -652,7 +667,50 @@ function setTaiji(br) {
   renderAll();
 }
 
-function renderAll() { renderBoard(); renderYun(); renderDetail(); renderFly(); }
+function renderAll() { renderBoard(); renderYun(); renderDetail(); renderFly(); renderBH(); }
+
+/* ================ 白话 ================ */
+// 命宫主星（亮度、生年四化）的常见性情，空宫借对宫；身宫落处；五行局。只作参考，随盘重画。
+const STAR_TXT = {
+  紫微: '有领导气质，自尊心强、重面子，喜欢主导局面', 天机: '聪明机敏，善思考谋划，心思灵动、闲不下来',
+  太阳: '热情外向，乐于付出、照顾人，看重名声与公道', 武曲: '刚毅果断，务实重执行，对钱与目标有冲劲',
+  天同: '性情温和，随遇而安，懂得享受，不爱争强', 廉贞: '个性鲜明，敢爱敢恨，有原则也有手腕',
+  天府: '稳重保守，有包容心，善于守成与理财', 太阴: '温和细腻，念家重情，心思内敛，善于积蓄',
+  贪狼: '多才多艺，交际手腕好，好奇心与欲望都强', 巨门: '口才好、观察细，爱追根究底，也易多疑、招口舌',
+  天相: '正直厚道，乐于助人，讲公平、重体面', 天梁: '成熟稳重，爱照顾人，有长者风范、喜讲道理',
+  七杀: '独立果敢，敢冲敢闯，不甘平淡，性子也急', 破军: '敢破旧立新，不按常理出牌，一生变动多'
+};
+const BRIGHT_TXT = { 庙: '入庙', 旺: '旺', 得: '得地', 利: '利', 平: '平', 不: '不得地', 陷: '落陷' };
+const HUA_TXT = { 禄: '化禄添人缘福气', 权: '化权添主见魄力', 科: '化科添名声条理', 忌: '化忌多执着牵挂' };
+const SHEN_TXT = {
+  命宫: '先天个性与后天作为一致，个性鲜明、主观较强', 夫妻: '后天重心在婚姻与伴侣，受另一半影响大',
+  财帛: '后天心力多放在赚钱理财上，重实际', 迁移: '好动，常在外奔波，出外发展的机会多',
+  官禄: '以事业为重心，看重成就与名位', 福德: '重精神生活与内心感受，讲究生活品味'
+};
+const JI6 = ['左辅', '右弼', '文昌', '文曲', '天魁', '天钺'], SHA6 = ['擎羊', '陀罗', '火星', '铃星', '地空', '地劫'];
+const bhRow = (k, html) => `<div class="r"><i>${k}</i><span>${html}</span></div>`;
+let bhOf = null;
+function renderBH() {
+  if (bhOf === C) return;          // 点宫、转宫、运限都会 renderAll，白话只随命盘变
+  bhOf = C;
+  const p = C.palaces[C.ming], o = C.palaces[Z.sanfang(C.ming).opp], sh = C.palaces[C.shen];
+  const tag = s => [BRIGHT_TXT[s.bright], s.hua ? '化' + s.hua : ''].filter(Boolean).join('、');
+  const stars = list => list.map(s => `<b>${s.name}</b>${tag(s) ? `（${tag(s)}）` : ''}`).join('、');
+  const use = p.major.length ? p.major : o.major;           // 命宫无主星，借对宫（迁移）的星来看
+  const ji = p.minor.filter(s => JI6.includes(s.name)).map(s => s.name), sha = p.minor.filter(s => SHA6.includes(s.name)).map(s => s.name);
+  let ming = p.major.length ? `在${p.zhi}，坐${stars(p.major)}`
+    : o.major.length ? `在${p.zhi}，无主星（空宫），借对宫迁移宫（${o.zhi}）的${stars(o.major)}来看；空宫的人可塑性大，较受环境影响`
+      : `在${p.zhi}，无主星，对宫也无主星，宜合三方的财帛、官禄一起看`;
+  if (ji.length || sha.length) ming += '；同宫另有' + [ji.length ? '吉星' + ji.join('、') : '', sha.length ? '煞星' + sha.join('、') : ''].filter(Boolean).join('，');
+  const hua = [...new Set(use.map(s => s.hua).filter(Boolean))];
+  $('bhCard').innerHTML = `<div class="bh-h"><span class="fb-tag">白话</span><small>一眼看个大概 · 参考</small></div>` +
+    bhRow('命宫', ming + '。') +
+    (use.length ? bhRow('性情', use.map(s => `<b>${s.name}</b>：${STAR_TXT[s.name] || '—'}`).join('；') + (p.major.length ? '。' : '。借来的星，力道打些折扣。')) : '') +
+    bhRow('身宫', C.shen === C.ming ? `与命宫同在${p.zhi}（命身同宫），${SHEN_TXT.命宫}。` : `在${sh.name.endsWith('宫') ? sh.name : sh.name + '宫'}（${sh.zhi}），${SHEN_TXT[sh.name] || '后天重心多在' + sh.name + '之事'}。`) +
+    bhRow('五行局', `${C.info.ju}：大限从 ${p.dx[0]} 岁起排，每十年换一步。`) +
+    `<p class="fb-fine">亮度：入庙、旺最得力，得地、利尚可，平为平常，不得地、落陷较失力${hua.length ? '；' + hua.map(h => HUA_TXT[h]).join('，') : ''}。皆为常见说法，参考。</p>`;
+  $('bhCard').hidden = false;
+}
 
 $('board').addEventListener('click', e => {
   const dot = e.target.closest('[data-dot]');
@@ -713,8 +771,8 @@ $('libSel').onchange = () => {
   libCur = +v; applySnapshot(lib[libCur]);
   renderLib(); $('libSel').value = String(libCur);
 };
-$('copyBtn').onclick = () => {
-  if (!C) return;
+// 盘面文字：「复制」与「问 AI」共用
+function chartText() {
   const I = C.info, L = [];
   L.push(`紫微斗数 · ${C.name || '命盘'} · ${I.yinyang}`);
   L.push(`公历 ${C.form.raw ? toLocalInput(C.form.raw).replace('T', ' ') : I.solar}${C.form.sun ? `（真太阳时 ${pad(C.form.clock.getHours())}:${pad(C.form.clock.getMinutes())}）` : ''} · 农历 ${I.lunar}`);
@@ -724,8 +782,31 @@ $('copyBtn').onclick = () => {
     const st = list => list.map(s => s.name + (s.bright || '') + (s.hua ? '化' + s.hua : '') + (s.self ? '(自化' + s.self + ')' : '')).join(' ');
     L.push(`${p.name}${p.body ? '(身)' : ''} ${p.gan}${p.zhi} ${p.dx[0]}-${p.dx[1]}｜${st(p.major) || '空宫'}｜${st(p.minor)}`);
   }
-  copy(L.join('\n'), '命盘已复制');
-};
+  return L.join('\n');
+}
+$('copyBtn').onclick = () => { if (C) copy(chartText(), '命盘已复制'); };
+// 问 AI：盘面文字再补今年所行大限，及盘上正看的运限四化，连同本页口径一并复制
+function aiText() {
+  const L = [chartText()];
+  NOW_LY = NOW_LY || curLunarYear();
+  const age = NOW_LY - C.info.lunarRaw.lunarYear + 1, p = C.palaces.find(q => age >= q.dx[0] && age <= q.dx[1]);
+  L.push(`今年 农历${NOW_LY}年（${Z.GAN[(NOW_LY - 4) % 10]}${ZHI[(NOW_LY - 4) % 12]}），虚岁 ${age}` + (p ? `，行${p.name}大限（${p.gan}${p.zhi}，${p.dx[0]}–${p.dx[1]} 岁）` : ''));
+  if (Y) {
+    const lay = (s, n) => s ? `${n}${s.gan}${s.zhi}（命宫在${s.zhi}）四化 ${(s.hua || []).map((x, k) => x ? x + Z.HUA[k] : '').filter(Boolean).join(' ')}` : '';
+    const parts = [lay(Y.decadal, '大限'), lay(Y.yearly, '流年'), lay(Y.monthly, '流月')].filter(Boolean);
+    if (parts.length) L.push('盘上正看 ' + parts.join('；'));
+  }
+  return L.join('\n');
+}
+function rulesText() {
+  return [
+    '安星引擎为开源的 iztro；以正月初一换年；闰月以十五为界，前半归本月、后半归下月；晚子时（23 点后）作次日子时。',
+    '四化：庚干取「阳武阴同」（太阳禄、武曲权、太阴科、天同忌）；星曜庙旺依《斗数全书》。',
+    `中宫四柱为八字口径：年以立春、月以节的交节时刻换。${C.form && C.form.sun ? '时辰已按出生地真太阳时定。' : ''}1986–1991 年大陆夏令时只提示，不自动扣。`,
+    '十二宫自命宫起逆行；「(身)」为身宫，「自化」为本宫宫干化本宫之星；各宫后为宫干支与大限岁数。'
+  ].join('\n');
+}
+$('aiBtn').onclick = () => { if (C) Fabao.askAI('紫微斗数', aiText(), rulesText()); };
 function writeURL() {
   const s = formSnapshot(), q = new URLSearchParams();
   if (s.cal === 'solar') { q.set('d', s.when); if (s.sun) { q.set('lon', s.sun.lon); q.set('tz', s.sun.tz); } }

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>九星气学 · 潜蛟阁法宝库</title>
+  <meta name="description" content="九星气学：按立春与节算本命星、月命星，排年盘月盘（南上），自动标出五黄杀、暗剑杀、岁破月破、本命杀与本命的杀，给出你的吉方、最大吉方与搬家方位，附年运月运。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=5">
+  <style>
+    [data-wx="木"] { --wc: var(--wx-mu); } [data-wx="火"] { --wc: var(--wx-huo); } [data-wx="土"] { --wc: var(--wx-tu); }
+    [data-wx="金"] { --wc: var(--wx-jin); } [data-wx="水"] { --wc: var(--wx-shui); }
+
+    /* —— 此人此时 —— */
+    .jx-info { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .jx-who { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; min-width: 0; }
+    .jx-who .lab { font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .25em; flex-shrink: 0; }
+    .jx-chips { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; min-width: 0; }
+    .jx-chip {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; cursor: pointer;
+      border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-3);
+      font-family: var(--font-title); font-size: 13px; letter-spacing: .1em; color: var(--muted); white-space: nowrap;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .jx-chip:hover { color: var(--fg); border-color: var(--zi-2); }
+    .jx-chip.on { color: var(--fg); border-color: var(--zi-2); background: rgba(122, 91, 192, .22); }
+    .jx-other { padding: 1px 4px 1px 12px; }
+    .fb-main .jx-other input[type=date] { padding: 2px 4px; font-size: 12.5px; border: none; background: transparent; font-family: var(--font-title); letter-spacing: .02em; }
+    .jx-tm { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--jin); letter-spacing: .05em; }
+    .fb-main .jx-tm input[type=time] { padding: 3px 6px; font-size: 13px; }
+    .jx-who.ask { display: grid; gap: 8px; padding: 14px 16px; border: 1px dashed var(--zi-2); border-radius: var(--r); background: rgba(122, 91, 192, .08); }
+    .jx-who.ask .ask-lab { font-family: var(--font-title); font-size: 16px; letter-spacing: .12em; color: var(--fg); }
+    .fb-main .jx-who.ask input[type=date] { font-size: 16px; padding: 8px 12px; font-family: var(--font-title); }
+
+    .jx-natal { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; font-family: var(--font-title); font-size: 13px; color: var(--muted); letter-spacing: .06em; }
+    .jx-natal .nm b { color: var(--fg); font-weight: 600; letter-spacing: .12em; margin-right: 8px; font-size: 14px; }
+    .jx-natal .st { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+    .jx-natal .st small { font-size: 12px; color: var(--muted); letter-spacing: .15em; }
+    .jx-natal .st b { font-size: 18px; font-weight: 600; color: var(--fg); letter-spacing: .12em; }
+    .jx-natal .st b::after { content: attr(data-wx); font-size: 11px; font-weight: 400; letter-spacing: 0; margin-left: 5px; padding: 0 5px; border-radius: 3px; vertical-align: 2px; color: var(--wc); background: color-mix(in oklab, var(--wc) 16%, transparent); }
+    .jx-natal .edge { flex-basis: 100%; font-family: var(--font-body); font-size: 12.5px; color: var(--jin); letter-spacing: .03em; }
+
+    .jx-sum { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 18px; align-items: baseline; padding-top: 12px; border-top: 1px solid var(--rule); }
+    .jx-sum .lab { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; color: var(--fg); white-space: nowrap; line-height: 1.5; }
+    .jx-sum .lab small { display: block; font-weight: 400; font-size: 11.5px; letter-spacing: .04em; color: var(--muted); }
+    .jx-sum .txt { font-family: var(--font-title); font-size: 15.5px; line-height: 1.85; color: var(--fg-2); letter-spacing: .03em; }
+    .jx-sum b { font-weight: 600; }
+    .jx-sum b.ji { color: var(--lv); } .jx-sum b.best { color: var(--jin); } .jx-sum b.xiong { color: var(--zhu); } .jx-sum b.none { color: var(--muted); font-weight: 400; }
+
+    .jx-ctrl { min-width: 272px; }
+    .jx-step { flex-wrap: nowrap; }
+    .jx-step .fb-btn { padding: 6px 12px; font-size: 18px; letter-spacing: 0; line-height: 1.3; }
+    .fb-main .jx-step input[type=date] { font-family: var(--font-title); letter-spacing: .04em; }
+    .jx-span { justify-content: space-between; flex-wrap: nowrap; }
+    .jx-span .fb-btn { padding: 4px 6px; font-size: 13px; letter-spacing: .1em; }
+    .jx-ctrl .fb-row .grow { flex: 1; }
+
+    /* —— 年盘、月盘 —— */
+    .jx-boards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+    .jx-board { padding: 16px 16px 14px; min-width: 0; }
+    .jx-bhead { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; margin-bottom: 12px; }
+    .jx-bhead h2 { font-family: var(--font-title); font-weight: 600; font-size: 18px; letter-spacing: .2em; display: flex; align-items: baseline; gap: 10px; }
+    .jx-bhead h2 small { font-size: 13.5px; font-weight: 400; color: var(--fg-2); letter-spacing: .12em; }
+    .jx-bhead p { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+    .jx-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+    .jx-cell {
+      --tc: var(--muted);
+      display: flex; flex-direction: column; gap: 3px; min-width: 0; min-height: 104px; padding: 7px 8px 8px;
+      border-radius: var(--r); background: var(--bg-3); border: 1px solid var(--rule); cursor: pointer;
+      transition: border-color .15s, background .15s, box-shadow .15s;
+    }
+    .jx-cell:hover { border-color: var(--rule-2); }
+    .jx-cell .dir { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; color: var(--fg-2); }
+    .jx-cell .dir small { font-size: 11px; color: var(--faint); letter-spacing: 0; }
+    .jx-cell .star { margin-top: auto; text-align: center; font-family: var(--font-title); font-weight: 600; font-size: 22px; letter-spacing: .1em; color: var(--fg); line-height: 1.2; white-space: nowrap; }
+    .jx-cell .star i { font-style: normal; font-weight: 400; font-size: 11px; letter-spacing: 0; color: var(--wc); margin-left: 2px; vertical-align: 3px; }
+    .jx-cell .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; min-height: 18px; margin-top: auto; }
+    .jx-cell .tags span { font-family: var(--font-title); font-size: 11px; line-height: 18px; padding: 0 6px; border-radius: 3px; white-space: nowrap; color: var(--tc); background: color-mix(in oklab, var(--tc) 16%, transparent); }
+    .jx-cell.ji { --tc: var(--lv); background: color-mix(in oklab, var(--lv) 12%, var(--bg-2)); border-color: color-mix(in oklab, var(--lv) 55%, var(--rule)); }
+    .jx-cell.best { --tc: var(--jin); background: color-mix(in oklab, var(--jin) 15%, var(--bg-2)); border-color: var(--jin); }
+    .jx-cell.xiong { --tc: var(--zhu); background: color-mix(in oklab, var(--zhu) 10%, var(--bg-2)); border-color: color-mix(in oklab, var(--zhu) 45%, var(--rule)); }
+    .jx-cell.center { --tc: var(--zi-2); background: var(--bg); border-style: dashed; }
+    .jx-cell.sel { box-shadow: 0 0 0 2px var(--fg-2); }
+    .jx-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 10px; font-size: 11.5px; color: var(--faint); }
+    .jx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 1px solid var(--tc); background: color-mix(in oklab, var(--tc) 28%, transparent); }
+    .jx-legend .ji { --tc: var(--lv); } .jx-legend .best { --tc: var(--jin); } .jx-legend .xiong { --tc: var(--zhu); }
+    .jx-detail { margin-top: 10px; padding: 10px 12px; border-radius: var(--r); background: var(--bg-3); font-size: 13px; line-height: 1.8; color: var(--fg-2); }
+    .jx-detail b { font-family: var(--font-title); font-weight: 600; color: var(--fg); letter-spacing: .08em; margin-right: 6px; }
+    .jx-detail .hint, .jx-detail .muted { color: var(--faint); }
+    .jx-detail .best { color: var(--jin); }
+    .jx-yun { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--rule-2); }
+    .jx-yun h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .15em; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+    .jx-yun h3 em { font-style: normal; color: var(--zi-2); letter-spacing: .1em; }
+    .jx-yun h3 small { font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+    .jx-yun p { margin-top: 4px; font-size: 13.5px; line-height: 1.8; color: var(--fg-2); }
+    .jx-yun p.fb-fine { font-size: 12px; color: var(--faint); }
+
+    /* —— 本命星、月命星 —— */
+    .jx-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+    .jx-cards:empty { display: none; }
+    .jx-ncard { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; padding: 18px 20px; align-items: start; }
+    .jx-ncard .num {
+      grid-row: 1 / span 4; width: 54px; height: 54px; display: grid; place-items: center; border-radius: 50%;
+      font-family: var(--font-title); font-weight: 900; font-size: 28px; color: var(--wc);
+      background: color-mix(in oklab, var(--wc) 13%, transparent); border: 1px solid color-mix(in oklab, var(--wc) 45%, transparent);
+    }
+    .jx-ncard h3 { font-family: var(--font-title); font-weight: 600; font-size: 13px; color: var(--muted); letter-spacing: .2em; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; }
+    .jx-ncard h3 b { font-size: 19px; color: var(--fg); letter-spacing: .15em; }
+    .jx-ncard h3 small { font-size: 12px; font-weight: 400; color: var(--wc); letter-spacing: .1em; }
+    .jx-ncard .meta { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+    .jx-ncard .sk { font-size: 14px; line-height: 1.85; color: var(--fg-2); }
+    .jx-ncard .js { font-size: 12.5px; color: var(--muted); }
+
+    /* —— 九星一览 —— */
+    .jx-all { margin-top: 18px; overflow: hidden; }
+    .jx-all summary { cursor: pointer; padding: 14px 20px; list-style: none; display: flex; align-items: baseline; gap: 10px; font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; }
+    .jx-all summary::-webkit-details-marker { display: none; }
+    .jx-all summary small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
+    .jx-all summary::after { content: "展开"; margin-left: auto; font-size: 12px; font-weight: 400; color: var(--zi-2); letter-spacing: .15em; }
+    .jx-all[open] summary::after { content: "收起"; }
+    .jx-allgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border-top: 1px solid var(--rule); }
+    .jx-allgrid > div { background: var(--bg-2); padding: 12px 16px 14px; }
+    .jx-allgrid > div.me { background: color-mix(in oklab, var(--zi) 12%, var(--bg-2)); }
+    .jx-allgrid h4 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .12em; color: var(--fg); display: flex; align-items: baseline; gap: 8px; }
+    .jx-allgrid h4 i { font-style: normal; font-weight: 400; font-size: 11px; padding: 0 5px; border-radius: 3px; color: var(--wc); background: color-mix(in oklab, var(--wc) 16%, transparent); letter-spacing: 0; }
+    .jx-allgrid h4 em { font-style: normal; font-weight: 400; font-size: 11.5px; color: var(--zi-2); letter-spacing: .1em; }
+    .jx-allgrid .yrs { font-size: 12px; color: var(--muted); letter-spacing: .04em; margin-top: 2px; }
+    .jx-allgrid p { font-size: 13px; line-height: 1.75; color: var(--fg-2); margin-top: 4px; }
+
+    /* —— 口径 —— */
+    .jx-help { margin-top: 18px; padding: 16px 20px; }
+    .jx-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
+    .jx-help ul { padding: 0; }
+    .jx-help li { list-style: none; padding-left: 14px; position: relative; font-size: 13px; line-height: 1.9; color: var(--fg-2); }
+    .jx-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .jx-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
+
+    @media (max-width: 860px) {
+      .jx-boards, .jx-cards { grid-template-columns: 1fr; gap: 14px; }
+      .jx-cards, .jx-all, .jx-help { margin-top: 14px; }
+      .jx-board { padding: 14px 10px 12px; }
+      .jx-bhead { padding: 0 4px; }
+      .jx-grid { max-width: 520px; margin: 0 auto; gap: 4px; }
+      .jx-cell { min-height: 92px; padding: 6px 5px 7px; }
+      .jx-cell .dir { font-size: 12px; letter-spacing: .04em; }
+      .jx-cell .star { font-size: 19px; letter-spacing: .06em; }
+      .jx-cell .tags span { font-size: 10.5px; line-height: 17px; padding: 0 4px; }
+      .jx-sum { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .jx-sum .lab { display: flex; align-items: baseline; gap: 8px; }
+      .jx-sum .lab small { display: inline; }
+      .jx-sum .txt { font-size: 14.5px; margin-bottom: 10px; }
+      .jx-sum .txt:last-child { margin-bottom: 0; }
+      .jx-natal .st b { font-size: 16px; }
+      .jx-ncard { padding: 16px; gap: 4px 12px; }
+      .jx-ncard .num { width: 44px; height: 44px; font-size: 22px; }
+      .jx-allgrid { grid-template-columns: 1fr; }
+      .jx-all summary { padding: 14px 16px; }
+      .jx-help { padding: 16px; }
+    }
+  </style>
+</head>
+<body data-tool="jiuxing">
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">九</div>
+    <div>
+      <h1 class="fb-title">九星气学<span class="en">JIUXING · QIXUE</span></h1>
+      <p class="fb-sub">本命星 · 月命星 · 年盘月盘 · 八方吉凶 · 年运月运</p>
+    </div>
+  </header>
+
+  <section class="fb-now" aria-label="此人此时">
+    <div class="jx-info">
+      <div class="jx-who" id="whoBox"></div>
+      <div class="jx-natal" id="natalBox" hidden></div>
+      <div class="jx-sum" id="sumBox" aria-live="polite"></div>
+    </div>
+    <div class="fb-now-ctrl jx-ctrl">
+      <label class="fb-label" for="dateIn">出行 / 搬家日期</label>
+      <div class="fb-row jx-step">
+        <button type="button" class="fb-btn" id="prevBtn" title="上一个节月" aria-label="上一个节月">‹</button>
+        <input type="date" id="dateIn" class="grow" min="1900-02-05" max="2100-12-31" aria-label="出行或搬家日期">
+        <button type="button" class="fb-btn" id="nextBtn" title="下一个节月" aria-label="下一个节月">›</button>
+      </div>
+      <div class="fb-row jx-span"><span class="fb-fine" id="spanOut"></span><button type="button" class="fb-btn ghost" id="todayBtn">回到今天</button></div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn primary grow" id="copyBtn">复制摘要</button>
+        <button type="button" class="fb-btn grow" id="aiBtn">问 AI</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="jx-boards">
+    <section class="fb-card jx-board" id="yearCard" aria-label="年盘"></section>
+    <section class="fb-card jx-board" id="monthCard" aria-label="月盘"></section>
+  </div>
+
+  <div class="jx-cards" id="cardsBox"></div>
+
+  <details class="fb-card jx-all" id="allBox">
+    <summary>九星一览<small>按出生年查本命星（1 月 1 日至立春前出生的，算上一年）</small></summary>
+    <div class="jx-allgrid" id="allGrid"></div>
+  </details>
+
+  <section class="fb-card jx-help" aria-label="口径">
+    <h3>口径</h3>
+    <ul id="rulesList"></ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/fabao/kyureki.js?v=1"></script>
+<script src="/fabao/tongshu.js?v=1"></script>
+<script src="/kanyu/kanyu.js?v=1"></script>
+<script src="/jiuxing/jiuxing.js?v=1"></script>
+<script src="/fabao/fabao.js?v=12"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, JX = window.JX;
+const S = JX.STAR, PAL = JX.PAL;
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CN = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+const LS_VIEW = 'jiuxing.view.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const view = Object.assign({ other: '', otherT: '' }, store.get(LS_VIEW, {}));
+const saveView = () => store.set(LS_VIEW, { other: view.other, otherT: view.otherT });
+const ymd = o => `${o.y}-${pad(o.m)}-${pad(o.d)}`;
+const parseYMD = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? { y: +m[1], m: +m[2], d: +m[3] } : null; };
+const today = () => { const n = new Date(); return { y: n.getFullYear(), m: n.getMonth() + 1, d: n.getDate() }; };
+const where = p => p === 5 ? '中宫' : `${PAL[p].dir}（${PAL[p].g}宫）`;
+
+const RULES = [
+  ['本命星、月命星', '本命星看出生时刻（精确到分）落在哪个立春之后，取那一干支年的年星；月命星看出生前最后交的「节」定月，取那个月的月星。时刻按生辰所记的时区换算，没记就按本机时区；生在交节前后一两天的，时刻要准。'],
+  ['年盘月盘', '年盘以立春换、月盘以节换（交节当日算新月）；都是中宫星顺飞：乾、兑、艮、离、坎、坤、震、巽。盘面上南下北、左东右西，是九星气学的习惯。'],
+  ['凶方', '五黄杀（五黄所在）、暗剑杀（五黄对宫，五黄入中则无）、岁破（年盘，太岁对冲）/ 月破（月盘，月建对冲）、本命杀与本命的杀（本命星所在及其对宫）、月命杀与月命的杀（月命星所在及其对宫）；本命星、月命星入中宫则无相应的杀。定位对冲、小儿杀等不标。'],
+  ['吉方', '吉星按五行取：与本命星相生（生我为生气、我生为退气）或比和者为吉，相克者不取；五黄永不为吉星，本命星自身也不算。方位上是吉星、又无任何凶方，即为吉方；那颗星同时也是月命星的吉星，即为最大吉方。'],
+  ['本命五黄', '此处按土论，吉星取二黑、六白、七赤、八白、九紫；另有流派男借二黑、女借八白来定吉方，各家口径不一。月命五黄同此。'],
+  ['怎么用', '搬家、长住看年盘与月盘都吉的方位；短期出行以月盘为主。本命星入中宫的那一年（月），旧说「八方塞」，大的迁动宜缓。'],
+  ['方位与日盘', '方位采八方各四十五度（九星气学原用四正三十度、四隅六十度，此处只标方位不画度数）；不排日盘（日家九星的闰法各家不一）。']
+];
+const RULES_TEXT = RULES.map(r => `· ${r[0]}：${r[1]}`).join('\n');
+
+let target = today(), pick = null, sel = null, cur = null;
+
+/* ================ 人 ================ */
+// 共享生辰（命部几件起过盘就有）与存过的几个人
+function sources() {
+  const b = F.birth.load(), list = (F.people.list() || []).filter(p => p && p.when);
+  const key = F.people.key, bk = b && b.when ? key(b) : '';
+  const out = [];
+  if (bk && !list.some(p => key(p) === bk)) out.push({ k: 'birth', name: b.name || '本人', rec: b });
+  list.forEach(p => out.push({ k: 'p:' + p.id, name: p.name || '未名', rec: p }));
+  return { out, bk };
+}
+function defaultPick() {
+  const { out, bk } = sources();
+  if (bk) { const m = out.find(x => x.k === 'birth') || out.find(x => F.people.key(x.rec) === bk); if (m) return m.k; }
+  if (view.other) return 'other';
+  return out.length ? out[0].k : null;
+}
+function whoNow() {
+  if (pick === 'other') return view.other ? { k: 'other', name: '别人', when: view.other + (view.otherT ? 'T' + view.otherT : ''), tz: null, dst: false } : null;
+  const s = sources().out.find(x => x.k === pick);
+  return s ? { k: s.k, name: s.name, when: s.rec.when, tz: s.rec.tz, dst: !!s.rec.dst } : null;
+}
+function renderWho() {
+  const { out } = sources(), box = $('whoBox');
+  const dateIn = `<input type="date" id="otherIn" min="1900-02-05" max="2100-12-31" value="${esc(view.other)}" aria-label="出生日期">`;
+  const tm = `<span class="jx-tm" id="tmBox" hidden><span id="tmNote"></span><input type="time" id="otherTime" value="${esc(view.otherT)}" aria-label="出生时刻"></span>`;
+  if (!out.length) {
+    box.className = 'jx-who ask';
+    box.innerHTML = `<label class="ask-lab" for="otherIn">填出生日期，算你的本命星、月命星与吉方</label>
+      <div class="fb-row">${dateIn}${tm}</div>
+      <p class="fb-fine" id="askNote">不填也能看：下面先排这天的年盘、月盘，标出人人皆忌的五黄杀、暗剑杀与破方。在八字、紫微、占星里起过盘的生辰，这里会自动带上。</p>`;
+  } else {
+    box.className = 'jx-who';
+    box.innerHTML = `<span class="lab">看谁</span><span class="jx-chips">${out.map(x =>
+      `<button type="button" class="jx-chip" data-k="${esc(x.k)}" title="${esc(String(x.rec.when).replace('T', ' '))}">${esc(x.name)}</button>`).join('')}<label class="jx-chip jx-other" data-k="other" title="看别人：填出生日期"><span>别人</span>${dateIn}</label></span>${tm}`;
+  }
+  box.querySelectorAll('button[data-k]').forEach(b => b.onclick = () => { pick = b.dataset.k; render(); });
+  const other = box.querySelector('label[data-k="other"]');
+  if (other) other.addEventListener('click', () => { if (view.other && pick !== 'other') { pick = 'other'; render(); } });
+  $('otherIn').addEventListener('change', () => {
+    view.other = $('otherIn').value || ''; view.otherT = ''; $('otherTime').value = ''; saveView();
+    pick = view.other ? 'other' : defaultPick(); render();
+  });
+  $('otherTime').addEventListener('change', () => { view.otherT = $('otherTime').value || ''; saveView(); render(); });
+}
+function syncWho(N) {
+  document.querySelectorAll('#whoBox .jx-chip').forEach(c => c.classList.toggle('on', c.dataset.k === pick));
+  const note = $('askNote'); if (note) note.hidden = !!view.other;
+  // 「别人」生在交节当天：补个时刻
+  const show = pick === 'other' && N && N.near && N.near.sameDay;
+  $('tmBox').hidden = !show;
+  if (show) $('tmNote').textContent = `这天 ${JX.fmtT(N.near.t, null).split(' ')[1]} 交${N.near.n}，补出生时刻`;
+}
+function renderNatal(W, N) {
+  const box = $('natalBox');
+  if (!W || !N) { box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  const hm = S[N.honmei], gm = S[N.getsumei];
+  let edge = '';
+  if (N.near) {
+    const t = JX.fmtT(N.near.t, N.tz, true), what = N.near.n === '立春' ? '本命星与月命星' : '月命星';
+    edge = N.noTime && N.near.sameDay
+      ? `这天 ${t.slice(11)} 交${N.near.n}，没填时刻先按正午算；生在交节之前，${what}会不同。`
+      : `生在${N.near.n}前后一天内（${N.near.n} ${t}${N.tz != null ? '，出生地时间' : ''}），出生时刻差一点，${what}就会不同。`;
+  }
+  box.innerHTML = `<span class="nm"><b>${esc(W.name)}</b>${esc(W.when.replace('T', ' '))} 生</span>
+    <span class="st" data-wx="${hm.wx}"><small>本命</small><b data-wx="${hm.wx}">${hm.full}</b></span>
+    <span class="st" data-wx="${gm.wx}"><small>月命</small><b data-wx="${gm.wx}">${gm.full}</b></span>
+    <span>${N.gz}年 · ${N.month}</span>${edge ? `<span class="edge">${edge}</span>` : ''}`;
+}
+
+/* ================ 摘要 ================ */
+function renderSum(L) {
+  const row = x => `<span class="lab">${x.lab}${x.sub ? `<small>${x.sub}</small>` : ''}</span><span class="txt">${x.body}</span>`;
+  $('sumBox').innerHTML = row(L.month) + row(L.year) + row(L.move);
+}
+
+/* ================ 盘 ================ */
+function cellHTML(J, p) {
+  const c = J.cells[p], s = S[c.star], center = p === 5;
+  const cls = ['jx-cell', center ? 'center' : '', c.best ? 'best' : c.ji ? 'ji' : c.xiong ? 'xiong' : '', sel === p ? 'sel' : ''].filter(Boolean).join(' ');
+  let tags = [];
+  if (center) { if (J.hmAt === 5) tags.push('本命入中'); if (J.gmAt === 5) tags.push('月命入中'); }
+  else if (c.xiong) tags = c.marks;
+  else if (c.best) tags = ['最大吉方'];
+  else if (c.ji) tags = ['吉方'];
+  const dir = center ? '中宫' : PAL[p].dir;
+  const say = c.marks.length ? c.marks.join('、') : c.best ? '最大吉方' : c.ji ? '吉方' : '';
+  return `<div class="${cls}" data-p="${p}" role="button" tabindex="0" aria-pressed="${sel === p}" aria-label="${dir} ${s.full}${say ? '，' + say : ''}">
+    <span class="dir">${dir}${center ? '' : `<small>${PAL[p].g}</small>`}</span>
+    <b class="star" data-wx="${s.wx}">${s.n}<i>${s.wx}</i></b>
+    <span class="tags">${tags.map(t => `<span>${t}</span>`).join('')}</span>
+  </div>`;
+}
+function relLine(lab, me, s) {
+  const head = `对${lab}${S[me].n}：`;
+  if (s === me) return head + `同星（${lab}杀）`;
+  if (s === 5) return head + '五黄不作吉星';
+  const ok = JX.isJi(me, s);
+  return head + JX.relText(me, s) + `<span class="${ok ? 'good' : 'muted'}">（${ok ? '吉' : '不取'}）</span>`;
+}
+function detailHTML(J, p) {
+  if (!p) return '<span class="hint">点盘上任一方，看那一方的星、生克与凶方说明；两张盘同时亮出同一方。</span>';
+  const c = J.cells[p], s = S[c.star], P = J.person;
+  let h = `<b>${p === 5 ? '中宫' : `${PAL[p].dir} · ${PAL[p].g}宫`}</b>${s.full}（${s.wx}）`;
+  if (P) h += `<br>${relLine('本命', P.honmei, c.star)}；${relLine('月命', P.getsumei, c.star)}`;
+  if (p === 5) {
+    const n = [];
+    if (J.hmAt === 5) n.push('本命星入中宫，旧说「八方塞」，这段时间大的迁动宜缓');
+    if (J.gmAt === 5) n.push('月命星入中宫');
+    h += `<br>${n.length ? n.join('；') + '。' : ''}中宫不论方位吉凶。`;
+  } else if (c.marks.length) h += '<br>' + c.marks.map(m => `<span class="bad">${m}</span>：${JX.MARK[m].d}`).join('；') + '。';
+  else if (c.best) h += '<br><span class="best">本命、月命都吉，又无凶方 → 最大吉方</span>';
+  else if (c.ji) h += `<br><span class="good">与本命相生比和、无凶方 → 吉方</span>${P && !c.jiG ? '（与月命不合，所以不算最大吉）' : ''}`;
+  else if (P) h += '<br>没有凶方，但这颗星与本命相克，不取。';
+  else h += '<br>没有凶方。填出生日期后，可看这一方对你吉不吉。';
+  return h;
+}
+function boardHTML(J) {
+  const B = J.board, isY = B.kind === 'year', P = J.person, sp = JX.span(B.from, B.to);
+  const when = !sp ? '' : isY ? `立春 ${sp.a.y}/${sp.a.m}/${sp.a.d} 起` : `${B.from.n} ${sp.text}`;
+  const legend = P
+    ? '<span class="ji"><i></i>吉方</span><span class="best"><i></i>最大吉方</span><span class="xiong"><i></i>凶方</span><span>上南下北 · 左东右西</span>'
+    : '<span class="xiong"><i></i>凶方</span><span>上南下北 · 左东右西 · 填生日后显示吉方</span>';
+  const yun = P
+    ? `<h3>${isY ? '年运' : '月运'}<em>${J.phase.k}</em><small>本命${S[P.honmei].n}在${where(J.hmAt)}</small></h3><p>${J.phase.d}</p>`
+    : `<h3>${isY ? '年运' : '月运'}</h3><p class="fb-fine">填出生日期后，这里说你${isY ? '这一年' : '这个月'}的运程（看本命星飞到哪一宫）。</p>`;
+  return `<div class="jx-bhead"><h2>${isY ? '年盘' : '月盘'}<small>${isY ? B.gz + '年' : B.name + ' · ' + B.gz}</small></h2><p>${S[B.center].n}入中 · ${when}</p></div>
+    <div class="jx-grid" role="group" aria-label="${isY ? '年盘' : '月盘'}九宫，上南下北">${JX.SOUTH_UP.map(p => cellHTML(J, p)).join('')}</div>
+    <div class="jx-legend">${legend}</div>
+    <div class="jx-detail" aria-live="polite">${detailHTML(J, sel)}</div>
+    <div class="jx-yun">${yun}</div>`;
+}
+function renderBoards() {
+  $('yearCard').innerHTML = boardHTML(cur.L.jy);
+  $('monthCard').innerHTML = boardHTML(cur.L.jm);
+}
+['yearCard', 'monthCard'].forEach(id => {
+  const el = $(id);
+  const hit = (c, refocus) => {
+    const p = +c.dataset.p; sel = sel === p ? null : p; renderBoards();
+    if (refocus) { const a = el.querySelector(`[data-p="${p}"]`); if (a) a.focus(); }
+  };
+  el.addEventListener('click', e => { const c = e.target.closest('.jx-cell'); if (c) hit(c, false); });
+  el.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const c = e.target.closest('.jx-cell'); if (!c) return;
+    e.preventDefault(); hit(c, true);
+  });
+});
+
+/* ================ 本命星、月命星、九星一览 ================ */
+function cardsHTML(N) {
+  if (!N) return '';
+  const card = (role, s, meta, use) => {
+    const st = S[s];
+    return `<article class="fb-card jx-ncard" data-wx="${st.wx}">
+      <div class="num" aria-hidden="true">${CN[s]}</div>
+      <h3>${role}<b>${st.full}</b><small>${st.wx} · ${st.xiang}</small></h3>
+      <p class="meta">${meta}<br>${use}</p>
+      <p class="sk">${st.sketch}</p>
+      <p class="js">吉星：${JX.jiStars(s).map(x => S[x].n).join('、')}${s === 5 ? '（按土论）' : ''}</p>
+    </article>`;
+  };
+  return card('本命星', N.honmei, `${N.Y} ${N.gz}年生 · ${N.lichun.n} ${JX.fmtT(N.lichun.t, N.tz, true)} 之后`, '看一生的大势与对外的样子，吉方以它为主。') +
+    card('月命星', N.getsumei, `${N.month}生 · ${N.jie.n} ${JX.fmtT(N.jie.t, N.tz, true)} 之后`, '看内在性情，也常用来看少年时；与本命同吉之方即最大吉方。');
+}
+function allHTML(N) {
+  return S.slice(1).map((st, i) => {
+    const s = i + 1, me = N && N.honmei === s, mo = N && N.getsumei === s;
+    return `<div data-wx="${st.wx}"${me ? ' class="me"' : ''}><h4>${st.full}<i>${st.wx}</i>${me ? '<em>本命</em>' : ''}${mo ? '<em>月命</em>' : ''}</h4>
+      <p class="yrs">${JX.yearsOf(s, 1941, 2030).join(' · ')}</p><p>${st.sketch}</p></div>`;
+  }).join('');
+}
+
+/* ================ 起盘 ================ */
+function render() {
+  let info = JX.forDate(target.y, target.m, target.d);
+  if (!info) { F.toast('日期超出可排范围（1900–2100）'); target = today(); info = JX.forDate(target.y, target.m, target.d); }
+  if (pick && !whoNow() && pick !== 'other') pick = defaultPick();
+  const W = whoNow(), N = W ? JX.natal(W.when, { tz: W.tz, dst: W.dst }) : null;
+  if (W && !N) F.toast('这个生日超出可排范围（1900–2100）');
+  const person = N ? { honmei: N.honmei, getsumei: N.getsumei } : null;
+  const t0 = today(), now = JX.forDate(t0.y, t0.m, t0.d);
+  const L = JX.lines(info, person, { now, wrap: (k, t) => `<b class="${k}">${t}</b>` });
+  cur = { W: N ? W : null, N, info, L, Lt: JX.lines(info, person, { now }) };
+
+  $('dateIn').value = ymd(target);
+  const ms = JX.span(info.month.from, info.month.to);
+  $('spanOut').textContent = `${info.year.gz}年 · ${info.month.name}${ms ? ' ' + ms.text : ''}`;
+  $('todayBtn').disabled = ymd(target) === ymd(t0);
+  $('todayBtn').style.visibility = $('todayBtn').disabled ? 'hidden' : '';
+  syncWho(N);
+  renderNatal(cur.W, N);
+  renderSum(L);
+  renderBoards();
+  $('cardsBox').innerHTML = cardsHTML(N);
+  $('allGrid').innerHTML = allHTML(N);
+}
+function step(dir) {
+  const n = JX.stepMonth(target.y, target.m, target.d, dir);
+  if (!n || n.y < 1900 || n.y > 2100 || !JX.forDate(n.y, n.m, n.d)) { F.toast('超出可排范围（1900–2100）'); return; }
+  target = n; render();
+}
+
+/* ================ 复制 · 问 AI ================ */
+function summaryText() {
+  const { W, N, info, Lt } = cur, out = [];
+  out.push('九星气学' + (N ? ` · ${W.k === 'other' ? '' : W.name + '，'}${W.when.replace('T', ' ')} 生` : ' · 未填生日（只看人人皆忌的方位）'));
+  if (N) out.push(`本命星 ${S[N.honmei].full}（${S[N.honmei].wx}）· 月命星 ${S[N.getsumei].full}（${S[N.getsumei].wx}）· ${N.gz}年${N.month}生`);
+  const ms = JX.span(info.month.from, info.month.to);
+  out.push(`所看日期 ${ymd(target)}：${info.year.gz}年（${S[info.year.center].n}入中）· ${info.month.name}（${S[info.month.center].n}入中${ms ? '，' + ms.text : ''}）`);
+  out.push('');
+  [Lt.month, Lt.year, Lt.move].forEach(x => out.push(JX.lineText(x)));
+  if (N) {
+    out.push(`年运：本命星在${where(Lt.jy.hmAt)}，${Lt.jy.phase.k}。${Lt.jy.phase.d}`);
+    out.push(`月运：本命星在${where(Lt.jm.hmAt)}，${Lt.jm.phase.k}。${Lt.jm.phase.d}`);
+  }
+  out.push('');
+  out.push(`年盘（上南下北）：${JX.boardText(info.year)}`);
+  out.push(`月盘（上南下北）：${JX.boardText(info.month)}`);
+  return out.join('\n');
+}
+$('copyBtn').onclick = () => F.copy(summaryText(), '摘要已复制');
+$('aiBtn').onclick = () => F.askAI('九星气学', summaryText(), RULES_TEXT);
+
+/* ================ 绑定 ================ */
+$('dateIn').addEventListener('change', () => { const d = parseYMD($('dateIn').value); if (d) { target = d; render(); } });
+$('prevBtn').onclick = () => step(-1);
+$('nextBtn').onclick = () => step(1);
+$('todayBtn').onclick = () => { target = today(); render(); };
+// 别的分页改了共享生辰或人名单：跟着换
+window.addEventListener('storage', e => {
+  if (e.key && e.key.indexOf('mingbu.') === 0) { pick = defaultPick(); renderWho(); render(); }
+});
+$('rulesList').innerHTML = RULES.map(r => `<li><b>${r[0]}</b>${r[1]}</li>`).join('');
+
+// 网址可带 ?d=出行日 &b=出生（YYYY-MM-DD 或 YYYY-MM-DDTHH:MM）
+const Q = new URLSearchParams(location.search);
+const qd = parseYMD(Q.get('d')); if (qd) target = qd;
+const qb = /^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2}))?$/.exec(Q.get('b') || '');
+pick = defaultPick();
+if (qb) { view.other = qb[1]; view.otherT = qb[2] || ''; pick = 'other'; }
+renderWho();
+render();
+$('allBox').open = !cur.N;
+})();
+</script>
+</body>
+</html>
