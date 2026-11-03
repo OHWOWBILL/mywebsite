@@ -92,6 +92,15 @@
     refreshMingbuLinks();
     renderPeople();
   }
+  // 整份替换共享生辰（不与上一个人的经纬度、城市混在一起）；合盘「对调」之类用
+  function replaceBirth(b) {
+    const nb = {};
+    Object.keys(b || {}).forEach(k => { if (b[k] !== undefined && b[k] !== null && b[k] !== '') nb[k] = b[k]; });
+    delete nb.id;
+    lsSet(LS_BIRTH, JSON.stringify(nb));
+    refreshMingbuLinks();
+    renderPeople();
+  }
   const pad2 = n => String(n).padStart(2, '0');
   function minusHour(when) {
     const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(when || '');
@@ -336,8 +345,8 @@ ${body}${rules ? '\n\n【口径】\n' + rules : ''}`;
 
   window.Fabao = {
     GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy, askAI, FAMILIES,
-    birth: { save: saveBirth, load: loadBirth, query: birthQuery, minusHour, yearOf: birthYearOf },
-    people: { list: loadPeople, add: addPerson, remove: removePerson, use: usePerson, current: currentPerson, key: personKey }
+    birth: { save: saveBirth, replace: replaceBirth, load: loadBirth, query: birthQuery, minusHour, yearOf: birthYearOf },
+    people: { list: loadPeople, add: addPerson, remove: removePerson, use: usePerson, current: currentPerson, key: personKey, refresh: () => { refreshMingbuLinks(); renderPeople(); } }
   };
   mountShell();
 })();

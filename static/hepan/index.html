@@ -432,9 +432,9 @@ function onForm(f) {
 // 把某人整份写成命部当前的人：存过的人照存档整份替换，没存过的逐项写全
 function setShared(p) {
   const saved = people().find(x => keyOf(x) === keyOf(p) && +x.tz === +p.tz && Math.abs((+x.lon || 0) - (+p.lon || 0)) < 0.005);
-  if (saved) { F.people.use(saved.id); F.birth.save({}); return; }
+  if (saved) { F.people.use(saved.id); F.people.refresh(); return; }
   const pl = placeOf(p);
-  F.birth.save({ when: p.when, male: p.male !== false, name: p.name || '', tz: p.tz, lon: p.lon, lat: p.lat != null ? p.lat : pl ? pl.lat : null, sun: !!p.sun, dst: !!p.dst, city: pl ? pl.name : p.city || '' });
+  F.birth.replace({ when: p.when, male: p.male !== false, name: p.name || '', tz: p.tz, lon: p.lon, lat: p.lat != null ? p.lat : pl ? pl.lat : null, sun: !!p.sun, dst: !!p.dst, city: pl ? pl.name : p.city || '' });
 }
 function swap() {
   if (!A || !B) return;
@@ -478,7 +478,7 @@ function saveB() {
   if (!rec) return;
   B = Object.assign({}, rec, { pid: rec.id });
   store.set(LS_B, B);
-  if (A) F.birth.save({});                            // 让命部条上的人名跟着刷新
+  if (A) F.people.refresh();                          // 让命部条上的人名跟着刷新
   editB = false; update(true);
   F.toast(`已把「${rec.name}」存入命部，下次一点就合`);
 }
