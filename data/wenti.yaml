@@ -1,4 +1,4 @@
-# 「我想问…」：法宝库页与首页的问事入口（layouts/partials/qj-wenti.html）
+# 「我想问…」：首页与法宝库大堂的问事入口（layouts/partials/qj-wenti.html；大堂读构建时生成的 /fabao/wenti.js）
 # 每条一问：q 问句，a 去哪件法宝（小字），href 直达地址（可带题型、模式参数），seal 一字印，
 # home: true 的几条也摆在首页日课下面（首页只放常用的，其余在法宝库页）。
 # 顺序即显示顺序；阁主可随意增删改，推送即生效。

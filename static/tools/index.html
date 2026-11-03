@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>法宝库 · 潜蛟阁</title>
+  <meta name="description" content="潜蛟阁法宝库：阁主自制的术数工具，通书（黄历 · 择日 · 流年）、梅花、六爻、奇门、命部（八字 · 紫微 · 占星 · 合盘）、十二长生、子午流注、五运六气、堪舆（玄空 · 九星）、相部，打开即用。" />
+  <meta property="og:title" content="法宝库 · 潜蛟阁" />
+  <meta property="og:description" content="阁主自制的术数工具，按山医命卜相分门，打开即用。" />
+  <link rel="canonical" href="https://ohwowbill.com/tools/" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
+  <style>
+    /* 法宝库大堂：一屏小牌，按五门分行；牌子由 /fabao/fabao.js 的 TOOLS 现排（与顶栏同一份名单） */
+    .ku-now { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 4px; color: var(--muted); font-size: 14px; letter-spacing: .12em; margin: -6px 0 22px; }
+    .ku-now span { color: var(--faint); margin-right: 6px; }
+    .ku-now b { font-family: var(--font-title); font-weight: 600; color: var(--fg); font-size: 16px; }
+    .ku-again { margin-left: auto; color: var(--jin); text-decoration: none; font-family: var(--font-title); letter-spacing: .15em; padding: 6px 14px; border: 1px solid rgba(217,174,78,.4); border-radius: 999px; }
+    .ku-again:hover { background: rgba(217,174,78,.1); }
+
+    /* 我想问：一排问句，点了直达（名单在 data/wenti.yaml） */
+    .ku-ask { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: -8px 0 22px; }
+    .ku-ask-h { font-family: var(--font-title); font-size: 13px; color: var(--faint); letter-spacing: .2em; margin-right: 4px; }
+    .ku-ask a { font-size: 13.5px; color: var(--fg-2); text-decoration: none; padding: 5px 12px; border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-2); white-space: nowrap; transition: border-color .2s, color .2s; }
+    .ku-ask a:hover { color: var(--fg); border-color: var(--zi-2); }
+    .ku-ask-more { font-size: 13px; color: var(--zi-2); padding: 5px 10px; font-family: var(--font-title); letter-spacing: .1em; }
+    .ku-ask-more:hover { color: var(--fg); }
+
+    .ku-men { display: flex; flex-direction: column; gap: 14px; }
+    .ku-row { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; }
+    .ku-seal {
+      width: 40px; height: 40px; margin-top: 8px; display: grid; place-items: center; text-decoration: none;
+      font-family: var(--font-title); font-weight: 900; font-size: 19px; color: var(--zi-2);
+      border: 1px solid var(--rule-2); border-radius: 6px; transition: color .2s, border-color .2s;
+    }
+    .ku-seal:hover { color: var(--fg); border-color: var(--zi-2); }
+    .ku-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+    .ku-tile {
+      display: grid; grid-template-columns: 34px 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 2px; align-items: center;
+      padding: 13px 16px; text-decoration: none; color: var(--fg);
+      background: var(--bg-2); border: 1px solid var(--rule); border-radius: var(--r-lg);
+      transition: border-color .2s, transform .2s, background .2s;
+    }
+    .ku-tile:hover { border-color: var(--zi-2); background: var(--bg-3); transform: translateY(-1px); }
+    .ku-ico { grid-row: 1 / 3; width: 34px; height: 34px; display: grid; place-items: center; color: var(--zi-2); background: var(--bg-3); border-radius: 8px; }
+    .ku-ico svg { width: 20px; height: 20px; }
+    .ku-t { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .12em; display: inline-flex; align-items: center; gap: 8px; }
+    .ku-t i { font-style: normal; font-weight: 400; font-size: 10px; line-height: 16px; padding: 0 5px; border-radius: 3px; background: rgba(224,122,98,.2); color: var(--zhu); letter-spacing: 0; }
+    .ku-s { font-size: 12.5px; color: var(--muted); letter-spacing: .05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .ku-else { margin-top: 26px; font-size: 13px; color: var(--faint); letter-spacing: .1em; line-height: 2; }
+    .ku-else a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--rule-2); }
+    .ku-else a:hover { color: var(--fg); }
+
+    @media (max-width: 560px) {
+      .ku-row { grid-template-columns: 1fr; gap: 8px; }
+      .ku-seal { display: inline-flex; align-items: baseline; width: auto; height: auto; margin: 0; border: 0; font-size: 15px; letter-spacing: .3em; justify-self: start; }
+      .ku-seal::after { content: "门"; font-weight: 400; font-size: 13px; color: var(--faint); }
+      .ku-tiles { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .ku-tile { grid-template-columns: 26px 1fr; column-gap: 8px; padding: 11px 12px; row-gap: 4px; }
+      .ku-ico { grid-row: 1; width: 26px; height: 26px; background: none; }
+      .ku-ico svg { width: 18px; height: 18px; }
+      .ku-t { font-size: 15px; letter-spacing: .06em; }
+      .ku-s { grid-column: 1 / 3; font-size: 12px; }
+      .ku-s { white-space: normal; }
+      .ku-again { margin-left: 0; }
+      .ku-ask { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; }
+      .ku-ask::-webkit-scrollbar { display: none; }
+    }
+  </style>
+</head>
+<body data-tool="ku">
+
+<main class="fb-main">
+  <div class="fb-head">
+    <div class="fb-seal">术</div>
+    <div>
+      <h1 class="fb-title">法宝库 <span class="en">TOOLS</span></h1>
+      <div class="fb-sub">阁主自制之器，随手取用，不必言谢</div>
+    </div>
+  </div>
+
+  <div id="fbKu">
+    <noscript><p class="fb-empty">法宝要开脚本才能用。<br>顶栏各件：<a href="/huangli/">通书</a> · <a href="/meihua/">梅花</a> · <a href="/liuyao/">六爻</a> · <a href="/qimen/">奇门</a> · <a href="/bazi/">命部</a> · <a href="/changsheng/">长生</a> · <a href="/ziwu/">流注</a> · <a href="/yunqi/">运气</a> · <a href="/kanyu/">堪舆</a> · <a href="/xiangbu/">相部</a></p></noscript>
+  </div>
+
+  <p class="ku-else">
+    另藏一件：<a href="/yanzhi/">閩吳淮泰谚文 · 私人音位字母表</a><br>
+    门印可点，看那一门的文章；全部按术分门，见 <a href="/wushu/">五术门庭</a>。
+  </p>
+</main>
+
+<script src="/fabao/wenti.js"></script>
+<script src="/fabao/fabao.js?v=13"></script>
+</body>
+</html>

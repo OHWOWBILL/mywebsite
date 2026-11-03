@@ -28,17 +28,18 @@
     jiuxing: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.5"/><circle cx="12" cy="6" r="1.5"/><circle cx="18" cy="6" r="1.5"/><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="2.6"/><circle cx="18" cy="12" r="1.5"/><circle cx="6" cy="18" r="1.5"/><circle cx="12" cy="18" r="1.5"/><circle cx="18" cy="18" r="1.5"/></svg>',
     hepan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="5.6"/><circle cx="15" cy="12" r="5.6"/></svg>'
   };
+  // men = 归哪一门（五术门庭 data/wushu.toml）；desc = 法宝库大堂（/tools/）上那一行，短到一眼看完即可
   const TOOLS = [
-    { id: 'tongshu', name: '通书', href: '/huangli/' },  // 黄历、择日、流年三件在通书里切换
-    { id: 'meihua', name: '梅花', href: '/meihua/' },
-    { id: 'liuyao', name: '六爻纳甲', short: '六爻', href: '/liuyao/' },
-    { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/' },
-    { id: 'mingbu', name: '命部', href: '/bazi/' },     // 星命同参：八字、紫微、占星、合盘、读盘都在命部里切换
-    { id: 'kanyu', name: '堪舆', href: '/kanyu/' },     // 玄空八宅、九星气学
-    { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/' },
-    { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/' },
-    { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/' },
-    { id: 'xiangbu', name: '相部', href: '/xiangbu/' }  // 口令加密页，未解禁时为锁屏
+    { id: 'tongshu', name: '通书', href: '/huangli/', men: '卜', desc: '黄历、择日、流年' },  // 黄历、择日、流年三件在通书里切换
+    { id: 'meihua', name: '梅花', href: '/meihua/', men: '卜', desc: '此刻起卦，本互变并排' },
+    { id: 'liuyao', name: '六爻纳甲', short: '六爻', href: '/liuyao/', men: '卜', desc: '摇卦装卦，旺衰逐爻标' },
+    { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/', men: '卜', desc: '起局看断语，回头复盘' },
+    { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字 · 紫微 · 占星 · 合盘' },     // 星命同参：八字、紫微、占星、合盘、读盘都在命部里切换
+    { id: 'kanyu', name: '堪舆', href: '/kanyu/', men: '山', desc: '玄空飞星、八宅、九星气学' },     // 玄空八宅、九星气学
+    { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/', men: '命', desc: '干支旺衰速查' },
+    { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/', men: '医', desc: '按时开穴，四法并排' },
+    { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/', men: '医', desc: '岁运、司天在泉、六步' },
+    { id: 'xiangbu', name: '相部', href: '/xiangbu/', men: '相', lock: true, desc: '相法读书卡与字相九宫' }  // 口令加密页，未解禁时为锁屏
   ];
 
   // —— 一家：顶栏一个标签，进来后在家族条里切换 ——
@@ -71,7 +72,7 @@
     }
   };
   const MINGBU = FAMILIES.mingbu.items;
-  const LS_BIRTH = 'mingbu.birth.v1', LS_PEOPLE = 'mingbu.people.v1';
+  const LS_BIRTH = 'mingbu.birth.v1', LS_PEOPLE = 'mingbu.people.v1', LS_KU_LAST = 'fabao.last';
   const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* 无痕模式 */ } };
   const famOf = id => { for (const k in FAMILIES) { const it = FAMILIES[k].items.find(t => t.id === id); if (it) return { key: k, fam: FAMILIES[k], item: it }; } return null; };
@@ -209,12 +210,15 @@
     const cur = curTool = document.body.dataset.tool;
     const F = famOf(cur);
     const curTab = F ? F.key : cur;
+    const isKu = cur === 'ku';   // 法宝库大堂 /tools/：顶栏照旧，正文由 mountKu 现排
+    // 记下上回用的是哪一件（一家记家名），大堂上给「接着用」；锁屏页不算
+    if (!isKu && TOOLS.some(t => t.id === curTab) && !document.querySelector('.lock-wrap')) lsSet(LS_KU_LAST, curTab);
     // 记下这一家上次用的是哪件；锁屏页（.lock-wrap）不记，免得访客每次点进来都落到锁屏
     if (F && !(F.item.lock && document.querySelector('.lock-wrap'))) lsSet(F.fam.lsLast, F.item.id);
     const top = document.createElement('header');
     top.className = 'fb-top';
     top.innerHTML = `
-      <a class="fb-back" href="/tools/" title="回法宝库">
+      <a class="fb-back" href="${isKu ? '/' : '/tools/'}" title="${isKu ? '回潜蛟阁' : '回法宝库'}">
         <span class="mark">ohwowbill</span><span class="ge">潜蛟阁</span><span class="ku">法宝库</span>
       </a>
       <nav class="fb-tabs" aria-label="法宝">
@@ -343,10 +347,44 @@ ${body}${rules ? '\n\n【口径】\n' + rules : ''}`;
     (window.Fabao && window.Fabao.copy || copy)(text, '已复制，贴给任意 AI 即可');   // 走 Fabao.copy，测试时可替换
   }
 
+  // —— 法宝库大堂（/tools/，body data-tool="ku"）——
+  // 不逐件写说明：按五门排成一屏小牌，一件一行字，点了就进；上回用过的放最前「接着用」；
+  // 另有一排「我想问」（名单在 data/wenti.yaml，构建时出成 /fabao/wenti.js 的 window.QJ_WENTI）。
+  const MEN = [['山', '堪舆'], ['医', '方脉针灸'], ['命', '推命'], ['卜', '占断'], ['相', '观形']];
+  function mountKu() {
+    const box = document.getElementById('fbKu');
+    if (!box) return;
+    const href = t => FAMILIES[t.id] ? famHref(t.id, lsGet(FAMILIES[t.id].lsLast) || FAMILIES[t.id].items[0].id) : t.href;
+    const tile = t => `
+      <a class="ku-tile${t.lock ? ' is-lock' : ''}" href="${href(t)}">
+        <span class="ku-ico">${ICONS[t.id]}</span>
+        <span class="ku-t">${t.name}${t.lock ? '<i title="此宝被阁主下了禁制，持诀者可开">禁</i>' : ''}</span>
+        <span class="ku-s">${t.desc || ''}</span>
+      </a>`;
+    const last = TOOLS.find(t => t.id === lsGet(LS_KU_LAST));
+    const dh = dayHour(new Date());
+    const ask = Array.isArray(window.QJ_WENTI) ? window.QJ_WENTI : [];
+    box.innerHTML = `
+      <p class="ku-now"><span>此刻</span><b>${dh.day.name}</b>日<b>${dh.hour.name}</b>时${last ? `
+        <a class="ku-again" href="${href(last)}">接着用 · ${last.name} →</a>` : ''}</p>
+      ${ask.length ? `<nav class="ku-ask" aria-label="我想问"><span class="ku-ask-h">我想问</span>${ask.map(a => `<a href="${a.href}" title="${a.a || ''}"${a.home ? '' : ' class="more" hidden'}>${a.q}</a>`).join('')}${ask.some(a => !a.home) ? '<button type="button" class="ku-ask-more">更多 ▾</button>' : ''}</nav>` : ''}
+      <div class="ku-men">${MEN.map(([seal, name]) => {
+        const ts = TOOLS.filter(t => t.men === seal);
+        return ts.length ? `
+        <section class="ku-row" aria-label="${seal}门 · ${name}">
+          <a class="ku-seal" href="/wushu/#men-${encodeURIComponent(seal)}" title="${seal}门 · ${name}：此门文章">${seal}</a>
+          <div class="ku-tiles">${ts.map(tile).join('')}</div>
+        </section>` : '';
+      }).join('')}</div>`;
+    const more = box.querySelector('.ku-ask-more');
+    if (more) more.onclick = () => { box.querySelectorAll('.ku-ask a.more').forEach(a => { a.hidden = false; }); more.remove(); };
+  }
+
   window.Fabao = {
     GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy, askAI, FAMILIES,
     birth: { save: saveBirth, replace: replaceBirth, load: loadBirth, query: birthQuery, minusHour, yearOf: birthYearOf },
     people: { list: loadPeople, add: addPerson, remove: removePerson, use: usePerson, current: currentPerson, key: personKey, refresh: () => { refreshMingbuLinks(); renderPeople(); } }
   };
   mountShell();
+  if (document.body.dataset.tool === 'ku') mountKu();
 })();

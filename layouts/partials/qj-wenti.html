@@ -1,9 +1,12 @@
 {{- /* ===========================================================
      我想问…：按问题直达法宝（数据见 data/wenti.yaml）
-     用法：partial "qj-wenti.html" (dict "home" true) 只出首页那几条，另加「更多问法」；
-           不带参数（法宝库页的 {{< wenti >}}）出全部。
+     用法：partial "qj-wenti.html" (dict "home" true) 只出首页那几条，另加「更多问法」（去法宝库大堂）；
+           (dict "home" false) 出全部。顺带把名单出成 /fabao/wenti.js，大堂（static/tools/index.html）读它。
      =========================================================== */ -}}
 {{- $home := and . (index . "home") -}}
+{{- /* 同一份名单另出一个脚本给法宝库大堂（/tools/ 是静态页，读不到 data）：window.QJ_WENTI */ -}}
+{{- $wj := printf "/* 由 layouts/partials/qj-wenti.html 依 data/wenti.yaml 生成，勿手改 */\nwindow.QJ_WENTI = %s;\n" (jsonify site.Data.wenti.ask) | resources.FromString "fabao/wenti.js" -}}
+{{- $wj.Publish -}}
 <section class="qj-block qj-wenti" id="wenti" aria-label="我想问">
   <h2 class="qj-block-h"><span class="qj-seal" aria-hidden="true">问</span>我想问…<span class="qj-wenti-note">点一下就到，不用先懂是哪门术</span></h2>
   <div class="qj-wenti-grid">
@@ -15,7 +18,7 @@
     </a>
     {{- end }}{{ end }}
     {{- if $home }}
-    <a class="qj-wenti-a qj-wenti-more" href="{{ "tools/#wenti" | relURL }}">
+    <a class="qj-wenti-a qj-wenti-more" href="{{ "tools/" | relURL }}">
       <span class="qj-wenti-s" aria-hidden="true">…</span>
       <span class="qj-wenti-q">更多问法</span>
       <span class="qj-wenti-d">法宝库里按问题找</span>
