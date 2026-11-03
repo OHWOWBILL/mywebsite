@@ -143,6 +143,34 @@ eq([N.asc, N.wx.reduce((s, x) => s + x, 0), N.C.clock.h], [null, 6, 12], '时辰
 const RN = HP.compare(P1, N);
 eq([RN.aspects.some(x => x.a === 'asc' || x.b === 'asc'), RN.aspects.filter(x => x.b === 'moon').every(x => x.approx)], [false, true], '时辰不详：一方无上升则两边都不排；月亮相位标「约」');
 eq(HP.person({ when: '1899-05-01T12:00', tz: 8 }).error, '只合 1900–2100 年', '超出年限给出提示');
+// —— 随机两千对：文字里不漏 undefined / NaN，计数自洽，相位两向对称，每种判语都出现过 ——
+const CITY = require('../../static/fabao/cities.js').LIST;
+let seed = 20261103;
+const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+const randBirth = () => {
+  const t = Date.UTC(1901, 0, 1) + Math.floor(rnd() * (Date.UTC(2099, 11, 1) - Date.UTC(1901, 0, 1)));
+  const c = CITY[Math.floor(rnd() * CITY.length)], f = new Date(t + c[3] * 3600e3), p = x => String(x).padStart(2, '0');
+  return { b: { when: `${f.getUTCFullYear()}-${p(f.getUTCMonth() + 1)}-${p(f.getUTCDate())}T${p(f.getUTCHours())}:${p(f.getUTCMinutes())}`, male: rnd() < 0.5, name: '某' + Math.floor(rnd() * 100), tz: c[3], lon: c[1], lat: c[2] }, noTime: rnd() < 0.15 };
+};
+const seenWords = {}, fuzzBad = [];
+for (let k = 0; k < 2000; k++) {
+  const x = randBirth(), y = randBirth();
+  const PX = HP.person(x.b, { noTime: x.noTime, name: '甲' }), PY = HP.person(y.b, { noTime: y.noTime, name: '乙' });
+  const RR = HP.compare(PX, PY), s = HP.toText(RR) + RR.verdict.text;
+  RR.rows.forEach(r => { seenWords[r.label + r.word] = 1; });
+  const why = /undefined|NaN|null|\[object/.test(s) ? '文字有空值' :
+    RR.tally.good + RR.tally.bad + RR.tally.mid !== 6 + RR.keys.length ? '计数不合' :
+    !/——/.test(RR.verdict.text) ? '总评无结论' :
+    RR.aspects.some(a => a.orb > a.type.orb + 1e-9) ? '超出容许度' :
+    HP.cross(PY, PX).length !== RR.aspects.length ? '相位两向不对称' :
+    (x.noTime || y.noTime) && RR.aspects.some(a => a.a === 'asc' || a.b === 'asc') ? '时辰不详却排了上升' : '';
+  if (why) { fuzzBad.push(why + ' ' + x.b.when + ' / ' + y.b.when); if (fuzzBad.length > 3) break; }
+}
+eq(fuzzBad, [], '随机两千对：文字无空值、计数自洽、相位不超容许、两向对称');
+const WANT = ['生肖六合', '生肖三合', '生肖六冲', '生肖相刑', '生肖自刑', '生肖相害', '生肖相破', '生肖同属', '生肖无',
+  '日干五合', '日干相冲', '日干同干', '日干比和', '日干相生', '日干相克', '日支六合', '日支三合', '日支六冲', '日支相刑', '日支自刑', '日支相害', '日支相破', '日支同属', '日支无',
+  '纳音相生', '纳音比和', '纳音相克', '五行互补', '五行单补', '五行同缺', '五行同旺', '五行不补', '命卦同组', '命卦异组'];
+eq(WANT.filter(w => !seenWords[w]), [], '每种判语在随机样本里都出现过（' + WANT.length + ' 种）');
 // 不随本机时区：换到纽约时区再算一遍，结果全同
 const txt = HP.toText(R, ['东京', '大阪']);
 process.env.TZ = 'America/New_York';
