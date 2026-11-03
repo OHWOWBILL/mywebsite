@@ -303,6 +303,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
       <div class="fb-row">
         <button type="button" class="fb-btn grow" id="copyPan">复制盘面</button>
         <button type="button" class="fb-btn grow" id="copyLink">此盘链接</button>
+        <button type="button" class="fb-btn grow" id="askAI" title="把盘面、题型断语和口径打包复制，贴给任意 AI">问 AI</button>
       </div>
       <div class="override" id="overrideRow">
         <select id="ovDun" aria-label="阴阳遁"><option value="yang">阳遁</option><option value="yin">阴遁</option></select>
@@ -852,6 +853,17 @@ function panText(c){
   return L.join('\n');
 }
 $('copyPan').onclick=()=>{ if(cur) Fabao.copy(panText(cur),'盘面已复制'); };
+$('askAI').onclick=()=>{
+  if(!cur) return;
+  let body=panText(cur);
+  if(curType!=='天气'){
+    const v=QM.verdict(cur,curType);
+    body+=`\n\n题型：${curType==='考试'?'考试·面谈':curType}（本站白话断语：${v.grade}，${v.score}）\n`+v.lines.map(l=>'· '+l.text).join('\n');
+  }
+  const q=($('fQ')&&$('fQ').value.trim())||'';
+  if(q) body='所问：'+q+'\n\n'+body;
+  Fabao.askAI('时家奇门遁甲', body, '时家转盘，拆补定局；隐干按地盘干随八门同转；入墓按十二长生阳顺阴逆（乙丙戊墓乾，丁己庚墓艮，辛壬墓巽，癸墓坤）；击刑：戊震、己坤、庚艮、辛离、壬巽、癸巽；门迫为门克宫。用神按题型取，看与日干宫的生克、空亡、入墓、击刑、门迫与格局。');
+};
 $('copyLink').onclick=()=>{
   const u=new URL(location.href); u.search=''; u.hash='';
   u.searchParams.set('t',Fabao.toLocalInput(curDate));

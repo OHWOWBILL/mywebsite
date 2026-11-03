@@ -331,7 +331,7 @@
 盘里没有的信息别编；拿不准就直说。
 
 ${body}${rules ? '\n\n【口径】\n' + rules : ''}`;
-    copy(text, '已复制，贴给任意 AI 即可');
+    (window.Fabao && window.Fabao.copy || copy)(text, '已复制，贴给任意 AI 即可');   // 走 Fabao.copy，测试时可替换
   }
 
   window.Fabao = {
