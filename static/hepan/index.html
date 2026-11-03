@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=5">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
   <style>
     :root { --glyph: "Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", "Symbola", serif; }
     .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
@@ -53,7 +53,7 @@
     .hp-f { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
     .hp-f > small { font-family: var(--font-title); font-size: 11.5px; color: var(--faint); letter-spacing: .12em; white-space: nowrap; }
     .hp-form input[type=date] { width: 10.6em; }
-    .hp-form input[type=time] { width: 7.4em; }
+    .hp-form input[type=time] { width: 8.8em; }
     .hp-form input[type=text] { width: 8.5em; }
     .hp-form select { max-width: 11em; }
     .hp-form .fb-seg button { padding: 7px 14px; }
@@ -66,10 +66,13 @@
     .hp-form-foot .fb-btn { padding: 6px 14px; font-size: 13px; }
 
     /* —— 总评 —— */
-    .hp-verdict { padding: 18px 24px 16px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px; animation: fbIn .35s ease both; }
-    .hp-vhead { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; }
+    /* 宽屏：按钮在右上；手机：按钮落到最后，金句紧跟标题 */
+    .hp-verdict { padding: 18px 24px 16px; margin-bottom: 18px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 18px; align-items: center; animation: fbIn .35s ease both; }
+    .hp-verdict > * { grid-column: 1 / -1; }
+    .hp-verdict > .hp-vhead { grid-column: 1; grid-row: 1; }
+    .hp-verdict > .acts { grid-column: 2; grid-row: 1; display: flex; gap: 8px; }
+    .hp-vhead { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; min-width: 0; }
     .hp-vhead .who { font-family: var(--font-title); font-size: 15px; letter-spacing: .15em; color: var(--fg-2); overflow-wrap: anywhere; }
-    .hp-vhead .acts { margin-left: auto; display: flex; gap: 8px; }
     .hp-verdict .fb-key { font-size: 21px; line-height: 1.6; }
     .hp-tally { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
     .hp-tally .n { display: inline-flex; align-items: baseline; gap: 7px; padding: 2px 13px 3px; border-radius: 999px; background: var(--bg-3); font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; color: var(--muted); }
@@ -142,16 +145,24 @@
       .hp-grid { grid-template-columns: minmax(0, 1fr); }
     }
     @media (max-width: 860px) {
-      .fb-now.hp-pair { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-      .hp-swap { justify-self: center; width: 38px; height: 38px; }
-      .hp-swap svg { transform: rotate(90deg); }
+      .fb-now.hp-pair { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+      .hp-swap { justify-self: center; width: 34px; height: 34px; margin: -8px 0; }
+      .hp-swap svg { width: 17px; height: 17px; transform: rotate(90deg); }
+      /* 手机上两张卡收紧些，好让总评露在第一屏 */
+      .hp-p { gap: 8px; }
+      .hp-name b { font-size: 19px; }
+      .hp-card { gap: 4px; }
+      .hp-card .fb-pillars { gap: 5px; }
+      .hp-card .fb-pillar { min-width: 0; padding: 3px 9px; }
+      .hp-card .fb-pillar small { display: none; }
+      .hp-card .fb-pillar b { font-size: 15px; }
       .hp-form { padding: 10px; }
       .hp-form .fb-row > .hp-f { flex: 1 1 8em; }
       .hp-form input[type=date], .hp-form input[type=time], .hp-form input[type=text], .hp-form select { width: 100%; max-width: none; }
-      .hp-verdict { padding: 16px 16px 14px; }
+      .hp-verdict { padding: 16px 16px 14px; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+      .hp-verdict > .acts { grid-column: 1; grid-row: auto; }
+      .hp-verdict > .acts .fb-btn { flex: 1; }
       .hp-verdict .fb-key { font-size: 17.5px; }
-      .hp-vhead .acts { margin-left: 0; flex-basis: 100%; }
-      .hp-vhead .acts .fb-btn { flex: 1; }
       .hp-sec { padding: 14px 14px 12px; }
       .hp-row { grid-template-columns: 2.4em minmax(0, 1fr) auto; gap: 3px 8px; }
       .hp-row .pair { font-size: 14.5px; letter-spacing: .04em; }
@@ -219,7 +230,7 @@
 'use strict';
 const $ = id => document.getElementById(id);
 const F = window.Fabao, HP = window.HP, XP = window.XP, BZ = window.BZ, QC = window.QJ_CITIES;
-const T = '︎';                                   // 符号按文字显示，不变彩色表情
+const T = '\uFE0E';                                   // 符号按文字显示，不变彩色表情
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const LS_B = 'hepan.b', LS_A = 'hepan.a', LS_NT = 'hepan.notime';
 const store = {
@@ -229,7 +240,8 @@ const store = {
 const valid = b => b && typeof b.when === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(b.when) ? b : null;
 const keyOf = b => F.people.key(b);
 // 时辰不详：按人（生辰 + 性别）记一张表，换到本人一边也跟着走
-const ntList = () => store.get(LS_NT, []);
+const ntList = () => { const l = store.get(LS_NT, []); return Array.isArray(l) ? l : []; };
+const people = () => F.people.list().filter(p => valid(p));        // 只认生辰齐全的存档
 const isNT = b => !!b && ntList().indexOf(keyOf(b)) >= 0;
 function setNT(b, on) { const k = keyOf(b), l = ntList().filter(x => x !== k); if (on) l.unshift(k); store.set(LS_NT, l.slice(0, 60)); }
 
@@ -266,7 +278,7 @@ let editA = false, editB = false, formNew = false, showAll = false;   // formNew
 // 与存过的某人同一生辰：就当是那个人（记下 pid，人名一排里亮起）
 function asSaved(b) {
   if (!b || b.pid) return b;
-  const p = F.people.list().find(x => keyOf(x) === keyOf(b));
+  const p = people().find(x => keyOf(x) === keyOf(b));
   return p ? Object.assign({}, p, { pid: p.id }) : b;
 }
 function labels() {
@@ -278,7 +290,7 @@ function loadState() {
   A = valid(F.birth.load());
   let b = valid(store.get(LS_B, null));
   if (b && b.pid) {
-    const p = F.people.list().find(x => x.id === b.pid);
+    const p = people().find(x => x.id === b.pid);
     if (p) b = Object.assign({}, p, { pid: p.id }); else delete b.pid;
   }
   // 对方刚在命部条上被点成了本人：上一回的本人换到对方这边
@@ -288,8 +300,8 @@ function loadState() {
   }
   B = asSaved(b);
   store.set(LS_B, B);
-  const others = F.people.list().filter(p => !A || keyOf(p) !== keyOf(A));
-  editA = !A && !F.people.list().length;
+  const others = people().filter(p => !A || keyOf(p) !== keyOf(A));
+  editA = !A && !people().length;
   editB = !B && !others.length;
 }
 
@@ -315,7 +327,7 @@ function cardHTML(b, P, role) {
   if (P.error) return `<p class="hp-err">${esc(P.error)}</p>`;
   const [na, nb] = labels(), name = role === 'A' ? na : nb;
   const w = b.when.replace('T', ' ');
-  const saved = role === 'B' && F.people.list().some(p => keyOf(p) === keyOf(b));
+  const saved = role === 'B' && people().some(p => keyOf(p) === keyOf(b));
   return `<div class="hp-card">
     <div class="hp-name"><b>${esc(name)}</b><span>${P.male ? '男' : '女'} · 属${P.sx} · ${SIGN(P.sunSign)}座</span></div>
     <div class="hp-when">${P.noTime ? w.slice(0, 10) + ' · 时辰不详' : w}${b.dst ? '（夏令时）' : ''} · ${esc(placeLabel(b))}${b.sun && !P.noTime ? '<span class="fb-tag">真太阳时</span>' : ''}</div>
@@ -345,13 +357,15 @@ function formHTML(role) {
   </form>`;
 }
 function chipsHTML(role) {
-  if (role === 'A') return A ? '' : `<button type="button" class="hp-chip add" data-act="manualA">${editA ? '收起' : '＋ 手填'}</button>`;
-  const list = F.people.list().filter(p => !A || keyOf(p) !== keyOf(A)), k = B ? keyOf(B) : '';
+  // 本人只在还没有时手填；一个人都没存过时表单常开，不给「收起」
+  if (role === 'A') return A || !people().length ? '' : `<button type="button" class="hp-chip add" data-act="manualA">${editA ? '收起' : '＋ 手填'}</button>`;
+  const list = people().filter(p => !A || keyOf(p) !== keyOf(A)), k = B ? keyOf(B) : '';
   const toggle = list.length || B ? `<button type="button" class="hp-chip add" data-act="manualB">${editB ? '收起' : '＋ 手填'}</button>` : '';
   return list.map(p => `<button type="button" class="hp-chip${keyOf(p) === k ? ' on' : ''}" data-pid="${esc(p.id)}" title="${esc(p.when.replace('T', ' '))}">${esc(p.name || '未名')}</button>`).join('') + toggle;
 }
 function headHTML(role) {
-  const hint = role === 'A' ? (A ? '命部当前 · 上方点人名可换' : F.people.list().length ? '点上方命部条里的人名即定本人，或' : '') : '';
+  const ppl = people();
+  const hint = role !== 'A' ? '' : A ? (ppl.some(p => keyOf(p) !== keyOf(A)) ? '命部当前 · 上方点人名可换' : '命部当前') : ppl.length ? '点上方命部条里的人名即定本人，或' : '';
   return `<span class="hp-role">${role === 'A' ? '本人' : '对方'}</span>${hint ? `<span class="hp-hint">${hint}</span>` : ''}<span class="hp-chips">${chipsHTML(role)}</span>`;
 }
 function renderSlot(role) {
@@ -417,7 +431,7 @@ function onForm(f) {
 
 // 把某人整份写成命部当前的人：存过的人照存档整份替换，没存过的逐项写全
 function setShared(p) {
-  const saved = F.people.list().find(x => keyOf(x) === keyOf(p) && +x.tz === +p.tz && Math.abs((+x.lon || 0) - (+p.lon || 0)) < 0.005);
+  const saved = people().find(x => keyOf(x) === keyOf(p) && +x.tz === +p.tz && Math.abs((+x.lon || 0) - (+p.lon || 0)) < 0.005);
   if (saved) { F.people.use(saved.id); F.birth.save({}); return; }
   const pl = placeOf(p);
   F.birth.save({ when: p.when, male: p.male !== false, name: p.name || '', tz: p.tz, lon: p.lon, lat: p.lat != null ? p.lat : pl ? pl.lat : null, sun: !!p.sun, dst: !!p.dst, city: pl ? pl.name : p.city || '' });
@@ -428,20 +442,28 @@ function swap() {
   delete oldB.pid;
   setShared(oldB);
   A = valid(F.birth.load());
-  const saved = F.people.list().find(p => keyOf(p) === keyOf(oldA));
+  const saved = people().find(p => keyOf(p) === keyOf(oldA));
   B = saved ? Object.assign({}, saved, { pid: saved.id }) : oldA;
   store.set(LS_B, B);
   editA = editB = false;
   update(true);
-  F.toast(`已互换：${labels()[0]}成为命部当前的人`);
+  F.toast(`已互换：${labels()[0]}成为命部当前的人${isNT(A) ? '（时辰不详，命部里先按正午记）' : ''}`);
 }
 function pickB(pid) {
-  const p = F.people.list().find(x => x.id === pid);
+  const p = people().find(x => x.id === pid);
   if (!p) return;
   B = Object.assign({}, p, { pid: p.id });
   store.set(LS_B, B);
   editB = false;
   update(true);
+  reveal();
+}
+// 一点就合：总评若在屏幕下半截以外（手机上常见），轻轻往上带一段，让金句露出来
+function reveal() {
+  const v = $('verdict'), top = v.getBoundingClientRect().top, vh = window.innerHeight;
+  if (top <= vh * 0.6) return;
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollBy({ top: top - vh * 0.3, behavior: still ? 'auto' : 'smooth' });
 }
 function saveB() {
   if (!B) return;
@@ -499,16 +521,14 @@ function renderResults() {
   [PA, PB].forEach(P => { if (P.noTime) notes.push(`${esc(P.name)}时辰不详：时柱不计五行，月亮位置为约数`); });
   if (!PA.noTime && !PB.noTime && (PA.asc === null || PB.asc === null)) notes.push(`${esc((PA.asc === null ? PA : PB).name)}缺出生地纬度，未排上升`);
   V.innerHTML = `
-    <div class="hp-vhead">
-      <span class="fb-tag">合看 · 参考</span><span class="who">${esc(na)} × ${esc(nb)}</span>
-      <div class="acts"><button class="fb-btn" id="copyBtn" type="button">复制</button><button class="fb-btn primary" id="aiBtn" type="button">问 AI</button></div>
-    </div>
+    <div class="hp-vhead"><span class="fb-tag">合看 · 参考</span><span class="who">${esc(na)} × ${esc(nb)}</span></div>
     <p class="fb-key"><span class="jin">${esc(v.head)}</span>${v.tail ? '；' + esc(v.tail) : ''}</p>
     <div class="hp-tally" aria-label="契合计数">
       <span class="n good">合<b>${t.good}</b></span><span class="n bad">冲<b>${t.bad}</b></span><span class="n mid">平<b>${t.mid}</b></span>
       <span class="fb-fine">八字六项（合 ${t.bz.good} · 冲 ${t.bz.bad}）＋ 星盘要紧相位 ${R.keys.length} 条（合 ${t.xp.good} · 冲 ${t.xp.bad}）· 粗看，仅供参考</span>
     </div>
-    ${notes.length ? `<p class="hp-vnote">${notes.join('；')}。</p>` : ''}`;
+    ${notes.length ? `<p class="hp-vnote">${notes.join('；')}。</p>` : ''}
+    <div class="acts"><button class="fb-btn" id="copyBtn" type="button">复制</button><button class="fb-btn primary" id="aiBtn" type="button">问 AI</button></div>`;
   $('copyBtn').onclick = () => F.copy(text(), '合盘已复制');
   $('aiBtn').onclick = () => F.askAI('合盘（八字合婚与星盘比较）', text(), HP.RULES.map((s, i) => (i + 1) + '. ' + s).join('\n'));
   S.hidden = false;
@@ -524,7 +544,7 @@ function renderBazi() {
       const [ea, eb] = r.ext;
       pair = `${esc(na)}旺${wxs(ea.strong)}弱${wxs(ea.weak)} · ${esc(nb)}旺${wxs(eb.strong)}弱${wxs(eb.weak)}`;
       const cell = (w, e, i) => `<span class="v wx-${i}${e.strong.includes(i) ? ' hi' : e.weak.includes(i) ? ' lo' : ''}">${w[i]}${e.strong.includes(i) ? '<small>旺</small>' : e.weak.includes(i) ? '<small>弱</small>' : ''}</span>`;
-      extra = `<div class="hp-wx" role="table" aria-label="两人五行力量"><span></span>${BZ.WX.map((n, i) => `<b class="h wx-${i}">${n}</b>`).join('')}` +
+      extra = `<div class="hp-wx"><span></span>${BZ.WX.map((n, i) => `<b class="h wx-${i}">${n}</b>`).join('')}` +
         [[na, r.wx[0], ea], [nb, r.wx[1], eb]].map(([n, w, e]) => `<span class="nm">${esc(n)}</span>${[0, 1, 2, 3, 4].map(i => cell(w, e, i)).join('')}`).join('') + '</div>';
     }
     return `<div class="hp-row"><span class="lab">${r.label}</span><span class="pair">${pair}</span><span class="hp-word t-${r.tone}">${r.word}</span><p class="why">${esc(r.text)}</p>${extra}</div>`;
