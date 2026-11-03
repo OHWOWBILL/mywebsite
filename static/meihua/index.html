@@ -47,6 +47,7 @@
       <div class="fb-row">
         <button type="button" class="fb-btn primary grow" id="castBtn">起 卦</button>
         <button type="button" class="fb-btn" id="copyBtn" title="复制为 Markdown 卦例">复制</button>
+        <button type="button" class="fb-btn" id="aiBtn" title="把卦连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
         <button type="button" class="fb-btn ghost" id="clearBtn">清空</button>
       </div>
     </div>
@@ -98,5 +99,42 @@
 <script src="data/yao.js?v=3"></script>
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="js/app.js?v=6"></script>
+<script>
+// 问 AI：借「复制」的卦例文字（app.js 的 caseMarkdown），再补卦辞与动爻爻辞，连同本页口径一并复制
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const RULES = [
+    '先天八卦数：乾一、兑二、离三、震四、巽五、坎六、艮七、坤八；除八取余定卦（余零作八），除六取余定动爻（余零作六）。',
+    '时间起卦：农历年支数（子一……亥十二）+ 月 + 日为上卦，再加时支数为下卦，总数定动爻；23 点起为子时，算作次日；农历为寿星万年历口径。',
+    '报数起卦：上数定上卦，下数定下卦，两数之和加时支数定动爻。',
+    '动爻所在的经卦为用，另一经卦为体；互卦取本卦二至四、三至五爻；变卦为动爻阴阳互变。',
+    '体用生克：比和吉，用生体大吉，体克用吉而费力，体生用耗泄，用克体不利。'
+  ].join('\n');
+  // 某张卦卡上配出的卦名（未配齐为空）
+  const nameOf = type => { const el = document.querySelector(`[data-card="${type}"] .matched-name`); return el && el.classList.contains('ok') ? el.textContent.replace('✓', '').trim() : ''; };
+  // 临时接住 Fabao.copy，点一下「复制」取到卦例文字，再原样放回
+  function caseText() {
+    let got = null;
+    const orig = Fabao.copy;
+    Fabao.copy = t => { got = t; };
+    try { $('copyBtn').click(); } finally { Fabao.copy = orig; }
+    return got;
+  }
+  $('aiBtn').addEventListener('click', () => {
+    const ben = nameOf('ben');
+    if (!ben) { Fabao.toast('先起一卦，或选齐上下卦'); return; }
+    const t = caseText();
+    // 卦例末尾的「所问 / 断」空栏与标签是记笔记用的，问 AI 时换成所问一行
+    const L = [t ? t.replace(/\n+### 所问[\s\S]*$/, '') : `## 梅花卦例\n\n${$('qiguaInfo').innerText.trim()}\n- 本 ${ben} · 互 ${nameOf('hu') || '—'} · 变 ${nameOf('bian') || '—'}`];
+    const T = window.YAO_TEXT && window.YAO_TEXT[ben], dong = document.querySelector('[data-card="ben"] .yao-row.dong');
+    if (T) L.push(`- **${ben}卦辞**：${T.gua}`);
+    const y = T && dong && T.yao[+dong.dataset.idx];
+    if (y) L.push(`- **动爻爻辞**：${y[0]} ${y[1]}`);
+    L.push('- **所问**：（未写；贴给 AI 时在这里补上所问之事）');
+    Fabao.askAI('梅花易数', L.join('\n'), RULES);
+  });
+})();
+</script>
 </body>
 </html>

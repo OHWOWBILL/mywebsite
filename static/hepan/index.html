@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>合盘 · 潜蛟阁法宝库</title>
+  <meta name="description" content="合盘：两人的生辰一齐看。八字合婚（生肖、日干、日支、纳音、五行互补、东西四命）与星盘比较（日月金火等交叉相位），一句总评、合冲计数，可复制、可问 AI。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=5">
+  <style>
+    :root { --glyph: "Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", "Symbola", serif; }
+    .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
+
+    /* —— 两人 —— */
+    .fb-now.hp-pair { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px 22px; align-items: start; }
+    .hp-p { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .hp-p-head { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; min-height: 30px; }
+    .hp-role { flex-shrink: 0; padding: 1px 10px; border-radius: 999px; background: rgba(122, 91, 192, .22); color: var(--zi-2); font-family: var(--font-title); font-size: 12px; letter-spacing: .2em; white-space: nowrap; }
+    .hp-hint { font-size: 12px; color: var(--faint); letter-spacing: .06em; }
+    .hp-chips { display: flex; gap: 6px; flex-wrap: wrap; min-width: 0; }
+    .hp-chip { padding: 4px 13px; border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-3); font-family: var(--font-title); font-size: 13px; letter-spacing: .1em; color: var(--fg-2); white-space: nowrap; transition: border-color .2s, color .2s, background .2s; }
+    .hp-chip:hover { border-color: var(--zi-2); color: var(--fg); }
+    .hp-chip.on { background: var(--zi); border-color: var(--zi); color: #fff; }
+    .hp-chip.add { background: none; border-style: dashed; color: var(--zi-2); }
+    .hp-chip.add:hover { border-color: var(--zi-2); }
+
+    .hp-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .hp-name { display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; }
+    .hp-name b { font-family: var(--font-title); font-weight: 600; font-size: 21px; letter-spacing: .15em; color: var(--fg); overflow-wrap: anywhere; }
+    .hp-name span { font-size: 13px; color: var(--muted); letter-spacing: .08em; }
+    .hp-when { font-size: 13px; color: var(--muted); letter-spacing: .05em; }
+    .hp-when .fb-tag { margin-left: 6px; padding: 0 8px; font-size: 11px; }
+    .hp-card .fb-pillars { margin-top: 2px; }
+    .hp-card .fb-pillar.nt b { color: var(--faint); }
+    .hp-mini-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+    .hp-mini { padding: 3px 11px; border-radius: var(--r-sm); border: 1px solid var(--rule-2); font-family: var(--font-title); font-size: 12.5px; letter-spacing: .1em; color: var(--muted); white-space: nowrap; }
+    .hp-mini:hover { border-color: var(--zi-2); color: var(--fg); }
+    .hp-wait { font-family: var(--font-title); font-size: 14px; color: var(--faint); letter-spacing: .15em; line-height: 2; padding: 6px 0; }
+    .hp-err { font-size: 13px; color: var(--zhu); }
+
+    .hp-swap { align-self: center; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--rule-2); background: var(--bg-3); color: var(--zi-2); display: grid; place-items: center; transition: border-color .2s, color .2s, opacity .2s; }
+    .hp-swap svg { width: 20px; height: 20px; }
+    .hp-swap:hover:not(:disabled) { border-color: var(--zi-2); color: var(--fg); }
+    .hp-swap:disabled { opacity: .3; cursor: default; }
+
+    /* 手填 */
+    .hp-form { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border: 1px dashed var(--rule-2); border-radius: var(--r); }
+    .hp-form .fb-row { gap: 8px 10px; align-items: flex-end; }
+    .hp-f { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .hp-f > small { font-family: var(--font-title); font-size: 11.5px; color: var(--faint); letter-spacing: .12em; white-space: nowrap; }
+    .hp-form input[type=date] { width: 10.6em; }
+    .hp-form input[type=time] { width: 7.4em; }
+    .hp-form input[type=text] { width: 8.5em; }
+    .hp-form select { max-width: 11em; }
+    .hp-form .fb-seg button { padding: 7px 14px; }
+    .hp-chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); letter-spacing: .08em; cursor: pointer; white-space: nowrap; padding-bottom: 8px; }
+    .hp-chk input { accent-color: var(--zi); }
+    .hp-preview { font-size: 12.5px; color: var(--muted); font-family: var(--font-title); letter-spacing: .08em; line-height: 1.7; }
+    .hp-preview b { color: var(--fg-2); font-weight: 600; }
+    .hp-dst { font-size: 12.5px; color: var(--qing); line-height: 1.7; }
+    .hp-form-foot { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+    .hp-form-foot .fb-btn { padding: 6px 14px; font-size: 13px; }
+
+    /* —— 总评 —— */
+    .hp-verdict { padding: 18px 24px 16px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px; animation: fbIn .35s ease both; }
+    .hp-vhead { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; }
+    .hp-vhead .who { font-family: var(--font-title); font-size: 15px; letter-spacing: .15em; color: var(--fg-2); overflow-wrap: anywhere; }
+    .hp-vhead .acts { margin-left: auto; display: flex; gap: 8px; }
+    .hp-verdict .fb-key { font-size: 21px; line-height: 1.6; }
+    .hp-tally { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
+    .hp-tally .n { display: inline-flex; align-items: baseline; gap: 7px; padding: 2px 13px 3px; border-radius: 999px; background: var(--bg-3); font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; color: var(--muted); }
+    .hp-tally .n b { font-family: var(--font-mark); font-weight: 800; font-size: 15px; letter-spacing: 0; }
+    .hp-tally .good b { color: var(--lv); } .hp-tally .bad b { color: var(--zhu); } .hp-tally .mid b { color: var(--fg-2); }
+    .hp-tally .fb-fine { margin-left: 2px; }
+    .hp-vnote { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+    .hp-verdict .fb-empty { padding: 26px 10px; }
+
+    /* —— 两节 —— */
+    .hp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .hp-sec { padding: 16px 20px 14px; min-width: 0; }
+    .hp-sec h3 { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .2em; margin-bottom: 8px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+    .hp-sec h3 small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
+
+    .hp-row { display: grid; grid-template-columns: 2.7em minmax(0, 1fr) auto; gap: 3px 12px; padding: 11px 0; border-top: 1px dashed var(--rule); align-items: baseline; }
+    .hp-row:first-child { border-top: none; padding-top: 4px; }
+    .hp-row .lab { grid-row: span 2; font-family: var(--font-title); font-size: 13px; color: var(--muted); letter-spacing: .12em; }
+    .hp-row .pair { font-family: var(--font-title); font-size: 15.5px; color: var(--fg); letter-spacing: .08em; min-width: 0; overflow-wrap: anywhere; }
+    .hp-row .why { grid-column: 2 / 4; font-size: 13px; color: var(--fg-2); line-height: 1.75; }
+    .hp-row .hp-wx { grid-column: 2 / 4; }
+    .hp-word { justify-self: end; display: inline-block; padding: 1px 11px 2px; border-radius: 999px; font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; white-space: nowrap; }
+    .t-good { background: rgba(141, 191, 151, .16); color: var(--lv); }
+    .t-bad { background: rgba(224, 122, 98, .16); color: var(--zhu); }
+    .t-mid { background: var(--bg-3); color: var(--muted); }
+
+    .hp-wx { display: grid; grid-template-columns: auto repeat(5, minmax(0, 1fr)); gap: 3px 5px; margin-top: 4px; font-size: 12.5px; align-items: center; }
+    .hp-wx .h { font-family: var(--font-title); font-weight: 600; color: var(--wc); text-align: center; font-size: 13px; }
+    .hp-wx .nm { font-family: var(--font-title); color: var(--muted); padding-right: 6px; max-width: 6em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hp-wx .v { text-align: center; font-family: var(--font-mark); color: var(--fg-2); background: var(--bg-3); border-radius: 4px; padding: 2px 0; white-space: nowrap; }
+    .hp-wx .v.hi { color: var(--wc); font-weight: 800; box-shadow: inset 0 0 0 1px var(--wc); }
+    .hp-wx .v.lo { color: var(--faint); }
+    .hp-wx .v small { font-family: var(--font-title); font-weight: 400; font-size: 10px; margin-left: 2px; }
+
+    .hp-signs { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 4px 10px; margin: 2px 0 10px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--bg-3); font-size: 13px; color: var(--fg-2); align-items: baseline; }
+    .hp-signs .nm { font-family: var(--font-title); color: var(--muted); max-width: 6em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hp-signs span { font-family: var(--font-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hp-signs .g { font-family: var(--glyph); font-style: normal; color: var(--zi-2); margin-right: 3px; }
+    .hp-signs .no { color: var(--faint); }
+    .hp-sign-note { font-size: 12px; color: var(--faint); margin: -4px 0 10px; }
+
+    .hp-asps { display: flex; flex-direction: column; gap: 4px; }
+    .hp-ah, .hp-asp { display: grid; grid-template-columns: minmax(0, 1fr) 4.4em minmax(0, 1fr) 4.2em; gap: 6px; align-items: center; }
+    .hp-ah { padding: 0 10px 2px; font-family: var(--font-title); font-size: 12px; color: var(--faint); letter-spacing: .12em; }
+    .hp-ah span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hp-ah span:last-child { text-align: right; }
+    .hp-asp { padding: 5px 10px; border-radius: var(--r-sm); background: var(--bg-3); font-size: 13px; color: var(--fg-2); }
+    .hp-asp > span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-title); }
+    .hp-asp .g { font-family: var(--glyph); font-style: normal; font-size: 15px; color: var(--fg); margin-right: 4px; }
+    .hp-asp .t { text-align: center; }
+    .hp-asp .t i { font-style: normal; font-family: var(--glyph); font-size: 15px; margin-right: 3px; }
+    .hp-asp .t.soft { color: var(--lv); } .hp-asp .t.hard { color: var(--zhu); } .hp-asp .t.conj { color: var(--zi-2); }
+    .hp-asp .o { text-align: right; font-family: var(--font-mark); font-size: 11.5px; color: var(--muted); }
+    .hp-asp.key { background: rgba(122, 91, 192, .13); box-shadow: inset 3px 0 0 var(--kc, var(--zi-2)); }
+    .hp-asp.k-good { --kc: var(--lv); } .hp-asp.k-bad { --kc: var(--zhu); } .hp-asp.k-mid { --kc: var(--qing); }
+    .hp-asp .mean { grid-column: 1 / -1; display: flex; gap: 8px; align-items: baseline; font-size: 12.5px; color: var(--fg-2); line-height: 1.65; padding: 1px 0 2px; }
+    .hp-asp .mean b { flex-shrink: 0; padding: 0 7px; border-radius: 4px; background: rgba(122, 91, 192, .26); color: var(--zi-2); font-family: var(--font-title); font-weight: 600; font-size: 11.5px; letter-spacing: .1em; }
+    .hp-more { align-self: flex-start; margin-top: 4px; padding: 4px 12px; border-radius: var(--r-sm); font-family: var(--font-title); font-size: 12.5px; letter-spacing: .1em; color: var(--zi-2); border: 1px dashed var(--rule-2); }
+    .hp-more:hover { border-color: var(--zi-2); color: var(--fg); }
+    .hp-none { font-size: 13px; color: var(--faint); padding: 6px 0; }
+
+    .hp-help { padding: 16px 20px; margin-top: 18px; }
+    .hp-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
+    .hp-help ul { font-size: 13px; line-height: 1.9; color: var(--fg-2); padding-left: 0; }
+    .hp-help li { list-style: none; padding-left: 14px; position: relative; }
+    .hp-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .hp-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
+
+    @media (max-width: 1100px) {
+      .hp-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 860px) {
+      .fb-now.hp-pair { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .hp-swap { justify-self: center; width: 38px; height: 38px; }
+      .hp-swap svg { transform: rotate(90deg); }
+      .hp-form { padding: 10px; }
+      .hp-form .fb-row > .hp-f { flex: 1 1 8em; }
+      .hp-form input[type=date], .hp-form input[type=time], .hp-form input[type=text], .hp-form select { width: 100%; max-width: none; }
+      .hp-verdict { padding: 16px 16px 14px; }
+      .hp-verdict .fb-key { font-size: 17.5px; }
+      .hp-vhead .acts { margin-left: 0; flex-basis: 100%; }
+      .hp-vhead .acts .fb-btn { flex: 1; }
+      .hp-sec { padding: 14px 14px 12px; }
+      .hp-row { grid-template-columns: 2.4em minmax(0, 1fr) auto; gap: 3px 8px; }
+      .hp-row .pair { font-size: 14.5px; letter-spacing: .04em; }
+      .hp-ah, .hp-asp { grid-template-columns: minmax(0, 1fr) 3.9em minmax(0, 1fr) 3.7em; gap: 4px; }
+      .hp-asp { padding: 5px 8px; font-size: 12.5px; }
+      .hp-ah { padding: 0 8px 2px; }
+      .hp-asp .g { margin-right: 2px; font-size: 14px; }
+      .hp-signs { grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 4px 6px; font-size: 12.5px; }
+      .hp-help { padding: 14px 16px; }
+    }
+  </style>
+</head>
+<body data-tool="hepan">
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">合</div>
+    <div>
+      <h1 class="fb-title">合盘<span class="en">SYNASTRY · HEHUN</span></h1>
+      <p class="fb-sub">八字合婚 · 星盘比较 · 两人一盘看</p>
+    </div>
+  </header>
+
+  <section class="fb-now hp-pair" aria-label="两人">
+    <div class="hp-p" id="slotA"></div>
+    <button class="hp-swap" id="swapBtn" type="button" title="两人互换：对方成为命部当前的人" aria-label="两人互换">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5h15M15.5 5l3.5 3.5-3.5 3.5M20 15.5H5M8.5 12L5 15.5 8.5 19"/></svg>
+    </button>
+    <div class="hp-p" id="slotB"></div>
+  </section>
+
+  <section class="fb-card hp-verdict" id="verdict" aria-live="polite"></section>
+
+  <div class="hp-grid" id="secs" hidden>
+    <section class="fb-card hp-sec" aria-label="八字合婚">
+      <h3>八字合婚<small>生肖 · 日干 · 日支 · 纳音 · 五行 · 命卦</small></h3>
+      <div id="bzRows"></div>
+    </section>
+    <section class="fb-card hp-sec" aria-label="星盘比较">
+      <h3>星盘比较<small>合 0° · 六合 60° · 刑 90° · 拱 120° · 冲 180°</small></h3>
+      <div class="hp-signs" id="xpSigns"></div>
+      <p class="hp-sign-note" id="xpNote" hidden></p>
+      <div class="hp-asps" id="aspBox"></div>
+    </section>
+  </div>
+
+  <section class="fb-card hp-help" aria-label="口径">
+    <h3>用法与口径</h3>
+    <ul id="rules">
+      <li><b>两人</b>本人即命部当前的人（八字、紫微、占星里起过盘就记下了，上方命部条点人名可换）；对方点一下存过的人即可，没存过就手填，时间不知可空着。⇄ 把两人互换，对方随即成为命部当前的人。</li>
+    </ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/bazi/bazi.js?v=1"></script>
+<script src="/xingpan/xingpan.js?v=1"></script>
+<script src="/kanyu/kanyu.js?v=1"></script>
+<script src="/fabao/cities.js?v=1"></script>
+<script src="/hepan/hepan.js?v=1"></script>
+<script src="/fabao/fabao.js?v=12"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, HP = window.HP, XP = window.XP, BZ = window.BZ, QC = window.QJ_CITIES;
+const T = '︎';                                   // 符号按文字显示，不变彩色表情
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LS_B = 'hepan.b', LS_A = 'hepan.a', LS_NT = 'hepan.notime';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const valid = b => b && typeof b.when === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(b.when) ? b : null;
+const keyOf = b => F.people.key(b);
+// 时辰不详：按人（生辰 + 性别）记一张表，换到本人一边也跟着走
+const ntList = () => store.get(LS_NT, []);
+const isNT = b => !!b && ntList().indexOf(keyOf(b)) >= 0;
+function setNT(b, on) { const k = keyOf(b), l = ntList().filter(x => x !== k); if (on) l.unshift(k); store.set(LS_NT, l.slice(0, 60)); }
+
+/* ================ 出生地 ================ */
+function placeOf(b) {
+  let c = b.city ? QC.byName(b.city) : null;
+  if (c && b.lon != null && Math.abs(c[1] - b.lon) > 0.01) c = null;      // 城市名与经度不合，是旧名残留
+  if (!c && b.lon != null) c = QC.find(+b.lon, b.lat != null ? +b.lat : null, b.tz != null ? +b.tz : null);
+  return c ? { name: c[0], lon: c[1], lat: c[2], tz: c[3] } : null;
+}
+function placeLabel(b) {
+  const p = placeOf(b);
+  if (p) return p.name;
+  const tz = QC.tzLabel(b.tz != null ? +b.tz : 8);
+  return b.lon != null ? `${tz} · ${+b.lon >= 0 ? '东经' : '西经'} ${Math.abs(+b.lon).toFixed(2)}°` : tz;
+}
+// 只给了经度（紫微）而经度正是表里某城：纬度取那座城的
+function norm(b) {
+  const p = placeOf(b), o = Object.assign({}, b);
+  if (o.lat == null && p) o.lat = p.lat;
+  return o;
+}
+function defaultCity(role) {
+  const p = role === 'B' && A ? placeOf(A) : null;
+  if (p) return p.name;
+  const tz = role === 'B' && A && A.tz != null ? +A.tz : -new Date().getTimezoneOffset() / 60;
+  return (QC.LIST.find(c => c[3] === tz) || QC.LIST[0])[0];
+}
+const cityOptions = sel => QC.GROUPS.map(([g, list]) => `<optgroup label="${g}">${list.map(([n]) => `<option value="${n}"${n === sel ? ' selected' : ''}>${n}</option>`).join('')}</optgroup>`).join('');
+
+/* ================ 状态 ================ */
+let A = null, B = null, PA = null, PB = null, R = null;
+let editA = false, editB = false, formNew = false, showAll = false;   // formNew：「＋ 手填」是另起一人，「改生辰」是改手填的那位
+// 与存过的某人同一生辰：就当是那个人（记下 pid，人名一排里亮起）
+function asSaved(b) {
+  if (!b || b.pid) return b;
+  const p = F.people.list().find(x => keyOf(x) === keyOf(b));
+  return p ? Object.assign({}, p, { pid: p.id }) : b;
+}
+function labels() {
+  let a = (A && A.name) || '本人', b = (B && B.name) || '对方';
+  if (a === b) { a += '（甲）'; b += '（乙）'; }
+  return [a, b];
+}
+function loadState() {
+  A = valid(F.birth.load());
+  let b = valid(store.get(LS_B, null));
+  if (b && b.pid) {
+    const p = F.people.list().find(x => x.id === b.pid);
+    if (p) b = Object.assign({}, p, { pid: p.id }); else delete b.pid;
+  }
+  // 对方刚在命部条上被点成了本人：上一回的本人换到对方这边
+  if (b && A && keyOf(b) === keyOf(A)) {
+    const prev = valid(store.get(LS_A, null));
+    b = prev && keyOf(prev) !== keyOf(A) ? prev : null;
+  }
+  B = asSaved(b);
+  store.set(LS_B, B);
+  const others = F.people.list().filter(p => !A || keyOf(p) !== keyOf(A));
+  editA = !A && !F.people.list().length;
+  editB = !B && !others.length;
+}
+
+function compute() {
+  const [na, nb] = labels();
+  PA = A ? HP.person(norm(A), { noTime: isNT(A), name: na }) : null;
+  PB = B ? HP.person(norm(B), { noTime: isNT(B), name: nb }) : null;
+  R = PA && PB && !PA.error && !PB.error ? HP.compare(PA, PB) : null;
+}
+function update(full) {
+  compute();
+  if (full) { renderSlot('A'); renderSlot('B'); }
+  else { renderChips(); renderPreview('A'); renderPreview('B'); }
+  renderResults();
+  $('swapBtn').disabled = !(A && B);
+  if (A) store.set(LS_A, A);
+}
+
+/* ================ 两人 ================ */
+const SIGN = s => XP.SIGNS[s];
+function cardHTML(b, P, role) {
+  if (!P) return '';
+  if (P.error) return `<p class="hp-err">${esc(P.error)}</p>`;
+  const [na, nb] = labels(), name = role === 'A' ? na : nb;
+  const w = b.when.replace('T', ' ');
+  const saved = role === 'B' && F.people.list().some(p => keyOf(p) === keyOf(b));
+  return `<div class="hp-card">
+    <div class="hp-name"><b>${esc(name)}</b><span>${P.male ? '男' : '女'} · 属${P.sx} · ${SIGN(P.sunSign)}座</span></div>
+    <div class="hp-when">${P.noTime ? w.slice(0, 10) + ' · 时辰不详' : w}${b.dst ? '（夏令时）' : ''} · ${esc(placeLabel(b))}${b.sun && !P.noTime ? '<span class="fb-tag">真太阳时</span>' : ''}</div>
+    <div class="fb-pillars">${['年', '月', '日', '时'].map((l, i) => `<span class="fb-pillar${i === 3 && P.noTime ? ' nt' : ''}"><small>${l}</small><b>${i === 3 && P.noTime ? '不详' : P.pillars[i].name}</b></span>`).join('')}</div>
+    ${role === 'B' && !b.pid ? `<div class="hp-mini-row"><button type="button" class="hp-mini" data-act="editB">改生辰</button>${saved ? '' : '<button type="button" class="hp-mini" data-act="saveB">存入命部</button>'}</div>` : ''}
+  </div>`;
+}
+function formHTML(role) {
+  const cur = role === 'A' ? A : B;
+  const init = cur && (role === 'A' || (!cur.pid && !formNew)) ? cur : null;   // 改的是手填的那位就带上原值
+  const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec((init && init.when) || '') || [];
+  const male = init ? init.male !== false : role === 'B' && A ? A.male === false : true;
+  const p = init ? placeOf(init) : null, city = p ? p.name : defaultCity(role);
+  return `<form class="hp-form" data-role="${role}" autocomplete="off">
+    <div class="fb-row">
+      <label class="hp-f"><small>出生日期</small><input type="date" name="d" value="${m[1] || ''}" min="1900-01-01" max="2100-12-31" aria-label="出生日期（出生地）"></label>
+      <label class="hp-f"><small>时间（不知可空）</small><input type="time" name="t" value="${init && !isNT(init) ? m[2] || '' : ''}" aria-label="出生时间（出生地钟表时间，不知可空）"></label>
+      <div class="fb-seg" role="group" aria-label="性别"><button type="button" data-v="1" class="${male ? 'on' : ''}">男</button><button type="button" data-v="0" class="${male ? '' : 'on'}">女</button></div>
+    </div>
+    <div class="fb-row">
+      <label class="hp-f"><small>出生地</small><select name="city" aria-label="出生地">${cityOptions(city)}</select></label>
+      <label class="hp-f"><small>称呼</small><input type="text" name="n" maxlength="12" placeholder="可空" value="${esc((init && init.name) || '')}" aria-label="称呼"></label>
+      <label class="hp-chk" title="出生时当地正行夏令时，钟表比标准时快一小时"><input type="checkbox" name="dst"${init && init.dst ? ' checked' : ''}>夏令时</label>
+    </div>
+    <div class="hp-dst" hidden></div>
+    <div class="hp-form-foot"><span class="hp-preview"></span>${(role === 'A' ? A : B) ? `<button type="button" class="fb-btn" data-act="done${role}">好了</button>` : ''}</div>
+  </form>`;
+}
+function chipsHTML(role) {
+  if (role === 'A') return A ? '' : `<button type="button" class="hp-chip add" data-act="manualA">${editA ? '收起' : '＋ 手填'}</button>`;
+  const list = F.people.list().filter(p => !A || keyOf(p) !== keyOf(A)), k = B ? keyOf(B) : '';
+  const toggle = list.length || B ? `<button type="button" class="hp-chip add" data-act="manualB">${editB ? '收起' : '＋ 手填'}</button>` : '';
+  return list.map(p => `<button type="button" class="hp-chip${keyOf(p) === k ? ' on' : ''}" data-pid="${esc(p.id)}" title="${esc(p.when.replace('T', ' '))}">${esc(p.name || '未名')}</button>`).join('') + toggle;
+}
+function headHTML(role) {
+  const hint = role === 'A' ? (A ? '命部当前 · 上方点人名可换' : F.people.list().length ? '点上方命部条里的人名即定本人，或' : '') : '';
+  return `<span class="hp-role">${role === 'A' ? '本人' : '对方'}</span>${hint ? `<span class="hp-hint">${hint}</span>` : ''}<span class="hp-chips">${chipsHTML(role)}</span>`;
+}
+function renderSlot(role) {
+  const el = $('slot' + role), b = role === 'A' ? A : B, P = role === 'A' ? PA : PB, edit = role === 'A' ? editA : editB;
+  let body;
+  if (edit) body = formHTML(role);
+  else if (b) body = cardHTML(b, P, role);
+  else if (role === 'A') body = `<p class="hp-wait">还没有本人的生辰。</p>`;
+  else body = `<p class="hp-wait">点上面一个人，一点就合；<br>没存过的，点「＋ 手填」。</p>`;
+  el.innerHTML = `<div class="hp-p-head">${headHTML(role)}</div>${body}` +
+    (role === 'A' && !A ? '<p class="fb-fine">在八字、紫微、占星里起过盘，会自动记作本人。</p>' : '');
+  if (edit) { renderPreview(role); syncDst(el.querySelector('form')); }
+}
+// 只换页头（人名一排），不动正在填的表单
+function renderChips() { ['A', 'B'].forEach(r => { const h = $('slot' + r).querySelector('.hp-p-head'); if (h) h.innerHTML = headHTML(r); }); }
+function renderPreview(role) {
+  const f = $('slot' + role).querySelector('form'); if (!f) return;
+  const el = f.querySelector('.hp-preview'), b = role === 'A' ? A : B, P = role === 'A' ? PA : PB;
+  const mine = b && (role === 'A' || !b.pid) && f.d.value;
+  if (!mine || !P) { el.textContent = '填上出生日期即出（时间不知可空）'; return; }
+  if (P.error) { el.textContent = P.error; return; }
+  el.innerHTML = `四柱 <b>${P.pillars.map((p, i) => i === 3 && P.noTime ? '时辰不详' : p.name).join(' ')}</b> · 属${P.sx} · ${SIGN(P.sunSign)}座`;
+}
+// 大陆 1986–1991 夏令时：日期落在其间而没勾，提醒一句
+function syncDst(f) {
+  if (!f) return;
+  const note = f.querySelector('.hp-dst'), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(f.d.value), c = QC.byName(f.city.value);
+  const hit = m && c && c[3] === 8 && !f.dst.checked && BZ.isChinaDST(+m[1], +m[2], +m[3]);
+  note.hidden = !hit;
+  if (hit) note.textContent = `此日在大陆夏令时期间（${m[1]} 年），钟表比北京标准时快一小时；若填的是当时钟表时间，请勾「夏令时」。`;
+}
+function readForm(f) {
+  const d = f.d.value, t = f.t.value;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+  const y = +d.slice(0, 4);
+  if (y < 1900 || y > 2100) return { err: '只合 1900–2100 年' };
+  const c = QC.byName(f.city.value) || QC.LIST[0];
+  const on = f.querySelector('.fb-seg .on');
+  return { noTime: !t, b: { when: d + 'T' + (t || '12:00'), male: !on || on.dataset.v === '1', name: f.n.value.trim(), tz: c[3], lon: c[1], lat: c[2], city: c[0], sun: false, dst: f.dst.checked } };
+}
+function onForm(f) {
+  syncDst(f);
+  const role = f.dataset.role, r = readForm(f);
+  if (!r) { renderPreview(role); return; }
+  if (r.err) { f.querySelector('.hp-preview').textContent = r.err; return; }
+  if (role === 'A') {
+    F.birth.save(r.b);
+    A = valid(F.birth.load());
+    if (A) setNT(A, r.noTime);
+    if (A && B && keyOf(A) === keyOf(B)) F.toast('两人生辰相同');
+  } else {
+    B = r.b; formNew = false; setNT(B, r.noTime); store.set(LS_B, B);
+    if (A && keyOf(A) === keyOf(B)) F.toast('与本人生辰相同');
+  }
+  update(false);
+  if (role === 'A' && !$('slotA').querySelector('[data-act="doneA"]')) {
+    // 第一次有了本人：补上「好了」，表单仍留着好接着填时间
+    const foot = f.querySelector('.hp-form-foot');
+    foot.insertAdjacentHTML('beforeend', '<button type="button" class="fb-btn" data-act="doneA">好了</button>');
+  }
+  if (role === 'B' && !f.querySelector('[data-act="doneB"]')) f.querySelector('.hp-form-foot').insertAdjacentHTML('beforeend', '<button type="button" class="fb-btn" data-act="doneB">好了</button>');
+}
+
+// 把某人整份写成命部当前的人：存过的人照存档整份替换，没存过的逐项写全
+function setShared(p) {
+  const saved = F.people.list().find(x => keyOf(x) === keyOf(p) && +x.tz === +p.tz && Math.abs((+x.lon || 0) - (+p.lon || 0)) < 0.005);
+  if (saved) { F.people.use(saved.id); F.birth.save({}); return; }
+  const pl = placeOf(p);
+  F.birth.save({ when: p.when, male: p.male !== false, name: p.name || '', tz: p.tz, lon: p.lon, lat: p.lat != null ? p.lat : pl ? pl.lat : null, sun: !!p.sun, dst: !!p.dst, city: pl ? pl.name : p.city || '' });
+}
+function swap() {
+  if (!A || !B) return;
+  const oldA = Object.assign({}, A), oldB = Object.assign({}, B);
+  delete oldB.pid;
+  setShared(oldB);
+  A = valid(F.birth.load());
+  const saved = F.people.list().find(p => keyOf(p) === keyOf(oldA));
+  B = saved ? Object.assign({}, saved, { pid: saved.id }) : oldA;
+  store.set(LS_B, B);
+  editA = editB = false;
+  update(true);
+  F.toast(`已互换：${labels()[0]}成为命部当前的人`);
+}
+function pickB(pid) {
+  const p = F.people.list().find(x => x.id === pid);
+  if (!p) return;
+  B = Object.assign({}, p, { pid: p.id });
+  store.set(LS_B, B);
+  editB = false;
+  update(true);
+}
+function saveB() {
+  if (!B) return;
+  if (!B.name) {
+    editB = true; update(true);
+    const inp = $('slotB').querySelector('input[name=n]'); if (inp) inp.focus();
+    F.toast('先在「称呼」里写个名字');
+    return;
+  }
+  const clean = Object.assign({}, B); delete clean.pid;
+  const rec = F.people.add(B.name, clean);
+  if (!rec) return;
+  B = Object.assign({}, rec, { pid: rec.id });
+  store.set(LS_B, B);
+  if (A) F.birth.save({});                            // 让命部条上的人名跟着刷新
+  editB = false; update(true);
+  F.toast(`已把「${rec.name}」存入命部，下次一点就合`);
+}
+
+['A', 'B'].forEach(role => {
+  const el = $('slot' + role);
+  el.addEventListener('click', e => {
+    const chip = e.target.closest('[data-pid]');
+    if (chip) { pickB(chip.dataset.pid); return; }
+    const seg = e.target.closest('.fb-seg button');
+    if (seg) { seg.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === seg)); onForm(seg.closest('form')); return; }
+    const act = e.target.closest('[data-act]'); if (!act) return;
+    const a = act.dataset.act;
+    if (a === 'manualA') { editA = !editA; update(true); }
+    else if (a === 'manualB') { editB = !editB; formNew = true; update(true); if (editB) { const d = $('slotB').querySelector('input[name=d]'); if (d) d.focus(); } }
+    else if (a === 'doneA') { editA = false; update(true); }
+    else if (a === 'doneB' || a === 'editB') { editB = a === 'editB'; formNew = false; update(true); }
+    else if (a === 'saveB') saveB();
+  });
+  el.addEventListener('change', e => { const f = e.target.closest('form'); if (f) onForm(f); });
+  el.addEventListener('input', e => { const f = e.target.closest('form'); if (f && e.target.name !== 'd') onForm(f); });
+  el.addEventListener('submit', e => e.preventDefault());
+});
+$('swapBtn').onclick = swap;
+
+/* ================ 结果 ================ */
+const G = id => id === 'asc' ? '↑' : HP.BODY[id].g + T;
+const natCls = x => x.type.a === 0 ? 'conj' : x.type.a === 90 || x.type.a === 180 ? 'hard' : 'soft';
+const wxs = list => list.map(i => BZ.WX[i]).join('');
+function renderResults() {
+  const V = $('verdict'), S = $('secs');
+  if (!R) {
+    S.hidden = true;
+    const err = (PA && PA.error) || (PB && PB.error);
+    V.innerHTML = `<div class="fb-empty">${err ? esc(err) : !A && !B ? '定下本人、选好对方，<br>合盘即出' : !A ? '再定本人的生辰，合盘即出' : '选一个人或手填对方的生辰，<br>合盘即出'}</div>`;
+    return;
+  }
+  const t = R.tally, v = R.verdict, [na, nb] = labels();
+  const notes = [];
+  [PA, PB].forEach(P => { if (P.noTime) notes.push(`${esc(P.name)}时辰不详：时柱不计五行，月亮位置为约数`); });
+  if (!PA.noTime && !PB.noTime && (PA.asc === null || PB.asc === null)) notes.push(`${esc((PA.asc === null ? PA : PB).name)}缺出生地纬度，未排上升`);
+  V.innerHTML = `
+    <div class="hp-vhead">
+      <span class="fb-tag">合看 · 参考</span><span class="who">${esc(na)} × ${esc(nb)}</span>
+      <div class="acts"><button class="fb-btn" id="copyBtn" type="button">复制</button><button class="fb-btn primary" id="aiBtn" type="button">问 AI</button></div>
+    </div>
+    <p class="fb-key"><span class="jin">${esc(v.head)}</span>${v.tail ? '；' + esc(v.tail) : ''}</p>
+    <div class="hp-tally" aria-label="契合计数">
+      <span class="n good">合<b>${t.good}</b></span><span class="n bad">冲<b>${t.bad}</b></span><span class="n mid">平<b>${t.mid}</b></span>
+      <span class="fb-fine">八字六项（合 ${t.bz.good} · 冲 ${t.bz.bad}）＋ 星盘要紧相位 ${R.keys.length} 条（合 ${t.xp.good} · 冲 ${t.xp.bad}）· 粗看，仅供参考</span>
+    </div>
+    ${notes.length ? `<p class="hp-vnote">${notes.join('；')}。</p>` : ''}`;
+  $('copyBtn').onclick = () => F.copy(text(), '合盘已复制');
+  $('aiBtn').onclick = () => F.askAI('合盘（八字合婚与星盘比较）', text(), HP.RULES.map((s, i) => (i + 1) + '. ' + s).join('\n'));
+  S.hidden = false;
+  renderBazi(); renderXing();
+}
+function text() { return HP.toText(R, [placeLabel(A), placeLabel(B)]); }
+
+function renderBazi() {
+  const [na, nb] = labels();
+  $('bzRows').innerHTML = R.rows.map(r => {
+    let pair = esc(r.pair), extra = '';
+    if (r.id === 'wx') {
+      const [ea, eb] = r.ext;
+      pair = `${esc(na)}旺${wxs(ea.strong)}弱${wxs(ea.weak)} · ${esc(nb)}旺${wxs(eb.strong)}弱${wxs(eb.weak)}`;
+      const cell = (w, e, i) => `<span class="v wx-${i}${e.strong.includes(i) ? ' hi' : e.weak.includes(i) ? ' lo' : ''}">${w[i]}${e.strong.includes(i) ? '<small>旺</small>' : e.weak.includes(i) ? '<small>弱</small>' : ''}</span>`;
+      extra = `<div class="hp-wx" role="table" aria-label="两人五行力量"><span></span>${BZ.WX.map((n, i) => `<b class="h wx-${i}">${n}</b>`).join('')}` +
+        [[na, r.wx[0], ea], [nb, r.wx[1], eb]].map(([n, w, e]) => `<span class="nm">${esc(n)}</span>${[0, 1, 2, 3, 4].map(i => cell(w, e, i)).join('')}`).join('') + '</div>';
+    }
+    return `<div class="hp-row"><span class="lab">${r.label}</span><span class="pair">${pair}</span><span class="hp-word t-${r.tone}">${r.word}</span><p class="why">${esc(r.text)}</p>${extra}</div>`;
+  }).join('');
+}
+
+function renderXing() {
+  const [na, nb] = labels();
+  const moon = P => P.moonSigns.map(SIGN).join('或');
+  $('xpSigns').innerHTML = [[na, PA], [nb, PB]].map(([n, P]) =>
+    `<span class="nm">${esc(n)}</span><span><i class="g">☉${T}</i>${SIGN(P.sunSign)}</span><span><i class="g">☽${T}</i>${moon(P)}</span>` +
+    `<span${P.ascSign === null ? ' class="no"' : ''}><i class="g">↑</i>${P.ascSign === null ? '上升不详' : SIGN(P.ascSign)}</span>`).join('');
+  const noAsc = PA.ascSign === null || PB.ascSign === null;
+  $('xpNote').hidden = !noAsc;
+  if (noAsc) $('xpNote').textContent = '上升要两人都有出生时刻与地点，这一盘没算上升。';
+  const list = R.aspects;
+  if (!list.length) { $('aspBox').innerHTML = '<p class="hp-none">两人七政之间没有主要相位。</p>'; return; }
+  let nk = 0;
+  list.forEach(x => { x.hide = !x.key && nk++ >= 8; });
+  const hidden = list.filter(x => x.hide).length;
+  $('aspBox').innerHTML = `<div class="hp-ah" aria-hidden="true"><span>${esc(na)}</span><span></span><span>${esc(nb)}</span><span>容许</span></div>` +
+    list.map(x => `<div class="hp-asp${x.key ? ' key k-' + x.tone : ''}"${x.hide && !showAll ? ' hidden' : ''}>
+      <span><i class="g">${G(x.a)}</i>${HP.BODY[x.a].n}</span>
+      <span class="t ${natCls(x)}"><i>${x.type.g}${T}</i>${x.type.n}</span>
+      <span><i class="g">${G(x.b)}</i>${HP.BODY[x.b].n}</span>
+      <span class="o">${x.approx ? '约' : ''}${HP.fmtOrb(x.orb)}</span>
+      ${x.key ? `<p class="mean"><b>${HP.KEY_NAME[x.key]}</b><span>${esc(x.meaning)}</span></p>` : ''}
+    </div>`).join('') +
+    (hidden ? `<button type="button" class="hp-more" id="moreBtn">${showAll ? '收起较松的相位' : `再看 ${hidden} 条较松的相位`}</button>` : '');
+  const mb = $('moreBtn');
+  if (mb) mb.onclick = () => { showAll = !showAll; renderXing(); };
+}
+
+/* ================ 口径 ================ */
+$('rules').insertAdjacentHTML('beforeend', HP.RULES.map(s => { const i = s.indexOf('：'); return `<li><b>${esc(s.slice(0, i))}</b>${esc(s.slice(i + 1))}</li>`; }).join(''));
+
+loadState();
+update(true);
+})();
+</script>
+</body>
+</html>

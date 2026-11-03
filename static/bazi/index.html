@@ -684,7 +684,8 @@ function renderBH() {
   // 五行：个数最多（同数看力量）、力量最弱、明面缺哪一行
   const W = A.wuxing, maxN = Math.max(...W.map(w => w.count)), tops = W.filter(w => w.count === maxN);
   const minW = Math.min(...W.map(w => w.weight)), lows = W.filter(w => w.weight === minW), miss = W.filter(w => !w.count);
-  let wx = `${tops.map(w => w.name).join('、')}最多（${tops.length > 1 ? '各 ' : ''}${maxN} 个${tops.some(w => w.ws === '旺') ? (tops.length > 1 ? `，${ling}又当令` : '，又当令') : ''}）`;
+  let wx = tops.length > 2 ? `分布较匀（${tops.map(w => w.name).join('、')}各 ${maxN} 个）`
+    : `${tops.map(w => w.name).join('、')}最多（${tops.length > 1 ? '各 ' : ''}${maxN} 个${tops.some(w => w.ws === '旺') ? (tops.length > 1 ? `，${ling}又当令` : '，又当令') : ''}）`;
   if (miss.length) wx += '；' + miss.map(w => w.weight ? `明面缺${w.name}（只藏在地支里）` : `缺${w.name}（藏干里也没有）`).join('，');
   else wx += `，${lows.map(w => w.name).join('、')}最弱；五行俱全`;
   const G = A.geju;

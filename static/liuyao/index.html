@@ -194,6 +194,7 @@
       <div class="fb-row">
         <button class="fb-btn primary" id="saveBtn" type="button">存卦</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
+        <button class="fb-btn" id="aiBtn" type="button" title="把卦连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
       </div>
       <select id="libSel" aria-label="卦例"><option value="">卦例（存过的卦）</option></select>
       <p class="fb-fine">摇卦用浏览器的密码学随机数，每爻三钱：背三、字二，合六为交（老阴）、七为单、八为拆、九为重（老阳）。</p>
@@ -516,21 +517,38 @@ $('libSel').onchange = () => {
   if (v === '') return;
   libCur = +v; apply(lib[libCur]); renderLib(); $('libSel').value = String(libCur);
 };
-$('copyBtn').onclick = () => {
-  if (!G) { toast('先起一卦'); return; }
+// 卦面文字：「复制」与「问 AI」共用。ai 为真时，每爻再注旺衰与日月动变，并补互卦、卦身、伏神、用神（AI 自己推容易推错）
+function guaText(ai) {
   const B = G.ben, V = G.bian, d = G.day, out = [];
-  out.push('六爻 · ' + ($('qIn').value.trim() || '所问未记'));
+  out.push('六爻 · ' + ($('qIn').value.trim() || (ai ? '所问未记（贴给 AI 时可在这里补上所问之事）' : '所问未记')));
   if (d) out.push(`时间 ${d.w.y}-${pad(d.w.mo)}-${pad(d.w.d)} ${pad(d.w.h)}:${pad(d.w.mi)} · ${d.w.c.pillars.map(p => p.name).join(' ')} · 月建${ZHI[d.monthZhi]} 日辰${GAN[d.dayGan]}${ZHI[d.dayZhi]} · 旬空${d.kong.map(z => ZHI[z]).join('')}`);
   out.push(`本卦 ${B.name}（${B.palace}宫·${WX[B.palaceWx]}·${B.genName}）${V ? ' 之 ' + V.name + '（' + V.palace + '宫）' : ' 静卦'}`);
   [5, 4, 3, 2, 1, 0].forEach(i => {
     const y = B.yao[i], v = V ? V.yao[i] : null, mv = G.moving[i];
     const fu = G.fu.filter(f => f.pos === i + 1).map(f => `伏${f.qin}${ZHI[f.zhi]}${WX[f.wx]}`).join('');
     const line = y.yang ? '▅▅▅▅▅' : '▅▅ ▅▅';
-    out.push(`${(y.shen || '').padEnd(2, '　')} ${y.qin}${GAN[y.gan]}${ZHI[y.zhi]}${WX[y.wx]} ${line} ${B.shi === i + 1 ? '世' : B.ying === i + 1 ? '应' : '　'}${mv ? (nums[i] === 9 ? '○' : '✕') : '　'}${v ? ' → ' + v.qin + GAN[v.gan] + ZHI[v.zhi] + WX[v.wx] : ''}${fu ? ' ' + fu : ''}`);
+    const mk = ai ? [y.ws].concat(y.marks || [], y.hua || []).filter(Boolean).join(' ') : '';
+    out.push(`${(y.shen || '').padEnd(2, '　')} ${y.qin}${GAN[y.gan]}${ZHI[y.zhi]}${WX[y.wx]} ${line} ${B.shi === i + 1 ? '世' : B.ying === i + 1 ? '应' : '　'}${mv ? (nums[i] === 9 ? '○' : '✕') : '　'}${v ? ' → ' + v.qin + GAN[v.gan] + ZHI[v.zhi] + WX[v.wx] : ''}${fu ? ' ' + fu : ''}${mk ? ' ［' + mk + '］' : ''}`);
   });
+  if (ai) {
+    const sh = G.guaShen;
+    out.push(`互卦 ${G.hu.name}（${G.hu.palace}宫） · 卦身 ${ZHI[sh.zhi]}${WX[LY.ZHI_WX[sh.zhi]]}，${sh.at.length ? '现于' + sh.at.map(p => POS[p - 1]).join('、') + '爻' : '不上卦'}${G.ch ? ' · 本卦' + G.ch : ''}${G.chBian ? ' · 变卦' + G.chBian : ''}`);
+    if (G.fu.length) out.push('伏神 ' + G.fu.map(f => `${f.qin}${ZHI[f.zhi]}${WX[f.wx]}伏${POS[f.pos - 1]}爻（${f.rel || ''}${f.kong ? '，旬空' : ''}）`).join('、'));
+    const pick = $('yongIn').value;
+    if (pick) { const r = LY.yongShen(G, pick); out.push(`用神 ${pick === '世爻' ? '世爻（自占）' : r.yong}，属${WX[r.yongWx]} · 原神${r.yuan} · 忌神${r.ji} · 仇神${r.chou}`); }
+  }
   if ($('noteIn').value.trim()) out.push('断语 ' + $('noteIn').value.trim());
-  copy(out.join('\n'), '卦已复制');
-};
+  return out.join('\n');
+}
+$('copyBtn').onclick = () => { if (!G) { toast('先起一卦'); return; } copy(guaText(false), '卦已复制'); };
+const LY_RULES = [
+  '京房八宫定卦宫与世应，纳甲配干支，六亲以卦宫五行为我；六神按日干自初爻起。',
+  '本卦缺的六亲取本宫纯卦同位之爻为伏神，并注飞伏生克；卦身阳世从子、阴世从午数至世爻。',
+  '起卦时间按本机时区：月建以节换（交节时刻按太阳视黄经算），日辰于 23 点换日（子时作次日），旬空按日柱。',
+  '［］里为该爻的月令旺相休囚死与标注：临月建日辰、月破、日冲（静爻旺相为暗动、休囚为日破）、日合月合、旬空、入日墓、日绝；动爻另注化进退神、回头生克、化空化破化墓化绝、伏吟反吟。',
+  '三钱摇卦：背三字二，合六为交（老阴）、七为单、八为拆、九为重（老阳）；○ 为老阳动、✕ 为老阴动；→ 后为变卦同位之爻（静爻也列出）。'
+].join('\n');
+$('aiBtn').onclick = () => { if (!G) { toast('先起一卦'); return; } Fabao.askAI('六爻纳甲', guaText(true), LY_RULES); };
 function writeURL() {
   const q = new URLSearchParams();
   q.set('g', nums.join('')); q.set('t', $('whenIn').value);
