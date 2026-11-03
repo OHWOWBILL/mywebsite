@@ -1,4 +1,4 @@
-// 生成日本旧暦月表 static/fabao/kyureki.js（与 assets/js/qj/kyureki.js 同一份）：node scripts/lunar/gen-kyureki.js
+// 生成日本旧暦月表 static/fabao/kyureki.js：node scripts/lunar/gen-kyureki.js
 // 六曜、不成就日按日本旧暦算。旧暦与中国农历同法（定朔、中气定月、冬至在十一月、无中气之月置闰），
 // 只是「哪一天」按日本时间（UTC+9）切：朔若落在北京时间 23 点到 24 点之间，日本那边已是次日，月首差一天。
 // 做法：
@@ -143,7 +143,6 @@ const src = fs.readFileSync(path.join(__dirname, 'template.js'), 'utf8')
   .replace('root.QJ_LUNAR = api', 'root.QJ_KYUREKI = api');
 if (!/root\.QJ_KYUREKI = api/.test(src)) throw new Error('模板里没找到挂载名');
 fs.writeFileSync(path.join(__dirname, '../../static/fabao/kyureki.js'), src);
-fs.writeFileSync(path.join(__dirname, '../../assets/js/qj/kyureki.js'), src);
 
 // —— 3. 与中国农历相异之处 ——
 delete require.cache[require.resolve('../../static/fabao/kyureki.js')];
@@ -156,5 +155,5 @@ for (let d = Date.UTC(1900, 0, 31); d < Date.UTC(2101, 0, 1); d += DAY) {
   if (a.y !== b.y || a.m !== b.m || a.d !== b.d || a.leap !== b.leap) diff.push(x.toISOString().slice(0, 7));
 }
 const span = [...new Set(diff)];
-console.log(`写入 static/fabao/kyureki.js 与 assets/js/qj/kyureki.js；与农历相异 ${diff.length} 日，涉及 ${span.length} 个公历月`);
+console.log(`写入 static/fabao/kyureki.js；与农历相异 ${diff.length} 日，涉及 ${span.length} 个公历月`);
 console.log('  ' + span.filter(s => s >= '1990' && s <= '2040').join(' '));

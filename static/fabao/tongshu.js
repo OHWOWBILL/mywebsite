@@ -24,8 +24,10 @@
   'use strict';
   var NODE = typeof module !== 'undefined' && module.exports;
   var J = NODE ? require('../qimen/jieqi.js') : root.QM_JIEQI;
-  var LUNAR = NODE ? require('./lunar.js') : root.QJ_LUNAR;
-  var KYU = NODE ? require('./kyureki.js') : root.QJ_KYUREKI;
+  // 农历、旧暦月表用时再取：首页的脚本包里农历表在本文件之后才载入
+  var LUNAR0 = NODE ? require('./lunar.js') : null, KYU0 = NODE ? require('./kyureki.js') : null;
+  function LUNAR() { return LUNAR0 || root.QJ_LUNAR || null; }
+  function KYU() { return KYU0 || root.QJ_KYUREKI || null; }
   var DAY = 86400000;
   function mod(a, n) { return ((a % n) + n) % n; }
 
@@ -220,7 +222,8 @@
     var jm = jieMonth(y, m, d);
     if (!jm) return null;
     var g = dayGZ(y, m, d), w = new Date(y, m - 1, d).getDay();
-    var L = LUNAR && LUNAR.toLunar(y, m, d), K = KYU && KYU.toLunar(y, m, d);
+    var LU = LUNAR(), KY = KYU();
+    var L = LU && LU.toLunar(y, m, d), K = KY && KY.toLunar(y, m, d);
     var jc = JIANCHU[mod(g.zhi - jm.zhi, 12)];
     var shen = shenOf(jm.zhi, g.zhi);
     var season = ['冬', '冬', '春', '春', '春', '夏', '夏', '夏', '秋', '秋', '秋', '冬'][jm.zhi];
@@ -236,7 +239,7 @@
     var r = {
       key: key, y: y, m: m, d: d, w: w, week: '周' + WEEK[w],
       gz: g, nayin: nayin(g.i), year: jm.year, yearNum: jm.yearNum, month: jm.month, jie: jm,
-      lunar: L, lunarText: L ? LUNAR.text(L) : '', kyu: K, kyuText: K ? (K.leap ? '閏' : '') + K.m + '月' + K.d + '日' : '',
+      lunar: L, lunarText: L ? LU.text(L) : '', kyu: K, kyuText: K ? (K.leap ? '閏' : '') + K.m + '月' + K.d + '日' : '',
       jieqi: jq, season: season, doyo: doyo,
       jianchu: jc, jcTone: JC_TONE[jc], shen: shen, huang: !!HUANG[shen],
       chong: chongOf(g),

@@ -1129,6 +1129,20 @@ html[data-season="winter"] { --jin: #D8C597; --color-secondary-400: 216, 197, 15
   color: var(--ge-fg-2);
 }
 .qj-rike-facts dd b { font-weight: 400; color: var(--ge-fg); letter-spacing: .06em; }
+.qj-rike-facts dd .hd { color: #8DBF97; }
+.qj-rike-facts dd .hk { color: #E07A62; }
+.qj-rike-facts dd .hd, .qj-rike-facts dd .hk, .qj-rike-facts dd .ky { white-space: nowrap; }
+.qj-rike-facts dd .ky { font-size: .78rem; color: var(--ge-muted); margin-left: .3em; }
+.qj-rike-link {
+  font-family: var(--font-title);
+  font-size: .88rem;
+  letter-spacing: .14em;
+  color: var(--ge-fg-2);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ge-rule);
+  padding-bottom: 1px;
+}
+.qj-rike-link:hover { color: var(--ge-fg); border-color: var(--zi); }
 
 .qj-rike-gua {
   display: grid;
@@ -1158,7 +1172,7 @@ html[data-season="winter"] { --jin: #D8C597; --color-secondary-400: 216, 197, 15
   color: var(--ge-muted);
 }
 
-.qj-rike-foot { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+.qj-rike-foot { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1.1rem; margin-top: 1rem; }
 .qj-rike-qian {
   padding: .45rem 1.1rem;
   font-family: var(--font-title);
