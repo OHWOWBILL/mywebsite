@@ -48,7 +48,7 @@
     .jx-sum .lab { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; color: var(--fg); white-space: nowrap; line-height: 1.5; }
     .jx-sum .lab small { display: block; font-weight: 400; font-size: 11.5px; letter-spacing: .04em; color: var(--muted); }
     .jx-sum .txt { font-family: var(--font-title); font-size: 15.5px; line-height: 1.85; color: var(--fg-2); letter-spacing: .03em; }
-    .jx-sum b { font-weight: 600; }
+    .jx-sum b { font-weight: 600; white-space: nowrap; }
     .jx-sum b.ji { color: var(--lv); } .jx-sum b.best { color: var(--jin); } .jx-sum b.xiong { color: var(--zhu); } .jx-sum b.none { color: var(--muted); font-weight: 400; }
 
     .jx-ctrl { min-width: 272px; }
@@ -80,7 +80,7 @@
     .jx-cell .star i { font-style: normal; font-weight: 400; font-size: 11px; letter-spacing: 0; color: var(--wc); margin-left: 2px; vertical-align: 3px; }
     .jx-cell .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; min-height: 18px; margin-top: auto; }
     .jx-cell .tags span { font-family: var(--font-title); font-size: 11px; line-height: 18px; padding: 0 6px; border-radius: 3px; white-space: nowrap; color: var(--tc); background: color-mix(in oklab, var(--tc) 16%, transparent); }
-    .jx-cell.ji { --tc: var(--lv); background: color-mix(in oklab, var(--lv) 12%, var(--bg-2)); border-color: color-mix(in oklab, var(--lv) 55%, var(--rule)); }
+    .jx-cell.ji { --tc: var(--lv); background: color-mix(in oklab, var(--lv) 17%, var(--bg-2)); border-color: color-mix(in oklab, var(--lv) 75%, var(--rule)); }
     .jx-cell.best { --tc: var(--jin); background: color-mix(in oklab, var(--jin) 15%, var(--bg-2)); border-color: var(--jin); }
     .jx-cell.xiong { --tc: var(--zhu); background: color-mix(in oklab, var(--zhu) 10%, var(--bg-2)); border-color: color-mix(in oklab, var(--zhu) 45%, var(--rule)); }
     .jx-cell.center { --tc: var(--zi-2); background: var(--bg); border-style: dashed; }
@@ -105,7 +105,7 @@
     .jx-ncard { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; padding: 18px 20px; align-items: start; }
     .jx-ncard .num {
       grid-row: 1 / span 4; width: 54px; height: 54px; display: grid; place-items: center; border-radius: 50%;
-      font-family: var(--font-title); font-weight: 900; font-size: 28px; color: var(--wc);
+      font-family: var(--font-title); font-weight: 600; font-size: 28px; color: var(--wc);
       background: color-mix(in oklab, var(--wc) 13%, transparent); border: 1px solid color-mix(in oklab, var(--wc) 45%, transparent);
     }
     .jx-ncard h3 { font-family: var(--font-title); font-weight: 600; font-size: 13px; color: var(--muted); letter-spacing: .2em; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; }
@@ -114,13 +114,15 @@
     .jx-ncard .meta { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
     .jx-ncard .sk { font-size: 14px; line-height: 1.85; color: var(--fg-2); }
     .jx-ncard .js { font-size: 12.5px; color: var(--muted); }
+    .nw { white-space: nowrap; }
 
     /* —— 九星一览 —— */
     .jx-all { margin-top: 18px; overflow: hidden; }
-    .jx-all summary { cursor: pointer; padding: 14px 20px; list-style: none; display: flex; align-items: baseline; gap: 10px; font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; }
+    .jx-all summary { position: relative; cursor: pointer; padding: 14px 72px 14px 20px; list-style: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; }
+    .jx-all summary .t { white-space: nowrap; }
     .jx-all summary::-webkit-details-marker { display: none; }
     .jx-all summary small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
-    .jx-all summary::after { content: "展开"; margin-left: auto; font-size: 12px; font-weight: 400; color: var(--zi-2); letter-spacing: .15em; }
+    .jx-all summary::after { content: "展开"; position: absolute; right: 20px; top: 16px; font-size: 12px; font-weight: 400; color: var(--zi-2); letter-spacing: .15em; white-space: nowrap; }
     .jx-all[open] summary::after { content: "收起"; }
     .jx-allgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border-top: 1px solid var(--rule); }
     .jx-allgrid > div { background: var(--bg-2); padding: 12px 16px 14px; }
@@ -158,7 +160,8 @@
       .jx-ncard { padding: 16px; gap: 4px 12px; }
       .jx-ncard .num { width: 44px; height: 44px; font-size: 22px; }
       .jx-allgrid { grid-template-columns: 1fr; }
-      .jx-all summary { padding: 14px 16px; }
+      .jx-all summary { padding: 14px 64px 14px 16px; }
+      .jx-all summary::after { right: 16px; }
       .jx-help { padding: 16px; }
     }
   </style>
@@ -202,7 +205,7 @@
   <div class="jx-cards" id="cardsBox"></div>
 
   <details class="fb-card jx-all" id="allBox">
-    <summary>九星一览<small>按出生年查本命星（1 月 1 日至立春前出生的，算上一年）</small></summary>
+    <summary><span class="t">九星一览</span><small>按出生年查本命星（1 月 1 日至立春前出生的，算上一年）</small></summary>
     <div class="jx-allgrid" id="allGrid"></div>
   </details>
 
@@ -228,7 +231,6 @@ const F = window.Fabao, JX = window.JX;
 const S = JX.STAR, PAL = JX.PAL;
 const pad = n => String(n).padStart(2, '0');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const CN = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
 const LS_VIEW = 'jiuxing.view.v1';
 const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
@@ -271,7 +273,8 @@ function defaultPick() {
   return out.length ? out[0].k : null;
 }
 function whoNow() {
-  if (pick === 'other') return view.other ? { k: 'other', name: '别人', when: view.other + (view.otherT ? 'T' + view.otherT : ''), tz: null, dst: false } : null;
+  // 什么都没存时，填的多半是自己的生日
+  if (pick === 'other') return view.other ? { k: 'other', name: sources().out.length ? '别人' : '你', when: view.other + (view.otherT ? 'T' + view.otherT : ''), tz: null, dst: false } : null;
   const s = sources().out.find(x => x.k === pick);
   return s ? { k: s.k, name: s.name, when: s.rec.when, tz: s.rec.tz, dst: !!s.rec.dst } : null;
 }
@@ -410,15 +413,15 @@ function cardsHTML(N) {
   const card = (role, s, meta, use) => {
     const st = S[s];
     return `<article class="fb-card jx-ncard" data-wx="${st.wx}">
-      <div class="num" aria-hidden="true">${CN[s]}</div>
+      <div class="num" aria-hidden="true">${s}</div>
       <h3>${role}<b>${st.full}</b><small>${st.wx} · ${st.xiang}</small></h3>
       <p class="meta">${meta}<br>${use}</p>
       <p class="sk">${st.sketch}</p>
-      <p class="js">吉星：${JX.jiStars(s).map(x => S[x].n).join('、')}${s === 5 ? '（按土论）' : ''}</p>
+      <p class="js">吉星：${JX.jiStars(s).map(x => S[x].n).join('、')}${s === 5 ? '<span class="nw">（按土论）</span>' : ''}</p>
     </article>`;
   };
-  return card('本命星', N.honmei, `${N.Y} ${N.gz}年生 · ${N.lichun.n} ${JX.fmtT(N.lichun.t, N.tz, true)} 之后`, '看一生的大势与对外的样子，吉方以它为主。') +
-    card('月命星', N.getsumei, `${N.month}生 · ${N.jie.n} ${JX.fmtT(N.jie.t, N.tz, true)} 之后`, '看内在性情，也常用来看少年时；与本命同吉之方即最大吉方。');
+  return card('本命星', N.honmei, `<span class="nw">${N.Y} ${N.gz}年生</span> · <span class="nw">${N.lichun.n} ${JX.fmtT(N.lichun.t, N.tz, true)} 之后</span>`, '看一生的大势与对外的样子，吉方以它为主。') +
+    card('月命星', N.getsumei, `<span class="nw">${N.month}生</span> · <span class="nw">${N.jie.n} ${JX.fmtT(N.jie.t, N.tz, true)} 之后</span>`, '看内在性情，也常用来看少年时；与本命同吉之方即最大吉方。');
 }
 function allHTML(N) {
   return S.slice(1).map((st, i) => {
