@@ -21,16 +21,17 @@
     xingpan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.3"/><ellipse cx="12" cy="12" rx="9.6" ry="3.5" transform="rotate(-22 12 12)"/></svg>',
     xiangbu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 12c2.4-4 5.5-6 9.2-6s6.8 2 9.2 6c-2.4 4-5.5 6-9.2 6s-6.8-2-9.2-6z"/><circle cx="12" cy="12" r="2.6"/></svg>'
   };
+  // men = 归哪一门（五术门庭 data/wushu.toml）；desc = 法宝库大堂（/tools/）上那一行，短到一眼看完即可
   const TOOLS = [
-    { id: 'meihua', name: '梅花', href: '/meihua/' },
-    { id: 'liuyao', name: '六爻纳甲', short: '六爻', href: '/liuyao/' },
-    { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/' },
-    { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/' },
-    { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/' },
-    { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/' },
-    { id: 'mingbu', name: '命部', href: '/bazi/' },     // 星命同参：八字、紫微、占星、读盘四件都在命部里切换
-    { id: 'kanyu', name: '堪舆', href: '/kanyu/' },
-    { id: 'xiangbu', name: '相部', href: '/xiangbu/' }  // 口令加密页，未解禁时为锁屏
+    { id: 'meihua', name: '梅花', href: '/meihua/', men: '卜', desc: '此刻起卦，本互变并排' },
+    { id: 'liuyao', name: '六爻纳甲', short: '六爻', href: '/liuyao/', men: '卜', desc: '摇卦装卦，旺衰逐爻标' },
+    { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/', men: '命', desc: '干支旺衰速查' },
+    { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/', men: '卜', desc: '起局记断，回头复盘' },
+    { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/', men: '医', desc: '按时开穴，四法并排' },
+    { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/', men: '医', desc: '岁运、司天在泉、六步' },
+    { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字 · 紫微 · 占星同参' },     // 星命同参：八字、紫微、占星、读盘四件都在命部里切换
+    { id: 'kanyu', name: '堪舆', href: '/kanyu/', men: '山', desc: '玄空飞星、八宅、罗盘' },
+    { id: 'xiangbu', name: '相部', href: '/xiangbu/', men: '相', lock: true, desc: '相法读书卡与字相九宫' }  // 口令加密页，未解禁时为锁屏
   ];
 
   // 命部 · 星命同参：顶栏只留「命部」一个标签，进来后在这一排里切换。
@@ -41,7 +42,7 @@
     { id: 'xingpan', name: '占星', href: '/xingpan/' },
     { id: 'mingbu', name: '读盘', href: '/mingbu/', lock: true }
   ];
-  const LS_LAST = 'mingbu.last', LS_BIRTH = 'mingbu.birth.v1';
+  const LS_LAST = 'mingbu.last', LS_BIRTH = 'mingbu.birth.v1', LS_KU_LAST = 'fabao.last';
   const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* 无痕模式 */ } };
 
@@ -98,12 +99,15 @@
     const cur = document.body.dataset.tool;
     const fam = MINGBU.find(t => t.id === cur);
     const curTab = fam ? 'mingbu' : cur;
+    const isKu = cur === 'ku';   // 法宝库大堂 /tools/：顶栏照旧，正文由 mountKu 现排
+    // 记下上回用的是哪一件，大堂上给「接着用」；锁屏页不算
+    if (!isKu && TOOLS.some(t => t.id === curTab) && !document.querySelector('.lock-wrap')) lsSet(LS_KU_LAST, curTab);
     // 记下上次用的是哪件；读盘只在真解开了才记（锁屏页上有 .lock-wrap），免得访客每次点「命部」都落到锁屏
     if (fam && !(fam.lock && document.querySelector('.lock-wrap'))) lsSet(LS_LAST, fam.id);
     const top = document.createElement('header');
     top.className = 'fb-top';
     top.innerHTML = `
-      <a class="fb-back" href="/tools/" title="回法宝库">
+      <a class="fb-back" href="${isKu ? '/' : '/tools/'}" title="${isKu ? '回潜蛟阁' : '回法宝库'}">
         <span class="mark">ohwowbill</span><span class="ge">潜蛟阁</span><span class="ku">法宝库</span>
       </a>
       <nav class="fb-tabs" aria-label="法宝">
@@ -218,6 +222,35 @@
     }
   }
 
+  // —— 法宝库大堂（/tools/，body data-tool="ku"）——
+  // 不再逐件写说明：按五门排成一屏小牌，一件一行字，点了就进；上回用过的放最前「接着用」。
+  const MEN = [['山', '堪舆'], ['医', '方脉针灸'], ['命', '推命'], ['卜', '占断'], ['相', '观形']];
+  function mountKu() {
+    const box = document.getElementById('fbKu');
+    if (!box) return;
+    const href = t => t.id === 'mingbu' ? mingbuHref(lsGet(LS_LAST) || 'bazi') : t.href;
+    const tile = t => `
+      <a class="ku-tile${t.lock ? ' is-lock' : ''}" href="${href(t)}">
+        <span class="ku-ico">${ICONS[t.id]}</span>
+        <span class="ku-t">${t.name}${t.lock ? '<i title="此宝被阁主下了禁制，持诀者可开">禁</i>' : ''}</span>
+        <span class="ku-s">${t.desc || ''}</span>
+      </a>`;
+    const last = TOOLS.find(t => t.id === lsGet(LS_KU_LAST));
+    const dh = dayHour(new Date());
+    box.innerHTML = `
+      <p class="ku-now"><span>此刻</span><b>${dh.day.name}</b>日<b>${dh.hour.name}</b>时${last ? `
+        <a class="ku-again" href="${href(last)}">接着用 · ${last.name} →</a>` : ''}</p>
+      <div class="ku-men">${MEN.map(([seal, name]) => {
+        const ts = TOOLS.filter(t => t.men === seal);
+        return ts.length ? `
+        <section class="ku-row" aria-label="${seal}门 · ${name}">
+          <a class="ku-seal" href="/wushu/#men-${encodeURIComponent(seal)}" title="${seal}门 · ${name}：此门文章">${seal}</a>
+          <div class="ku-tiles">${ts.map(tile).join('')}</div>
+        </section>` : '';
+      }).join('')}</div>`;
+  }
+
   window.Fabao = { GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy, birth: { save: saveBirth, load: loadBirth, query: birthQuery, minusHour } };
   mountShell();
+  if (document.body.dataset.tool === 'ku') mountKu();
 })();

@@ -110,14 +110,8 @@ try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=ne
   {{- $doors = $doors | append (dict "seal" .seal "name" .name "shut" (and (eq (len $ps) 0) (eq (len $t) 0))) -}}
   {{- range $t }}{{ $wtools = $wtools | append (dict "seal" .seal "name" .name "href" .href) }}{{ if eq .seal "禁" }}{{ $locked = $locked | append .name }}{{ end }}{{ end -}}
 {{- end -}}
-{{- /* 宫灯按法宝库页（content/tools/index.md）的三级标题数，一件一盏；五术门庭里印为「禁」的贴符 */ -}}
-{{- $tools := slice -}}
-{{- with site.GetPage "/tools" -}}
-  {{- range .Fragments.Headings }}{{ range .Headings -}}
-    {{- range .Headings }}{{ $n := index (split .Title " · ") 0 }}{{ $tools = $tools | append (dict "name" $n "seal" (cond (in $locked $n) "禁" "") "href" (printf "/tools/#%s" .ID)) }}{{ end -}}
-  {{- end }}{{ end -}}
-{{- end -}}
-{{- if not $tools }}{{ $tools = $wtools }}{{ end }}
+{{- /* 宫灯 = 五术门庭里挂的法宝，一件一盏；印为「禁」的贴符（法宝库大堂 /tools/ 是静态页，名单与 data/wushu.toml 同） */ -}}
+{{- $tools := $wtools -}}
 {{- /* 真 3D 的山（tools/qj3d 打包出来的），入阁后 ge.js 才去拉，文字版不下载 */ -}}
 {{- $shan := resources.Get "js/qj3d.js" | fingerprint "sha512" }}
 <section class="qj-ge" id="qj-ge" aria-label="入阁 · 潜蛟阁全景" data-shan="{{ $shan.RelPermalink }}">

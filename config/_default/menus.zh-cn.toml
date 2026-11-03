@@ -17,7 +17,7 @@
 [[main]]
   name = "术"
   title = "法宝库 · 自制术数工具"
-  pageRef = "tools"
+  url = "/tools/"
   weight = 20
 
 [[main]]
@@ -65,7 +65,7 @@
 
 [[footer]]
   name = "法宝库"
-  pageRef = "tools"
+  url = "/tools/"
   weight = 20
 
 [[footer]]
