@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>流年 · 潜蛟阁法宝库</title>
+  <meta name="description" content="流年一页看全：干支纳音、九宫飞星年盘、太岁岁破三煞五黄方位、犯太岁生肖、五运六气、你的这一年、二十四节气与节日。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=5">
+  <style>
+    .yr-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+    .yr-nav .fb-btn { padding: 6px 14px; }
+    .yr-nav b { font-family: var(--font-title); font-size: 15px; letter-spacing: .2em; color: var(--muted); }
+    .ln-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .ln-grid > .full { grid-column: 1 / -1; }
+    @media (max-width: 960px) { .ln-grid { grid-template-columns: 1fr; } }
+    .card { padding: 18px 20px; }
+    .card-h { font-family: var(--font-title); font-size: 15px; letter-spacing: .2em; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .card-h small { font-family: var(--font-body); font-size: 12px; color: var(--faint); letter-spacing: .08em; }
+    .hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px 26px; align-items: center; padding: 22px 24px; }
+    .hero .big { font-family: var(--font-title); font-weight: 900; font-size: 64px; line-height: 1; letter-spacing: .05em; }
+    .hero .big small { display: block; font-size: 15px; font-weight: 400; letter-spacing: .3em; color: var(--zi-2); margin-top: 10px; text-align: center; }
+    .hero dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 18px; }
+    .hero dt { font-family: var(--font-title); font-size: 11.5px; color: var(--faint); letter-spacing: .2em; }
+    .hero dd { font-family: var(--font-title); font-size: 15px; color: var(--fg-2); letter-spacing: .06em; }
+    .hero .key { grid-column: 1 / -1; font-family: var(--font-title); font-size: 16px; line-height: 1.8; letter-spacing: .06em; }
+    .hero .key b { color: var(--jin); font-weight: 600; }
+    @media (max-width: 700px) { .hero { grid-template-columns: 1fr; } .hero .big { font-size: 48px; text-align: center; } .hero dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    /* 九宫：南在上 */
+    .board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; max-width: 460px; }
+    .pal { position: relative; border-radius: var(--r-sm); background: var(--bg-3); padding: 8px 8px 7px; min-height: 92px; border: 1px solid transparent; display: flex; flex-direction: column; gap: 2px; }
+    .pal .dir { font-size: 11px; color: var(--faint); font-family: var(--font-title); letter-spacing: .15em; }
+    .pal .st { font-family: var(--font-title); font-size: 21px; font-weight: 600; line-height: 1.15; }
+    .pal .st small { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 4px; }
+    .pal .tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: auto; }
+    .pal .tags i { font-style: normal; font-size: 10.5px; padding: 0 5px; border-radius: 3px; font-family: var(--font-title); line-height: 16px; }
+    .pal .tags .b { background: rgba(224, 122, 98, .2); color: var(--zhu); }
+    .pal .tags .g { background: rgba(141, 191, 151, .18); color: var(--lv); }
+    .pal .tags .q { background: rgba(122, 91, 192, .25); color: var(--zi-2); }
+    .pal.bad { border-color: rgba(224, 122, 98, .5); }
+    .pal.mid { background: rgba(122, 91, 192, .14); }
+    .s1 { color: #9DB8E8; } .s2 { color: #C9A578; } .s3 { color: #8DBF97; } .s4 { color: #8DBF97; } .s5 { color: var(--zhu); } .s6 { color: #DCD8E6; } .s7 { color: #DCD8E6; } .s8 { color: #C9A578; } .s9 { color: #E8A2C9; }
+    .lst { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.7; }
+    .lst li { display: grid; grid-template-columns: 4.5em 1fr; gap: 8px; }
+    .lst b { font-family: var(--font-title); letter-spacing: .1em; }
+    .lst .bad { color: var(--zhu); } .lst .good { color: var(--lv); }
+    .boardwrap { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 18px; align-items: start; }
+    @media (max-width: 960px) { .boardwrap { grid-template-columns: 1fr; } }
+    /* 生肖 */
+    .sx { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+    .sx div { text-align: center; padding: 8px 2px 6px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent; }
+    .sx b { display: block; font-family: var(--font-title); font-size: 19px; }
+    .sx small { display: block; font-size: 11px; color: var(--faint); font-family: var(--font-title); letter-spacing: .05em; min-height: 1.5em; }
+    .sx .b { border-color: rgba(224, 122, 98, .55); } .sx .b small { color: var(--zhu); }
+    .sx .g { border-color: rgba(141, 191, 151, .5); } .sx .g small { color: var(--lv); }
+    .sx .me { box-shadow: 0 0 0 2px var(--jin); }
+    @media (max-width: 560px) { .sx { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    /* 你 */
+    .ppl { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .ppl button { border: 1px solid var(--rule-2); border-radius: 999px; padding: 3px 12px; font-family: var(--font-title); font-size: 13px; color: var(--muted); background: var(--bg-3); }
+    .ppl button.on { border-color: var(--jin); color: var(--fg); }
+    .me-line { font-size: 15px; line-height: 1.85; color: var(--fg-2); }
+    .me-line b { font-family: var(--font-title); color: var(--fg); }
+    .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .links a { text-decoration: none; }
+    .me-in { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+    .me-in input { width: 7em; padding: 4px 8px; }
+    /* 节气、节日 */
+    .terms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 18px; font-size: 13.5px; }
+    .terms div { display: flex; justify-content: space-between; gap: 8px; padding: 4px 2px; border-bottom: 1px solid var(--rule); }
+    .terms b { font-family: var(--font-title); font-weight: 400; color: var(--fg-2); letter-spacing: .1em; }
+    .terms span { color: var(--muted); font-family: var(--font-mark); font-size: 12.5px; }
+    .terms .next { background: rgba(217, 174, 78, .1); }
+    .terms .next b { color: var(--jin); }
+    .terms .past { opacity: .55; }
+    .fest { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+    .fest a { display: inline-flex; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--bg-3); color: var(--fg-2); text-decoration: none; border: 1px solid transparent; }
+    .fest a:hover { border-color: var(--zi-2); }
+    .fest a span { color: var(--faint); font-family: var(--font-mark); font-size: 12px; }
+    .fest a.jp { color: var(--qing); } .fest a.k { color: var(--jin); }
+    .seg-sm { display: flex; gap: 6px; margin-bottom: 10px; }
+    .tg { border: 1px solid var(--rule-2); border-radius: 999px; padding: 2px 11px; font-size: 12.5px; color: var(--faint); font-family: var(--font-title); }
+    .tg.on { color: var(--fg-2); border-color: var(--zi-2); }
+    .yq { font-size: 14px; line-height: 1.85; color: var(--fg-2); }
+    .yq b { font-family: var(--font-title); color: var(--fg); letter-spacing: .08em; }
+  </style>
+</head>
+<body data-tool="liunian">
+<main class="fb-main">
+  <div class="fb-head">
+    <div class="fb-seal">年</div>
+    <div>
+      <h1 class="fb-title"><span id="ttl">流年</span> <span class="en">THE YEAR</span></h1>
+      <div class="fb-sub">太岁方位 · 九宫飞星 · 犯太岁生肖 · 运气 · 你的这一年 · 节气节日</div>
+    </div>
+  </div>
+
+  <div class="yr-nav">
+    <button type="button" class="fb-btn" id="prevY" aria-label="上一年">‹</button>
+    <b id="yrT"></b>
+    <button type="button" class="fb-btn" id="nextY" aria-label="下一年">›</button>
+    <button type="button" class="fb-btn ghost" id="thisY">今年</button>
+  </div>
+
+  <div class="ln-grid">
+    <section class="fb-card hero full" id="hero"></section>
+    <section class="fb-card card full">
+      <div class="card-h">方位 · 九宫飞星年盘<small>南在上；以立春换年</small></div>
+      <div class="boardwrap"><div class="board" id="board"></div><ul class="lst" id="dirList"></ul></div>
+    </section>
+    <section class="fb-card card">
+      <div class="card-h">你的这一年<small id="meSub"></small></div>
+      <div class="ppl" id="ppl"></div>
+      <div id="me"></div>
+    </section>
+    <section class="fb-card card">
+      <div class="card-h">十二生肖与太岁<small>值、冲、刑、害、破为犯；三合六合为合</small></div>
+      <div class="sx" id="sx"></div>
+    </section>
+    <section class="fb-card card">
+      <div class="card-h">五运六气<small>以大寒交</small></div>
+      <div class="yq" id="yq"></div>
+    </section>
+    <section class="fb-card card">
+      <div class="card-h">二十四节气<small id="termSub"></small></div>
+      <div class="terms" id="terms"></div>
+    </section>
+    <section class="fb-card card full">
+      <div class="card-h">节日与吉日<small>点一下看那天的黄历</small></div>
+      <div class="seg-sm"><button type="button" class="tg" id="jpTg">日本历注</button></div>
+      <div class="fest" id="fest"></div>
+    </section>
+  </div>
+
+  <p class="fb-fine" style="margin-top:26px">口径：年以立春换（立春前出生的人属上一年）；九宫飞星年盘取三元九运紫白，2026 丙午一白入中，顺飞；太岁在年支之方，岁破在其对冲，三煞：申子辰年在南、寅午戌年在北、巳酉丑年在东、亥卯未年在西；犯太岁取值、冲、刑（三刑与自刑）、害、破，三合六合为合。九星年运按本命星落年盘之宫论（坎停滞、坤准备、震萌发、巽顺遂、中宫顶点、乾充实、兑收获、艮变化、离显露），只作参照。五运六气按大寒交气（与「五运六气」法宝同一口径）。节气精确到分，时刻按本机时区。</p>
+</main>
+
+<script src="/fabao/fabao.js?v=12"></script>
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/fabao/kyureki.js?v=1"></script>
+<script src="/fabao/tongshu.js?v=1"></script>
+<script src="/kanyu/kanyu.js?v=1"></script>
+<script src="/yunqi/yunqi.js?v=1"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const ls = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const pad = n => String(n).padStart(2, '0');
+  const mod = (a, n) => ((a % n) + n) % n;
+  const GAN = TS.GAN, ZHI = TS.ZHI, SX = TS.SX;
+  const isJpTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Tokyo'; } catch (e) { return false; } })();
+  let jp = ls('tongshu.jp') == null ? isJpTz : ls('tongshu.jp') === '1';
+
+  // 当前干支年（立春前算上一年）
+  const now = new Date();
+  const curY = (() => { const lc = QM_JIEQI.terms.find(x => x.n === '立春' && new Date(x.t).getFullYear() === now.getFullYear()); return lc && now.getTime() < lc.t ? now.getFullYear() - 1 : now.getFullYear(); })();
+  let Y = +(new URLSearchParams(location.search).get('y')) || curY;
+  if (Y < 1901 || Y > 2099) Y = curY;
+
+  // —— 九宫 ——
+  const STAR = ['', '一白', '二黑', '三碧', '四绿', '五黄', '六白', '七赤', '八白', '九紫'];
+  const STAR_N = ['', '贪狼', '巨门', '禄存', '文曲', '廉贞', '武曲', '破军', '左辅', '右弼'];
+  const STAR_DO = ['', '桃花、人缘、贵人，利升迁', '病符：主疾病，宜静不宜动', '是非：主口舌、官非、争执', '文昌：利读书、考试、文职',
+    '五黄煞：最凶，忌动土、装修、久坐', '武曲：偏财、权贵、利升职', '破军：主破财、盗劫、口舌', '左辅：正财、置业，九运退气力减', '右弼：喜庆、姻缘、名声，九运当令最旺'];
+  const PDIR = { 1: '北', 2: '西南', 3: '东', 4: '东南', 5: '中', 6: '西北', 7: '西', 8: '东北', 9: '南' };
+  const GRID = [4, 9, 2, 3, 5, 7, 8, 1, 6];              // 南在上：巽离坤 / 震中兑 / 艮坎乾
+  const OPP = { 1: 9, 9: 1, 2: 8, 8: 2, 3: 7, 7: 3, 4: 6, 6: 4 };
+  const ZHI_P = [1, 8, 8, 3, 4, 4, 9, 2, 2, 7, 6, 6];     // 子在坎，丑寅在艮……
+  const starAt = (C, p) => mod(C - 1 + mod(p - 5, 9), 9) + 1;
+  const SANSHA = z => [8, 0, 4].indexOf(z) >= 0 ? 9 : [2, 6, 10].indexOf(z) >= 0 ? 1 : [5, 9, 1].indexOf(z) >= 0 ? 3 : 7;
+  const SANSHA_Z = { 9: '巳午未', 1: '亥子丑', 3: '寅卯辰', 7: '申酉戌' };
+  // 生肖与太岁
+  const CHONG = z => mod(z + 6, 12);
+  const HAI = [7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9, 8];                     // 子未、丑午、寅巳、卯辰、申亥、酉戌
+  const PO = [9, 4, 11, 6, 1, 8, 3, 10, 5, 0, 7, 2];                      // 子酉、丑辰、寅亥、卯午、巳申、未戌
+  const XING = { 0: [3], 3: [0], 2: [5, 8], 5: [2, 8], 8: [2, 5], 1: [10, 7], 10: [1, 7], 7: [1, 10], 4: [4], 6: [6], 9: [9], 11: [11] };
+  const SANHE = z => [[8, 0, 4], [2, 6, 10], [5, 9, 1], [11, 3, 7]].find(g => g.indexOf(z) >= 0);
+  const LIUHE = [1, 0, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2];                    // 子丑、寅亥、卯戌、辰酉、巳申、午未
+  function relOf(z, tz) {
+    const out = [];
+    if (z === tz) out.push('值');
+    if (z === CHONG(tz)) out.push('冲');
+    if ((XING[tz] || []).indexOf(z) >= 0) out.push(z === tz ? '自刑' : '刑');
+    if (z === HAI[tz]) out.push('害');
+    if (z === PO[tz]) out.push('破');
+    const bad = out.length > 0;
+    if (!bad && SANHE(tz).indexOf(z) >= 0) out.push('三合');
+    if (!bad && LIUHE[tz] === z) out.push('六合');
+    return { tags: out, bad };
+  }
+  // 九星年运
+  const PHASE = { 1: '坎宫：停滞、蓄力之年，宜修养、学习，不宜冒进', 2: '坤宫：准备之年，打基础、勤恳做事，收在后头', 3: '震宫：萌发之年，事情动起来，宜开始、宜行动',
+    4: '巽宫：顺遂之年，人缘与信用好，利谈事、利远方', 5: '中宫：顶点之年（八方塞），表面风光、实则动则得咎，宜守成', 6: '乾宫：充实之年，忙而有成，宜担责、宜进取',
+    7: '兑宫：收获之年，有喜悦、有进账，留意口舌与花销', 8: '艮宫：变化之年，转机与变动多，宜顺势调整', 9: '离宫：显露之年，名声与是非同来，聚散分明' };
+  const bmStar = gy => { const n = mod(11 - mod(gy, 9), 9); return n === 0 ? 9 : n; };
+
+  // —— 人 ——
+  const people = (window.Fabao && Fabao.people.list()) || [];
+  const cur = window.Fabao && Fabao.birth.load();
+  let who = cur && cur.when ? { name: cur.name || '当前命盘', b: cur } : null;
+  let manual = ls('liunian.by') ? +ls('liunian.by') : null;
+
+  function render() {
+    const gz = mod(Y - 4, 60), g = gz % 10, z = gz % 12;
+    const C = KY.yearStar(Y);
+    const lc = QM_JIEQI.terms.find(x => x.n === '立春' && new Date(x.t).getFullYear() === Y);
+    const lcD = lc ? new Date(lc.t) : null;
+    const cny = QJ_LUNAR.toSolar(Y, 1, 1), leap = QJ_LUNAR.leapOf(Y);
+    const yq = Yunqi.year(Y), QI = Yunqi.QI;
+    const taiP = ZHI_P[z], poP = OPP[taiP], shaP = SANSHA(z);
+    const p5 = [1, 2, 3, 4, 6, 7, 8, 9].find(p => starAt(C, p) === 5) || 5;
+    const anP = p5 === 5 ? null : OPP[p5];
+    const pOf = n => [1, 2, 3, 4, 5, 6, 7, 8, 9].find(p => starAt(C, p) === n);
+    $('ttl').textContent = `流年 · ${Y} ${GAN[g]}${ZHI[z]}`;
+    document.title = `${Y} ${GAN[g]}${ZHI[z]}年 · 流年 · 潜蛟阁法宝库`;
+    $('yrT').textContent = `${Y} · ${GAN[g]}${ZHI[z]} ${SX[z]}年`;
+    const kao = [];
+    kao.push(`太岁在<b>${PDIR[taiP]}</b>（${ZHI[z]}），岁破在<b>${PDIR[poP]}</b>，三煞在<b>${PDIR[shaP]}方</b>（${SANSHA_Z[shaP]}）`);
+    kao.push(p5 === 5 ? '五黄入中' : `五黄在<b>${PDIR[p5]}</b>${p5 === taiP ? '，与太岁同宫，此方最忌动土' : ''}`);
+    kao.push(`文昌（四绿）在<b>${PDIR[pOf(4)]}</b>`);
+    $('hero').innerHTML = `<div class="big">${GAN[g]}${ZHI[z]}<small>${SX[z]}年 · ${TS.nayin(gz)}</small></div>
+      <dl>
+        <div><dt>立春</dt><dd>${lcD ? `${lcD.getMonth() + 1}月${lcD.getDate()}日 ${pad(lcD.getHours())}:${pad(lcD.getMinutes())}` : '—'}</dd></div>
+        <div><dt>春节</dt><dd>${cny ? `${cny.m}月${cny.d}日` : '—'}${leap ? `<br><small style="color:var(--muted)">农历闰${QJ_LUNAR.MONTH_CN[leap - 1]}月</small>` : ''}</dd></div>
+        <div><dt>九星</dt><dd>${STAR[C]}入中</dd></div>
+        <div><dt>岁运</dt><dd>${yq.yun.name}</dd></div>
+        <div><dt>司天</dt><dd>${QI[yq.sitian].name}</dd></div>
+        <div><dt>在泉</dt><dd>${QI[yq.zaiquan].name}</dd></div>
+        <div class="key">${kao.join('；')}。</div>
+      </dl>`;
+    // 九宫
+    $('board').innerHTML = GRID.map(p => {
+      const s = starAt(C, p), tags = [];
+      if (p === taiP) tags.push(['太岁', 'q']);
+      if (p === poP) tags.push(['岁破', 'b']);
+      if (p === shaP) tags.push(['三煞', 'b']);
+      if (s === 5 && p !== 5) tags.push(['五黄', 'b']);
+      if (p === anP) tags.push(['暗剑', 'b']);
+      if (s === 2) tags.push(['病符', 'b']);
+      if (s === 3) tags.push(['是非', 'b']);
+      if (s === 4) tags.push(['文昌', 'g']);
+      if (s === 9) tags.push(['喜庆', 'g']);
+      if (s === 8 || s === 6) tags.push(['财', 'g']);
+      if (s === 1) tags.push(['桃花', 'g']);
+      const qi = KY.qiOf(s, 9);
+      const bad = tags.some(t => t[1] === 'b');
+      return `<div class="pal${p === 5 ? ' mid' : ''}${bad ? ' bad' : ''}" title="${STAR[s]}${STAR_N[s]}：${STAR_DO[s]}">
+        <span class="dir">${PDIR[p]}${p !== 5 ? '' : '宫'}</span>
+        <span class="st s${s}">${STAR[s]}<small>${STAR_N[s]} · ${qi}</small></span>
+        <span class="tags">${tags.map(t => `<i class="${t[1]}">${t[0]}</i>`).join('')}</span></div>`;
+    }).join('');
+    const items = [];
+    items.push(['太岁', PDIR[taiP], `${ZHI[z]}方；不宜正对动土、开工，宜坐不宜向`, 'bad']);
+    items.push(['岁破', PDIR[poP], '与太岁对冲，忌动土、修造、迁入', 'bad']);
+    items.push(['三煞', PDIR[shaP] + '方', `${SANSHA_Z[shaP]}三山；忌坐向、动土`, 'bad']);
+    if (p5 !== 5) items.push(['五黄', PDIR[p5], '流年最凶之星，忌动土装修、长久停留', 'bad']);
+    if (anP) items.push(['暗剑', PDIR[anP], '五黄对宫，防意外、小人', 'bad']);
+    items.push(['病符', PDIR[pOf(2)], '二黑：病位，宜静', 'bad']);
+    items.push(['是非', PDIR[pOf(3)], '三碧：口舌之位', 'bad']);
+    items.push(['文昌', PDIR[pOf(4)], '四绿：书桌、书房宜放此方', 'good']);
+    items.push(['喜庆', PDIR[pOf(9)], '九紫：九运当令，利喜事名声', 'good']);
+    items.push(['财位', `${PDIR[pOf(8)]}、${PDIR[pOf(6)]}`, '八白正财、六白偏财', 'good']);
+    items.push(['桃花', PDIR[pOf(1)], '一白：人缘、贵人', 'good']);
+    $('dirList').innerHTML = items.map(x => `<li><b class="${x[3]}">${x[0]}</b><span><b>${x[1]}</b>　${x[2]}</span></li>`).join('');
+    // 生肖
+    const meSx = personSx();
+    $('sx').innerHTML = SX.split('').map((s, i) => {
+      const r = relOf(i, z);
+      return `<div class="${r.bad ? 'b' : r.tags.length ? 'g' : ''}${meSx === i ? ' me' : ''}"><b>${s}</b><small>${r.tags.join('·') || '　'}</small></div>`;
+    }).join('');
+    // 运气
+    $('yq').innerHTML = `<b>${yq.yun.name}</b>（${yq.yun.yinName}）：${yq.yun.jing}。<br>
+      司天<b>${QI[yq.sitian].name}</b>主上半年，在泉<b>${QI[yq.zaiquan].name}</b>主下半年；运气关系「${yq.rel.name}」（${yq.rel.note}）${yq.tags && yq.tags.length ? '，' + yq.tags.map(t => t.name || t).join('、') : ''}。
+      <div class="links"><a class="fb-btn" href="/yunqi/?y=${Y}">看六步主客与交气日</a></div>`;
+    // 节气
+    const ts = TS.termsOfYear(Y), nowT = Date.now();
+    const nextI = ts.findIndex(x => x.t > nowT);
+    $('termSub').textContent = '时刻按本机时区';
+    $('terms').innerHTML = ts.map((x, i) => { const d = new Date(x.t); return `<div class="${i === nextI ? 'next' : x.t < nowT ? 'past' : ''}"><b>${x.n}</b><span>${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}</span></div>`; }).join('');
+    renderFest();
+    renderMe();
+  }
+  function renderFest() {
+    $('jpTg').classList.toggle('on', jp); $('jpTg').textContent = '日本历注 · ' + (jp ? '开' : '关');
+    const out = [];
+    for (let m = 1; m <= 12; m++) TS.month(Y, m).forEach(r => {
+      r.fest.forEach(f => { if (f.kind === 'cn' || jp) out.push({ r, n: f.n, cls: f.kind === 'jp' ? 'jp' : '' }); });
+      if (jp && r.sen.some(s => s.n === '天赦日')) out.push({ r, n: r.sen.some(s => s.n === '一粒万倍日') ? '天赦日＋一粒万倍日' : '天赦日', cls: 'k' });
+    });
+    $('fest').innerHTML = out.map(x => `<a class="${x.cls}" href="/huangli/?d=${x.r.key}"><span>${x.r.m}/${x.r.d}</span>${x.n}</a>`).join('');
+  }
+  function personSx() {
+    if (who && who.b) { const y = Fabao.birth.yearOf(who.b); return y ? y.sx : null; }
+    return manual ? mod(manual - 4, 12) : null;
+  }
+  function renderMe() {
+    const list = people.slice();
+    if (cur && cur.when && !list.some(p => Fabao.people.key(p) === Fabao.people.key(cur))) list.unshift(Object.assign({ name: cur.name || '当前命盘' }, cur));
+    $('ppl').innerHTML = list.map((p, i) => `<button type="button" data-i="${i}" class="${who && who.b && Fabao.people.key(who.b) === Fabao.people.key(p) ? 'on' : ''}">${p.name || '未名'}</button>`).join('') +
+      `<button type="button" data-i="-1" class="${!who ? 'on' : ''}">只填出生年</button>`;
+    $('ppl').querySelectorAll('button').forEach(b => b.onclick = () => { const i = +b.dataset.i; who = i < 0 ? null : { name: list[i].name, b: list[i] }; render(); });
+    const gz = mod(Y - 4, 60), z = gz % 12, C = KY.yearStar(Y);
+    let gy = null, name = '';
+    if (who && who.b) { const y = Fabao.birth.yearOf(who.b); gy = y && y.gzYear; name = who.name; }
+    else gy = manual;
+    if (!gy) {
+      $('meSub').textContent = '';
+      $('me').innerHTML = `<div class="me-in">出生年 <input type="number" id="byIn" min="1900" max="2100" placeholder="如 1990" inputmode="numeric"> <span class="fb-fine">立春前出生填上一年；在命部起过盘的会自动带进来</span></div>`;
+      $('byIn').onchange = () => { const v = +$('byIn').value; if (v >= 1900 && v <= 2100) { manual = v; lss('liunian.by', v); render(); } };
+      return;
+    }
+    const sxi = mod(gy - 4, 12), r = relOf(sxi, z), bm = bmStar(gy);
+    const bp = [1, 2, 3, 4, 5, 6, 7, 8, 9].find(p => starAt(C, p) === bm);
+    const relTxt = r.bad ? `<span class="bad">犯太岁（${r.tags.join('、')}）</span>：今年行事宜稳，少做大的变动` : r.tags.length ? `<span class="good">与太岁${r.tags.join('、')}</span>：今年得太岁助力` : '与太岁无冲无合，平平';
+    $('meSub').textContent = name ? `${name} · ${gy} 年生` : `${gy} 年生`;
+    $('me').innerHTML = `<div class="me-line">属<b>${SX[sxi]}</b>，${relTxt}。<br>
+      九星本命<b>${STAR[bm]}</b>，今年落<b>${PDIR[bp]}</b>${bp === 5 ? '' : '方'}——${PHASE[bp]}。</div>
+      ${who && who.b ? `<div class="links">
+        <a class="fb-btn" href="/bazi/${Fabao.birth.query('bazi', who.b)}">看八字大运流年</a>
+        <a class="fb-btn" href="/ziwei/${Fabao.birth.query('ziwei', who.b)}">看紫微流年</a>
+        <a class="fb-btn" href="/xingpan/${Fabao.birth.query('xingpan', who.b)}">看占星法达小限</a>
+        <a class="fb-btn" href="/jiuxing/">看九星吉方</a></div>` : `<div class="me-in" style="margin-top:8px">出生年 <input type="number" id="byIn" min="1900" max="2100" value="${gy}" inputmode="numeric"></div>`}`;
+    const bi = $('byIn'); if (bi) bi.onchange = () => { const v = +bi.value; if (v >= 1900 && v <= 2100) { manual = v; lss('liunian.by', v); render(); } };
+  }
+  const go = y => { Y = Math.min(2099, Math.max(1901, y)); const u = new URL(location.href); u.searchParams.set('y', Y); history.replaceState(null, '', u); render(); };
+  $('prevY').onclick = () => go(Y - 1);
+  $('nextY').onclick = () => go(Y + 1);
+  $('thisY').onclick = () => go(curY);
+  $('jpTg').onclick = () => { jp = !jp; lss('tongshu.jp', jp ? '1' : '0'); renderFest(); };
+  render();
+})();
+</script>
+</body>
+</html>
