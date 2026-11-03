@@ -304,7 +304,7 @@
       if (!yi.length && !ji.length) put(r.jianchu + '日（建除' + (r.jcTone > 0 ? '吉' : '凶') + '日）', r.jcTone * 0.5, '建除');
     } else put(r.jianchu + '日（建除' + (r.jcTone > 0 ? '吉' : '凶') + '日）', r.jcTone, '建除');
     if (r.jianchu === '破' && !(ev && ev.k === '求医')) put('月破（破日）大事勿用', -3, '建除');
-    put((r.huang ? '黄道 · ' : '黑道 · ') + r.shen, r.huang ? 1.5 : -1.5, '值神');
+    put((r.huang ? '黄道日（' : '黑道日（') + r.shen + '）', r.huang ? 1.5 : -1.5, '值神');
     r.notes.forEach(function (x) { put(x.n + '：' + x.d, -3.5, '通书'); });        // 岁破、四离四绝、杨公忌：大事勿用
     if (opt.sx != null && opt.sx === r.chong.zhi) put('日冲本命（属' + SX[opt.sx] + '）', -3, '冲');
     if (ev) {
