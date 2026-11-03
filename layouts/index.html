@@ -31,6 +31,8 @@ try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=ne
 
   {{- partial "qj-rike.html" . }}
 
+  {{- partial "qj-wenti.html" (dict "home" true) }}
+
   {{- partial "qj-pinned.html" (dict "title" "置顶" "note" "初来者先读") }}
 
   <nav class="qj-doors" aria-label="门径">

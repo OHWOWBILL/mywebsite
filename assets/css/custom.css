@@ -1144,6 +1144,29 @@ html[data-season="winter"] { --jin: #D8C597; --color-secondary-400: 216, 197, 15
 }
 .qj-rike-link:hover { color: var(--ge-fg); border-color: var(--zi); }
 
+/* ===========================================================
+   十二½ 我想问…（partials/qj-wenti.html · data/wenti.yaml）
+   =========================================================== */
+.qj-wenti .qj-block-h { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; color: var(--ge-fg); }
+.qj-wenti-note { margin-left: auto; font-family: var(--font-body); font-weight: 400; font-size: .78rem; letter-spacing: .06em; color: var(--ge-muted); }
+.qj-wenti-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr)); gap: .6rem; }
+.qj-wenti-a {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: .75rem; row-gap: .1rem;
+  align-items: center; padding: .75rem .85rem; text-decoration: none !important;
+  background: var(--ge-bg-2); border: 1px solid var(--ge-rule); border-radius: 4px;
+  transition: border-color .2s ease, background .2s ease;
+}
+.qj-wenti-a:hover, .qj-wenti-a:focus-visible { border-color: var(--zi); background: rgba(122, 91, 192, .14); }
+.qj-wenti-s {
+  grid-row: 1 / 3; width: 2rem; height: 2rem; display: grid; place-items: center;
+  font-family: var(--font-title); font-weight: 900; font-size: .95rem; color: var(--ge-zi);
+  border: 1px solid rgba(169, 148, 224, .55); border-radius: 3px;
+}
+.qj-wenti-q { font-family: var(--font-title); font-weight: 600; font-size: .98rem; letter-spacing: .06em; color: var(--ge-fg); line-height: 1.45; }
+.qj-wenti-d { font-family: var(--font-body); font-size: .8rem; color: var(--ge-muted); line-height: 1.5; }
+.qj-wenti-more .qj-wenti-s { border-style: dashed; }
+@media (max-width: 640px) { .qj-wenti-grid { grid-template-columns: 1fr 1fr; } .qj-wenti-a { grid-template-columns: 1fr; padding: .7rem; } .qj-wenti-s { grid-row: auto; width: 1.7rem; height: 1.7rem; font-size: .85rem; margin-bottom: .2rem; } .qj-wenti-note { margin-left: 0; width: 100%; } }
+
 .qj-rike-gua {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);

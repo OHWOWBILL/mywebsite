@@ -163,7 +163,7 @@
   let cands = [];
   try { cands = (JSON.parse(ls('zeri.c')) || []).map(s => new Date(s)).filter(d => !isNaN(d)); } catch (e) {}
   if (q.get('c')) cands = q.get('c').split(',').map(s => new Date(s)).filter(d => !isNaN(d));
-  let mode = q.get('d') ? 'find' : q.get('c') || cands.length ? 'cand' : (ls('zeri.mode') || 'find');
+  let mode = q.get('m') === 'cand' || q.get('m') === 'find' ? q.get('m') : q.get('d') ? 'find' : q.get('c') || cands.length ? 'cand' : (ls('zeri.mode') || 'find');
   let from = new Date(today), to = new Date(today); to.setDate(to.getDate() + 13);
   if (q.get('d')) { const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(q.get('d')); if (m) { from = new Date(+m[1], m[2] - 1, +m[3]); to = new Date(from); } }
   const WINS = [['全天', [0, 24]], ['9–22 点', [9, 22]], ['上午', [7, 12]], ['下午', [12, 18]], ['晚上', [18, 23]]];
