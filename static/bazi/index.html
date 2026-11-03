@@ -166,6 +166,16 @@
     .bz-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
     .bz-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
 
+    /* 白话：盘上几句大白话，随盘重画（紫微、占星同式） */
+    .bh { padding: 13px 18px 12px; }
+    .bh-h { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 6px; }
+    .bh-h small { font-size: 11.5px; color: var(--faint); letter-spacing: .12em; }
+    .bh .r { display: flex; gap: 8px; padding: 3px 0; font-size: 14px; line-height: 1.75; color: var(--fg-2); letter-spacing: .02em; }
+    .bh .r > i { flex: 0 0 3.6em; font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 23px; color: var(--faint); letter-spacing: .12em; white-space: nowrap; }
+    .bh .r > span { min-width: 0; }
+    .bh .r b { font-family: var(--font-title); font-weight: 600; color: var(--fg); }
+    .bh .fb-fine { margin-top: 6px; }
+
     @media (max-width: 1100px) {
       .bz-wrap { grid-template-columns: 1fr; }
       .bz-side { position: static; display: grid; grid-template-columns: 1fr 1fr; }
@@ -184,6 +194,9 @@
       .bz-pick-sum .bz-slot { flex: 1 1 0; min-width: 0; padding: 4px 2px 5px; font-size: 16px; }
       .bz-pick-reset { flex-basis: 100%; text-align: right; padding: 0 2px; }
       .bz-chips button { padding: 6px 8px 5px; }
+      .bh { padding: 12px 14px 11px; }
+      .bh .r { font-size: 13.5px; gap: 6px; }
+      .bh .r > i { font-size: 11.5px; }
     }
   </style>
 </head>
@@ -236,6 +249,7 @@
         <button class="fb-btn primary" id="castBtn" type="button">排盘</button>
         <button class="fb-btn" id="saveBtn" type="button">存盘</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
+        <button class="fb-btn" id="aiBtn" type="button" title="把命盘连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
       </div>
       <select id="libSel" aria-label="盘库"><option value="">盘库（存过的盘）</option></select>
       <p class="fb-fine">排盘全在这台设备上算，不上传；存盘只存在本机浏览器。</p>
@@ -246,6 +260,7 @@
 
   <div class="bz-wrap">
     <div class="bz-main">
+      <section class="fb-card bh" id="bhCard" aria-label="白话" hidden></section>
       <section class="fb-card bz-board" id="board" aria-label="命盘"></section>
       <section class="fb-card bz-yun" aria-label="大运流年">
         <div class="bz-yhead"><h3>大运 · 流年</h3><p id="yunNote"></p></div>
@@ -540,7 +555,7 @@ function render() {
         ${row('神煞', (c, i) => shaHTML(sha[i]))}
       </tbody>
     </table>`;
-  renderYun(); renderInfo(); renderWX(); renderSS(); renderRel(cols);
+  renderYun(); renderInfo(); renderWX(); renderSS(); renderRel(cols); renderBH();
 }
 
 $('board').addEventListener('click', e => { const s = e.target.closest('.bz-sha span[title]'); if (s) toast(s.title, 5000); });
@@ -636,6 +651,52 @@ function renderRel(cols) {
     : '<p class="bz-none">四柱之间无合冲刑害破</p>';
 }
 
+/* ================ 白话 ================ */
+// 盘上几句大白话：日主与月令、身强弱（简单计数）、格局、五行、性格倾向。只作参考，随盘重画。
+const GAN_XIANG = ['参天之木', '花草之木', '太阳之火', '灯烛之火', '高山之土', '田园之土', '刀斧之金', '珠玉之金', '江河之水', '雨露之水'];
+const WX_DE = ['仁', '礼', '信', '义', '智'];
+// 日主五行的常见说法：[本色, 偏强, 偏弱, 中和]
+const XING = [
+  ['正直上进、心地仁厚', '主见强、肯担当，也容易固执', '心软随和，遇事容易犹豫', '有原则，也能体谅人'],
+  ['热情开朗、反应快、讲礼数', '行动力足、爱表现，也容易急躁', '热情来得快去得也快，情绪易起落', '热情而有分寸'],
+  ['厚道稳重、守信用、能包容', '踏实可靠，但较固执保守', '思虑多、易犹豫，少一点安全感', '稳重而不失变通'],
+  ['果断、讲原则、重义气', '做事干脆，也容易刚硬好胜', '顾虑多、不爱起冲突，有时下不了决心', '有决断，也懂分寸'],
+  ['聪明灵活、善变通、心思细', '点子多、应变快，也容易想得多做得少', '多思多虑，做决定前常反复掂量', '灵活而有定见']
+];
+const GE_TXT = {
+  正官格: '多主守规矩、重名誉', 七杀格: '多主有魄力、扛得住压力', 正印格: '多主重学问修养、得长辈照应', 偏印格: '多主心思独到、偏好专门学问',
+  食神格: '多主性情温和、有口福才艺', 伤官格: '多主聪明外露、不爱受拘束', 正财格: '多主勤俭务实、重稳定收入', 偏财格: '多主慷慨善交际、对机会敏感',
+  建禄格: '多主自立自强、靠自己打拼', 阳刃格: '多主刚强敢拼，也易冲动'
+};
+// 身强弱 · 简单计数：得令（月令旺相）3 分，地支每处通根 1 分（中气、余气根半分），天干（年月时）每个印比 1 分
+function strength() {
+  const P = C.pillars, dg = P[2].gan;
+  const ws = B.wangshuai(GAN_WX[dg], ZHI_WX[P[1].zhi]), de = ws === '旺' || ws === '相';
+  const root = A.roots.reduce((s, r) => s + (r.qi === '本气' ? 1 : 0.5), 0);
+  const help = [0, 1, 3].filter(i => /印|比肩|劫财/.test(B.shishen(dg, P[i].gan))).length;
+  const score = (de ? 3 : 0) + root + help;
+  return { ws, de, root, help, score, level: score > 5 ? '偏强' : score <= 3 ? '偏弱' : '中和' };
+}
+const bhRow = (k, html) => `<div class="r"><i>${k}</i><span>${html}</span></div>`;
+function renderBH() {
+  const P = C.pillars, dg = P[2].gan, x = GAN_WX[dg], dw = WX[x], ling = WX[ZHI_WX[P[1].zhi]], S = strength();
+  const lingTxt = S.ws === '旺' ? `正当${ling}旺之时，得令` : `${ling}当令，${dw}在此为「${S.ws}」，${S.de ? '得令' : '不得令'}`;
+  // 五行：个数最多（同数看力量）、力量最弱、明面缺哪一行
+  const W = A.wuxing, maxN = Math.max(...W.map(w => w.count)), tops = W.filter(w => w.count === maxN);
+  const minW = Math.min(...W.map(w => w.weight)), lows = W.filter(w => w.weight === minW), miss = W.filter(w => !w.count);
+  let wx = `${tops.map(w => w.name).join('、')}最多（${tops.length > 1 ? '各 ' : ''}${maxN} 个${tops.some(w => w.ws === '旺') ? (tops.length > 1 ? `，${ling}又当令` : '，又当令') : ''}）`;
+  if (miss.length) wx += '；' + miss.map(w => w.weight ? `明面缺${w.name}（只藏在地支里）` : `缺${w.name}（藏干里也没有）`).join('，');
+  else wx += `，${lows.map(w => w.name).join('、')}最弱；五行俱全`;
+  const G = A.geju;
+  $('bhCard').innerHTML = `<div class="bh-h"><span class="fb-tag">白话</span><small>一眼看个大概 · 参考</small></div>` +
+    bhRow('日主', `<b>${GAN[dg]}${dw}</b>（${GAN_XIANG[dg]}）生于${ZHI[P[1].zhi]}月（${C.jie.prev.n}后），${lingTxt}；通根 ${A.roots.length} 处、天干印比 ${S.help} 个，按简单计数<b>${S.level}</b>。`) +
+    bhRow('格局', G ? `<b>${G.name}</b>（月令取格，参考）${GE_TXT[G.name] ? '，' + GE_TXT[G.name] : ''}。` : '月令无格可取。') +
+    bhRow('五行', wx + '。') +
+    bhRow('性格', `${dw}主${WX_DE[x]}，多半${XING[x][0]}；身${S.level}，${XING[x][S.level === '偏强' ? 1 : S.level === '偏弱' ? 2 : 3]}。`) +
+    `<p class="fb-fine">强弱是简单计数：得令（月令旺相）3 分，地支每处通根 1 分（中气、余气根半分），天干每个印比 1 分；过 5 分偏强，3 分及以下偏弱，其间中和，本盘 ${S.score} 分。未计合冲刑害与调候；性格取日主五行的常见说法。</p>`;
+  $('bhCard').hidden = false;
+}
+
 /* ================ 四柱反推 ================ */
 function runPick() {
   const names = pickNames();
@@ -703,8 +764,8 @@ $('libSel').onchange = () => {
   libCur = +v; apply(lib[libCur]);
   renderLib(); $('libSel').value = String(libCur);
 };
-$('copyBtn').onclick = () => {
-  if (!C) return;
+// 盘面文字：「复制」与「问 AI」共用
+function chartText() {
   const P = C.pillars, Lr = [];
   Lr.push(`八字 · ${C.name || '命盘'} · ${C.male ? '乾造' : '坤造'}`);
   Lr.push(`公历 ${B.fmtF(C.wall)}${C.input.dst ? '（夏令时）' : ''} ${tzLabel(C.tz)}${C.solar ? ` · 真太阳时 ${B.fmtF(C.clock)}` : ''} · 农历 ${C.lunar ? C.lunar.y + '年' + L.text(C.lunar) : '—'}`);
@@ -717,8 +778,32 @@ $('copyBtn').onclick = () => {
   const Y = C.yun;
   Lr.push(`起运 出生后${Y.span.y}年${Y.span.m}个月${Y.span.d}天${Y.span.h}时，${Y.start.y}-${pad(Y.start.mo)}-${pad(Y.start.d)} 交运（${Y.forward ? '顺' : '逆'}排）`);
   Lr.push('大运 ' + Y.dayun.slice(0, 8).map(d => `${d.name}(${d.startYear})`).join(' '));
-  copy(Lr.join('\n'), '命盘已复制');
-};
+  return Lr.join('\n');
+}
+$('copyBtn').onclick = () => { if (C) copy(chartText(), '命盘已复制'); };
+// 问 AI：盘面文字之外，再补五行、通根透干、取格与今年所行之运（AI 自己数容易数错），连同本页口径一并复制
+function aiText() {
+  const P = C.pillars, dg = P[2].gan, Y = C.yun, Lr = [chartText()];
+  Lr.push('五行 ' + A.wuxing.map(w => `${w.name}${w.count}个(力量${w.weight}·${w.ws})`).join(' ') + `，月令属${A.ling}`);
+  Lr.push(`日主 ${GAN[dg]}${WX[GAN_WX[dg]]}，生${ZHI[P[1].zhi]}月为${B.wangshuai(GAN_WX[dg], ZHI_WX[P[1].zhi])}；通根 ${A.roots.length ? A.roots.map(r => `${r.pillar}支${r.zhi}（${r.qi}${r.gan}）`).join('、') : '无'}；月令透干 ${A.tou.length ? A.tou.map(t => `${t.gan}（${t.qi}）透${t.pillar}干为${t.ss}`).join('、') : '无'}`);
+  if (A.geju) Lr.push(`取格 ${A.geju.name}：${A.geju.why}（《子平真诠》月令取格法，参考）`);
+  const k = Y.dayun.findIndex(d => NOW_Y >= d.startYear && NOW_Y <= d.endYear);
+  Lr.push(`今年 ${NOW_Y} 年，流年${B.gzName(B.yearGZ(NOW_Y))}，虚岁 ${NOW_Y - C.std.y + 1}，` + (k >= 0 ? `行${Y.dayun[k].name}大运（${Y.dayun[k].startYear}–${Y.dayun[k].endYear}）` : NOW_Y < Y.start.y ? `尚未起运（${Y.start.y} 年交运）` : '已过所排大运'));
+  // 用户另点了别的运、年、月，才把正在叠看的几柱写上
+  const xs = extraCols();
+  if (xs.length && JSON.stringify(sel) !== JSON.stringify(defaultSel())) Lr.push('盘上正叠看 ' + xs.map(c => `${c.role}${c.name}（${c.sub}）`).join(' · '));
+  return Lr.join('\n');
+}
+function rulesText() {
+  return [
+    '节气按太阳视黄经算（与寿星万年历相差一分钟内）：年柱以立春换，月柱以十二节换，交节时刻精确到分，按出生地时区。',
+    `日柱、时柱按出生地${C.solar ? '真太阳时（经度时差 + 均时差）' : '钟表时间'}${C.input.dst ? '，已扣夏令时一小时' : ''}；${C.zi === 'same' ? '晚子时（23–24 点）日柱仍算本日，时柱接次日子时' : '23 点即换日（子时作次日）'}。`,
+    '大运阳男阴女顺排、阴男阳女逆排；起运按出生到前后节的时间折算：三日一年、一日四月、一时辰十日。',
+    '藏干分本气、中气、余气（五行力量按 0.6 / 0.3 / 0.1 分，二藏 0.7 / 0.3）；人元司令依《渊海子平》；取格依《子平真诠》月令取格法，仅供参考。',
+    '神煞只列常用者：羊刃取禄前一位；驿马、桃花、华盖等三合类以年支、日支两查；天乙、太极、文昌、国印以日干、年干两查。'
+  ].join('\n');
+}
+$('aiBtn').onclick = () => { if (C) Fabao.askAI('八字（子平）', aiText(), rulesText()); };
 function writeURL() {
   const s = snapshot(), q = new URLSearchParams();
   if (s.cal === 'lunar') { q.set('l', `${s.ly}-${s.lm}-${s.ld}`); q.set('t', s.lt); }
