@@ -5,6 +5,7 @@
      一、日：通书底座（/fabao/tongshu.js）给这一天对这件事的分（协纪辨方的每日宜忌、黄道黑道、大吉神、
         二十八宿、冲本命、岁破四离四绝杨公忌、彭祖百忌，开了日本历注再加六曜選日）；
      二、时：这个时辰的值神黄道黑道、时辰冲本命；开了日本历注再看六曜的上午下午（先勝、先負、赤口）；
+     附：嫁娶填了新娘出生年，再按《尅择讲义·嫁娶碎金赋》看女命（利月、杀翁姑、夫星天嗣、夫妻男女宫、埋儿时、孤寡），见 nvming.js；
      三、奇门：按事项取题型（面试→求职、考试面谈→考试……），用奇门手记的白话断语（QM.verdict）打分，
         年命填了也一并看。
    三层相加排先后；23 点以后按奇门惯例算次日子时。
@@ -17,6 +18,7 @@
   var NODE = typeof module !== 'undefined' && module.exports;
   var TS = NODE ? require('../fabao/tongshu.js') : root.TS;
   var QM = NODE ? require('../qimen/core.js') : root.QM;
+  var NM = NODE ? require('./nvming.js') : root.ZR_NM;
   var HOUR = 3600e3;
 
   // —— 读候选时间 ——
@@ -55,7 +57,7 @@
   }
 
   // —— 一个时刻 ——
-  // opt: { ev: 事项键, jp: 日本历注, sx: 本命年支或 null, ming: 出生年（奇门年命）或 null }
+  // opt: { ev: 事项键, jp: 日本历注, sx: 本命年支或 null, ming: 出生年（奇门年命）或 null, bride: 新娘出生年（只嫁娶用）或 null }
   function evalTime(date, opt) {
     var ev = TS.EV_BY[opt.ev] || TS.EVENTS[0];
     var civil = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -80,10 +82,13 @@
     var v = c ? QM.verdict(c, ev.qm) : null;
     var w = ev.qm === '自由' ? 0.3 : 0.55;
     var qmS = v ? (v.score + 3) * w : 0;
-    var total = Math.round((dayS.score + hourS + qmS) * 10) / 10;
+    var nm = ev.k === '嫁娶' && opt.bride && NM ? NM.items(r, hz, NM.of(opt.bride)) : [];
+    var nmS = 0; nm.forEach(function (x) { nmS += x.v; });
+    var total = Math.round((dayS.score + hourS + qmS + nmS) * 10) / 10;
     var items = []
       .concat(dayS.plus.concat(dayS.minus).map(function (x) { return { t: x.t, v: x.v, src: '日' }; }))
       .concat(hourItems.map(function (x) { return { t: x.t, v: x.v, src: '时' }; }))
+      .concat(nm.map(function (x) { return { t: x.t, v: x.v, src: '女命' }; }))
       .concat(v ? v.items.map(function (x) { return { t: x.t, v: x.v * w, src: '奇门' }; }) : []);
     var pros = items.filter(function (x) { return x.v > 0; }).sort(function (a, b) { return b.v - a.v; });
     var cons = items.filter(function (x) { return x.v < 0; }).sort(function (a, b) { return a.v - b.v; });
@@ -92,6 +97,7 @@
       dayScore: dayS.score, dayGrade: TS.grade(dayS.score, opt.jp), dayPlus: dayS.plus, dayMinus: dayS.minus,
       hourScore: Math.round(hourS * 10) / 10, hourItems: hourItems,
       qm: v, qmScore: Math.round(qmS * 10) / 10, chart: c,
+      nm: nm, nmScore: Math.round(nmS * 10) / 10,
       total: total, grade: grade(total, opt.jp), pros: pros, cons: cons
     };
   }
