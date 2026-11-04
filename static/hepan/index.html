@@ -536,7 +536,7 @@ function renderResults() {
     title: `${na} × ${nb}`,
     key: v.head + (v.tail ? '；' + v.tail : ''),
     lines: [['契合', `合 ${t.good} · 冲 ${t.bad} · 平 ${t.mid}`]].concat(R.rows.filter(r => r.id !== 'wx').slice(0, 5).map(r => [r.label, `${r.word}：${r.text}`])),
-    url: location.origin + '/hepan/'      // 两人生辰不进二维码
+    url: location.origin + '/hepan/', qrLabel: '扫码也合一盘'      // 两人生辰不进二维码
   });
   S.hidden = false;
   renderBazi(); renderXing();

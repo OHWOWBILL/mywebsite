@@ -301,6 +301,7 @@
         <button class="fb-btn primary" id="saveBtn" type="button">存盘</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
         <button class="fb-btn" id="aiBtn" type="button" title="把星盘连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button class="fb-btn" id="shareBtn" type="button" title="把这一页画成一张图，可存可分享">分享图</button>
       </div>
       <select id="libSel" aria-label="盘库"><option value="">盘库（存过的盘）</option></select>
       <p class="fb-fine">回归黄道。行星位置按 Schlyter 算法，精度约一至二角分；排盘全在本机计算，不上传。</p>
@@ -353,7 +354,7 @@
       </div>
       <p class="fb-key" id="trKey"></p>
       <div class="bh-h"><span class="fb-tag" id="trTopTag">今天最要紧的三条</span><small>按行运星轻重、落点、相位与紧密排 · 白话为常见说法，参考</small></div>
-      <ol class="xp-top3" id="trTop"></ol>
+      <ol class="xp-top3" id="trTop" data-gloss></ol>
     </section>
     <div class="xp-wrap">
       <div class="xp-main">
@@ -397,7 +398,7 @@
         </div>
       </div>
       <p class="fb-key" id="srKey"></p>
-      <div class="xp-dl" id="srPoints"></div>
+      <div class="xp-dl" id="srPoints" data-gloss></div>
     </section>
     <div class="xp-wrap">
       <div class="xp-main">
@@ -428,7 +429,7 @@
         </div>
       </div>
       <p class="fb-key" id="rtKey"></p>
-      <p class="xp-note" id="rtNow"></p>
+      <p class="xp-note" id="rtNow" data-gloss></p>
       <div class="xp-rt" id="rtTL"></div>
       <div class="xp-rt-key"><span><i></i>逆行（留逆至留顺）</span><span><i class="sh"></i>影子期</span><span><i class="tdy"></i>今天</span></div>
     </section>
@@ -454,7 +455,7 @@
     </section>
     <section class="fb-card xp-card" aria-label="未来七天">
       <h3>未来七天<small>自末一相位起，至月亮入下一座止</small></h3>
-      <div class="xp-vc" id="vcList"></div>
+      <div class="xp-vc" id="vcList" data-gloss></div>
     </section>
   </div>
 
@@ -1146,6 +1147,20 @@ function viewText() {
   }
   return L.join('\n');
 }
+// 分享图：本命取白话卡；行运、回归、逆行、空亡取该视图的要紧一句与几行。二维码只带视图，不带生辰
+$('shareBtn').onclick = () => {
+  if (!C && tab !== 'retro' && tab !== 'void') return;
+  const S = XP.SIGNS, key = id => { const el = $(id); return el ? el.innerText.replace(/\s+/g, ' ').trim() : ''; };
+  const u = location.origin + '/xingpan/' + (tab === 'natal' ? '' : '?v=' + tab), self = tab === 'retro' || tab === 'void';
+  const lines = tab === 'natal' ? null : viewText().split('\n').slice(1).filter(s => s && !/^(行运相位|行运星) /.test(s)).slice(0, 7).map(s => s.length > 70 ? s.slice(0, 69) + '…' : s);
+  const title = {
+    natal: C ? `太阳${S[C.bodies.sun.sign]} · 月亮${S[C.bodies.moon.sign]} · 上升${S[Math.floor(C.angles.asc / 30)]}` : '星盘',
+    transit: '行运 · ' + (trData ? ymd(trData.t) : ''), 'return': '太阳回归 · ' + (srData ? srData.Y : ''),
+    retro: '逆行日历 · ' + (rtData ? rtData.Y : ''), void: '月亮空亡 · 未来七天'
+  }[tab];
+  Fabao.share(Object.assign({ title, url: u, qrLabel: self ? '扫码看这一页' : '扫码也排一盘' },
+    tab === 'natal' ? {} : { key: key({ transit: 'trKey', 'return': 'srKey', retro: 'rtKey', void: 'vcKey' }[tab]), lines }));
+};
 $('copyBtn').onclick = () => { if (C) { const v = tab === 'natal' ? '' : viewText(); copy(chartText() + (v ? '\n\n' + v : ''), (tab === 'natal' ? '星盘' : VIEW_NAME[tab]) + '已复制'); } };
 // 问 AI：盘面文字再补元素模式分布、命主星、今年的小限与法达，连同本页口径一并复制
 function aiText() {

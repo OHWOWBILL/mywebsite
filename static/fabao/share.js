@@ -4,8 +4,8 @@
 // 样子跟首页日签（assets/js/qj/qian.js）一路：紫夜底、月白字、金只落在要紧的那一句。
 // fabao.js 的 Fabao.share(opt) 用到时才取本文件。opt 里不给的，从页面上取：
 //   印（.fb-head .fb-seal）、法宝名（.fb-title）、要紧一句（.fb-key，或白话卡第一行）、几行（白话卡 .bh .r）。
-// opt = { seal, tool, title, key, lines: ['…' | ['标签', '…']], meta, url }
-//   url 默认是当前网址（去掉名字参数 n，免得人名跟着图到处走）。
+// opt = { seal, tool, title, key, lines: ['…' | ['标签', '…']], meta, url, qrLabel }
+//   url 默认是当前网址（去掉名字参数 n，免得人名跟着图到处走）；命部各盘传不带生辰的网址，qrLabel 改说「扫码也排一盘」。
 // =========================================================
 (function () {
   'use strict';
@@ -163,7 +163,7 @@
       tx = X + qs + 34;
     }
     wrap(ctx, o.meta || '', '28px ' + BODY, W - tx - X - 150, 2, 2).forEach((l, i) => text(ctx, l, tx, qy + 44 + i * 40, '28px ' + BODY, C.fg2, 'left', 2));
-    if (q) text(ctx, '扫码看这一盘', tx, qy + 132, '28px ' + BODY, C.mute, 'left', 3);
+    if (q) text(ctx, o.qrLabel || '扫码看这一盘', tx, qy + 132, '28px ' + BODY, C.mute, 'left', 3);
     text(ctx, 'ohwowbill.com', tx, qy + 182, '500 30px ' + MARK, C.mute, 'left');
     // 落款印：紫府底，阴文「潜蛟子印」，右起竖读
     const ss = 104, sx = W - X - ss, sy2 = qy + 40;
@@ -233,7 +233,7 @@
     Object.keys(opt || {}).forEach(k => { if (opt[k] != null && opt[k] !== '') o[k] = opt[k]; });
     if (!o.meta) o.meta = defaultMeta();
     const link = shareURL(o.url);
-    const all = [o.seal, o.tool, o.title, o.key, o.meta].concat([].concat.apply([], (o.lines || []).map(l => [].concat(l)))).join('') +
+    const all = [o.seal, o.tool, o.title, o.key, o.meta, o.qrLabel].concat([].concat.apply([], (o.lines || []).map(l => [].concat(l)))).join('') +
       '潜蛟阁法宝库扫码看这一盘术数之言聊备参考潜蛟子印…·';
     if (F.toast) F.toast('研墨中……', 2500);
     const qp = F.qr ? F.qr(link, 'L').catch(() => null) : Promise.resolve(null);

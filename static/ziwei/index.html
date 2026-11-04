@@ -802,7 +802,7 @@ $('aiBtn').onclick = () => { if (C) Fabao.askAI('紫微斗数', aiText(), rulesT
 $('shareBtn').onclick = () => {
   if (!C) { toast('先排一盘'); return; }
   const p = C.palaces[C.ming], I = C.info;
-  Fabao.share({ title: `命宫在${p.zhi} · ${p.major.length ? p.major.map(s => s.name).join('') : '空宫'}`, meta: `${I.ju} · 命主${I.soul} · 身主${I.body}` });
+  Fabao.share({ title: `命宫在${p.zhi} · ${p.major.length ? p.major.map(s => s.name).join('') : '空宫'}`, meta: `${I.ju} · 命主${I.soul} · 身主${I.body}`, url: location.origin + '/ziwei/', qrLabel: '扫码也排一盘' });
 };
 function writeURL() {
   const s = formSnapshot(), q = new URLSearchParams();

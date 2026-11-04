@@ -225,6 +225,7 @@
         <button type="button" class="fb-btn primary grow" id="copyBtn">复制</button>
         <button type="button" class="fb-btn grow" id="aiBtn" title="把课式、白话和口径打包复制，贴给任意 AI">问 AI</button>
         <button type="button" class="fb-btn grow" id="linkBtn">此课链接</button>
+        <button type="button" class="fb-btn grow" id="shareBtn" title="把这一课画成一张图，可存可分享">分享图</button>
       </div>
     </div>
   </section>
@@ -496,6 +497,13 @@ $('copyBtn').onclick = () => { if (cur) F.copy(LR.text(cur, { ask: ask() }), '�
 $('aiBtn').onclick = () => {
   if (!cur) return;
   F.askAI('大六壬', LR.text(cur, { ask: ask() }) + '\n\n本站白话（参考）：\n' + plainText(), rulesText());
+};
+$('shareBtn').onclick = () => {
+  if (!cur) return;
+  const c = cur, u = new URL(location.href); u.search = ''; u.hash = '';
+  u.searchParams.set('t', F.toLocalInput(date));
+  F.share({ title: `${Z[c.jiang]}将加${Z[c.hour]}时 · ${c.pillars[2].name}日`, meta: `${F.fmt(c.date)} · ${c.pillars.map(p => p.name).join(' ')}`, url: u.toString(),
+    lines: (ask() ? [['所问', ask()]] : []).concat(LR.plain(c).map(r => [r.lab, r.html.replace(/<[^>]+>/g, '')])) });
 };
 $('linkBtn').onclick = () => {
   const u = new URL(location.href); u.search = ''; u.hash = '';
