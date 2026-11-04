@@ -1,6 +1,6 @@
 /* 六十甲子签 · 60 签
    签诗、卦象、断语、典故：DestinyLab/lottery-poetry-sixty-jiazi（MIT）。倾向 t 与白话解 j：潜蛟阁所写。
-   出处与许可：同目录 jiazi.LICENSE.md */
+   出处与许可：同目录 jiazi.LICENSE.txt */
 (function (root) {
   'use strict';
   var D = {
@@ -13,7 +13,7 @@
     scale: null,
     tones: ["吉","平","凶"],
     rite: "jiao",
-    note: "jiazi.LICENSE.md",
+    note: "jiazi.LICENSE.txt",
     origin: "台湾妈祖庙、王爷庙多用的六十签，以甲子至癸亥为号；签纸附卦象与各事断语，不标吉凶等级。",
     credit: "据 DestinyLab/lottery-poetry-sixty-jiazi（MIT，Lance He），繁体转简体、繁体原文同存；「倾向」与白话解为本站所写。",
     lots: [

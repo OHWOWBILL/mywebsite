@@ -1,6 +1,6 @@
 /* 观音灵签 · 100 签
    签诗、等级、典故名：古本，公有领域，三份公开转录互校。白话解 j：潜蛟阁所写。
-   出处与许可：同目录 guanyin.SOURCE.md */
+   出处与许可：同目录 guanyin.SOURCE.txt */
 (function (root) {
   'use strict';
   var D = {
@@ -11,7 +11,7 @@
     unit: "签",
     scale: ["上签","中签","下签"],
     rite: "jiao",
-    note: "guanyin.SOURCE.md",
+    note: "guanyin.SOURCE.txt",
     origin: "流传最广的一套，各地观音庙多用：一百签，七言四句，每签附一则典故。",
     credit: "签诗为民间流传古本（公有领域），据三份公开转录互校（各本均无开放许可，只取签诗、等级与典故名，不取其解签）；白话解为本站所写。",
     lots: [

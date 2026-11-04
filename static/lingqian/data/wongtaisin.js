@@ -1,6 +1,6 @@
 /* 黄大仙灵签 · 100 签
    签题、等级、签诗：Paul-sinbud2004/Bazi-cli（MIT），以 wickes1/wong-tai-sin（MIT）校字。白话解 j：潜蛟阁所写。
-   出处与许可：同目录 wongtaisin.LICENSE.md */
+   出处与许可：同目录 wongtaisin.LICENSE.txt */
 (function (root) {
   'use strict';
   var D = {
@@ -11,7 +11,7 @@
     unit: "签",
     scale: ["上上","上吉","中吉","中平","下下"],
     rite: "jiao",
-    note: "wongtaisin.LICENSE.md",
+    note: "wongtaisin.LICENSE.txt",
     origin: "香港啬色园黄大仙祠的一百签，每签以一则典故为题，七言四句。",
     credit: "签题、等级与签诗据 Paul-sinbud2004/Bazi-cli（MIT），对照 wickes1/wong-tai-sin（MIT）校正错字；白话解为本站所写。",
     lots: [

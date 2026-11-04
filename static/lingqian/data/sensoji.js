@@ -1,6 +1,6 @@
 /* 浅草寺おみくじ · 100 番
    签诗与等级：古本，公有领域，三份公开转录互校。白话解 j：潜蛟阁所写。
-   出处与许可：同目录 sensoji.SOURCE.md */
+   出处与许可：同目录 sensoji.SOURCE.txt */
 (function (root) {
   'use strict';
   var D = {
@@ -12,7 +12,7 @@
     unit: "番",
     scale: ["大吉","吉","半吉","小吉","末小吉","末吉","凶"],
     rite: "none",
-    note: "sensoji.SOURCE.md",
+    note: "sensoji.SOURCE.txt",
     origin: "东京浅草寺的观音百签（元三大师御籤），五言四句，凶签约占三成。寺里不掷筊，摇签筒得签号即可。",
     credit: "五言签诗为古本（公有领域），据三份公开转录互校（各本均无开放许可，只取签诗与等级，不取签纸上的现代解说）；白话解为本站所写。",
     lots: [

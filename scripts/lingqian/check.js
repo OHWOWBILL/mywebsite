@@ -77,7 +77,7 @@ eq(P('sensoji', 100), ['凶', '', '禄走白云间|携琴走远山|不遇神仙�
 /* —— 四、出处与许可文件就在数据旁边 —— */
 const notes = LQ.sets().map(D => [D.id, D.note, fs.existsSync(path.join(DIR, 'data', D.note)) && fs.statSync(path.join(DIR, 'data', D.note)).size > 500]);
 eq(notes.filter(x => !x[2]).map(x => x[0]), [], '每套数据旁都有出处或许可文件（' + notes.map(x => x[1]).join('、') + '）');
-const mit = ['guandi.LICENSE.md', 'jiazi.LICENSE.md', 'wongtaisin.LICENSE.md'].filter(f => !/Permission is hereby granted, free of charge/.test(fs.readFileSync(path.join(DIR, 'data', f), 'utf8')));
+const mit = ['guandi.LICENSE.txt', 'jiazi.LICENSE.txt', 'wongtaisin.LICENSE.txt'].filter(f => !/Permission is hereby granted, free of charge/.test(fs.readFileSync(path.join(DIR, 'data', f), 'utf8')));
 eq(mit, [], '三份 MIT 来源的许可全文都附上了');
 
 /* —— 五、掷筊 —— */

@@ -1,6 +1,6 @@
 /* 关帝灵签 · 100 签
    签诗与等级：清刊本，公有领域；校勘取自 lakeofsky347/dsh-wen_xiang（MIT）。白话解 j：潜蛟阁所写。
-   出处与许可：同目录 guandi.LICENSE.md */
+   出处与许可：同目录 guandi.LICENSE.txt */
 (function (root) {
   'use strict';
   var D = {
@@ -11,7 +11,7 @@
     unit: "签",
     scale: ["上上","大吉","上吉","中吉","中平","下下"],
     rite: "jiao",
-    note: "guandi.LICENSE.md",
+    note: "guandi.LICENSE.txt",
     origin: "关帝庙通行的一百签。此据清代刻本：七言四句，等级分六等。",
     credit: "签诗与等级据《关帝灵签》姑苏钮氏藏板清刊本（哈佛燕京图书馆藏，公有领域），用 dsh-wen_xiang 校勘本（MIT）；白话解为本站所写。",
     lots: [
