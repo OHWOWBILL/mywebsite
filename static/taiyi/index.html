@@ -202,6 +202,7 @@
         <button type="button" class="fb-btn primary grow" id="copyBtn">复制</button>
         <button type="button" class="fb-btn grow" id="aiBtn" title="把盘面、白话和口径打包复制，贴给任意 AI">问 AI</button>
         <button type="button" class="fb-btn grow" id="linkBtn">此盘链接</button>
+        <button type="button" class="fb-btn grow" id="shareBtn" title="把这一盘画成一张图，可存可分享">分享图</button>
       </div>
       <div class="fb-fine">积年依《太乙金镜式经》· 可排 1900–2100 年</div>
     </div>
@@ -582,6 +583,12 @@ $('linkBtn').onclick = () => {
   const u = new URL(location.href);
   u.search = ''; u.searchParams.set('t', F.toLocalInput(date)); u.searchParams.set('ji', view.kind);
   F.copy(u.toString(), '此盘链接已复制');
+};
+// 分享图：计与时刻为题，金句与几行取页上的要紧一句与白话卡；二维码回到这一盘
+$('shareBtn').onclick = () => {
+  const u = new URL(location.href);
+  u.search = ''; u.searchParams.set('t', F.toLocalInput(date)); u.searchParams.set('ji', view.kind);
+  F.share({ title: `${{ year: '年计', month: '月计', day: '日计', hour: '时计' }[view.kind] || '太乙'} · ${F.fmt(date)}`, url: u.toString() });
 };
 $('rulesList').innerHTML = RULES.map(r => `<li><b>${r[0]}</b>${r[1]}</li>`).join('') +
   '<li><b>许可</b>kintaiyi 采 MIT 许可，原文与引用清单见 <a href="/taiyi/LICENSE-kintaiyi.txt">LICENSE-kintaiyi.txt</a>；《太乙金镜式经》据 Kanripo（漢籍リポジトリ）KR3g0047 四库全书本。</li>';
