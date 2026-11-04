@@ -119,6 +119,27 @@ eq([W.score, W.grade, L.score, L.grade], [90, '上佳', 45, '偏弱'], '王菲 9
 const H = XM.analyze(['后'], ['羿'], { pick: { 后: '後' } }), F2 = XM.analyze(['刘'], ['备'], { fix: { 劉: 16 } });
 eq([H.chars[0].t, H.chars[0].n, F2.chars[0].n, F2.chars[0].src, F2.ge.tian.n], ['後', 9, 16, 'user', 17], '可改选繁体（后→後9），可手改笔画（劉改16，天格随之为17）');
 
+// 随机两千个名字（四种姓名形状，字取自简繁表两边）：不抛错、五格自洽、文字齐全
+const pool = Array.from(new Set(STS.replace(/ /g, '')));
+let seed = 7; const rnd = n => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed % n; };
+const fuzzBad = [];
+for (let i = 0; i < 2000; i++) {
+  const ns = 1 + (i % 2), ng = 1 + ((i >> 1) % 2);
+  const sur = Array.from({ length: ns }, () => pool[rnd(pool.length)]), giv = Array.from({ length: ng }, () => pool[rnd(pool.length)]);
+  let R2;
+  try { R2 = XM.analyze(sur, giv); } catch (e) { fuzzBad.push('抛错 ' + sur.join('') + giv.join('') + ' ' + e.message); continue; }
+  const S2 = R2.chars.slice(0, ns).map(x => x.n), G2 = R2.chars.slice(ns).map(x => x.n);
+  const why = !R2.ok ? '排不出' :
+    R2.ge.zong.n !== S2.concat(G2).reduce((a, b) => a + b, 0) ? '总格不等于笔画和' :
+    R2.ge.wai.n !== R2.ge.tian.n + R2.ge.di.n - R2.ge.ren.n ? '外格不合' :
+    Object.values(R2.ge).some(g => !(g.num >= 1 && g.num <= 81) || !g.text || !g.wx) ? '数理缺项' :
+    !XM.SANCAI[R2.sancai.key] || !R2.sancai.up || !R2.sancai.down ? '三才缺项' :
+    !(R2.score >= 0 && R2.score <= 100) || !R2.grade || R2.say.lines.length < 2 ? '总评缺项' :
+    !XM.toText(R2).includes(R2.tname) ? '文字版缺名' : '';
+  if (why) { fuzzBad.push(why + ' ' + sur.join('') + '|' + giv.join('')); if (fuzzBad.length > 4) break; }
+}
+eq(fuzzBad, [], '随机两千个名字：都排得出，总格＝笔画和、外格＝天＋地－人，数理、三才、总评与文字版齐全');
+
 /* —— 八、数据文件 —— */
 eq([KX.ALPH.length, new Set(KX.ALPH).size, KX.kx.length, [...KX.kx].filter(c => c !== '.').length], [64, 64, 0x9FFF - 0x4E00 + 1, 20717], 'kangxi.js：基本区 20,992 位，有数 20,717 字');
 eq(Object.values(KX.fix).concat(Object.values(KX.alt), Object.values(KX.more), Object.values(KX.est)).every(n => Number.isInteger(n) && n > 0 && n < 70), true, 'fix / alt / more / est 的数都合理');

@@ -88,6 +88,7 @@
     .facts details[open] summary::after { content: " －"; }
     .facts details p { margin-top: 4px; font-size: 12.5px; line-height: 1.75; color: var(--muted); }
     .facts .hou-jp { display: block; color: var(--qing); font-size: 12.5px; }
+    .facts .se { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; box-shadow: 0 0 0 1px rgba(237, 235, 242, .18); }
     .facts .hou-jp small { color: var(--faint); }
     .sky { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 14px; padding: 10px 12px; border-radius: var(--r); background: var(--bg-3); font-size: 13px; color: var(--fg-2); }
     .sky .k { font-family: var(--font-title); color: var(--faint); letter-spacing: .1em; margin-right: 3px; }
@@ -227,6 +228,7 @@
 <script src="/fabao/tongshu-shensha.js?v=1"></script>
 <script src="/fabao/tongshu-hou.js?v=1"></script>
 <script src="/fabao/tongshu.js?v=2"></script>
+<script src="/fabao/jieqi-se.js?v=1"></script>
 <script src="/fabao/cities.js?v=1"></script>
 <script src="/xingpan/xingpan.js?v=1"></script>
 <script src="/fabao/tongshu-sky.js?v=1"></script>
@@ -309,7 +311,7 @@
     const jq = r.jieqi ? `<span class="tag k">${pad(new Date(r.jieqi.t).getHours())}:${pad(new Date(r.jieqi.t).getMinutes())} 交${r.jieqi.n}</span>` : '';
     const fest = r.fest.filter(f => f.kind === 'cn' || jp).map(f => `<span class="tag ${f.kind === 'cn' ? 'k' : ''}">${f.n}</span>`).join('');
     const notes = r.notes.map(n => `<span class="warn">${n.n}：${n.d}</span>`).join('');
-    const H = r.hou;
+    const H = r.hou, se = H && (window.QJ_JIEQI_SE || {})[H.jie];
     return `
       <div class="d-top">
         <div>
@@ -343,7 +345,7 @@
         <div><dt>阴贵</dt><dd>${r.fang.yinGui}</dd></div>
         ${r.tai ? `<div class="wide"><dt>胎神</dt><dd>${r.tai.day}${r.tai.month ? ` <small>· 本月${r.tai.month}</small>` : ''}</dd></div>` : ''}
         ${r.xiu ? `<div class="wide"><dt>星宿</dt><dd><details><summary><span class="${r.xiu.luck === '吉' ? 'lk' : 'xk'}">${r.xiu.full} · ${r.xiu.luck}</span> <small>${r.xiu.gong}方${r.xiu.shou}</small> ${r.xiu.note}</summary><p>${r.xiu.song}</p></details></dd></div>` : ''}
-        ${H && H.cn ? `<div class="wide"><dt>七十二候</dt><dd>${H.cnName} · ${H.cn}${H.first ? ' <small>（今日入候）</small>' : ''}${jp ? `<span class="hou-jp">本朝 ${H.jpName} · ${H.jp} <small>${H.yomi}</small></span>` : ''}</dd></div>` : ''}
+        ${H && H.cn ? `<div class="wide"><dt>七十二候</dt><dd>${se ? `<i class="se" style="background:${se[1]}" title="${H.jie}色 · ${se[0]}：${se[2]}"></i>` : ''}${H.cnName} · ${H.cn}${H.first ? ' <small>（今日入候）</small>' : ''}${se ? ` <small>· ${se[0]}</small>` : ''}${jp ? `<span class="hou-jp">本朝 ${H.jpName} · ${H.jp} <small>${H.yomi}</small></span>` : ''}</dd></div>` : ''}
         <div class="wide"><dt>彭祖</dt><dd>${r.pengzu.join('；')}</dd></div>
       </dl>
       ${jp ? `<div class="jp"><span class="lab">日本历注</span><span class="tag ${r.rokuyo === '大安' ? 'g' : r.rokuyo === '仏滅' ? 'b' : ''}" title="${r.rokuyoNote}">${r.rokuyo}</span>

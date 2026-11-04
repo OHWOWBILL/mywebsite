@@ -421,7 +421,7 @@ function renderCands() {
   const ok = C.filter(c => c.ok);
   $('cmpHint').innerHTML = !C.length
     ? `${sur ? `姓取上面的「${esc(sur)}」；两字以内当名，三字以上当全名。` : '上面没写姓时，这里请写全名。'}<button type="button" class="xm-mini" id="egBtn">填几个试试</button>`
-    : `共 ${C.length} 个${ok.length < C.length ? `（${C.length - ok.length} 个排不了）` : ''} · 按参考分排，点一行看详解 · 分数是本页的简单加权，只作比较`;
+    : `共 ${C.length} 个${ok.length < C.length ? `（${C.length - ok.length} 个排不了）` : ''}${C.extra ? `，另有 ${C.extra} 个超出上限未排` : ''} · 按参考分排，点一行看详解 · 分数是本页的简单加权，只作比较`;
   const eg = $('egBtn'); if (eg) eg.onclick = () => { $('candIn').value = sur ? CAND_EG : '张子涵 张梓萱 欧阳一诺'; onCand(); };
   if (!C.length) { box.innerHTML = ''; return; }
   const curKey = R && R.ok ? R.tname : '';

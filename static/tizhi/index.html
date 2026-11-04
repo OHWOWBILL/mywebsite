@@ -354,6 +354,12 @@ const qHTML = t => esc(t).replace(/（[^）]{2,}）/g, m => `<span class="p">${m
 function show(which) {
   ['introBox', 'oneBox', 'allBox', 'resultBox'].forEach(id => { $(id).hidden = id !== which; });
 }
+// 没有结果可看时：有没答完的就回去接着答，否则回起始页
+function home() {
+  at = -1;
+  if (cur) renderQuiz(true);
+  else { renderIntro(); show('introBox'); window.scrollTo(0, 0); }
+}
 
 /* ================ 起始 ================ */
 function renderIntro() {
@@ -393,6 +399,10 @@ function renderQuiz(top) {
   if (top) window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
+// 作答时的小字：性别（可改）、重来、有存档时可先看上次结果（进度不丢）
+const metaHTML = () => `${SEX[cur.x]} · <button type="button" class="tz-link" data-go="sex">改性别</button> · <button type="button" class="tz-link" data-go="restart">重来</button>` +
+  (H.length ? ` · <button type="button" class="tz-link" data-go="peek">上次结果</button>` : '');
+
 // —— 逐题 ——
 function renderOne(focus) {
   const L = qsOf(), i = cur.i = Math.max(0, Math.min(cur.i, L.length - 1)), q = L[i], a = cur.ans[q.id], n = nDone();
@@ -412,7 +422,7 @@ function renderOne(focus) {
       </div>
       <div class="tz-nav">
         <button type="button" class="fb-btn" data-go="prev"${i === 0 ? ' disabled' : ''}>‹ 上一题</button>${next}
-        <span class="tz-meta">${SEX[cur.x]} · <button type="button" class="tz-link" data-go="sex">改性别</button> · <button type="button" class="tz-link" data-go="restart">重来</button></span>
+        <span class="tz-meta">${metaHTML()}</span>
       </div>
     </section>`;
   if (focus) { const h = $('qText'); if (h) h.focus({ preventScroll: true }); }
@@ -462,7 +472,7 @@ function renderAll() {
       <button type="button" class="fb-btn ghost tz-sw" data-go="one">逐题</button>
       <button type="button" class="fb-btn primary" data-go="finish">看结果</button>
     </div>
-    <p class="tz-hint tz-allhint">按最近一年的感受作答 · ${SEX[cur.x]} · <button type="button" class="tz-link" data-go="sex">改性别</button> · <button type="button" class="tz-link" data-go="restart">重来</button></p>
+    <p class="tz-hint tz-allhint">按最近一年的感受作答 · ${metaHTML()}</p>
     <ol class="tz-list">${L.map(liHTML).join('')}</ol>
     <button type="button" class="fb-btn primary block tz-allgo" data-go="finish">看结果</button>`;
   syncAll();
@@ -490,7 +500,7 @@ $('allBox').addEventListener('click', e => {
   if (el) {
     const r = el.getBoundingClientRect();
     if (r.bottom > window.innerHeight - 80) el.scrollIntoView({ block: 'nearest', behavior });
-  } else if (nDone() === L.length) F.toast('都答完了，点「看结果」');
+  } else if (nDone() === L.length) F.toast('都答完了，点「看结果」', 1400);
 });
 
 // —— 共用动作 ——
@@ -515,7 +525,7 @@ function act(k) {
   } else if (k === 'restart') {
     if (!confirm('清掉这次已答的题，从头开始？')) return;
     cur = null; store.del(LS_P); renderIntro(); show('introBox'); window.scrollTo(0, 0);
-  }
+  } else if (k === 'peek') showResult(H.length - 1, true);
 }
 function finish() {
   if (!cur) return;
@@ -542,7 +552,7 @@ function finish() {
 /* ================ 结果 ================ */
 function showResult(idx, toTop) {
   const e = H[idx];
-  if (!e) { at = -1; renderIntro(); show('introBox'); return; }
+  if (!e) { home(); return; }
   at = idx;
   const v = vOf(e), prev = idx > 0 ? H[idx - 1] : null, pv = prev ? vOf(prev) : null;
   renderHead(e, v, prev, pv);
@@ -576,7 +586,7 @@ function renderHead(e, v, prev, pv) {
         <button type="button" class="fb-btn primary grow" data-go="copy">复制结果</button>
         <button type="button" class="fb-btn grow" data-go="ai">问 AI</button>
       </div>
-      <button type="button" class="fb-btn" data-go="again">再测一次</button>
+      <button type="button" class="fb-btn" data-go="again">${cur ? `接着答（已答 ${nDone()} 题）` : '再测一次'}</button>
       <p class="fb-fine">自评问卷，只说体质倾向，不是诊断；调养建议不替代医嘱。</p>
     </div>`;
 }
@@ -689,11 +699,11 @@ $('histBox').addEventListener('click', e => {
     const i = +d.dataset.del, e0 = H[i];
     if (!e0 || !confirm(`删掉 ${e0.t} 这一次的结果？`)) return;
     H.splice(i, 1); saveH();
-    if (!H.length) { at = -1; renderIntro(); show('introBox'); window.scrollTo(0, 0); return; }
+    if (!H.length) { home(); return; }
     showResult(i === at ? H.length - 1 : at > i ? at - 1 : at);
   } else if (g && g.dataset.go === 'clear') {
     if (!confirm(`清空本机的 ${H.length} 次结果？清空后找不回来。`)) return;
-    H = []; saveH(); at = -1; renderIntro(); show('introBox'); window.scrollTo(0, 0);
+    H = []; saveH(); home();
   }
 });
 
@@ -707,7 +717,7 @@ $('resHead').addEventListener('click', e => {
   if (!g || !H[at]) return;
   if (g.dataset.go === 'copy') F.copy(resultText(), '结果已复制');
   else if (g.dataset.go === 'ai') F.askAI('中医体质辨识', resultText(), Z.RULES_TEXT);
-  else if (g.dataset.go === 'again') start(H[at].x || store.get(LS_X, 'f'));
+  else if (g.dataset.go === 'again') { if (cur) renderQuiz(true); else start(H[at].x || store.get(LS_X, 'f')); }
   else if (g.dataset.go === 'latest') showResult(H.length - 1, true);
 });
 

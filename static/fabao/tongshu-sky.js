@@ -132,7 +132,9 @@
     }
     return x > t ? newMoonBefore(x - 2 * DAY) : x;
   }
-  var PHASE = ['朔', '蛾眉', '上弦', '盈凸', '望', '亏凸', '下弦', '残月'];
+  // 月相名按日月黄经差：朔、望、上下弦各占前后十余度，其间为蛾眉、盈凸、亏凸、残月
+  var PHASE = ['朔', '蛾眉', '上弦', '盈凸', '望', '亏凸', '下弦', '残月'], PHASE_AT = [12, 80, 100, 168, 192, 260, 280, 348];
+  function phaseOf(e) { for (var i = 0; i < 8; i++) if (e < PHASE_AT[i]) return PHASE[i]; return PHASE[0]; }
 
   /* —— 一天 ——
      y, m, d：该地的民用日；p：place() 所得。回 UTC 毫秒（没有就 null） */
@@ -149,12 +151,12 @@
       var mo = moonRiseSet(t0, t1, p.lat, p.lon), noon = t0 + 12 * 3600e3;
       r.moonrise = mo.rise; r.moonset = mo.set;
       r.age = Math.round((noon - newMoonBefore(noon)) / DAY * 10) / 10;
-      r.phase = PHASE[Math.floor(mod(elong(noon) / 45 + 0.5, 8))];
+      r.phase = phaseOf(elong(noon));
     }
     return (cache[key] = r);
   }
 
   var api = { IANA: IANA, place: place, day: day, hm: hm, midnight: midnight, offsetMin: offsetMin,
-    sunEvent: sunEvent, moonRiseSet: moonRiseSet, newMoonBefore: newMoonBefore, elong: elong, PHASE: PHASE };
+    sunEvent: sunEvent, moonRiseSet: moonRiseSet, newMoonBefore: newMoonBefore, elong: elong, phaseOf: phaseOf, PHASE: PHASE };
   if (NODE) module.exports = api; else root.TS_SKY = api;
 })(this);

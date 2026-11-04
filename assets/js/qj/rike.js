@@ -70,8 +70,10 @@
     var row = function (k, on) { var el = box.querySelector('[data-row="' + k + '"]'); if (el) el.hidden = !on; };
     var T = r.ts;
     row('shen', !!T); row('shi', !!(T && r.hour)); row('fang', !!T); row('jp', !!(T && r.jp)); row('hou', !!r.hou);
-    // 七十二候：中国候名；开日本历注时并列本朝候名
-    if (r.hou) set('hou', '<b>' + r.hou.cnName + '</b> · ' + r.hou.cn + (r.jp ? ' <span class="jph" title="' + r.hou.jpName + '（' + r.hou.yomi + '）">' + r.hou.jp + '</span>' : ''));
+    // 七十二候：中国候名；开日本历注时并列本朝候名；前面一枚节气色
+    var se = r.hou && (window.QJ_JIEQI_SE || {})[r.hou.jie];
+    if (r.hou) set('hou', (se ? '<i class="se" style="background:' + se[1] + '" title="' + r.hou.jie + '色 · ' + se[0] + '：' + se[2] + '"></i>' : '') +
+      '<b>' + r.hou.cnName + '</b> · ' + r.hou.cn + (r.jp ? ' <span class="jph" title="' + r.hou.jpName + '（' + r.hou.yomi + '）">' + r.hou.jp + '</span>' : ''));
     if (T) {
       set('shen', '<b class="' + (T.huang ? 'hd' : 'hk') + '">' + T.shen + (T.huang ? '黄道' : '黑道') + '</b> · 冲' + T.chong.sx + '（' + T.chong.gz + '）煞' + T.chong.sha +
         (T.notes.length ? ' · <span class="hk">' + T.notes.map(function (n) { return n.n; }).join('、') + '</span>' : ''));

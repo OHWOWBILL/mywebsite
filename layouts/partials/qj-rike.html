@@ -34,17 +34,19 @@
   </div>
   <script type="application/json" id="qj-rike-data">{{ site.Data.rike | jsonify | safeJS }}</script>
 </section>
-{{- /* 宜忌摘要后的「…」链去黄历；本朝候名用浅青，与暦行的旧暦同色系 */}}
+{{- /* 宜忌摘要后的「…」链去黄历；本朝候名用浅青；候前一枚节气色（static/fabao/jieqi-se.js） */}}
 <style>
   .qj-rike-facts dd .more { color: var(--ge-muted); text-decoration: none; border-bottom: 1px dotted var(--ge-rule); margin-left: .2em; }
   .qj-rike-facts dd .more:hover { color: var(--ge-fg); }
   .qj-rike-facts dd .jph { color: #9cc7c9; white-space: nowrap; }
+  .qj-rike-facts dd .se { display: inline-block; width: .55em; height: .55em; border-radius: 50%; margin-right: .4em; vertical-align: .1em; box-shadow: 0 0 0 1px rgba(237, 235, 242, .18); }
 </style>
 {{- /* 日课用法宝库的通书底座（值神冲煞、协纪宜忌、方位、时辰、七十二候、日本历注）：节气表、日本旧暦表、
-       协纪宜忌神煞表、七十二候名与底座本身。
+       协纪宜忌神煞表、七十二候名、底座本身与节气色。
        写在这里而不是页脚：页脚是 partialCached，分不出首页；这几行在脚本包之前载入，日课一画就用得上 */}}
 <script src="{{ "qimen/jieqi.js" | relURL }}?v=1"></script>
 <script src="{{ "fabao/kyureki.js" | relURL }}?v=1"></script>
 <script src="{{ "fabao/tongshu-shensha.js" | relURL }}?v=1"></script>
 <script src="{{ "fabao/tongshu-hou.js" | relURL }}?v=1"></script>
 <script src="{{ "fabao/tongshu.js" | relURL }}?v=2"></script>
+<script src="{{ "fabao/jieqi-se.js" | relURL }}?v=1"></script>
