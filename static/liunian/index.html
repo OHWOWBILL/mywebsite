@@ -127,10 +127,11 @@
     <b id="yrT"></b>
     <button type="button" class="fb-btn" id="nextY" aria-label="下一年">›</button>
     <button type="button" class="fb-btn ghost" id="thisY">今年</button>
+    <button type="button" class="fb-btn ghost" id="shareY" title="把这一年画成一张图，可存可分享">分享图</button>
   </div>
 
   <div class="ln-grid">
-    <section class="fb-card hero full" id="hero"></section>
+    <section class="fb-card hero full" id="hero" data-gloss></section>
     <section class="fb-card card full">
       <div class="card-h">方位 · 九宫飞星年盘<small>南在上；以立春换年</small></div>
       <div class="boardwrap"><div class="board" id="board"></div><ul class="lst" id="dirList"></ul></div>
@@ -404,6 +405,16 @@
   $('thisY').onclick = () => go(curY);
   $('jpTg').onclick = () => { jp = !jp; lss('tongshu.jp', jp ? '1' : '0'); renderFest(); };
   $('icsBtn').onclick = yearICS;
+  // 分享图：年为题，太岁岁破三煞五黄一句作金句，立春春节九星运气随后
+  $('shareY').onclick = () => {
+    const t = el => (el ? el.innerText : '').replace(/\s+/g, ' ').trim();
+    Fabao.share({
+      tool: '流年', title: t($('yrT')),
+      key: t(document.querySelector('#hero .key')),
+      lines: [...document.querySelectorAll('#hero dl > div:not(.key)')].map(d => [t(d.querySelector('dt')), t(d.querySelector('dd'))]),
+      meta: '潜蛟阁通书 · 流年', url: location.origin + '/liunian/', qrLabel: '扫码看你的这一年'
+    });
+  };
   render();
 })();
 </script>

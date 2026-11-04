@@ -22,7 +22,7 @@
     const o = {};
     o.seal = [...txt(document.querySelector('.fb-head .fb-seal'))][0] || '';
     const t = document.querySelector('.fb-head .fb-title');
-    if (t) o.tool = [...t.childNodes].filter(n => n.nodeType === 3).map(n => n.nodeValue).join('').trim() || txt(t);
+    if (t) { const c = t.cloneNode(true); c.querySelectorAll('.en').forEach(e => e.remove()); o.tool = (c.textContent || '').replace(/\s+/g, ' ').trim(); }
     const key = [...document.querySelectorAll('.fb-key')].find(visible);
     if (key && txt(key)) o.key = txt(key);
     const rows = [...document.querySelectorAll('.bh .r')].filter(visible);
@@ -117,7 +117,12 @@
     ctx.fillText(o.seal || '术', 0, 4);
     ctx.restore();
     ctx.textBaseline = 'alphabetic';
-    text(ctx, o.tool || '法宝库', X + S + 34, sy + 60, '600 50px ' + TITLE, C.fg, 'left', 8);
+    // 法宝名太长就缩字号，再长就截断，免得压到右上的字标
+    const toolW = W - X - (X + S + 34) - 230;
+    let tf = 50;
+    setFont(ctx, '600 50px ' + TITLE, 8);
+    while (tf > 34 && ctx.measureText(o.tool || '').width > toolW) { tf -= 2; setFont(ctx, '600 ' + tf + 'px ' + TITLE, 8); }
+    text(ctx, wrap(ctx, o.tool || '法宝库', '600 ' + tf + 'px ' + TITLE, toolW, 1, 8)[0] || '法宝库', X + S + 34, sy + 60, '600 ' + tf + 'px ' + TITLE, C.fg, 'left', 8);
     text(ctx, '潜蛟阁 · 法宝库', X + S + 34, sy + 106, '30px ' + BODY, C.mute, 'left', 4);
     text(ctx, 'ohwowbill', W - X, sy + 44, '800 32px ' + MARK, C.fg2, 'right');
 

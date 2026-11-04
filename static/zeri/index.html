@@ -127,7 +127,7 @@
 
     <section>
       <div class="res-h"><b id="resT">排名</b><span class="fb-fine" id="resSub"></span><span class="sp"></span>
-        <button type="button" class="fb-btn" id="icsAll" title="把下面列出的时辰都存进日历（.ics，手机上点开即可加入）">全部加入</button><button type="button" class="fb-btn" id="copyBtn">复制</button><button type="button" class="fb-btn" id="aiBtn">问 AI</button></div>
+        <button type="button" class="fb-btn" id="icsAll" title="把下面列出的时辰都存进日历（.ics，手机上点开即可加入）">全部加入</button><button type="button" class="fb-btn" id="copyBtn">复制</button><button type="button" class="fb-btn" id="aiBtn">问 AI</button><button type="button" class="fb-btn" id="shareBtn" title="把排名画成一张图，可存可分享">分享图</button></div>
       <div id="res"></div>
     </section>
   </div>
@@ -142,7 +142,7 @@
 <script src="/fabao/tongshu-shensha.js?v=1"></script>
 <script src="/fabao/tongshu-hou.js?v=1"></script>
 <script src="/fabao/tongshu.js?v=2"></script>
-<script src="/qimen/core.js?v=4"></script>
+<script src="/qimen/core.js?v=5"></script>
 <script src="/zeri/zeri.js?v=2"></script>
 <script>
 (function () {
@@ -290,6 +290,19 @@
       })).concat(['—— 潜蛟阁 · 择日 ohwowbill.com/zeri/']).join('\n');
   }
   $('copyBtn').onclick = () => last.length ? Fabao.copy(resultText(), '排名已复制') : Fabao.toast('还没有结果');
+  // 分享图：事项为题，头一名作金句，前几名随后
+  $('shareBtn').onclick = () => {
+    if (!last.length) { Fabao.toast('还没有结果'); return; }
+    const E = TS.EV_BY[ev], when = e => `${e.date.getMonth() + 1}月${e.date.getDate()}日 周${WEEK[e.date.getDay()]} ${pad(e.date.getHours())}:${pad(e.date.getMinutes())}`;
+    const top = last.slice(0, 6), a = top[0];
+    Fabao.share({
+      title: `择日 · ${E.name}`,
+      key: `首选 ${when(a)}（${a.hour.name}）· ${a.grade}`,
+      lines: top.slice(1).map((e, i) => [`第${'二三四五六'[i]}`, `${when(e)} ${e.grade}：${e.pros.slice(0, 2).map(x => short(x.t)).join('、') || '—'}`]),
+      meta: `黄历宜忌 · 时辰黄黑道 · 奇门用神合看`,
+      url: location.origin + '/zeri/', qrLabel: '扫码也挑一个日子'
+    });
+  };
   $('aiBtn').onclick = () => last.length ? Fabao.askAI('择日（通书与奇门）', resultText(),
     '日：《协纪辨方书》每日宜忌（事项对应：面试→赴任、会亲友；签约→立券、交易；开业→开市、挂匾、纳财；搬家→移徙、入宅、安香；动土→动土、修造、破土等）、值神黄道黑道、天德月德等大吉神、二十八宿、冲本命、岁破四离四绝杨公忌、彭祖百忌；时：时辰值神与冲；奇门：时家转盘拆补，按事项取用神（面试看开门值符日干时干，考试面谈看景门丁奇天辅日干），用神与日干宫生克、空墓刑迫、神将格局，伏吟反吟五不遇时扣分。' + (jp ? '另计日本六曜選日。' : '')) : Fabao.toast('还没有结果');
   render();

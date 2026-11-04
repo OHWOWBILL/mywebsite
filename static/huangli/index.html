@@ -190,7 +190,7 @@
   </div>
 
   <div class="hl-wrap">
-    <section class="fb-card hl-day" id="day" aria-live="polite"></section>
+    <section class="fb-card hl-day" id="day" aria-live="polite" data-gloss></section>
 
     <div class="hl-col">
       <section class="fb-card find">
@@ -230,7 +230,7 @@
 <script src="/fabao/tongshu.js?v=2"></script>
 <script src="/fabao/jieqi-se.js?v=1"></script>
 <script src="/fabao/cities.js?v=1"></script>
-<script src="/xingpan/xingpan.js?v=1"></script>
+<script src="/xingpan/xingpan.js?v=2"></script>
 <script src="/fabao/tongshu-sky.js?v=1"></script>
 <script>
 (function () {
@@ -358,6 +358,7 @@
         <a class="fb-btn primary" href="/zeri/?d=${r.key}${ev ? '&do=' + encodeURIComponent(ev) : ''}">挑这天的好时辰</a>
         <a class="fb-btn" href="/qimen/?t=${r.key}T${isToday ? pad(new Date().getHours()) + ':' + pad(new Date().getMinutes()) : '12:00'}${ev && E.qm !== '自由' ? '&type=' + encodeURIComponent(E.qm) : ''}">起一局奇门</a>
         <button type="button" class="fb-btn" id="copyDay">复制</button>
+        <button type="button" class="fb-btn" id="shareDay" title="把这一天画成一张日签，可存可分享">分享图</button>
       </div>`;
   }
   function skyText(r) {
@@ -464,6 +465,22 @@
     if (!r) { $('day').innerHTML = '<div class="fb-empty">超出可排范围（1900–2100）</div>'; return; }
     $('day').innerHTML = dayHTML(r);
     $('copyDay').onclick = () => Fabao.copy(dayText(r), '这一天的黄历已复制');
+    // 分享图：日子为题，宜忌作金句，值神冲煞、七十二候、吉时、彭祖随后；二维码回到这一天
+    $('shareDay').onclick = () => {
+      const H = r.hou, hrs = TS.hours(r).filter(h => h.huang).map(h => ZHI[h.zhi]).join('');
+      Fabao.share({
+        title: `${r.m}月${r.d}日 ${r.week} · 农历${r.lunarText}`,
+        key: `宜 ${r.yi.slice(0, 6).join(' ') || '无'}　忌 ${r.ji.slice(0, 5).join(' ') || '无'}`,
+        lines: [['干支', `${r.year.name}年 ${r.month.name}月 ${r.gz.name}日（${r.nayin}）`],
+          ['值神', `${r.jianchu}日 · ${r.shen}${r.huang ? '黄道' : '黑道'} · 冲${r.chong.sx}煞${r.chong.sha}`],
+          H && H.cn ? ['物候', `${H.cnName} ${H.cn}${jp && H.jp ? ' · ' + H.jp : ''}`] : null,
+          ['吉时', hrs ? hrs + '时' : '—'],
+          jp ? ['六曜', r.rokuyo + (r.sen.length ? ' · ' + r.sen.map(x => x.n).join('、') : '')] : null,
+          ['彭祖', r.pengzu.join('；')]].filter(Boolean),
+        meta: `${r.y}.${pad(r.m)}.${pad(r.d)} · 潜蛟阁通书`,
+        url: location.origin + '/huangli/?d=' + r.key
+      });
+    };
     $('day').querySelectorAll('[data-open]').forEach(b => b.onclick = () => { open[b.dataset.open] = true; renderDay(); });
     $('day').querySelectorAll('[data-close]').forEach(b => b.onclick = () => { open[b.dataset.close] = false; renderDay(); });
     const cs = $('citySel');
