@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-5666e6aeea33';
+const V = 'fb-474370c8d99f';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -42,7 +42,7 @@ const PRE = [
   '/fabao/backup.js?v=1',
   '/fabao/cidian.js?v=1',
   '/fabao/cities.js?v=1',
-  '/fabao/fabao.css?v=7',
+  '/fabao/fabao.css?v=8',
   '/fabao/fabao.js?v=14',
   '/fabao/jieqi-se.js?v=1',
   '/fabao/kyureki.js?v=1',
@@ -93,7 +93,7 @@ const PRE = [
   '/meihua/data/yao.js',
   '/meihua/data/yao.js?v=3',
   '/meihua/js/app.js?v=7',
-  '/meihua/styles/main.css?v=4',
+  '/meihua/styles/main.css?v=5',
   '/qimen/core.js?v=5',
   '/qimen/jieqi.js?v=1',
   '/taiyi/taiyi.js?v=1',

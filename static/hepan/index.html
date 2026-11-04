@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=7">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=8">
   <style>
     :root { --glyph: "Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", "Symbola", serif; }
     .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
@@ -19,10 +19,10 @@
     .fb-now.hp-pair { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px 22px; align-items: start; }
     .hp-p { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
     .hp-p-head { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; min-height: 30px; }
-    .hp-role { flex-shrink: 0; padding: 1px 10px; border-radius: 999px; background: rgba(122, 91, 192, .22); color: var(--zi-2); font-family: var(--font-title); font-size: 12px; letter-spacing: .2em; white-space: nowrap; }
+    .hp-role { flex-shrink: 0; padding: 1px 10px; border-radius: var(--r-xs); background: rgba(122, 91, 192, .22); color: var(--zi-2); font-family: var(--font-title); font-size: 12px; letter-spacing: .2em; white-space: nowrap; }
     .hp-hint { font-size: 12px; color: var(--faint); letter-spacing: .06em; }
     .hp-chips { display: flex; gap: 6px; flex-wrap: wrap; min-width: 0; }
-    .hp-chip { padding: 4px 13px; border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-3); font-family: var(--font-title); font-size: 13px; letter-spacing: .1em; color: var(--fg-2); white-space: nowrap; transition: border-color .2s, color .2s, background .2s; }
+    .hp-chip { padding: 4px 13px; border: 1px solid var(--rule-2); border-radius: var(--r-sm); background: var(--bg-3); font-family: var(--font-title); font-size: 13px; letter-spacing: .1em; color: var(--fg-2); white-space: nowrap; transition: border-color .2s, color .2s, background .2s; }
     .hp-chip:hover { border-color: var(--zi-2); color: var(--fg); }
     .hp-chip.on { background: var(--zi); border-color: var(--zi); color: #fff; }
     .hp-chip.add { background: none; border-style: dashed; color: var(--zi-2); }
@@ -75,7 +75,7 @@
     .hp-vhead .who { font-family: var(--font-title); font-size: 15px; letter-spacing: .15em; color: var(--fg-2); overflow-wrap: anywhere; }
     .hp-verdict .fb-key { font-size: 21px; line-height: 1.6; }
     .hp-tally { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
-    .hp-tally .n { display: inline-flex; align-items: baseline; gap: 7px; padding: 2px 13px 3px; border-radius: 999px; background: var(--bg-3); font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; color: var(--muted); }
+    .hp-tally .n { display: inline-flex; align-items: baseline; gap: 7px; padding: 2px 13px 3px; border-radius: var(--r-sm); background: var(--bg-3); font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; color: var(--muted); }
     .hp-tally .n b { font-family: var(--font-mark); font-weight: 800; font-size: 15px; letter-spacing: 0; }
     .hp-tally .good b { color: var(--lv); } .hp-tally .bad b { color: var(--zhu); } .hp-tally .mid b { color: var(--fg-2); }
     .hp-tally .fb-fine { margin-left: 2px; }
@@ -94,7 +94,7 @@
     .hp-row .pair { font-family: var(--font-title); font-size: 15.5px; color: var(--fg); letter-spacing: .08em; min-width: 0; overflow-wrap: anywhere; }
     .hp-row .why { grid-column: 2 / 4; font-size: 13px; color: var(--fg-2); line-height: 1.75; }
     .hp-row .hp-wx { grid-column: 2 / 4; }
-    .hp-word { justify-self: end; display: inline-block; padding: 1px 11px 2px; border-radius: 999px; font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; white-space: nowrap; }
+    .hp-word { justify-self: end; display: inline-block; padding: 1px 11px 2px; border-radius: var(--r-xs); font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; white-space: nowrap; }
     .t-good { background: rgba(141, 191, 151, .16); color: var(--lv); }
     .t-bad { background: rgba(224, 122, 98, .16); color: var(--zhu); }
     .t-mid { background: var(--bg-3); color: var(--muted); }
@@ -180,7 +180,7 @@
   <header class="fb-head">
     <div class="fb-seal" aria-hidden="true">合</div>
     <div>
-      <h1 class="fb-title">合盘<span class="en">SYNASTRY · HEHUN</span></h1>
+      <h1 class="fb-title">合盘</h1>
       <p class="fb-sub">八字合婚 · 星盘比较 · 两人一盘看</p>
     </div>
   </header>

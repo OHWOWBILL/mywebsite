@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-<link rel="stylesheet" href="/fabao/fabao.css?v=7">
+<link rel="stylesheet" href="/fabao/fabao.css?v=8">
 <style>
 /* 大六壬 · 课式与表单（外框见 /fabao/fabao.css） */
 [data-w="0"]{--wc:var(--wx-mu)} [data-w="1"]{--wc:var(--wx-huo)} [data-w="2"]{--wc:var(--wx-tu)} [data-w="3"]{--wc:var(--wx-jin)} [data-w="4"]{--wc:var(--wx-shui)}
@@ -36,7 +36,7 @@
 .lr-bh .bh-h .fb-tag{background:rgba(141,191,151,.16);color:var(--lv)}
 .lr-bh .r > i{flex-basis:3em}
 .lr-chips{display:flex;flex-wrap:wrap;gap:4px 6px;margin:2px 0 4px}
-.lr-chips span{font-family:var(--font-title);font-size:12px;letter-spacing:.08em;padding:1px 9px;border-radius:999px;border:1px solid var(--rule-2);color:var(--fg-2)}
+.lr-chips span{font-family:var(--font-title);font-size:12px;letter-spacing:.08em;padding:1px 9px;border-radius: var(--r-xs);border:1px solid var(--rule-2);color:var(--fg-2)}
 .lr-chips span.main{border-color:var(--zi-2);color:var(--fg);background:rgba(122,91,192,.18)}
 
 /* ---------- 布局：左盘右课传 ---------- */
@@ -72,7 +72,7 @@
 .lr-cell .bd{display:flex;gap:2px}
 .lr-cell .bd i{background:var(--zi);color:#fff}
 .lr-cell .bd i.z,.lr-cell .bd i.m{background:none;color:var(--fg-2);box-shadow:inset 0 0 0 1px var(--zi-2)}
-.lr-cell.c1{border-color:var(--zi-2);box-shadow:0 0 0 1px var(--zi-2),0 0 18px -6px rgba(169,148,224,.55)}
+.lr-cell.c1{border-color:var(--zi-2);box-shadow:0 0 0 1px var(--zi-2)}
 .lr-cell.c2,.lr-cell.c3{border-color:color-mix(in oklab,var(--zi-2) 55%,var(--rule-2))}
 .lr-cell.kong{background:repeating-linear-gradient(135deg,transparent 0 11px,rgba(224,122,98,.08) 11px 12px),var(--bg-3)}
 .lr-cell.kong .tb b{opacity:.72}
@@ -131,7 +131,7 @@
 .lr-sc .ex{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;font-size:14px;color:var(--zi-2);letter-spacing:.06em}
 .lr-sc .ex .x{color:var(--zhu)}
 .lr-sc .ex small{font-size:11px;color:var(--faint);letter-spacing:.02em;font-family:var(--font-body)}
-.lr-sc .ex .kong{font-size:11px;line-height:16px;padding:0 6px;border-radius:999px;color:var(--zhu);border:1px solid rgba(224,122,98,.6)}
+.lr-sc .ex .kong{font-size:11px;line-height:16px;padding:0 6px;border-radius: var(--r-xs);color:var(--zhu);border:1px solid rgba(224,122,98,.6)}
 .lr-why{margin-top:10px;font-size:13px;line-height:1.75;color:var(--fg-2)}
 .lr-why b{font-family:var(--font-title);font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.15em;margin-right:6px}
 
@@ -188,7 +188,7 @@
   <header class="fb-head">
     <div class="fb-seal" aria-hidden="true">壬</div>
     <div>
-      <h1 class="fb-title">大六壬<span class="en">DA LIU REN</span></h1>
+      <h1 class="fb-title">大六壬</h1>
       <p class="fb-sub">月将加时 · 四课三传 · 天将神煞 · 课体白话</p>
     </div>
   </header>
