@@ -56,6 +56,7 @@ for (let d = 0; d < 60; d++) ft += SS.tai(d, 0).day + ';';
 for (let m = 1; m <= 12; m++) ft += SS.tai(0, m).month + ';';
 for (let z = 0; z < 12; z++) for (let w = 0; w < 7; w++) { const x = SS.xiu(z, w); fx += x.full + x.luck + x.gong + x.song + ';'; }
 eq({ yiji: fnv(fy), shensha: fnv(fs2), tai: fnv(ft), xiu: fnv(fx) }, { yiji: '6d5fc935', shensha: '98c5a80f', tai: 'f9aa43ea', xiu: 'd5cdf593' }, '移植件与 lunar-javascript 原件逐格相同');
+console.log('  协纪移植件指纹：宜忌 ' + fnv(fy) + '、神煞 ' + fnv(fs2) + '、胎神 ' + fnv(ft) + '、星宿 ' + fnv(fx) + '（与 lunar-javascript 1.7.7 原件所算相同）');
 // 事项用到的协纪条目都在协纪名目里（防错字）
 TS.EVENTS.forEach(e => e.yi.forEach(x => ok(SS.YI_JI.indexOf(x) >= 0, '事项「' + e.k + '」的条目「' + x + '」不在协纪名目里')));
 eq(TS.EVENTS.map(e => e.k + ':' + e.yi.slice(0, e.main).join('/')), ['面试:赴任/会亲友', '考试:入学', '签约:立券/交易', '开业:开市', '搬家:移徙/入宅', '出行:出行', '嫁娶:嫁娶', '求医:求医/治病', '动土:动土/修造', '祭祀:祭祀/祈福'], '事项正项');
@@ -88,6 +89,7 @@ NAOJ.split(',').forEach((row, i) => {
   eq(s.age, +f[4], 'NAOJ 11/' + (i + 1) + ' 月龄');
 });
 ok(worst <= 1, '日月出没与国立天文台差 ' + worst + ' 分（应不过 1 分）');
+console.log('  国立天文台东京 2026-11：日出、日落、月出、月落逐日最大差 ' + worst + ' 分；月龄 30 日同');
 const t4 = SKY.day(2026, 11, 4, tokyo);
 eq([SKY.hm(t4.sunrise, tokyo), SKY.hm(t4.sunset, tokyo), SKY.hm(t4.moonrise, tokyo), SKY.hm(t4.moonset, tokyo), t4.age], ['06:05', '16:43', '00:47', '13:52', 24.5], '2026-11-04 东京（国立天文台）');
 const bj = SKY.place('北京'), ny = SKY.place('纽约');

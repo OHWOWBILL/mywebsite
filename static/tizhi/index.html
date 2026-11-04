@@ -181,7 +181,7 @@
     .tz-type { padding: 18px 20px; min-width: 0; scroll-margin-top: 72px; }
     .tz-type h3 { font-family: var(--font-title); font-weight: 600; font-size: 19px; letter-spacing: .15em; color: var(--fg); display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; }
     .tz-type h3 small { font-weight: 400; font-size: 12.5px; color: var(--muted); letter-spacing: .05em; }
-    .tz-type .gist { margin-top: 6px; font-size: 14.5px; line-height: 1.85; color: var(--fg); }
+    .tz-type .gist { display: block; margin-top: 6px; font-size: 14.5px; line-height: 1.85; color: var(--fg); }
     .tz-type h4 { font-family: var(--font-title); font-weight: 600; font-size: 13px; letter-spacing: .3em; color: var(--muted); margin: 14px 0 6px; padding-top: 10px; border-top: 1px dashed var(--rule-2); }
     .tz-rows .r { display: flex; gap: 8px; padding: 3px 0; font-size: 14px; line-height: 1.8; color: var(--fg-2); }
     .tz-rows .r > i { flex: 0 0 2.6em; font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 25px; color: var(--faint); letter-spacing: .12em; white-space: nowrap; }
@@ -645,14 +645,15 @@ function cardBody(k) {
       <p class="tz-xnote">${Z.XUE_NOTE}</p></section>
     <section><h4>节气</h4><p class="tz-jie">${t.jie.all}</p>${nowLine(k)}</section>`;
 }
-function cardHead(k, v, role, tag) {
+// 展开的卡片用 header 包住；收起的放进 summary（只放标题与一行字）
+function cardHead(k, v, role) {
   const t = Z.TYPE[k];
-  return `<${tag}><h3>${t.name}<small>${t.code} 型 · ${R(v.scores[k])} 分 · ${v.levels[k]}</small>${role ? `<span class="tz-role">${role}</span>` : ''}</h3><p class="gist">${t.gist}</p></${tag}>`;
+  return `<h3>${t.name}<small>${t.code} 型 · ${R(v.scores[k])} 分 · ${v.levels[k]}</small>${role ? `<span class="tz-role">${role}</span>` : ''}</h3><span class="gist">${t.gist}</span>`;
 }
 function card(k, v, role, open, wide) {
   return open
-    ? `<article class="fb-card tz-type${wide ? ' wide' : ''}" id="t-${k}">${cardHead(k, v, role, 'header')}${cardBody(k)}</article>`
-    : `<details class="fb-card tz-type" id="t-${k}"><summary>${cardHead(k, v, role, 'div')}</summary><div class="body">${cardBody(k)}</div></details>`;
+    ? `<article class="fb-card tz-type${wide ? ' wide' : ''}" id="t-${k}"><header>${cardHead(k, v, role)}</header>${cardBody(k)}</article>`
+    : `<details class="fb-card tz-type" id="t-${k}"><summary>${cardHead(k, v, role)}</summary><div class="body">${cardBody(k)}</div></details>`;
 }
 function renderCards(v) {
   const mine = v.kind === 'none' ? ['pinghe'] : v.main.concat(v.jian);
