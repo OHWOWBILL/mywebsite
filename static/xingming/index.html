@@ -262,11 +262,11 @@ const store = {
   get() { try { const v = JSON.parse(localStorage.getItem(LS)); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } },
   set(v) { try { localStorage.setItem(LS, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
 };
-const S = Object.assign({ name: '', cands: '', fix: {}, pick: {} }, store.get());
+const S = Object.assign({ name: '', cands: '', fix: {}, pick: {}, bn: '' }, store.get());   // bn：上回见到的命部名字
 if (!S.fix || typeof S.fix !== 'object') S.fix = {};
 if (!S.pick || typeof S.pick !== 'object') S.pick = {};
 Object.keys(S.fix).forEach(k => { const n = +S.fix[k]; if (!(Number.isInteger(n) && n >= 1 && n <= 64)) delete S.fix[k]; });
-const save = () => store.set({ name: S.name, cands: S.cands, fix: S.fix, pick: S.pick });
+const save = () => store.set({ name: S.name, cands: S.cands, fix: S.fix, pick: S.pick, bn: S.bn });
 
 const WXI = { 木: 0, 火: 1, 土: 2, 金: 3, 水: 4 };
 const tone = lv => lv === '吉' || lv === '大吉' ? 'good' : lv === '凶' || lv === '大凶' ? 'bad' : 'mid';
@@ -351,9 +351,11 @@ function renderVerdict() {
       <span class="sub">${R.tname !== R.name ? esc(R.name) + ' · ' : ''}${R.kind}</span><span class="pts">参考分<b>${R.score}</b>/ 100</span></div>
     <p class="fb-key"><span class="jin">${esc(s.head)}</span>：${esc(s.tail)}</p>
     <div class="xm-lines">${s.lines.map(l => `<p class="r"><i>${esc(l[0])}</i><span>${esc(l[1])}</span></p>`).join('')}</div>
-    <div class="acts"><button class="fb-btn" id="copyBtn" type="button">复制</button><button class="fb-btn primary" id="aiBtn" type="button">问 AI</button></div>`;
+    <div class="acts"><button class="fb-btn" id="copyBtn" type="button">复制</button><button class="fb-btn primary" id="aiBtn" type="button">问 AI</button><button class="fb-btn" id="shareBtn" type="button" title="把五格三才画成一张图，可存可分享">分享图</button></div>`;
   $('copyBtn').onclick = () => F.copy(XM.toText(R, C), '已复制');
   $('aiBtn').onclick = () => F.askAI('姓名学（五格剖象）', XM.toText(R, C), XM.RULES_TEXT);
+  // 分享图：名字为题，总评作金句，五格三才几行随后；二维码只到姓名页，不带名字
+  $('shareBtn').onclick = () => F.share({ title: R.tname !== R.name ? `${R.name}（${R.tname}）` : R.name, meta: `${R.kind} · 参考分 ${R.score} / 100`, url: location.origin + '/xingming/', qrLabel: '扫码也测一个名字' });
 }
 
 /* ================ 笔画 · 五格 · 三才 ================ */
@@ -493,14 +495,17 @@ $('charsBox').addEventListener('change', e => {
   if (!(v >= 1 && v <= 64)) { inp.value = x.n || ''; F.toast('笔画请填 1–64'); return; }
   setFix(x, v);
 });
-// 命部里换了人：「命部 · 某某」跟着换
-document.addEventListener('fabao:person', renderQuick);
+// 命部里换了人：姓名跟着换（名字认不出是全名的，只刷新「命部 · 某某」）
+document.addEventListener('fabao:person', () => { const n = birthName(); if (n) { S.bn = n; setName(n); } else renderQuick(); });
 window.addEventListener('storage', e => { if (!e.key || e.key.indexOf('mingbu.') === 0) renderQuick(); });
 
 // 网址可带 ?n=姓名 &c=候选（逗号或空格分隔）
 const Q = new URLSearchParams(location.search);
 const qn = Q.get('n'), qc = Q.get('c');
-$('nameIn').value = qn != null ? qn : S.name || birthName() || '';
+// 先后：网址 > 命部里换了人（或头一回来）> 上回写的 > 命部里的名字
+const bn0 = birthName();
+$('nameIn').value = qn != null ? qn : bn0 && bn0 !== S.bn ? bn0 : S.name || bn0 || '';
+S.bn = bn0;
 $('candIn').value = qc != null ? qc.replace(/[,，]/g, ' ') : S.cands || '';
 S.name = $('nameIn').value.trim(); S.cands = $('candIn').value;
 update();
