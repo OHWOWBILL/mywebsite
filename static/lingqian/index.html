@@ -663,6 +663,7 @@ function renderResult() {
         ${canCf && !S.cf && v.c == null ? '<button type="button" class="fb-btn primary" data-act="confirm">掷筊确认是这一支</button>' : ''}
         <button type="button" class="fb-btn" data-act="copy">复制</button>
         <button type="button" class="fb-btn" data-act="ai" title="把签文连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button type="button" class="fb-btn" data-act="share" title="把这支签画成一张图，可存可分享">分享图</button>
         <button type="button" class="fb-btn ghost" data-act="again">再求一签</button>
       </div>
       <p class="lq-src">${esc(x.credit)}</p>
@@ -706,6 +707,18 @@ function viewText(v) {
   return LQ.text(x, L, { q: v.q, when: v.t ? fmtT(v.t) : '', how: howText(v), ok: okText(v) });
 }
 function copyIt() { if (S.view) F.copy(viewText(S.view) + '\n—— 潜蛟阁 · 法宝库 · 灵签', '签文已复制'); }
+// 分享图：签种与签号为题，等级与典故作金句，四句签诗、白话随后；所问不上图；二维码打开这一支签
+function shareIt() {
+  if (!S.view || !F.share) return;
+  const v = S.view, x = LQ.set(v.s), L = LQ.lot(v.s, v.n);
+  F.share({
+    title: `${x.name} · ${LQ.label(x, L.n)}`,
+    key: `${x.scale ? L.g : '倾向' + L.t}${L.s ? ' · ' + L.s : ''}`,
+    lines: L.p.slice().concat([['白话', L.j]]),
+    meta: v.t ? fmtT(v.t) : '',
+    url: location.origin + '/lingqian/?set=' + v.s + '&n=' + v.n, qrLabel: '扫码看这支签'
+  });
+}
 function askIt() {
   if (!S.view) return;
   let t = viewText(S.view);
@@ -753,7 +766,7 @@ $('histClear').addEventListener('click', () => {
 /* ================ 绑定 ================ */
 const ACT = {
   toss: () => tossOnce(false), auto: autoToss, jump, shake: shakeTube, motion: () => Motion.ask(), again,
-  confirm: confirmToss, putback: putBack, copy: copyIt, ai: askIt,
+  confirm: confirmToss, putback: putBack, copy: copyIt, ai: askIt, share: shareIt,
   script: () => { S.script = S.script === 't' ? 's' : 't'; store.set(LS_SCRIPT, S.script); renderResult(); }
 };
 [$('acts'), $('result')].forEach(box => box.addEventListener('click', e => {
