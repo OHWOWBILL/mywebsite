@@ -245,6 +245,7 @@
       .xp-ctl select { flex: 1 1 10em; min-width: 0; }
       .xp-tr .row { grid-template-columns: minmax(0, 1fr); }
       .xp-tr .o, .xp-tr .d { text-align: left; justify-content: flex-start; }
+      .xp-tr .o { white-space: normal; }
       .xp-vc .v { grid-template-columns: minmax(0, 1fr) auto; }
       .xp-vc .v .tm { grid-column: 1; }
       .xp-vc .v .why { grid-column: 1 / -1; }
@@ -821,13 +822,14 @@ function trScore(a) {
   return W_TR[a.tr] * W_NA[a.na] * (a.na === ruler ? 1.3 : 1) * W_AS[a.type.a] * (1 - .6 * a.orb / XP.TRANSIT_ORB[a.tr]) * (a.applying ? 1.1 : 1);
 }
 const fast = id => id === 'moon';
-const passTxt = (p, id) => `${fast(id) ? md(p.t) + ' ' + hm(p.t) : md(p.t)}${p.retro ? '℞' : ''}`;
+// 跨年的那一次写全年份，免得 01-09 看不出是哪年
+const passTxt = (p, id, t) => `${fast(id) ? md(p.t) + ' ' + hm(p.t) : LD(p.t).getFullYear() !== LD(t).getFullYear() ? ymd(p.t) : md(p.t)}${p.retro ? '℞' : ''}`;
 // 一条行运的「最准」说明：已准、将准、几次往返
 function exactTxt(a, t) {
   const past = a.passes.filter(p => p.t <= t), fut = a.passes.filter(p => p.t > t);
   const last = past[past.length - 1], parts = [];
-  if (last && (!fut.length || !a.applying)) parts.push(`${passTxt(last, a.tr)} 已准`);
-  if (fut.length) parts.push((parts.length ? '再准 ' : '最准 ') + fut.slice(0, fast(a.tr) ? 1 : 3).map(p => passTxt(p, a.tr)).join('、'));
+  if (last && (!fut.length || !a.applying)) parts.push(`${passTxt(last, a.tr, t)} 已准`);
+  if (fut.length) parts.push((parts.length ? '再准 ' : '最准 ') + fut.slice(0, fast(a.tr) ? 1 : 3).map(p => passTxt(p, a.tr, t)).join('、'));
   else if (a.applying) parts.push('这回不到准点就转向');   // 入相却在留前止步
   return parts.join(' · ');
 }

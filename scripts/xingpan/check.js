@@ -1,5 +1,6 @@
 // 星盘核心自检：node scripts/xingpan/check.js
 // 太阳对照奇门手记节气表（astronomy-engine 算出）；行星对照公认天象的时刻；宫制对照 Raphael 宫位表。
+// 推运部分：2026 年水星等星之留对照公开星历，太阳回归读回黄经，月亮空亡对照公开空亡表（出处见各段注释）。
 const XP = require('../../static/xingpan/xingpan.js');
 const J = require('../../static/qimen/jieqi.js');
 let bad = 0, ok = 0;
