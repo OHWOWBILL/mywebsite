@@ -158,6 +158,7 @@
       <div class="fb-row">
         <button class="fb-btn primary" id="saveBtn" type="button">存盘</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
+        <button class="fb-btn" id="shareBtn" type="button" title="把飞星盘画成一张图，可存可分享">分享图</button>
       </div>
       <select id="libSel" aria-label="宅库"><option value="">宅库（存过的盘）</option></select>
       <p class="fb-fine">向度为罗盘所量向首之度（磁北为零，顺时针）。偏离本山中线三度以上为兼向，可改用替卦；近两山交界为空亡。</p>
@@ -173,7 +174,7 @@
       </section>
       <section class="fb-card ky-card" aria-label="格局">
         <h3>格局<small id="geNote"></small></h3>
-        <div class="ky-ge" id="geBox"></div>
+        <div class="ky-ge" id="geBox" data-gloss></div>
       </section>
       <section class="fb-card ky-card" id="lpCard" aria-label="罗盘">
         <h3>罗盘<small id="lpNote">手机上可开指南针；电脑上拖动滑杆</small></h3>
@@ -189,7 +190,7 @@
       </section>
     </div>
     <aside class="ky-side">
-      <section class="fb-card ky-card" id="cellCard" aria-live="polite"></section>
+      <section class="fb-card ky-card" id="cellCard" aria-live="polite" data-gloss></section>
       <section class="fb-card ky-card" aria-label="八宅">
         <h3>八宅<small>命卦与宅卦</small></h3>
         <div class="fb-row" style="gap:8px">
@@ -449,6 +450,16 @@ $('copyBtn').onclick = () => {
   L.push(row([4, 9, 2])); L.push(row([3, 5, 7])); L.push(row([8, 1, 6]));
   L.push('格局 ' + C.ge.map(g => g.k).join('、'));
   copy(L.join('\n'), '飞星盘已复制');
+};
+// 分享图：坐向与运为题，格局作金句，九宫三行（每宫：山星向星/运星）随后
+$('shareBtn').onclick = () => {
+  const n = C.yun, row = ps => ps.map(p => `${PALACE[p].n} ${C.shan[p]}${C.xiangPan[p]}/${C.yunPan[p]}`).join('　');
+  Fabao.share({
+    title: `${C.zuo.n}山${C.xiang.n}向 · ${CN[n]}运${C.ti ? '替卦' : '下卦'}`,
+    key: C.ge.map(g => g.k).join('、'),
+    lines: [['格局', C.ge.map(g => g.d).join('')], ['九宫', row([4, 9, 2])], ['', row([3, 5, 7])], ['', row([8, 1, 6])], ['读法', '每宫：山星向星 / 运星']],
+    meta: `${$('nameIn').value.trim() || '某宅'} · 向 ${st.deg}°`
+  });
 };
 function writeURL() {
   const q = new URLSearchParams();

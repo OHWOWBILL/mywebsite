@@ -32,6 +32,8 @@
       return [txt(i), s ? txt(s) : txt(r).slice(txt(i).length).trim()];
     });
     if (!o.key && o.lines.length) { const f = o.lines.shift(); o.key = Array.isArray(f) ? f[1] : f; }
+    // 没有白话卡的（流注、运气、长生……）：拿「此刻」面板里的几行
+    if (!o.lines.length) o.lines = [...document.querySelectorAll('.fb-now-info .fb-note, .fb-now-info .fb-when')].filter(visible).map(txt).filter(Boolean).slice(0, 5);
     return o;
   }
   function shareURL(u) {
@@ -98,6 +100,12 @@
       ctx.fillStyle = `rgba(237,235,242,${(.05 + rnd() * .15).toFixed(2)})`;
       ctx.beginPath(); ctx.arc(rnd() * W, rnd() * H, rnd() * 1.7 + .4, 0, 6.3); ctx.fill();
     }
+
+    // 水印：法宝的印字，大而淡，压在右下（字少的页面不显空）
+    ctx.save();
+    ctx.globalAlpha = .07; ctx.fillStyle = C.zi2; ctx.font = '900 560px ' + TITLE; ctx.textAlign = 'right';
+    ctx.fillText(o.seal || '术', W - 36, FOOT - 46);
+    ctx.restore();
 
     // 页眉：法宝的印、名字；右上字标
     const S = 116, sy = 84;

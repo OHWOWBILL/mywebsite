@@ -180,7 +180,7 @@
     <div class="jx-info">
       <div class="jx-who" id="whoBox"></div>
       <div class="jx-natal" id="natalBox" hidden></div>
-      <div class="jx-sum" id="sumBox" aria-live="polite"></div>
+      <div class="jx-sum" id="sumBox" aria-live="polite" data-gloss></div>
     </div>
     <div class="fb-now-ctrl jx-ctrl">
       <label class="fb-label" for="dateIn">出行 / 搬家日期</label>
@@ -193,6 +193,7 @@
       <div class="fb-row">
         <button type="button" class="fb-btn primary grow" id="copyBtn">复制摘要</button>
         <button type="button" class="fb-btn grow" id="aiBtn">问 AI</button>
+        <button type="button" class="fb-btn grow" id="shareBtn" title="把吉方画成一张图，可存可分享">分享图</button>
       </div>
     </div>
   </section>
@@ -481,6 +482,18 @@ function summaryText() {
 }
 $('copyBtn').onclick = () => F.copy(summaryText(), '摘要已复制');
 $('aiBtn').onclick = () => F.askAI('九星气学', summaryText(), RULES_TEXT);
+// 分享图：本命星为题，本月吉方作金句；今年、搬家、年运月运随后
+$('shareBtn').onclick = () => {
+  if (!cur) return;
+  const { N, info, Lt } = cur, plain = s => String(s).replace(/<[^>]+>/g, '');
+  const pair = x => [x.lab, plain((x.sub ? '（' + x.sub + '）' : '') + x.body)];
+  F.share({
+    title: N ? `本命星 ${S[N.honmei].full} · 月命星 ${S[N.getsumei].full}` : '九星气学 · 人人皆忌的方位',
+    key: plain(JX.lineText(Lt.month)),
+    lines: [pair(Lt.year), pair(Lt.move)].concat(N ? [['年运', `本命星在${where(Lt.jy.hmAt)}，${Lt.jy.phase.k}`], ['月运', `本命星在${where(Lt.jm.hmAt)}，${Lt.jm.phase.k}`]] : []),
+    meta: `所看 ${ymd(target)} · ${info.year.gz}年 · ${info.month.name}`
+  });
+};
 
 /* ================ 绑定 ================ */
 $('dateIn').addEventListener('change', () => { const d = parseYMD($('dateIn').value); if (d) { target = d; render(); } });

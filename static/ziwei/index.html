@@ -260,6 +260,7 @@
         <button class="fb-btn" id="saveBtn" type="button">存盘</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
         <button class="fb-btn" id="aiBtn" type="button" title="把命盘连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button class="fb-btn" id="shareBtn" type="button" title="把命盘大概画成一张图，可存可分享">分享图</button>
       </div>
       <select id="libSel" class="zw-lib" aria-label="盘库"><option value="">盘库（存过的盘）</option></select>
       <div class="zw-opts">
@@ -797,6 +798,12 @@ function rulesText() {
   ].join('\n');
 }
 $('aiBtn').onclick = () => { if (C) Fabao.askAI('紫微斗数', aiText(), rulesText()); };
+// 分享图：题为命宫主星，金句与几行取白话卡；不写生辰，只写五行局与命主身主
+$('shareBtn').onclick = () => {
+  if (!C) { toast('先排一盘'); return; }
+  const p = C.palaces[C.ming], I = C.info;
+  Fabao.share({ title: `命宫在${p.zhi} · ${p.major.length ? p.major.map(s => s.name).join('') : '空宫'}`, meta: `${I.ju} · 命主${I.soul} · 身主${I.body}` });
+};
 function writeURL() {
   const s = formSnapshot(), q = new URLSearchParams();
   if (s.cal === 'solar') { q.set('d', s.when); if (s.sun) { q.set('lon', s.sun.lon); q.set('tz', s.sun.tz); } }

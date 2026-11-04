@@ -156,7 +156,7 @@
   </div>
 
   <section class="fb-now">
-    <div class="fb-now-info" id="nowInfo"></div>
+    <div class="fb-now-info" id="nowInfo" data-gloss></div>
     <div class="fb-now-ctrl">
       <div class="fb-row">
         <input type="datetime-local" id="dtInput" class="grow" aria-label="查看时间">
@@ -166,6 +166,7 @@
         <button type="button" class="fb-btn" id="prevBtn">‹ 前一年</button>
         <button type="button" class="fb-btn" id="nextBtn">后一年 ›</button>
       </div>
+      <button type="button" class="fb-btn ghost" id="shareBtn" title="把这一页的结论画成一张图，可存可分享" onclick="Fabao.share()">分享图</button>
       <div class="fb-fine">运气年自大寒交；点轮上一步或下方六十年表可换看</div>
     </div>
   </section>

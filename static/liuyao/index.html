@@ -200,6 +200,7 @@
         <button class="fb-btn primary" id="saveBtn" type="button">存卦</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
         <button class="fb-btn" id="aiBtn" type="button" title="把卦连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button class="fb-btn" id="shareBtn" type="button" title="把这一卦画成一张图，可存可分享">分享图</button>
       </div>
       <select id="libSel" aria-label="卦例"><option value="">卦例（存过的卦）</option></select>
       <p class="fb-fine">摇卦用浏览器的密码学随机数，每爻三钱：背三、字二，合六为交（老阴）、七为单、八为拆、九为重（老阳）。</p>
@@ -212,8 +213,8 @@
       <section class="fb-card ly-card ly-text" id="textCard" hidden></section>
     </div>
     <aside class="ly-side">
-      <section class="fb-card ly-card" id="infoCard" hidden></section>
-      <section class="fb-card ly-card" id="yongCard" hidden></section>
+      <section class="fb-card ly-card" id="infoCard" hidden data-gloss></section>
+      <section class="fb-card ly-card" id="yongCard" hidden data-gloss></section>
       <section class="fb-card ly-card" id="xlrCard" hidden></section>
       <section class="fb-card ly-card ly-note">
         <h3>断语<small>随卦一并存入卦例</small></h3>
@@ -578,6 +579,27 @@ const LY_RULES = [
   '三钱摇卦：背三字二，合六为交（老阴）、七为单、八为拆、九为重（老阳）；○ 为老阳动、✕ 为老阴动；→ 后为变卦同位之爻（静爻也列出）。'
 ].join('\n');
 $('aiBtn').onclick = () => { if (!G) { toast('先起一卦'); return; } Fabao.askAI('六爻纳甲', guaText(true), LY_RULES); };
+// 分享图：本之变为题，卦辞作金句，所问、日月、世应、动爻、用神随后；二维码回到这一卦
+$('shareBtn').onclick = () => {
+  if (!G) { toast('先起一卦'); return; }
+  const B = G.ben, V = G.bian, d = G.day, yi = i => B.yao[i - 1], T = TXT[B.name];
+  const yz = y => `${y.qin}${ZHI[y.zhi]}${WX[y.wx]}`;
+  const mv = [0, 1, 2, 3, 4, 5].filter(i => G.moving[i]).map(i => `${POS[i]}爻${yz(B.yao[i])}${V ? ' 化 ' + yz(V.yao[i]) : ''}`);
+  const pick = $('yongIn').value, r = pick ? LY.yongShen(G, pick) : null;
+  Fabao.share({
+    title: V ? `${B.name} 之 ${V.name}` : `${B.name} · 静卦`,
+    key: T && T.gua ? `「${T.gua}」` : `${B.palace}宫 · ${B.genName}`,
+    lines: [
+      ['所问', $('qIn').value.trim() || '心中默念，未记'],
+      d ? ['日月', `月建${ZHI[d.monthZhi]} · 日辰${GAN[d.dayGan]}${ZHI[d.dayZhi]} · 旬空${d.kong.map(z => ZHI[z]).join('')}`] : null,
+      ['世应', `世在${POS[B.shi - 1]}爻${yz(yi(B.shi))}，应在${POS[B.ying - 1]}爻${yz(yi(B.ying))}`],
+      ['动爻', mv.length ? mv.join('；') : '六爻安静'],
+      r ? ['用神', `${pick === '世爻' ? '世爻（自占）' : r.yong}属${WX[r.yongWx]} · 原神${r.yuan} · 忌神${r.ji}`] : null,
+      ['互卦', `${G.hu.name}`]
+    ].filter(Boolean),
+    meta: d ? `${d.w.y}.${pad(d.w.mo)}.${pad(d.w.d)} ${pad(d.w.h)}:${pad(d.w.mi)} · ${d.w.c.pillars.map(p => p.name).join(' ')}` : ''
+  });
+};
 function writeURL() {
   const q = new URLSearchParams();
   q.set('g', nums.join('')); q.set('t', $('whenIn').value);

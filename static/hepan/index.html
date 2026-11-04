@@ -193,12 +193,12 @@
     <div class="hp-p" id="slotB"></div>
   </section>
 
-  <section class="fb-card hp-verdict" id="verdict" aria-live="polite"></section>
+  <section class="fb-card hp-verdict" id="verdict" aria-live="polite" data-gloss></section>
 
   <div class="hp-grid" id="secs" hidden>
     <section class="fb-card hp-sec" aria-label="八字合婚">
       <h3>八字合婚<small>生肖 · 日干 · 日支 · 纳音 · 五行 · 命卦</small></h3>
-      <div id="bzRows"></div>
+      <div id="bzRows" data-gloss></div>
     </section>
     <section class="fb-card hp-sec" aria-label="星盘比较">
       <h3>星盘比较<small>合 0° · 六合 60° · 刑 90° · 拱 120° · 冲 180°</small></h3>
@@ -528,9 +528,16 @@ function renderResults() {
       <span class="fb-fine">八字六项（合 ${t.bz.good} · 冲 ${t.bz.bad}）＋ 星盘要紧相位 ${R.keys.length} 条（合 ${t.xp.good} · 冲 ${t.xp.bad}）· 粗看，仅供参考</span>
     </div>
     ${notes.length ? `<p class="hp-vnote">${notes.join('；')}。</p>` : ''}
-    <div class="acts"><button class="fb-btn" id="copyBtn" type="button">复制</button><button class="fb-btn primary" id="aiBtn" type="button">问 AI</button></div>`;
+    <div class="acts"><button class="fb-btn" id="copyBtn" type="button">复制</button><button class="fb-btn primary" id="aiBtn" type="button">问 AI</button><button class="fb-btn" id="shareBtn" type="button" title="把合盘大概画成一张图，可存可分享">分享图</button></div>`;
   $('copyBtn').onclick = () => F.copy(text(), '合盘已复制');
   $('aiBtn').onclick = () => F.askAI('合盘（八字合婚与星盘比较）', text(), HP.RULES.map((s, i) => (i + 1) + '. ' + s).join('\n'));
+  // 分享图：两人为题、总评作金句、合冲计数；八字六项与要紧相位各取几条
+  $('shareBtn').onclick = () => F.share({
+    title: `${na} × ${nb}`,
+    key: v.head + (v.tail ? '；' + v.tail : ''),
+    lines: [['契合', `合 ${t.good} · 冲 ${t.bad} · 平 ${t.mid}`]].concat(R.rows.filter(r => r.id !== 'wx').slice(0, 5).map(r => [r.label, `${r.word}：${r.text}`])),
+    url: location.origin + '/hepan/'      // 两人生辰不进二维码
+  });
   S.hidden = false;
   renderBazi(); renderXing();
 }
