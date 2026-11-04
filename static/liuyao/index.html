@@ -44,6 +44,10 @@
     @keyframes lySpin { 0% { transform: translateY(0) rotateY(0); } 40% { transform: translateY(-26px) rotateY(540deg); } 100% { transform: translateY(0) rotateY(var(--end, 720deg)); } }
     .ly-toss-ctrl { display: flex; flex-direction: column; gap: 6px; }
     .ly-toss-ctrl .fb-btn { min-width: 9em; }
+    /* 摇一摇：开着时按钮亮起，前面一颗点慢慢呼吸 */
+    #shakeBtn.on { border-color: var(--zi-2); color: var(--fg); background: rgba(122, 91, 192, .22); }
+    #shakeBtn.on::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--zi-2); animation: lyBreath 1.4s ease-in-out infinite; }
+    @keyframes lyBreath { 50% { opacity: .25; transform: scale(.7); } }
     .ly-stack { display: flex; flex-direction: column-reverse; gap: 4px; min-width: 120px; }
     .ly-stack div { display: grid; grid-template-columns: 2.6em 64px 1.4em; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); font-family: var(--font-title); }
     .ly-stack svg { width: 64px; height: 8px; }
@@ -173,6 +177,7 @@
         <div class="ly-coins" id="coins" aria-hidden="true"></div>
         <div class="ly-toss-ctrl">
           <button class="fb-btn primary" id="tossBtn" type="button">摇第一爻</button>
+          <button class="fb-btn" id="shakeBtn" type="button" aria-pressed="false" title="手机上点开后，晃一下手机就摇一爻" hidden>摇一摇</button>
           <div class="fb-row"><button class="fb-btn ghost" id="tossAll" type="button">一气摇完</button><button class="fb-btn ghost" id="tossReset" type="button">重来</button></div>
         </div>
         <div class="ly-stack" id="stack" aria-live="polite"></div>
@@ -318,6 +323,30 @@ let busy = false;
 $('tossBtn').onclick = () => { if (busy) return; busy = true; tossOne(false); setTimeout(() => { busy = false; }, 720); };
 $('tossAll').onclick = () => { if (nums.length >= 6) nums = []; while (nums.length < 6) tossOne(true); };
 $('tossReset').onclick = () => { nums = []; renderStack(); $('tossBtn').textContent = '摇第一爻'; G = null; show(); };
+// 摇一摇：手机上点开，晃一下手机摇一爻，六爻摇齐自动停（iOS 要先允许「动作与方向」）；电脑上不出这个按钮
+if (Fabao.shake && window.matchMedia && matchMedia('(pointer: coarse)').matches) {
+  const sb = $('shakeBtn');
+  let sh = null;
+  const stop = msg => {
+    if (sh) sh.stop();
+    sh = null; sb.classList.remove('on'); sb.textContent = '摇一摇'; sb.setAttribute('aria-pressed', 'false');
+    if (msg) toast(msg, 2600);
+  };
+  sb.hidden = false;
+  sb.onclick = () => {
+    if (sh) { stop(); return; }
+    Fabao.shake(() => {
+      if (busy) return;
+      busy = true; tossOne(false); setTimeout(() => { busy = false; }, 720);
+      if (nums.length >= 6) stop('六爻摇齐，卦成');
+    }).then(r => {
+      if (!r.ok) { toast(r.why, 3200); return; }
+      sh = r; sb.classList.add('on'); sb.textContent = '摇着 · 点停'; sb.setAttribute('aria-pressed', 'true');
+      toast(nums.length >= 6 ? '再摇一卦：心里默念所问，晃一下摇一爻' : '心里默念所问，晃一下摇一爻', 2600);
+      setTimeout(() => { if (sh && !sh.heard()) stop('这台设备没有动作感应，改点「' + $('tossBtn').textContent + '」'); }, 2500);
+    });
+  };
+}
 
 // —— 手动 ——
 function renderManual() {
