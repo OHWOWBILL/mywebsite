@@ -260,6 +260,7 @@
         <button class="fb-btn" id="saveBtn" type="button">存盘</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
         <button class="fb-btn" id="aiBtn" type="button" title="把命盘连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button class="fb-btn" id="shareBtn" type="button" title="把命盘大概画成一张图，可存可分享">分享图</button>
       </div>
       <select id="libSel" aria-label="盘库"><option value="">盘库（存过的盘）</option></select>
       <p class="fb-fine">排盘全在这台设备上算，不上传；存盘只存在本机浏览器。</p>
@@ -871,6 +872,11 @@ function rulesText() {
   ].join('\n');
 }
 $('aiBtn').onclick = () => { if (C) Fabao.askAI('八字（子平）', aiText(), rulesText()); };
+// 分享图：乾坤造与四柱为题，白话卡作金句与几行；二维码只到八字页，不带生辰
+$('shareBtn').onclick = () => {
+  if (!C) { toast('先排一盘'); return; }
+  Fabao.share({ title: `${C.male ? '乾造' : '坤造'} · ${C.pillars.map(p => p.name).join(' ')}`, url: location.origin + '/bazi/', qrLabel: '扫码也排一盘' });
+};
 function writeURL() {
   const s = snapshot(), q = new URLSearchParams();
   if (s.cal === 'lunar') { q.set('l', `${s.ly}-${s.lm}-${s.ld}`); q.set('t', s.lt); }
