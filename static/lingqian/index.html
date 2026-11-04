@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>灵签 · 潜蛟阁法宝库</title>
+  <meta name="description" content="灵签求签：观音、关帝、六十甲子（妈祖庙常用）、黄大仙、浅草寺おみくじ五套签诗。默念所问，掷筊连得三圣杯，摇签筒（手机可直接摇），签出看竖排签诗、典故与白话解；记录只存在本机。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
+  <style>
+    .tone-top { --tc: var(--jin); } .tone-good { --tc: var(--lv); } .tone-mid { --tc: var(--fg-2); } .tone-bad { --tc: var(--zhu); }
+
+    /* —— 求签：签种 + 所问 —— */
+    .lq-now { grid-template-columns: minmax(0, 1fr) minmax(250px, 300px); }
+    .lq-ask { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .lq-sets { display: flex; flex-wrap: wrap; gap: 6px; }
+    .lq-set {
+      display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 14px;
+      border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-3);
+      font-family: var(--font-title); font-size: 14px; letter-spacing: .12em; color: var(--muted); white-space: nowrap;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .lq-set small { font-size: 11px; color: var(--faint); letter-spacing: .04em; }
+    .lq-set:hover { color: var(--fg); border-color: var(--zi-2); }
+    .lq-set[aria-checked="true"] { color: var(--fg); border-color: var(--zi-2); background: rgba(122, 91, 192, .22); }
+    .lq-set[aria-checked="true"] small { color: var(--zi-2); }
+    .lq-setnote { font-size: 13px; line-height: 1.8; color: var(--muted); letter-spacing: .03em; }
+    .lq-setnote b { font-family: var(--font-title); font-weight: 600; color: var(--fg-2); margin-right: 6px; letter-spacing: .1em; }
+    .lq-q .fb-label small { letter-spacing: .05em; color: var(--faint); margin-left: 6px; }
+    .lq-q input { width: 100%; font-size: 15px; padding: 9px 12px; }
+    .lq-ctrl { justify-content: center; }
+    .lq-ctrl .fb-btn.block { letter-spacing: .4em; }
+    .lq-seed { color: var(--jin); }
+
+    /* —— 求签过程 —— */
+    .lq-stage { padding: 16px 20px 18px; margin-bottom: 22px; scroll-margin-top: calc(var(--top-h) + 14px); overflow: hidden; }
+    .lq-steps { display: flex; justify-content: center; align-items: center; gap: 8px; list-style: none; flex-wrap: nowrap; }
+    .lq-steps li { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-title); font-size: 13px; letter-spacing: .15em; color: var(--faint); white-space: nowrap; }
+    .lq-steps li + li::before { content: ""; width: 22px; height: 1px; background: var(--rule-2); margin-right: 2px; }
+    .lq-steps li b { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--rule-2); font-weight: 400; font-size: 12px; letter-spacing: 0; }
+    .lq-steps li.done { color: var(--muted); }
+    .lq-steps li.done b { border-color: var(--lv); color: var(--lv); }
+    .lq-steps li.on { color: var(--fg); }
+    .lq-steps li.on b { background: var(--zi); border-color: var(--zi); color: #fff; }
+
+    .lq-scene { display: flex; justify-content: center; align-items: flex-end; gap: 56px; padding: 70px 0 4px; }
+    .lq-jiao, .lq-tube { display: flex; flex-direction: column; align-items: center; transition: opacity .35s, transform .35s, filter .35s; }
+    .lq-scene .dim { opacity: .34; filter: saturate(.55); transform: scale(.88); }
+    .lq-cap { margin-top: 10px; display: flex; gap: 16px; justify-content: center; font-family: var(--font-title); font-size: 12.5px; letter-spacing: .2em; color: var(--muted); min-height: 21px; }
+    .lq-cap span { min-width: 84px; text-align: center; }
+    .lq-cap .yang { color: var(--fg); }
+    .lq-cap .yin { color: var(--zi-2); }
+
+    /* 筊杯：两面，平面（阳）在前，凸面（阴）在背 */
+    .lq-blks { display: flex; gap: 16px; perspective: 520px; padding-top: 40px; }
+    .blk { width: 84px; height: 40px; position: relative; transform-style: preserve-3d; }
+    .blk .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .blk .face.yin { transform: rotateX(180deg); }
+    .blk svg { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 7px 6px rgba(0, 0, 0, .5)); }
+    .lq-streak { display: flex; gap: 10px; justify-content: center; margin-top: 10px; min-height: 14px; }
+    .lq-streak i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--rule-2); transition: background .25s, border-color .25s, box-shadow .25s; }
+    .lq-streak i.on { background: var(--lv); border-color: var(--lv); box-shadow: 0 0 10px rgba(141, 191, 151, .55); }
+    .lq-streak[hidden] { display: none; }
+
+    /* 签筒 */
+    .lq-tube .tube { position: relative; width: 112px; height: 210px; }
+    .lq-tube .tube-in { position: absolute; inset: 0; transform-origin: 50% 92%; }
+    .lq-tube svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+    .lq-tube .sticks { transform-origin: 50% 100%; }
+    .lq-tube .hexf, .lq-tube.hex .round { display: none; }
+    .lq-tube.hex .hexf { display: block; }
+    .lq-stick {
+      position: absolute; left: 50%; top: 44px; width: 18px; height: 128px; margin-left: -9px; z-index: 2;
+      border-radius: 3px 3px 2px 2px; background: linear-gradient(90deg, #CDB07A, #F0DFB4 45%, #D2B680);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .45); display: flex; justify-content: center; visibility: hidden;
+    }
+    .lq-stick::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 15px; background: var(--zhu); border-radius: 3px 3px 0 0; }
+    .lq-stick span { margin-top: 20px; writing-mode: vertical-rl; text-orientation: upright; font-family: var(--font-title); font-weight: 600; font-size: 12px; line-height: 1; letter-spacing: .02em; color: #4A3410; }
+    .lq-tube.hex .lq-stick { width: 12px; margin-left: -6px; top: 52px; }
+    .lq-tube.hex .lq-stick span { font-size: 10px; }
+    .lq-tube.out .lq-stick { visibility: visible; }
+    .lq-tube .front { position: absolute; inset: 0; z-index: 3; }
+
+    .lq-say { margin: 14px auto 0; max-width: 34em; text-align: center; font-family: var(--font-title); font-size: 15px; line-height: 1.85; letter-spacing: .06em; color: var(--fg-2); min-height: 1.85em; }
+    .lq-say b { font-weight: 600; color: var(--fg); }
+    .lq-say .k-sheng { color: var(--lv); } .lq-say .k-xiao { color: var(--jin); } .lq-say .k-yin { color: var(--zhu); }
+    .lq-say small { display: block; font-family: var(--font-body); font-size: 12.5px; color: var(--muted); letter-spacing: .03em; }
+    .lq-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px; }
+    .lq-acts:empty { display: none; }
+    .lq-acts .fb-btn { min-width: 8em; }
+    .lq-acts .primary { min-width: 10em; letter-spacing: .3em; }
+    .lq-acts .fb-btn:disabled, .lq-racts .fb-btn:disabled { opacity: .45; cursor: default; }
+    .lq-hint { width: 100%; text-align: center; font-size: 12.5px; color: var(--muted); }
+
+    /* —— 签出 —— */
+    .lq-result { padding: 20px 22px; margin-bottom: 22px; scroll-margin-top: calc(var(--top-h) + 14px); animation: fbIn .45s ease; }
+    .lq-rgrid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px 30px; align-items: start; }
+    .lq-slipwrap { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 0; }
+    .lq-slip {
+      position: relative; writing-mode: vertical-rl; text-orientation: upright;
+      background: var(--bg-3); border: 1px solid var(--rule-2); border-radius: 6px; padding: 18px 10px 22px;
+      font-family: var(--font-title); box-shadow: 0 10px 30px -14px rgba(0, 0, 0, .7);
+    }
+    .lq-slip::after { content: ""; position: absolute; inset: 4px; border: 1px solid var(--rule); border-radius: 3px; pointer-events: none; }
+    .lq-slip p { padding: 0 9px; line-height: 1.5; border-left: 1px solid var(--rule); }
+    .lq-slip p:last-of-type { border-left: none; }
+    .lq-slip .hd { font-size: 13px; color: var(--muted); letter-spacing: .2em; }
+    .lq-slip .hd b { font-weight: 600; color: var(--fg); margin-top: .5em; }
+    .lq-slip .ln { font-size: 23px; font-weight: 600; letter-spacing: .3em; color: var(--fg); }
+    .lq-slip .ft { font-size: 13px; color: var(--zi-2); letter-spacing: .2em; }
+    .lq-stamp {
+      position: absolute; left: -12px; bottom: -14px; padding: 5px 3px; border: 2px solid var(--tc); border-radius: 4px;
+      background: var(--bg-2); color: var(--tc); font-size: 14px; font-weight: 600; letter-spacing: .1em; line-height: 1.15; transform: rotate(-7deg);
+    }
+    .lq-script { font-size: 12px; color: var(--muted); letter-spacing: .1em; padding: 2px 10px; border: 1px solid var(--rule-2); border-radius: 999px; }
+    .lq-script:hover { color: var(--fg); border-color: var(--zi-2); }
+
+    .lq-rinfo { min-width: 0; }
+    .lq-rtitle { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+    .lq-rtitle .nm { font-family: var(--font-title); font-size: 13px; color: var(--muted); letter-spacing: .2em; }
+    .lq-rtitle h2 { font-family: var(--font-title); font-weight: 600; font-size: 24px; letter-spacing: .2em; color: var(--fg); line-height: 1.3; }
+    .lq-rtitle h2 small { font-size: 15px; font-weight: 400; color: var(--fg-2); letter-spacing: .15em; margin-left: 8px; }
+    .lq-grade { display: inline-block; padding: 1px 12px; border-radius: 999px; font-family: var(--font-title); font-size: 14px; letter-spacing: .2em; color: var(--tc); border: 1px solid color-mix(in oklab, var(--tc) 60%, transparent); background: color-mix(in oklab, var(--tc) 13%, transparent); white-space: nowrap; }
+    .lq-grade small { font-size: 11px; letter-spacing: .05em; color: var(--muted); margin-left: 4px; }
+    .lq-ok { font-family: var(--font-title); font-size: 12.5px; color: var(--lv); letter-spacing: .12em; white-space: nowrap; }
+    .lq-ok.no { color: var(--muted); }
+    .lq-scale { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0 4px; }
+    .lq-scale span { font-family: var(--font-title); font-size: 11.5px; line-height: 20px; padding: 0 7px; border-radius: 3px; background: var(--bg-3); color: var(--faint); letter-spacing: .08em; }
+    .lq-scale span.on { color: var(--tc); background: color-mix(in oklab, var(--tc) 14%, transparent); box-shadow: inset 0 0 0 1px var(--tc); }
+    .lq-dl { margin-top: 8px; }
+    .lq-dl > div { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 10px; padding: 8px 0; border-top: 1px dashed var(--rule); }
+    .lq-dl dt { font-family: var(--font-title); font-size: 12px; color: var(--faint); letter-spacing: .15em; padding-top: 4px; }
+    .lq-dl dd { min-width: 0; font-size: 14px; line-height: 1.85; color: var(--fg-2); }
+    .lq-dl dd.bai { font-size: 15.5px; color: var(--fg); }
+    .lq-dl dd .fine { font-size: 12px; color: var(--faint); }
+    .lq-items { display: flex; flex-wrap: wrap; gap: 4px 6px; list-style: none; }
+    .lq-items li { font-size: 12.5px; line-height: 1.6; padding: 1px 8px; border-radius: 4px; background: var(--bg-3); color: var(--fg-2); }
+    .lq-items li i { font-style: normal; color: var(--faint); margin-right: 5px; font-family: var(--font-title); }
+    .lq-gua { font-family: var(--font-title); letter-spacing: .1em; color: var(--fg); margin-right: 8px; white-space: nowrap; }
+    .lq-racts { margin-top: 14px; }
+    .lq-confirm { margin-top: 12px; padding: 12px 14px; border-radius: var(--r); background: var(--bg-3); display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; }
+    .lq-confirm .lq-blks { padding-top: 26px; gap: 10px; perspective: 400px; }
+    .lq-confirm .blk { width: 58px; height: 28px; }
+    .lq-confirm p { flex: 1 1 14em; min-width: 0; font-family: var(--font-title); font-size: 14px; line-height: 1.8; color: var(--fg-2); letter-spacing: .04em; }
+    .lq-confirm p b { font-weight: 600; }
+    .lq-src { margin-top: 12px; font-size: 12px; line-height: 1.75; color: var(--faint); }
+
+    /* —— 求签记录 —— */
+    .lq-hist { padding: 16px 20px 12px; margin-bottom: 18px; }
+    .lq-hhead { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .lq-hhead h3, .lq-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; }
+    .lq-hhead h3 small { font-weight: 400; font-size: 12px; color: var(--faint); letter-spacing: .08em; margin-left: 8px; }
+    .lq-hhead .fb-btn { padding: 4px 10px; font-size: 13px; }
+    .lq-hlist { list-style: none; margin-top: 6px; }
+    .lq-hlist li { display: flex; align-items: center; border-top: 1px dashed var(--rule); }
+    .lq-hlist li.none { display: block; padding: 12px 2px; color: var(--faint); font-size: 13px; }
+    .lq-hlist .hi { flex: 1; min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; padding: 9px 4px; text-align: left; font-size: 13px; color: var(--fg-2); }
+    .lq-hlist .hi:hover b { color: var(--zi-2); }
+    .lq-hlist .hi.on { background: rgba(122, 91, 192, .1); }
+    .lq-hlist time { font-size: 12px; color: var(--faint); letter-spacing: .02em; white-space: nowrap; }
+    .lq-hlist .nm { font-family: var(--font-title); font-size: 12.5px; color: var(--muted); letter-spacing: .1em; white-space: nowrap; }
+    .lq-hlist b { font-family: var(--font-title); font-weight: 600; color: var(--fg); letter-spacing: .12em; white-space: nowrap; }
+    .lq-hlist .g { font-family: var(--font-title); font-size: 12.5px; color: var(--tc); white-space: nowrap; }
+    .lq-hlist .ok { color: var(--lv); font-size: 12px; white-space: nowrap; }
+    .lq-hlist .q { flex: 1 1 8em; min-width: 0; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lq-hlist .x { padding: 6px 10px; font-size: 17px; line-height: 1; color: var(--faint); }
+    .lq-hlist .x:hover { color: var(--zhu); }
+
+    /* —— 口径 —— */
+    .lq-help { padding: 16px 20px; }
+    .lq-help h3 + ul { margin-top: 8px; }
+    .lq-help ul + h3 { margin-top: 16px; }
+    .lq-help ul { padding: 0; }
+    .lq-help li { list-style: none; padding-left: 14px; position: relative; font-size: 13px; line-height: 1.9; color: var(--fg-2); }
+    .lq-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .lq-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 4px; }
+    .lq-help a { word-break: break-all; }
+
+    @media (max-width: 860px) {
+      .lq-now { grid-template-columns: minmax(0, 1fr); }
+      .lq-set { padding: 5px 12px; font-size: 13.5px; letter-spacing: .08em; }
+      .lq-stage { padding: 14px 12px 16px; margin-bottom: 14px; }
+      .lq-steps { gap: 5px; }
+      .lq-steps li { font-size: 12px; letter-spacing: .06em; gap: 4px; }
+      .lq-steps li + li::before { width: 10px; }
+      .lq-steps li b { width: 20px; height: 20px; font-size: 11px; }
+      .lq-scene { gap: 24px; padding-top: 60px; }
+      .lq-blks { gap: 10px; padding-top: 34px; }
+      .blk { width: 64px; height: 31px; }
+      .lq-cap { gap: 10px; }
+      .lq-cap span { min-width: 64px; }
+      .lq-tube .tube { width: 94px; height: 176px; }
+      .lq-stick { top: 37px; width: 15px; height: 108px; margin-left: -7.5px; }
+      .lq-tube.hex .lq-stick { width: 10px; margin-left: -5px; top: 44px; }
+      .lq-stick span { font-size: 10.5px; margin-top: 18px; }
+      .lq-say { font-size: 14px; }
+      .lq-acts .fb-btn { min-width: 0; flex: 1 1 auto; }
+      .lq-result { padding: 16px 14px; margin-bottom: 14px; }
+      .lq-rgrid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .lq-slip p { padding: 0 7px; }
+      .lq-slip .ln { font-size: 21px; letter-spacing: .26em; }
+      .lq-rtitle h2 { font-size: 21px; }
+      .lq-racts .fb-btn { flex: 1 1 auto; padding: 9px 10px; }
+      .lq-hist, .lq-help { padding: 14px 14px 10px; }
+    }
+  </style>
+</head>
+<body data-tool="lingqian">
+<!-- 筊杯的渐层：全页共用 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="lqFlat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CB5A44"/><stop offset="1" stop-color="#9E352A"/></linearGradient>
+    <radialGradient id="lqRound" cx="50%" cy="28%" r="78%"><stop offset="0" stop-color="#E8846A"/><stop offset=".55" stop-color="#B4402F"/><stop offset="1" stop-color="#6E2018"/></radialGradient>
+    <linearGradient id="lqWood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5C3D24"/><stop offset=".42" stop-color="#9C6E40"/><stop offset=".6" stop-color="#A9794A"/><stop offset="1" stop-color="#5A3B22"/></linearGradient>
+    <linearGradient id="lqHexTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B98955"/><stop offset="1" stop-color="#8E6337"/></linearGradient>
+  </defs>
+</svg>
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">签</div>
+    <div>
+      <h1 class="fb-title">灵签<span class="en">LINGQIAN · おみくじ</span></h1>
+      <p class="fb-sub">默念所问 · 掷筊请示 · 摇签筒 · 签出解签</p>
+    </div>
+  </header>
+
+  <section class="fb-now lq-now" aria-label="求签">
+    <div class="lq-ask">
+      <div class="lq-sets" id="setBox" role="radiogroup" aria-label="签种"></div>
+      <p class="lq-setnote" id="setNote"></p>
+      <div class="lq-q">
+        <label class="fb-label" for="qIn">默念所问<small>可不写；写了只存在这台设备</small></label>
+        <input type="text" id="qIn" maxlength="60" autocomplete="off" placeholder="一签只问一事，例：这次换工作顺不顺？">
+      </div>
+    </div>
+    <div class="fb-now-ctrl lq-ctrl">
+      <button type="button" class="fb-btn primary block" id="startBtn">掷筊请示</button>
+      <button type="button" class="fb-btn" id="skipBtn">跳过仪式，直接抽</button>
+      <p class="fb-fine" id="ctrlNote"></p>
+    </div>
+  </section>
+
+  <section class="fb-card lq-stage" id="stage" aria-label="求签过程">
+    <ol class="lq-steps" id="steps">
+      <li data-step="ask"><b>一</b>默念</li>
+      <li data-step="jiao"><b>二</b>掷筊</li>
+      <li data-step="tube"><b>三</b>摇签</li>
+      <li data-step="out"><b>四</b>签出</li>
+    </ol>
+    <div class="lq-scene" id="scene" aria-hidden="true">
+      <div class="lq-jiao" id="jiaoBox">
+        <div class="lq-blks" id="blks"></div>
+        <div class="lq-cap" id="jiaoCap"></div>
+        <div class="lq-streak" id="streak"><i></i><i></i><i></i></div>
+      </div>
+      <div class="lq-tube" id="tubeBox">
+        <div class="tube"><div class="tube-in" id="tubeIn">
+          <svg class="back round" viewBox="0 0 112 210">
+            <ellipse cx="56" cy="64" rx="44" ry="11" fill="#1B1410"/>
+            <g class="sticks" id="sticks">
+              <g transform="rotate(-9 56 64)"><rect x="25" y="14" width="7" height="60" rx="2" fill="#D9C08A"/><rect x="25" y="14" width="7" height="8" rx="2" fill="#C8584A"/></g>
+              <g transform="rotate(-4 56 64)"><rect x="35" y="4" width="7" height="70" rx="2" fill="#E6D2A2"/><rect x="35" y="4" width="7" height="8" rx="2" fill="#C8584A"/></g>
+              <g transform="rotate(3 56 64)"><rect x="46" y="10" width="7" height="64" rx="2" fill="#D4B87F"/><rect x="46" y="10" width="7" height="8" rx="2" fill="#C8584A"/></g>
+              <g transform="rotate(-1 56 64)"><rect x="57" y="0" width="7" height="74" rx="2" fill="#EAD8AA"/><rect x="57" y="0" width="7" height="8" rx="2" fill="#C8584A"/></g>
+              <g transform="rotate(6 56 64)"><rect x="67" y="8" width="7" height="66" rx="2" fill="#DCC48F"/><rect x="67" y="8" width="7" height="8" rx="2" fill="#C8584A"/></g>
+              <g transform="rotate(11 56 64)"><rect x="77" y="16" width="7" height="58" rx="2" fill="#D0B27A"/><rect x="77" y="16" width="7" height="8" rx="2" fill="#C8584A"/></g>
+            </g>
+          </svg>
+          <div class="lq-stick" id="stick"><span id="stickNo">一</span></div>
+          <svg class="front round" viewBox="0 0 112 210">
+            <path d="M12 64 A44 11 0 0 0 100 64 L96 194 A40 10 0 0 1 16 194 Z" fill="url(#lqWood)"/>
+            <path d="M13.5 90 A43 10 0 0 0 98.5 90" fill="none" stroke="#3E2816" stroke-width="3"/>
+            <path d="M15.5 176 A41 10 0 0 0 96.5 176" fill="none" stroke="#3E2816" stroke-width="3"/>
+            <ellipse cx="56" cy="64" rx="44" ry="11" fill="none" stroke="rgba(255,236,210,.22)" stroke-width="1.2"/>
+            <text id="tubeLab1" x="56" y="122" text-anchor="middle" font-size="17" font-weight="600" fill="#E8C979" font-family="Noto Serif SC, serif">灵</text>
+            <text id="tubeLab2" x="56" y="146" text-anchor="middle" font-size="17" font-weight="600" fill="#E8C979" font-family="Noto Serif SC, serif">签</text>
+          </svg>
+          <svg class="front hexf" viewBox="0 0 112 210">
+            <polygon points="14,62 34,74 34,196 14,184" fill="#5C3D24"/>
+            <polygon points="78,74 98,62 98,184 78,196" fill="#62422A"/>
+            <polygon points="34,74 78,74 78,196 34,196" fill="url(#lqWood)"/>
+            <polygon points="14,62 34,50 78,50 98,62 78,74 34,74" fill="url(#lqHexTop)"/>
+            <ellipse cx="56" cy="62" rx="6" ry="3" fill="#1B1410"/>
+            <rect x="40" y="96" width="32" height="74" rx="2" fill="#F0E4C8"/>
+            <text x="56" y="124" text-anchor="middle" font-size="15" font-weight="600" fill="#9E352A" font-family="Noto Serif SC, serif">御</text>
+            <text x="56" y="146" text-anchor="middle" font-size="15" font-weight="600" fill="#9E352A" font-family="Noto Serif SC, serif">籤</text>
+            <text x="56" y="163" text-anchor="middle" font-size="7.5" fill="#6E4A2A" font-family="Noto Serif SC, serif">浅草寺</text>
+          </svg>
+        </div></div>
+        <div class="lq-cap" id="tubeCap"><span>签筒</span></div>
+      </div>
+    </div>
+    <p class="lq-say" id="say" aria-live="polite"></p>
+    <div class="lq-acts" id="acts"></div>
+  </section>
+
+  <section class="fb-card lq-result" id="result" aria-label="签出" hidden></section>
+
+  <section class="fb-card lq-hist" aria-label="求签记录">
+    <div class="lq-hhead">
+      <h3>求签记录<small>最新在前 · 只存在这台设备</small></h3>
+      <button type="button" class="fb-btn ghost" id="histClear" hidden>清空</button>
+    </div>
+    <ol class="lq-hlist" id="histList"></ol>
+  </section>
+
+  <section class="fb-card lq-help" aria-label="口径">
+    <h3>口径</h3>
+    <ul id="rulesList"></ul>
+    <h3>签诗出处</h3>
+    <ul id="srcList"></ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/fabao/fabao.js?v=13"></script>
+<script src="data/guanyin.js?v=1"></script>
+<script src="data/guandi.js?v=1"></script>
+<script src="data/jiazi.js?v=1"></script>
+<script src="data/wongtaisin.js?v=1"></script>
+<script src="data/sensoji.js?v=1"></script>
+<script src="lingqian.js?v=1"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, LQ = window.LQ;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const fmtT = t => { const d = new Date(t); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const LS_HIST = 'lingqian.history', LS_SET = 'lingqian.set', LS_SCRIPT = 'lingqian.script';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const RM = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+const calm = () => RM.matches;
+const wait = ms => new Promise(r => setTimeout(r, calm() ? 0 : ms));
+const buzz = p => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) { /* 不支持就算了 */ } };
+const Q = new URLSearchParams(location.search);
+const SEED = Q.get('seed');
+const rnd = SEED ? LQ.seeded(SEED) : LQ.cryptoSource();
+const SETS = LQ.sets();
+
+/* ================ 状态 ================ */
+let hist = LQ.histClean(store.get(LS_HIST, []));
+const S = {
+  set: (LQ.set(Q.get('set')) && Q.get('set')) || (LQ.set(store.get(LS_SET, '')) ? store.get(LS_SET, '') : 'guanyin'),
+  step: 'ask',          // ask 默念 · jiao 掷筊 · tube 摇签 · out 签出
+  mode: null,           // rite 三圣杯 · skip 跳过 · temple 浅草寺不掷筊
+  rite: null, last: null, busy: false, auto: false, drawn: null,
+  view: null,           // 结果卡上的这一签 { s, n, t, q, r, k, c }，有 t 的是记录里的
+  script: store.get(LS_SCRIPT, 's') === 't' ? 't' : 's',
+  cf: null              // 签出后掷筊确认：null | 'busy' | 'sheng' | 'xiao' | 'yin'
+};
+const D = () => LQ.set(S.set);
+const saveHist = () => store.set(LS_HIST, hist);
+
+/* ================ 筊杯 ================ */
+const BLK = 'M3 38 C 9 2, 91 2, 97 38 C 80 25, 20 25, 3 38 Z';
+const blkHTML = () => `<div class="blk"><div class="face yang"><svg viewBox="0 0 100 42"><path d="${BLK}" fill="url(#lqFlat)"/><path d="M13 33 C 20 11, 80 11, 87 33 C 72 25, 28 25, 13 33 Z" fill="none" stroke="rgba(255,228,208,.32)" stroke-width="1.3"/><path d="M30 22 C 42 18, 58 18, 70 22" fill="none" stroke="rgba(80,20,12,.35)" stroke-width="1"/></svg></div><div class="face yin"><svg viewBox="0 0 100 42"><path d="${BLK}" fill="url(#lqRound)"/><ellipse cx="50" cy="15" rx="24" ry="4.5" fill="rgba(255,238,224,.24)"/></svg></div></div>`;
+function makeBlocks(box) { box.innerHTML = blkHTML() + blkHTML(); return [...box.querySelectorAll('.blk')]; }
+// 落定：face 1 = 阳（平面朝上，rotateX 0），0 = 阴（凸面朝上，rotateX 180）；只转外观，结果早已定
+function place(el, face) { el._rx = face ? 0 : 180; el._rz = el._rz || 0; el.style.transform = `rotateX(${el._rx}deg) rotateZ(${el._rz}deg)`; }
+function flip(el, face, dur, delay) {
+  const from = el._rx || 0, end = face ? 0 : 180;
+  const spins = 2 + Math.floor(Math.random() * 2);
+  const to = from + spins * 360 + (((end - from) % 360) + 360) % 360;
+  const z0 = el._rz || 0, z = Math.round(Math.random() * 36 - 18);
+  el._rx = to % 360; el._rz = z;
+  if (calm() || !el.animate) { place(el, face); return Promise.resolve(); }
+  const lift = -(52 + Math.random() * 22);
+  const a = el.animate([
+    { transform: `translateY(0) rotateX(${from}deg) rotateZ(${z0}deg)` },
+    { transform: `translateY(${lift}px) rotateX(${from + (to - from) * .55}deg) rotateZ(${(z0 + z) / 2}deg)`, offset: .45 },
+    { transform: `translateY(0) rotateX(${to}deg) rotateZ(${z}deg)`, offset: .8 },
+    { transform: `translateY(-7px) rotateX(${to}deg) rotateZ(${z}deg)`, offset: .9 },
+    { transform: `translateY(0) rotateX(${to}deg) rotateZ(${z}deg)` }
+  ], { duration: dur, delay: delay || 0, easing: 'cubic-bezier(.3,.62,.4,1)', fill: 'forwards' });
+  return new Promise(res => { a.onfinish = a.oncancel = () => { place(el, face); a.cancel(); res(); }; });
+}
+const stageBlk = makeBlocks($('blks'));
+place(stageBlk[0], 1); place(stageBlk[1], 0);
+
+/* ================ 签筒 ================ */
+function shakeAnim(dur) {
+  const el = $('tubeIn'), st = $('sticks');
+  if (calm() || !el.animate) return Promise.resolve();
+  const n = Math.max(4, Math.round(dur / 130)), k = [], j = [];
+  for (let i = 0; i <= n; i++) {
+    const edge = i === 0 || i === n, s = i % 2 ? 1 : -1;
+    k.push({ transform: edge ? 'rotate(0deg)' : `rotate(${s * (7 + (i % 3) * 2)}deg) translateY(${s < 0 ? -3 : 0}px)` });
+    j.push({ transform: edge ? 'translateY(0)' : `translateY(${(i % 3) * -3}px)` });
+  }
+  if (st && st.animate) st.animate(j, { duration: dur, easing: 'linear' });
+  const a = el.animate(k, { duration: dur, easing: 'ease-in-out' });
+  return new Promise(res => { a.onfinish = a.oncancel = res; });
+}
+function nudge() {
+  const el = $('tubeIn');
+  if (calm() || !el.animate) return;
+  const s = Math.random() < .5 ? -1 : 1;
+  el.animate([{ transform: 'rotate(0)' }, { transform: `rotate(${s * 8}deg)` }, { transform: 'rotate(0)' }], { duration: 220, easing: 'ease-out' });
+}
+function resetStick() { const st = $('stick'); $('tubeBox').classList.remove('out'); st.getAnimations && st.getAnimations().forEach(a => a.cancel()); st.style.transform = ''; }
+function stickOut(L) {
+  const st = $('stick'), hex = D().rite === 'none';
+  $('stickNo').textContent = LQ.cn(L.n);
+  $('tubeBox').classList.add('out');
+  const h = st.offsetHeight || 128, up = Math.round(h * (hex ? .55 : .67));   // 手机上签短一些，升得也少一些
+  const end = hex ? `translateY(${-up}px) rotate(0deg)` : `translateY(${-up}px) rotate(7deg)`;
+  if (calm() || !st.animate) { st.style.transform = end; return Promise.resolve(); }
+  const a = st.animate([{ transform: 'translateY(0) rotate(0deg)' }, { transform: `translateY(${-Math.round(up * 1.16)}px) rotate(${hex ? 0 : 4}deg)`, offset: .7 }, { transform: end }],
+    { duration: 650, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
+  return new Promise(res => { a.onfinish = () => { st.style.transform = end; a.cancel(); res(); }; a.oncancel = res; });
+}
+
+/* ================ 摇手机（DeviceMotion） ================ */
+// 只在触屏设备上开：iOS 要在点按里 requestPermission；安卓直接听；桌面不出这一项
+const Motion = {
+  can: typeof window.DeviceMotionEvent !== 'undefined' && !!(window.matchMedia && matchMedia('(pointer: coarse)').matches),
+  perm: typeof window.DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function',
+  on: false, denied: false, ref: null, hits: [], last: 0,
+  start() { if (this.on) return; window.addEventListener('devicemotion', onMotion, { passive: true }); this.on = true; },
+  ask() {
+    let p;
+    try { p = DeviceMotionEvent.requestPermission(); } catch (e) { p = Promise.reject(e); }
+    Promise.resolve(p).then(r => {
+      if (r === 'granted') { this.start(); F.toast('好了：摇三下手机，就会摇出一支签'); }
+      else { this.denied = true; F.toast('没有动作感应的权限，点按钮摇也一样'); }
+    }, () => { this.denied = true; F.toast('这台设备开不了摇一摇，点按钮摇也一样'); }).then(renderStage);
+  }
+};
+function onMotion(e) {
+  if (S.step !== 'tube' || S.busy) { Motion.ref = null; Motion.hits = []; return; }
+  const a = e.accelerationIncludingGravity;
+  if (!a || a.x == null) return;
+  const now = performance.now(), r = Motion.ref;
+  if (r && now - r.t < 90) return;
+  Motion.ref = { t: now, x: a.x, y: a.y, z: a.z };
+  if (!r) return;
+  const d = Math.max(Math.abs(a.x - r.x), Math.abs(a.y - r.y), Math.abs(a.z - r.z));
+  if (d < 13 || now - Motion.last < 160) return;
+  Motion.last = now;
+  Motion.hits = Motion.hits.filter(t => now - t < 1600);
+  Motion.hits.push(now);
+  nudge(); buzz(12);
+  if (Motion.hits.length >= 3) { Motion.hits = []; shakeTube(); }
+}
+
+/* ================ 画面 ================ */
+function renderSets() {
+  $('setBox').innerHTML = SETS.map(x => `<button type="button" class="lq-set" role="radio" data-set="${x.id}" aria-checked="${x.id === S.set}" title="${esc(x.name + '：' + x.origin)}">${esc(x.short)}<small>${x.alias ? esc(x.alias) + ' · ' : ''}${x.count}</small></button>`).join('');
+  const d = D();
+  $('setNote').innerHTML = `<b>${esc(d.name)}</b>${esc(d.origin)}`;
+  const temple = d.rite === 'none';
+  $('startBtn').textContent = temple ? '摇签筒' : '掷筊请示';
+  $('skipBtn').hidden = temple;
+  $('ctrlNote').innerHTML = (temple
+    ? '浅草寺的习俗：心中默念所问，直接摇签筒（おみくじ箱），得签号再取签纸；凶签可结在寺里的签架上留下。'
+    : '先在心里报上姓名、住处与所问之事，再掷筊请示：连得三次圣杯才去抽签。') +
+    (SEED ? `<br><span class="lq-seed">固定种子 ?seed=${esc(SEED)}：同一种子抽出同一串结果。</span>` : '');
+  $('tubeBox').classList.toggle('hex', temple);
+  $('tubeCap').innerHTML = `<span>${temple ? 'おみくじ箱' : '签筒'}</span>`;
+}
+const KTXT = k => `<b class="k-${k}">${LQ.KIND[k].name}</b>`;
+function renderStage() {
+  const d = D(), temple = d.rite === 'none', st = S.step;
+  // 步骤条
+  const order = temple ? ['ask', 'tube', 'out'] : ['ask', 'jiao', 'tube', 'out'];
+  const at = order.indexOf(st);
+  $('steps').querySelectorAll('li').forEach(li => {
+    const i = order.indexOf(li.dataset.step);
+    li.hidden = i < 0;
+    li.classList.toggle('on', i === at);
+    li.classList.toggle('done', i >= 0 && i < at);
+  });
+  temple ? $('steps').querySelectorAll('li:not([hidden]) b').forEach((b, i) => { b.textContent = '一二三'[i]; })
+         : $('steps').querySelectorAll('li b').forEach((b, i) => { b.textContent = '一二三四'[i]; });
+  // 场景：当前这一样亮，另一样淡
+  $('jiaoBox').hidden = temple;
+  $('jiaoBox').classList.toggle('dim', st === 'tube' || st === 'out');
+  $('tubeBox').classList.toggle('dim', st === 'jiao');
+  const streak = S.rite ? S.rite.streak : 0;
+  $('streak').style.visibility = st === 'jiao' ? '' : 'hidden';
+  $('streak').querySelectorAll('i').forEach((i, n) => i.classList.toggle('on', n < streak));
+  $('jiaoCap').innerHTML = S.last && st === 'jiao'
+    ? [S.last.a, S.last.b].map(f => `<span class="${f ? 'yang' : 'yin'}">${LQ.FACE[f]}${f ? ' · 平面' : ' · 凸面'}</span>`).join('')
+    : '<span>筊杯一对</span>';
+  // 说明
+  let say = '';
+  if (st === 'ask') say = temple
+    ? '捧起おみくじ箱，心中默念所问，再点「摇签筒」。'
+    : '心中默念：自己的姓名、住处，与所问之事（一签只问一事）。<small>想好了就点「掷筊请示」；不掷筊也可以「跳过仪式，直接抽」。</small>';
+  else if (st === 'jiao') {
+    const r = S.rite, k = S.last && S.last.kind;
+    if (!k) say = '双手合起筊杯，在胸前再默念一遍所问，然后掷下。<small>须连得三次圣杯（一阴一阳）才去抽签。</small>';
+    else if (k === 'sheng') say = r.done() ? `${KTXT(k)}：连得三次圣杯，神明应允。<small>请摇签筒。</small>` : `${KTXT(k)}：一阴一阳，神明应允。已连得 <b>${r.streak}</b> 次，还要 ${r.need - r.streak} 次。`;
+    else say = `${KTXT(k)}：${LQ.KIND[k].look}，${LQ.KIND[k].mean}。<small>连数归零，从头再掷。${r.tosses >= 12 && !S.auto ? '已掷 ' + r.tosses + ' 次：可以稍歇，把所问想得更具体些，或直接摇签。' : ''}</small>`;
+  } else if (st === 'tube') {
+    say = temple ? '摇几下おみくじ箱，倒过来，从小孔里摇出一支签。' : S.mode === 'skip' ? '不掷筊，直接摇签。' : '签筒前低后高，轻轻摇晃，直到一支签跳出来。';
+    if (Motion.on) say += '<small>摇三下手机也行。</small>';
+  } else if (st === 'out' && S.drawn) {
+    const L = LQ.lot(S.drawn.s, S.drawn.n), x = LQ.set(S.drawn.s);
+    if (L) say = `签出：<b>${esc(x.short)} · ${LQ.label(x, L.n)}</b>（${esc(LQ.grade(x, L))}）<small>签诗与白话解在下方。</small>`;
+  }
+  $('say').innerHTML = say;
+  renderActs();
+}
+function renderActs() {
+  const st = S.step, b = S.busy;
+  let h = '';
+  if (st === 'jiao') {
+    h = `<button type="button" class="fb-btn primary" data-act="toss"${b || S.auto ? ' disabled' : ''}>掷 筊</button>` +
+        `<button type="button" class="fb-btn" data-act="auto">${S.auto ? '停' : '连掷到三圣杯'}</button>` +
+        `<button type="button" class="fb-btn ghost" data-act="jump"${b ? ' disabled' : ''}>跳过，直接摇签</button>`;
+  } else if (st === 'tube') {
+    h = `<button type="button" class="fb-btn primary" data-act="shake"${b ? ' disabled' : ''}>摇签筒</button>`;
+    if (Motion.can && Motion.perm && !Motion.on && !Motion.denied) h += `<button type="button" class="fb-btn" data-act="motion">开启摇一摇</button>`;
+  } else if (st === 'out') {
+    h = `<button type="button" class="fb-btn ghost" data-act="again">再求一签</button>`;
+  }
+  $('acts').innerHTML = h;
+}
+function go(step) {
+  S.step = step;
+  if (step === 'tube' && Motion.can && !Motion.perm) Motion.start();   // 安卓：不用问
+  renderStage();
+}
+function scrollToEl(el) {
+  const r = el.getBoundingClientRect(), top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-h')) || 56;
+  if (r.top < top || r.top > innerHeight * .55) el.scrollIntoView({ behavior: calm() ? 'auto' : 'smooth', block: 'start' });
+}
+
+/* ================ 求签 ================ */
+function start() {
+  if (S.busy) return;
+  S.auto = false; S.last = null; S.cf = null;
+  resetStick();
+  if (D().rite === 'none') { S.mode = 'temple'; S.rite = null; go('tube'); }
+  else { S.mode = 'rite'; S.rite = new LQ.Rite(3); go('jiao'); }
+  scrollToEl($('stage'));
+}
+function skip() {
+  if (S.busy) return;
+  S.auto = false; S.mode = D().rite === 'none' ? 'temple' : 'skip'; S.rite = null; S.last = null; S.cf = null;
+  resetStick(); go('tube'); scrollToEl($('stage'));
+  shakeTube();
+}
+async function tossOnce(fast) {
+  if (S.busy || S.step !== 'jiao' || !S.rite || S.rite.done()) return false;
+  S.busy = true; renderActs();
+  const r = LQ.toss(rnd), dur = fast ? 560 : 900;
+  await Promise.all([flip(stageBlk[0], r.a, dur, 0), flip(stageBlk[1], r.b, dur, 70)]);
+  buzz(14);
+  const done = S.rite.push(r.kind);
+  S.last = r; S.busy = false;
+  if (done) { S.auto = false; buzz([20, 60, 20, 60, 30]); }
+  renderStage();
+  if (done) { await wait(1000); if (S.step === 'jiao' && S.rite && S.rite.done()) go('tube'); }
+  return done;
+}
+async function autoToss() {
+  if (S.auto) { S.auto = false; renderStage(); return; }
+  S.auto = true; renderStage();
+  while (S.auto && S.step === 'jiao' && S.rite && !S.rite.done()) {
+    if (S.busy) { await wait(120); continue; }
+    await tossOnce(true);
+    if (S.auto) await wait(260);
+  }
+  S.auto = false;
+  if (S.step === 'jiao') renderStage();
+}
+function jump() { if (S.busy) return; S.auto = false; S.mode = 'skip'; go('tube'); }
+async function shakeTube() {
+  if (S.busy || S.step !== 'tube') return;
+  S.busy = true; renderActs();
+  resetStick(); buzz(20);
+  await shakeAnim(S.mode === 'skip' && !S.rite ? 800 : 1300);
+  const d = D(), L = LQ.draw(d.id, rnd);    // 签在这一刻才定
+  await stickOut(L);
+  buzz([30, 40, 90]);
+  const rec = { t: Date.now(), s: d.id, n: L.n, r: S.mode || 'skip' };
+  if (S.mode === 'rite' && S.rite) rec.k = S.rite.tosses;
+  const q = $('qIn').value.trim(); if (q) rec.q = q;
+  hist = LQ.histAdd(hist, rec); saveHist();
+  S.busy = false; S.cf = null;
+  S.view = rec; S.drawn = rec;
+  go('out');
+  renderResult(); renderHist();
+  await wait(350);
+  scrollToEl($('result'));
+}
+function again() {
+  if (S.busy) return;
+  S.auto = false; S.mode = null; S.rite = null; S.last = null; S.cf = null;
+  resetStick(); go('ask');
+  scrollToEl(document.querySelector('.lq-now'));
+}
+
+/* ================ 签出 ================ */
+const HOW = { rite: '连得三圣杯后求得', skip: '未掷筊，直接抽', temple: '浅草寺习俗，不掷筊' };
+function howText(v) { return v.r ? HOW[v.r] + (v.r === 'rite' && v.k ? `（掷筊 ${v.k} 次）` : '') : ''; }
+function okText(v) { return v.c === 1 ? '签出后掷筊确认：圣杯' : v.c === 0 ? '签出后掷筊未得圣杯' : ''; }
+function isFresh(v) { return !!(v && v.t && hist[0] && hist[0].t === v.t && hist[0].s === v.s && hist[0].n === v.n); }
+function renderResult() {
+  const box = $('result'), v = S.view;
+  const x = v && LQ.set(v.s), L = v && LQ.lot(v.s, v.n);
+  if (!L) { box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  const tone = LQ.tone(x, L), g = LQ.grade(x, L), trad = S.script === 't' && L.pt;
+  const lines = trad ? L.pt : L.p;
+  const foot = L.s || (L.gz ? L.gz : '');
+  const slip = `<div class="lq-slip tone-${tone}" lang="${trad ? 'zh-Hant' : 'zh-CN'}">
+      <p class="hd">${esc(x.short)}<b>${LQ.label(x, L.n)}</b></p>
+      ${lines.map(l => `<p class="ln">${esc(l)}</p>`).join('')}
+      ${foot ? `<p class="ft">${esc(foot)}</p>` : ''}
+      <span class="lq-stamp">${esc(g)}</span>
+    </div>`;
+  const scale = LQ.scaleOf(x).map(s => `<span class="${s === g ? 'on' : ''}">${esc(s)}</span>`).join('');
+  const rows = [];
+  if (L.s) rows.push(['典故', esc(L.s)]);
+  if (L.st && L.st.length) rows.push(['典故', esc(L.st.join('；'))]);
+  rows.push(['白话', esc(L.j), 'bai']);
+  if (L.it && L.it.length) rows.push(['断语', `<ul class="lq-items">${L.it.map(i => `<li><i>${esc(i[0])}</i>${esc(i[1])}</li>`).join('')}</ul><span class="fine">原签所附，各宫庙用字略有出入</span>`]);
+  if (L.gua) rows.push(['卦象', `<span class="lq-gua">${esc(L.gua)}</span>${esc(L.el || '')}`]);
+  if (v.q) rows.push(['所问', esc(v.q)]);
+  if (v.t) rows.push(['求签', esc([fmtT(v.t), howText(v), okText(v)].filter(Boolean).join(' · '))]);
+  const fresh = isFresh(v), canCf = fresh && x.rite !== 'none';
+  let cf = '';
+  if (canCf && S.cf) {
+    const k = S.cf;
+    const say = k === 'busy' ? '掷筊中……'
+      : k === 'sheng' ? `<b class="good">圣杯</b>：神明确认，就是这一支。`
+      : `<b class="${k === 'xiao' ? 'warn' : 'bad'}">${LQ.KIND[k].name}</b>：不是这一支。依台湾习俗，把签放回签筒，再摇一次。`;
+    cf = `<div class="lq-confirm"><div class="lq-blks" id="cfBlks"></div><p>${say}</p>${k === 'xiao' || k === 'yin' ? '<button type="button" class="fb-btn primary" data-act="putback">放回再摇</button>' : ''}</div>`;
+  }
+  const okTag = v.c === 1 ? '<span class="lq-ok">✓ 掷筊确认</span>' : v.c === 0 ? '<span class="lq-ok no">未获圣杯</span>' : '';
+  box.innerHTML = `<div class="lq-rgrid">
+    <div class="lq-slipwrap">${slip}${L.pt ? `<button type="button" class="lq-script" data-act="script">${trad ? '看简体' : '看繁体'}</button>` : ''}</div>
+    <div class="lq-rinfo tone-${tone}">
+      <div class="lq-rtitle"><span class="nm">${esc(x.name)}</span><h2>${LQ.label(x, L.n)}${L.gz ? `<small>${esc(L.gz)}</small>` : ''}</h2>
+        <span class="lq-grade">${esc(g)}${x.scale ? '' : '<small>本站读</small>'}</span>${okTag}</div>
+      ${x.scale ? `<div class="lq-scale" aria-label="本套等级">${scale}</div>` : `<div class="lq-scale" aria-label="倾向">${scale}<span>原签不标等级，此为本站据诗意所标</span></div>`}
+      <dl class="lq-dl">${rows.map(r => `<div><dt>${r[0]}</dt><dd${r[2] ? ` class="${r[2]}"` : ''}>${r[1]}</dd></div>`).join('')}</dl>
+      ${cf}
+      <div class="fb-row lq-racts">
+        ${canCf && !S.cf && v.c == null ? '<button type="button" class="fb-btn primary" data-act="confirm">掷筊确认是这一支</button>' : ''}
+        <button type="button" class="fb-btn" data-act="copy">复制</button>
+        <button type="button" class="fb-btn" data-act="ai" title="把签文连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button type="button" class="fb-btn ghost" data-act="again">再求一签</button>
+      </div>
+      <p class="lq-src">${esc(x.credit)}</p>
+    </div>
+  </div>`;
+  if (cf) {
+    const bl = makeBlocks($('cfBlks'));
+    const r = S.cfToss;
+    if (r && S.cf !== 'busy') { place(bl[0], r.a); place(bl[1], r.b); } else { place(bl[0], 1); place(bl[1], 0); }
+    S.cfBlk = bl;
+  }
+  document.querySelectorAll('#histList .hi').forEach(b => b.classList.toggle('on', +b.dataset.t === v.t));
+}
+async function confirmToss() {
+  const v = S.view;
+  if (!isFresh(v) || S.cf) return;
+  S.cf = 'busy'; S.cfToss = null; renderResult();
+  const r = LQ.toss(rnd);
+  await Promise.all([flip(S.cfBlk[0], r.a, 850, 0), flip(S.cfBlk[1], r.b, 850, 70)]);
+  buzz(r.kind === 'sheng' ? [20, 50, 40] : 30);
+  S.cfToss = r; S.cf = r.kind;
+  v.c = r.kind === 'sheng' ? 1 : 0;
+  if (hist[0] && hist[0].t === v.t) { hist[0].c = v.c; saveHist(); }
+  renderResult(); renderHist();
+}
+function putBack() {
+  const v = S.view;
+  if (!isFresh(v)) return;
+  hist = LQ.histRemove(hist, 0); saveHist();
+  S.view = null; S.cf = null; S.cfToss = null;
+  renderResult(); renderHist();
+  if (!S.mode) S.mode = 'skip';
+  resetStick(); go('tube');
+  F.toast('签已放回签筒，再摇一次');
+  scrollToEl($('stage'));
+}
+function viewText(v) {
+  const x = LQ.set(v.s), L = LQ.lot(v.s, v.n);
+  return LQ.text(x, L, { q: v.q, when: v.t ? fmtT(v.t) : '', how: howText(v), ok: okText(v) });
+}
+function copyIt() { if (S.view) F.copy(viewText(S.view) + '\n—— 潜蛟阁 · 法宝库 · 灵签', '签文已复制'); }
+function askIt() {
+  if (!S.view) return;
+  let t = viewText(S.view);
+  if (!S.view.q) t += '\n所问：（未写；贴给 AI 时在这里补上所问之事）';
+  F.askAI('灵签解签', t, LQ.RULES_TEXT + '\n· 解签时请就签诗本身与所问之事来说；签里没有的别编，拿不准就直说。');
+}
+
+/* ================ 求签记录 ================ */
+function renderHist() {
+  const ul = $('histList');
+  $('histClear').hidden = !hist.length;
+  if (!hist.length) { ul.innerHTML = '<li class="none">还没有求过签。求得的签会记在这里，只存在这台设备。</li>'; return; }
+  ul.innerHTML = hist.map((r, i) => {
+    const x = LQ.set(r.s), L = LQ.lot(r.s, r.n), d = new Date(r.t);
+    return `<li class="tone-${LQ.tone(x, L)}"><button type="button" class="hi${S.view && S.view.t === r.t ? ' on' : ''}" data-i="${i}" data-t="${r.t}">
+      <time datetime="${new Date(r.t).toISOString()}">${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}</time>
+      <span class="nm">${esc(x.short)}</span><b>${LQ.label(x, L.n)}</b><span class="g">${esc(LQ.grade(x, L))}</span>${r.c === 1 ? '<span class="ok">✓</span>' : ''}
+      <span class="q">${esc(r.q || '')}</span></button><button type="button" class="x" data-del="${i}" title="删去这一条" aria-label="删去这一条记录">×</button></li>`;
+  }).join('');
+}
+$('histList').addEventListener('click', e => {
+  const del = e.target.closest('[data-del]');
+  if (del) {
+    const i = +del.dataset.del, r = hist[i];
+    if (!r) return;
+    hist = LQ.histRemove(hist, i); saveHist();
+    if (S.view && S.view.t === r.t) { S.view = null; S.cf = null; renderResult(); if (S.step === 'out') go('ask'); }
+    renderHist(); F.toast('已删去这一条');
+    return;
+  }
+  const b = e.target.closest('.hi');
+  if (!b || S.busy) return;
+  const r = hist[+b.dataset.i];
+  if (!r) return;
+  S.view = r; S.cf = null; S.cfToss = null;
+  renderResult(); scrollToEl($('result'));
+});
+$('histClear').addEventListener('click', () => {
+  if (!hist.length || !confirm('清空全部求签记录？（只删这台设备上的）')) return;
+  hist = []; saveHist();
+  if (S.view && S.view.t) { S.view = null; S.cf = null; renderResult(); if (S.step === 'out') go('ask'); }
+  renderHist(); F.toast('求签记录已清空');
+});
+
+/* ================ 绑定 ================ */
+const ACT = {
+  toss: () => tossOnce(false), auto: autoToss, jump, shake: shakeTube, motion: () => Motion.ask(), again,
+  confirm: confirmToss, putback: putBack, copy: copyIt, ai: askIt,
+  script: () => { S.script = S.script === 't' ? 's' : 't'; store.set(LS_SCRIPT, S.script); renderResult(); }
+};
+[$('acts'), $('result')].forEach(box => box.addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]');
+  if (b && !b.disabled && ACT[b.dataset.act]) ACT[b.dataset.act]();
+}));
+$('setBox').addEventListener('click', e => {
+  const b = e.target.closest('[data-set]');
+  if (!b || b.dataset.set === S.set) return;
+  if (S.busy) { F.toast('等这一下落定再换'); return; }
+  S.set = b.dataset.set; store.set(LS_SET, S.set);
+  S.auto = false; S.mode = null; S.rite = null; S.last = null;
+  resetStick();
+  renderSets(); go('ask');
+});
+$('setBox').addEventListener('keydown', e => {
+  if (!/^Arrow(Left|Right|Up|Down)$/.test(e.key)) return;
+  const ids = SETS.map(x => x.id), i = ids.indexOf(S.set), n = ids[(i + (/Right|Down/.test(e.key) ? 1 : ids.length - 1)) % ids.length];
+  e.preventDefault();
+  const b = $('setBox').querySelector(`[data-set="${n}"]`);
+  if (b) { b.click(); const nb = $('setBox').querySelector(`[data-set="${n}"]`); if (nb) nb.focus(); }
+});
+$('startBtn').addEventListener('click', start);
+$('skipBtn').addEventListener('click', skip);
+$('qIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); start(); } });
+
+$('rulesList').innerHTML = LQ.RULES.map(r => `<li><b>${esc(r[0])}</b>${esc(r[1])}</li>`).join('');
+const SRC = {
+  guanyin: '据三份公开转录互校：<a href="https://github.com/mediapig/qiantong">mediapig/qiantong</a>（源自 yanxinyu777-beep/guanyin-lingqian-100）、<a href="https://github.com/snjor-kii/guanyinqiuqian">snjor-kii/guanyinqiuqian</a>、<a href="https://github.com/iowi/guanyin">iowi/guanyin</a>；各本无开放许可，只取古本签诗、等级与典故名。',
+  guandi: '《关帝灵签》姑苏钮氏藏板清刊本（哈佛燕京图书馆藏，公有领域），用 <a href="https://github.com/lakeofsky347/dsh-wen_xiang">lakeofsky347/dsh-wen_xiang</a> 的校勘本（MIT）。',
+  jiazi: '<a href="https://github.com/DestinyLab/lottery-poetry-sixty-jiazi">DestinyLab/lottery-poetry-sixty-jiazi</a>（MIT，Lance He）；繁体转简体。',
+  wongtaisin: '<a href="https://github.com/Paul-sinbud2004/Bazi-cli">Paul-sinbud2004/Bazi-cli</a>（MIT），以 <a href="https://github.com/wickes1/wong-tai-sin">wickes1/wong-tai-sin</a>（MIT）校字。',
+  sensoji: '据三份公开转录互校：<a href="https://github.com/Tamshen/senso-ji-stick-data">Tamshen/senso-ji-stick-data</a>、<a href="https://github.com/yujianke100/asakusa">yujianke100/asakusa</a>、<a href="https://github.com/Raidenneox/nonebot_plugin_CyberSensoji">Raidenneox/nonebot_plugin_CyberSensoji</a>；只取古本签诗与等级，不取签纸上的现代解说。'
+};
+$('srcList').innerHTML = SETS.map(x => `<li><b>${esc(x.name)}</b>${SRC[x.id] || ''} <a href="data/${esc(x.note)}">出处与许可</a></li>`).join('') +
+  '<li><b>白话解</b>五套的白话解与六十甲子的「倾向」都是本站据诗意所写。浅草寺、观音两套只录签诗本身，不录各转录本的解签。</li>';
+
+// 网址带 ?set=…&n=… 时直接翻到那一签（不记入求签记录）
+const qn = parseInt(Q.get('n'), 10);
+if (Q.get('set') && LQ.lot(S.set, qn)) S.view = { s: S.set, n: qn };
+renderSets(); renderStage(); renderHist(); renderResult();
+RM.addEventListener && RM.addEventListener('change', () => { if (S.step !== 'out') resetStick(); });
+})();
+</script>
+</body>
+</html>

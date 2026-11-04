@@ -7,6 +7,7 @@
 //   [秘书]   《太乙秘书》阴阳一百四十四局断语，转引自 kintaiyi 的 src/kintaiyi/taiyimishu.py
 //   [kintaiyi] github.com/kentang2017/kintaiyi（MIT）：config.py 的 find_cal 主客算表、sf_list 始击表，
 //            kintaiyi.py 的 accnum() 积数公式（下面照抄成独立代码对照），README 输出例
+//            （kintaiyi 为 MIT 许可，许可原文见 static/taiyi/LICENSE-kintaiyi.txt）
 process.env.TZ = process.env.TZ || 'Asia/Tokyo';
 const TY = require('../../static/taiyi/taiyi.js');
 const BZ = require('../../static/bazi/bazi.js');

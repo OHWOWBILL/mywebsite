@@ -403,8 +403,8 @@
         desc: `${r.jieqi.n}：${r.y}年${r.m}月${r.d}日 ${hm}（本机时区）交节${r.hou && r.hou.cn ? `\n七十二候：${r.hou.cnName} ${r.hou.cn} · 本朝 ${r.hou.jp}` : ''}\n潜蛟阁 · 黄历` };
     }));
     if (!evs.length) { Fabao.toast('这个月没有可加入的日子'); return; }
-    TS.saveICS(`huangli-${vy}-${pad(vm)}${E ? '-' + E.py : ''}.ics`, TS.ics(evs, `潜蛟阁黄历 ${vy}年${vm}月${E ? ' · ' + E.name : ''}`));
-    Fabao.toast(`已生成 ${evs.length} 条日历事项，打开即可加入日历`, 2600);
+    const res = TS.saveICS(`huangli-${vy}-${pad(vm)}${E ? '-' + E.py : ''}.ics`, TS.ics(evs, `潜蛟阁黄历 ${vy}年${vm}月${E ? ' · ' + E.name : ''}`));
+    Fabao.toast(res === 'inapp' ? '这是应用内浏览器，若没存下，请用 Safari 或 Chrome 打开本页再点' : `已生成 ${evs.length} 条日历事项，打开即可加入日历`, 3200);
   }
 
   // —— 月历 ——

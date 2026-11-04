@@ -127,7 +127,7 @@
 
     <section>
       <div class="res-h"><b id="resT">排名</b><span class="fb-fine" id="resSub"></span><span class="sp"></span>
-        <button type="button" class="fb-btn" id="icsAll" title="把下面列出的时辰都存进日历（.ics）">全部加入日历</button><button type="button" class="fb-btn" id="copyBtn">复制</button><button type="button" class="fb-btn" id="aiBtn">问 AI</button></div>
+        <button type="button" class="fb-btn" id="icsAll" title="把下面列出的时辰都存进日历（.ics，手机上点开即可加入）">全部加入</button><button type="button" class="fb-btn" id="copyBtn">复制</button><button type="button" class="fb-btn" id="aiBtn">问 AI</button></div>
       <div id="res"></div>
     </section>
   </div>
@@ -276,8 +276,8 @@
     if (!list.length) { Fabao.toast('还没有结果'); return; }
     const E = TS.EV_BY[ev], d0 = list[0].date;
     const name = list.length === 1 ? `zeri-${E.py}-${ymd(d0)}-${pad(d0.getHours())}${pad(d0.getMinutes())}.ics` : `zeri-${E.py}-${list.length}.ics`;
-    TS.saveICS(name, TS.ics(list.map(ZR.toEvent), `潜蛟阁择日 · ${E.name}`));
-    Fabao.toast(list.length === 1 ? '已生成日历文件，打开即可加入日历' : `已生成 ${list.length} 个时辰的日历文件`, 2600);
+    const res = TS.saveICS(name, TS.ics(list.map(ZR.toEvent), `潜蛟阁择日 · ${E.name}`));
+    Fabao.toast(res === 'inapp' ? '这是应用内浏览器，若没存下，请用 Safari 或 Chrome 打开本页再点' : list.length === 1 ? '已生成日历文件，打开即可加入日历' : `已生成 ${list.length} 个时辰的日历文件`, 3200);
   }
   $('icsAll').onclick = () => saveICS(last.slice(0, mode === 'find' ? showN : 99));
   function resultText() {

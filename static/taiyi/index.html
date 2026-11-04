@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="/fabao/fabao.css?v=6">
 <style>
 /* 太乙神数 · 式盘与表单（外框见 /fabao/fabao.css） */
-:root{ --zhu-c:var(--qing); --ke-c:var(--wx-tu); }   /* 主方青、客方赭；朱只用于凶格 */
+:root{ --zhu-c:var(--qing); --ke-c:#D493AB; }   /* 主方青、客方绯；朱只用于凶格，金只留给此刻那一行 */
 
 /* ---------- 此刻面板 ---------- */
 .ty-sub{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:baseline}
@@ -41,7 +41,7 @@
 
 /* ---------- 布局：左盘右表 ---------- */
 .ty-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
-.ty-pan-card{padding:14px}
+.ty-pan-card{padding:14px;position:sticky;top:calc(var(--top-h) + 16px)}
 .ty-side{display:flex;flex-direction:column;gap:14px;min-width:0}
 .ty-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;margin-bottom:10px}
 .ty-h h2{font-family:var(--font-title);font-weight:600;font-size:16px;letter-spacing:.2em}
@@ -138,7 +138,7 @@
   .ty-ctrl{min-width:0}
   .ty-bh{margin-bottom:14px}
   .ty-layout{grid-template-columns:1fr;gap:14px}
-  .ty-pan-card{padding:8px}
+  .ty-pan-card{padding:8px;position:static}
   .ty-pan{gap:3px}
   .ty-c{min-height:70px;padding:4px 3px 3px;border-radius:6px;gap:2px}
   .ty-c.pal{min-height:78px}
@@ -216,8 +216,8 @@
       <div class="ty-pan" id="pan" role="group" aria-label="太乙式盘，南在上"></div>
       <div class="ty-key">
         <span><i class="ty-t taiyi">太乙</i>所在宫</span>
-        <span><i class="ty-t zhu mu">文昌</i><i class="ty-t zhu">主大</i>主方（青）</span>
-        <span><i class="ty-t ke mu">始击</i><i class="ty-t ke">客大</i>客方（赭）</span>
+        <span><i class="ty-t zhu mu">文昌</i><i class="ty-t zhu">主大</i>主方</span>
+        <span><i class="ty-t ke mu">始击</i><i class="ty-t ke">客大</i>客方</span>
         <span><i class="ty-t">囚<sup>迫</sup></i>右上小字为格局</span>
       </div>
       <div class="ty-detail" id="detail" aria-live="polite"></div>
@@ -324,7 +324,7 @@ function bhHTML(c) {
 }
 function geShort(g) {
   if (g.k === '提挟') return g.who === '二目' ? '二目挟太乙' : g.who.replace(/大将|参将/, m => m === '大将' ? '大' : '参');
-  if (g.k === '关') return g.who.replace(/大将|参将/g, m => m === '大将' ? '大' : '参').replace('、', '') + '关';
+  if (g.k === '关') return g.who.replace(/大将|参将/g, m => m === '大将' ? '大' : '参').replace('、', '与') + '关';
   if (g.k === '杜') return g.who + '杜';
   if (g.k === '四郭固' || g.k === '四郭杜') return g.k;
   if (g.k === '掩' && g.txt.indexOf('掩太乙') >= 0) return '始击掩太乙';
@@ -583,7 +583,8 @@ $('linkBtn').onclick = () => {
   u.search = ''; u.searchParams.set('t', F.toLocalInput(date)); u.searchParams.set('ji', view.kind);
   F.copy(u.toString(), '此盘链接已复制');
 };
-$('rulesList').innerHTML = RULES.map(r => `<li><b>${r[0]}</b>${r[1]}</li>`).join('');
+$('rulesList').innerHTML = RULES.map(r => `<li><b>${r[0]}</b>${r[1]}</li>`).join('') +
+  '<li><b>许可</b>kintaiyi 采 MIT 许可，原文与引用清单见 <a href="/taiyi/LICENSE-kintaiyi.txt">LICENSE-kintaiyi.txt</a>；《太乙金镜式经》据 Kanripo（漢籍リポジトリ）KR3g0047 四库全书本。</li>';
 
 // 网址可带 ?t=2026-11-04T15:30（时刻）&ji=year|month|day|hour（或 年/月/日/时）
 const Q = new URLSearchParams(location.search);

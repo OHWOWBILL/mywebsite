@@ -18,6 +18,8 @@
     .tz-link { color: var(--zi-2); font-size: inherit; padding: 0 2px; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
     .tz-link:hover { color: var(--fg); }
     .fb-btn:disabled { opacity: .35; cursor: default; border-color: var(--rule-2); color: var(--fg-2); }
+    /* 手机上一题一点：不要系统的蓝色点按高亮，悬停样式只给有鼠标的设备（触屏上会粘住） */
+    .fb-main button { -webkit-tap-highlight-color: transparent; }
 
     /* —— 起始 —— */
     .tz-intro { max-width: 760px; margin: 0 auto; padding: 24px 26px 20px; display: grid; gap: 16px; }
@@ -33,7 +35,7 @@
       transition: border-color .2s, background .2s;
     }
     .tz-sex button small { font-weight: 400; font-size: 12px; letter-spacing: .12em; color: var(--muted); }
-    .tz-sex button:hover { border-color: var(--zi-2); background: rgba(122, 91, 192, .14); }
+    .tz-sex button:active { background: rgba(122, 91, 192, .22); }
     .tz-sex button.was { border-color: var(--zi-2); }
     .tz-modeq { gap: 10px; }
     .tz-modeq .fb-label { display: inline; margin: 0; }
@@ -65,7 +67,7 @@
     .tz-opt .lv { width: 34px; height: 3px; border-radius: 2px; background: var(--rule-2); margin-top: 4px; overflow: hidden; }
     .tz-opt .lv::after { content: ""; display: block; height: 100%; width: calc(var(--n) * 20%); background: var(--zi-2); border-radius: 2px; }
     .tz-opt kbd { position: absolute; top: 5px; right: 7px; font-family: var(--font-mark); font-size: 9.5px; color: var(--faint); }
-    .tz-opt:hover { border-color: var(--zi-2); }
+    .tz-opt:active { background: color-mix(in oklab, var(--zi) 35%, var(--bg-3)); }
     .tz-opt.on { background: var(--zi); border-color: var(--zi); color: #fff; }
     .tz-opt.on small, .tz-opt.on kbd { color: rgba(255, 255, 255, .78); }
     .tz-opt.on .lv { background: rgba(255, 255, 255, .3); }
@@ -93,8 +95,16 @@
     .tz-li.miss { border-color: var(--zhu); }
     .tz-li .seg { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin-top: 8px; }
     .tz-li .seg button { padding: 7px 0; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid var(--rule); font-family: var(--font-title); font-size: 13.5px; letter-spacing: .08em; color: var(--muted); }
-    .tz-li .seg button:hover { color: var(--fg); border-color: var(--zi-2); }
+    .tz-li .seg button:active { background: color-mix(in oklab, var(--zi) 35%, var(--bg-3)); }
     .tz-li .seg button.on { background: var(--zi); border-color: var(--zi); color: #fff; }
+    @media (hover: hover) {
+      .tz-sex button:hover { border-color: var(--zi-2); background: rgba(122, 91, 192, .14); }
+      .tz-opt:hover { border-color: var(--zi-2); }
+      .tz-li .seg button:hover { color: var(--fg); border-color: var(--zi-2); }
+      .tz-li .seg button.on:hover { color: #fff; }
+      .tz-row:hover { background: var(--bg-3); }
+      .tz-row:hover .trk::before { background: var(--bg); }
+    }
     .tz-allgo { margin-top: 14px; }
 
     /* —— 结果：顶上一句 —— */
@@ -118,12 +128,12 @@
     .tz-axis .trk > span:first-child { transform: none; }
     .tz-axis .trk > span:last-child { transform: translateX(-100%); }
     .tz-row { width: 100%; padding: 4px 0; border-radius: var(--r-sm); text-align: left; transition: background .15s; }
-    .tz-row:hover, .tz-row:focus-visible { background: var(--bg-3); }
+    .tz-row:focus-visible { background: var(--bg-3); }
     .tz-row .nm { font-family: var(--font-title); font-size: 14px; letter-spacing: .12em; color: var(--fg-2); white-space: nowrap; padding-left: 4px; }
     .tz-row.me .nm { color: var(--fg); font-weight: 600; }
     .tz-row .trk { position: relative; height: 22px; }
     .tz-row .trk::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; height: 14px; border-radius: 0 4px 4px 0; background: var(--bg-3); }
-    .tz-row:hover .trk::before, .tz-row:focus-visible .trk::before { background: var(--bg); }
+    .tz-row:focus-visible .trk::before { background: var(--bg); }
     .tz-row .bar { position: absolute; left: 0; top: 4px; height: 14px; border-radius: 0 4px 4px 0; background: var(--lv0); }
     .tz-row[data-lv="1"] .bar { background: var(--lv1); }
     .tz-row[data-lv="2"] .bar { background: var(--lv2); }
@@ -146,13 +156,14 @@
     .tz-trend th { font-weight: 400; }
     .tz-trend thead th button { width: 100%; padding: 2px 0; border-radius: 4px; font-family: var(--font-mark); font-size: 10.5px; color: var(--muted); letter-spacing: 0; }
     .tz-trend thead th button:hover { color: var(--fg); background: var(--bg-3); }
-    .tz-trend thead th.cur button { color: var(--fg); }
+    .tz-trend thead th.cur button { color: var(--fg); font-weight: 800; }
+    .tz-trend thead th button small { display: block; font-size: 9.5px; font-weight: 500; color: var(--faint); line-height: 1.3; }
     .tz-trend th[scope=row] { width: 2.8em; text-align: left; font-family: var(--font-title); font-size: 12.5px; color: var(--fg-2); letter-spacing: .06em; white-space: nowrap; }
     .tz-trend thead th:first-child { width: 2.8em; }
     .tz-trend td { padding: 3px 0; border-radius: 4px; text-align: center; font-family: var(--font-mark); font-size: 12px; color: var(--muted); background: var(--bg-3); font-variant-numeric: tabular-nums; }
     .tz-trend td.l1 { background: color-mix(in oklab, var(--lv1) 42%, var(--bg-3)); color: var(--fg); }
     .tz-trend td.l2 { background: color-mix(in oklab, var(--lv2) 46%, var(--bg-3)); color: var(--fg); }
-    .tz-trend td.cur { box-shadow: inset 0 0 0 1px var(--fg-2); }
+    .tz-trend td.cur { box-shadow: inset 0 0 0 1px rgba(237, 235, 242, .3); }
     .tz-hlist { list-style: none; display: grid; gap: 4px; margin-top: 8px; }
     .tz-hlist li { display: flex; align-items: stretch; border-radius: var(--r-sm); background: var(--bg-3); }
     .tz-hlist li.on { box-shadow: inset 0 0 0 1px var(--zi-2); }
@@ -227,7 +238,7 @@
     @media (max-width: 600px) {
       .tz-intro { padding: 18px 16px 16px; gap: 14px; }
       .tz-q { padding: 18px 16px 14px; }
-      .tz-qt { font-size: 20px; min-height: 4.8em; }
+      .tz-qt { font-size: 20px; min-height: 3.2em; }   /* 375 宽下最长的题干两行 */
       .tz-opts { grid-template-columns: minmax(0, 1fr); gap: 7px; margin-top: 14px; }
       .tz-opt { flex-direction: row; justify-content: flex-start; align-items: center; gap: 12px; padding: 12px 16px; }
       .tz-opt b { font-size: 17px; min-width: 3.2em; }
@@ -558,7 +569,7 @@ function renderHead(e, v, prev, pv) {
       <div class="fb-key">${L.key}</div>
       <div class="fb-note">${esc(L.sub)}</div>
       ${main ? `<p class="tz-gist">${esc(main.gist)}</p>` : ''}
-      ${pv ? `<p class="fb-fine">与上一次（${esc(prev.t.slice(0, 10))}）比：${esc(changeText(v, pv))}</p>` : ''}
+      ${pv ? `<p class="fb-fine">与上一次（${esc(prev.t)}）比：${esc(changeText(v, pv))}</p>` : ''}
     </div>
     <div class="fb-now-ctrl tz-ctrl">
       <div class="fb-row">
@@ -576,7 +587,7 @@ function renderChart(v, pv) {
     const say = `${t.name} ${R(s)} 分，${lv}${role ? '，' + role : ''}${p != null ? `；上一次 ${R(p)} 分` : ''}`;
     return `<button type="button" class="tz-row${v.main.indexOf(k) >= 0 ? ' me' : ''}" data-k="${k}" data-lv="${lvNum(lv)}" aria-label="${say}" title="${say}">
       <span class="nm">${t.short}</span>
-      <span class="trk">${th.map(x => `<i class="th" style="left:${x}%"></i>`).join('')}<i class="bar" style="width:${Math.max(0, Math.min(100, s))}%"></i>${p != null ? `<i class="prev" style="left:${Math.max(0, Math.min(100, p))}%"></i>` : ''}</span>
+      <span class="trk">${th.map(x => `<i class="th" style="left:${x}%"></i>`).join('')}<i class="bar" style="width:${Math.max(0, Math.min(100, s))}%"></i>${d ? `<i class="prev" style="left:${Math.max(0, Math.min(100, p))}%"></i>` : ''}</span>
       <span class="val"><b>${R(s)}</b><small>${lv}</small>${d ? `<em>${d > 0 ? '↑' : '↓'}${Math.abs(d)}</em>` : ''}</span>
     </button>`;
   };
@@ -587,7 +598,7 @@ function renderChart(v, pv) {
     ${Z.PIAN.map(row).join('')}
     <div class="tz-legend">
       <span><i style="background:var(--lv2)"></i>是</span><span><i style="background:var(--lv1)"></i>倾向是 · 基本是</span><span><i style="background:var(--lv0)"></i>否</span>
-      <span><i class="dash"></i>判定线（偏颇 30、40；平和 60）</span>${pv ? '<span><i class="tick"></i>上一次</span>' : ''}
+      <span><i class="dash"></i>判定线（偏颇 30、40；平和 60）</span>${pv && Z.ORDER.some(k => R(v.scores[k]) !== R(pv.scores[k])) ? '<span><i class="tick"></i>上一次（有变化的才标）</span>' : ''}
     </div>`;
 }
 $('chartBox').addEventListener('click', e => {
@@ -615,7 +626,7 @@ function cardBody(k) {
       <div class="r"><i>适应</i><span>${s.shiying}</span></div>
     </div></section>
     <section><h4>调养</h4><div class="tz-rows">
-      <div class="r"><i>饮食</i><span><b>宜</b>${c.yi}<br><b>少</b>${c.shao}</span></div>
+      <div class="r"><i>饮食</i><span><b>宜</b>${c.yi}<br>${c.shao.indexOf('少吃') === 0 ? `<b>少吃</b>${c.shao.slice(2)}` : c.shao}</span></div>
       <div class="r"><i>起居</i><span>${c.qiju}</span></div>
       <div class="r"><i>运动</i><span>${c.yundong}</span></div>
       <div class="r"><i>情志</i><span>${c.qingzhi}</span></div>
@@ -654,11 +665,13 @@ function renderCards(v) {
 // —— 历次 ——
 function renderHist() {
   const cols = H.slice(-6), off = H.length - cols.length, md = t => t.slice(5, 10).replace('-', '/');
+  // 同一天测了几次：日期下面再写时刻
+  const twice = d => cols.filter(e => e.t.slice(0, 10) === d).length > 1;
   let grid;
   if (H.length >= 2) {
     const vs = cols.map(vOf);
     grid = `<table class="tz-trend"><caption class="vh">近 ${cols.length} 次九型转化分</caption>
-      <thead><tr><th scope="col"><span class="vh">体质</span></th>${cols.map((e, j) => `<th scope="col" class="${off + j === at ? 'cur' : ''}"><button type="button" data-at="${off + j}" title="看 ${esc(e.t)} 的结果">${md(e.t)}</button></th>`).join('')}</tr></thead>
+      <thead><tr><th scope="col"><span class="vh">体质</span></th>${cols.map((e, j) => `<th scope="col" class="${off + j === at ? 'cur' : ''}"><button type="button" data-at="${off + j}" title="看 ${esc(e.t)} 的结果">${md(e.t)}${twice(e.t.slice(0, 10)) ? `<small>${esc(e.t.slice(11, 16))}</small>` : ''}</button></th>`).join('')}</tr></thead>
       <tbody>${Z.ORDER.map((k, i) => `<tr><th scope="row">${Z.TYPE[k].short}</th>${cols.map((e, j) => {
         const lv = vs[j].levels[k];
         return `<td class="l${lvNum(lv)}${off + j === at ? ' cur' : ''}" title="${esc(e.t)} ${Z.TYPE[k].name} ${R(e.s[i])} 分 ${lv}">${R(e.s[i])}</td>`;

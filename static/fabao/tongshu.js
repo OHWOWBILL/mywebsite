@@ -14,7 +14,10 @@
        阳贵阴贵：甲戊庚牛羊（庚日阳贵丑、阴贵未，与天气网老黄历同；lunar-javascript 作庚日午寅，不取）。
      · 宜忌、吉神宜趋、凶煞宜忌、胎神、二十八宿：《协纪辨方书》的每日表，取自 lunar-javascript 1.7.7
        （6tail，MIT，移植在 /fabao/tongshu-shensha.js）：宜忌按节月干支与日干支、神煞按月建与日干支、
-       胎神按日干支（月胎神按农历月）、二十八宿按日支与星期。与该库逐日对照，1901–2099 年全同。
+       胎神按日干支（月胎神按农历月）、二十八宿按日支与星期。1901–2099 年逐日与该库对照：以北京时间计全同
+       （只有 4 天因中国当年行夏令时，交节那天早晚一日）；日本时间下约有百日因交节落在北京时间 23 点后而早一日换月——
+       按本机民用日，口径如此。建除、值神、冲煞、喜神财神、胎神、星宿也逐日相同；阳贵阴贵（庚日）与彭祖（壬日「汲水」）
+       从天气网老黄历，与该库不同。
        没载入该件时退回建除十二神的简本宜忌（与 data/rike.yaml 同一份）。
        另标黄道黑道、岁破、四离四绝、杨公忌（这几样不在协纪的每日表里）。
      · 七十二候：太阳黄经每 5° 一候（立春初候 315°），两端用精确节气、中间按低精度太阳黄经插值；
@@ -52,6 +55,7 @@
   var XI = ['东北', '西北', '西南', '正南', '东南'];                      // 甲己、乙庚、丙辛、丁壬、戊癸
   var CAI = ['东北', '东北', '西南', '西南', '正北', '正北', '正东', '正东', '正南', '正南'];
   var YANG_GUI = [7, 8, 9, 11, 1, 0, 1, 2, 3, 5], YIN_GUI = [1, 0, 11, 9, 7, 8, 7, 6, 5, 3];
+  // 彭祖百忌：壬日作「汲水」（天气网老黄历同；lunar-javascript 作「泱水」）
   var PENG_GAN = ['甲不开仓，财物耗散', '乙不栽植，千株不长', '丙不修灶，必见灾殃', '丁不剃头，头必生疮', '戊不受田，田主不祥',
     '己不破券，二比并亡', '庚不经络，织机虚张', '辛不合酱，主人不尝', '壬不汲水，更难提防', '癸不词讼，理弱敌强'];
   var PENG_ZHI = ['子不问卜，自惹祸殃', '丑不冠带，主不还乡', '寅不祭祀，神鬼不尝', '卯不穿井，水泉不香', '辰不哭泣，必主重丧',
@@ -467,15 +471,16 @@
   }
   // 浏览器里存成文件：Blob + <a download>。iOS Safari 下载后点开即进「日历」；不支持 download 的老浏览器直接打开。
   // 文件名用 ASCII（有的浏览器遇到中文文件名会改成 download）
+  // 回 'inapp' 表示像是 LINE、微信等应用内浏览器（多半存不下文件），页面可提示改用 Safari / Chrome 打开
   function saveICS(filename, text) {
     if (typeof document === 'undefined') return false;
     var blob = new Blob([text], { type: 'text/calendar;charset=utf-8' }), url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url; a.download = filename; a.rel = 'noopener'; a.style.display = 'none';
-    if (!('download' in a)) { location.href = url; return true; }
-    document.body.appendChild(a); a.click(); a.remove();
+    if (!('download' in a)) location.href = url;
+    else { document.body.appendChild(a); a.click(); a.remove(); }
     setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-    return true;
+    return /\bLine\/|MicroMessenger|FBAN|FBAV|Instagram/i.test(navigator.userAgent || '') ? 'inapp' : true;
   }
   // 整天事项的 UID：日期 + 种类 + 名目的短散列（同一天同一名目再导入时日历会认作同一条）
   function uid(dateKey, kind, name) {

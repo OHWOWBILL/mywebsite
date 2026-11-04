@@ -17,10 +17,12 @@
 
     /* —— 输入 —— */
     .fb-now.xm-in { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: start; }
+    .fb-now.xm-in.solo { grid-template-columns: minmax(0, 1fr); }
     .xm-in-l { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-    .xm-field { position: relative; }
-    .fb-main .xm-field input { width: 100%; padding: 10px 46px 10px 16px; font-family: var(--font-title); font-weight: 600; font-size: 24px; letter-spacing: .22em; }
-    .fb-main .xm-field input::placeholder { font-weight: 400; font-size: 17px; letter-spacing: .1em; color: var(--faint); }
+    .xm-field { position: relative; max-width: 620px; }
+    /* fabao.css 的 .fb-main input:not(…):not(…) 权重较高，这里用 id 压过它 */
+    #nameIn { width: 100%; padding: 10px 46px 10px 16px; font-family: var(--font-title); font-weight: 600; font-size: 24px; letter-spacing: .22em; }
+    #nameIn::placeholder { font-weight: 400; font-size: 17px; letter-spacing: .1em; color: var(--faint); }
     .xm-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; color: var(--faint); font-size: 20px; line-height: 1; }
     .xm-clear:hover { color: var(--fg); background: var(--bg-2); }
     .xm-split { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 26px; font-size: 13px; color: var(--muted); letter-spacing: .05em; }
@@ -68,7 +70,7 @@
     .xm-stp { display: inline-flex; align-items: center; gap: 2px; }
     .xm-stp button { width: 21px; height: 26px; border-radius: 5px; border: 1px solid var(--rule-2); color: var(--muted); font-size: 15px; line-height: 1; }
     .xm-stp button:hover { color: var(--fg); border-color: var(--zi-2); }
-    .fb-main .xm-stp input { width: 2.2em; height: 26px; padding: 0; text-align: center; font-family: var(--font-mark); font-weight: 800; font-size: 15px; -moz-appearance: textfield; appearance: textfield; }
+    .fb-main .xm-ch .xm-stp input[type=number] { width: 2.2em; height: 26px; padding: 0; text-align: center; font-family: var(--font-mark); font-weight: 800; font-size: 15px; -moz-appearance: textfield; appearance: textfield; }
     .xm-stp input::-webkit-outer-spin-button, .xm-stp input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .xm-ch .src { font-size: 11px; color: var(--faint); letter-spacing: .06em; text-align: center; line-height: 1.4; }
     .xm-ch.is-user .src { color: var(--zi-2); }
@@ -130,6 +132,7 @@
     .xm-g { display: inline-flex; align-items: baseline; gap: 4px; white-space: nowrap; font-family: var(--font-title); font-size: 13px; color: var(--tc); }
     .xm-g b { font-family: var(--font-mark); font-weight: 800; font-size: 14px; color: var(--fg-2); }
     .xm-g i { display: none; font-style: normal; color: var(--faint); font-size: 11.5px; }
+    .xm-g em { font-style: normal; margin-left: 4px; }
     .xm-sv { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .xm-sv b { font-family: var(--font-mark); font-weight: 800; font-size: 16px; color: var(--fg); min-width: 1.6em; text-align: right; }
     .xm-sv span { flex: 1; height: 5px; border-radius: 3px; background: var(--rule); overflow: hidden; min-width: 24px; }
@@ -149,7 +152,7 @@
     }
     @media (max-width: 860px) {
       .fb-now.xm-in { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-      .fb-main .xm-field input { font-size: 21px; padding: 9px 44px 9px 12px; }
+      #nameIn { font-size: 21px; padding: 9px 44px 9px 12px; }
       .fb-card.bh.xm-verdict { padding: 16px 16px 14px; grid-template-columns: minmax(0, 1fr); gap: 8px; }
       .xm-verdict > .acts { grid-column: 1; grid-row: auto; }
       .xm-verdict > .acts .fb-btn { flex: 1; }
@@ -178,6 +181,14 @@
       .xm-rr.bad-row { grid-template-columns: 1.9em minmax(0, 1fr); grid-template-areas: "rk nm" "rk gs"; }
     }
     .xm-rr .nm .bs-m { display: none; font-family: var(--font-mark); font-size: 11.5px; color: var(--faint); }
+    /* 手机：四个字并排时格子窄，加减键挪到数字下面 */
+    @media (max-width: 480px) {
+      .xm-stp { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "n n" "d i"; gap: 3px; width: 100%; padding: 0 5px; }
+      .fb-main .xm-ch .xm-stp input[type=number] { grid-area: n; width: 100%; height: 28px; font-size: 16px; }
+      .xm-stp button { width: auto; height: 26px; }
+      .xm-stp button[data-act="dec"] { grid-area: d; }
+      .xm-stp button[data-act="inc"] { grid-area: i; }
+    }
   </style>
 </head>
 <body data-tool="xingming">
@@ -318,6 +329,8 @@ function renderQuick() {
   const eg = !cur ? EXAMPLES.map(n => `<button type="button" class="xm-chip" data-name="${esc(n)}">${esc(n)}</button>`).join('') : '';
   box.innerHTML = me || eg ? `<span class="fb-label">${eg ? '试一个' : '换成'}</span><div class="xm-chips">${me}${eg}</div>` +
     (eg ? '<p class="fb-fine">只写姓也行：下面「候选名比较」会用这个姓，一次排几个备选名。</p>' : '') : '';
+  box.hidden = !box.innerHTML;
+  box.parentElement.classList.toggle('solo', box.hidden);
 }
 
 /* ================ 总评 ================ */
@@ -355,7 +368,7 @@ function charHTML(x, i) {
     <b class="t">${esc(x.t)}</b>
     <span class="s">${x.c !== x.t ? esc(x.c) : ''}</span>
     <span class="xm-stp" role="group" aria-label="${esc(x.t)} 的笔画">
-      <button type="button" data-i="${i}" data-act="dec" aria-label="${esc(x.t)} 减一画">−</button>
+      <button type="button" data-i="${i}" data-act="dec" aria-label="${esc(x.t)} 减一画">－</button>
       <input type="number" inputmode="numeric" min="1" max="64" value="${x.n || ''}" placeholder="?" data-i="${i}" aria-label="${esc(x.t)} 的笔画">
       <button type="button" data-i="${i}" data-act="inc" aria-label="${esc(x.t)} 加一画">＋</button>
     </span>
@@ -424,7 +437,7 @@ function renderCands() {
         <span class="rk">${n}</span>
         <span class="nm"><b>${esc(c.tname)}</b>${c.tname !== c.name ? `<small>${esc(c.name)}</small>` : ''}<span class="bs-m">${strokes}</span></span>
         <span class="bs">${strokes}</span>
-        <span class="gs">${g('ren', '人')}${g('di', '地')}${g('wai', '外')}${g('zong', '总')}<span class="xm-g t-${tone(c.sancai.lv)}" title="三才 ${c.sancai.key}"><i>三才</i>${c.sancai.key}${c.sancai.lv}</span></span>
+        <span class="gs">${g('ren', '人')}${g('di', '地')}${g('wai', '外')}${g('zong', '总')}<span class="xm-g t-${tone(c.sancai.lv)}" title="三才 ${c.sancai.key}"><i>三才</i>${c.sancai.key}<em>${c.sancai.lv}</em></span></span>
         <span class="xm-sv"><b>${c.score}</b><span><i style="width:${c.score}%"></i></span></span>
       </a>`;
     }).join('')}

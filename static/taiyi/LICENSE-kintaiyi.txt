@@ -1,0 +1,28 @@
+太乙神数（/taiyi/）的起局规则与 scripts/taiyi/check.js 里的对照数据，参照并引用了 kintaiyi：
+  https://github.com/kentang2017/kintaiyi （commit 11f78555，2026-10-02）
+  - 主客算表 find_cal、始击表 sf_list（src/kintaiyi/config.py）
+  - 积数公式 accnum()、格局 shi_geju() 等实现（src/kintaiyi/kintaiyi.py）
+  - 《太乙秘书》阴阳一百四十四局断语（src/kintaiyi/taiyimishu.py）
+本站代码为重写，经文出处另见页面「口径」；以下为 kintaiyi 的许可证原文。
+
+MIT License
+
+Copyright (c) 2023-2026 kentang2017
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

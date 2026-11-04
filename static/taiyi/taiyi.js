@@ -121,10 +121,8 @@
     if (u === 0) sancai.push('无人');
     if (n > 10 && u > 5) sancai.push('三才足');
     var chang = n >= 10;
-    var tags = [chang ? '长' : '短', he ? '和' : '不和'];
     return { n: n, chang: chang, he: he, du: du, name: name, sancai: sancai,
-      label: (chang ? '长' : '短') + (du ? '·杜' : he ? '·' + name : '·不和' + (name !== '不和' ? '（' + name + '）' : '')),
-      tags: tags };
+      label: (chang ? '长' : '短') + '·' + (du ? '杜' : he ? name : '不和' + (name !== '不和' ? '·' + name : '')) };
   }
 
   /* ================= 局 ================= */
@@ -248,7 +246,7 @@
     var dT = c.doors[c.T];
     if (dT === '开' || dT === '休' || dT === '生') why.push(dT + '门临太乙宫');
     var gw = POS_GONG[c.wc];
-    if (gw && gw !== c.T) { var dw = c.doors[gw]; if (dw === '开' || dw === '休' || dw === '生') why.push(dw + '门临文昌（' + gongName(gw) + '）'); }
+    if (gw && gw !== c.T) { var dw = c.doors[gw]; if (dw === '开' || dw === '休' || dw === '生') why.push(dw + '门临文昌所在' + gongName(gw)); }
     return { ju: !why.length, why: why };
   }
   function wuJiang(c, A) {

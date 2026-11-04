@@ -349,8 +349,8 @@
         desc: `${x.n}：${key} ${hm}（本机时区）交节${h && h.cn ? `\n七十二候：${h.cnName} ${h.cn} · 本朝 ${h.jp}` : ''}\n潜蛟阁 · 流年` };
     }).concat(festList().map(x => ({ uid: TS.uid(x.r.key, 'fe', x.n), date: [x.r.y, x.r.m, x.r.d], title: x.n, url: `https://ohwowbill.com/huangli/?d=${x.r.key}`,
       desc: `${x.r.y}年${x.r.m}月${x.r.d}日 ${x.r.week} · 农历${x.r.lunarText}${x.cls === 'jp' ? '\n日本雑節' : x.cls === 'k' ? '\n日本历注吉日' : ''}\n潜蛟阁 · 流年` })));
-    TS.saveICS(`liunian-${Y}.ics`, TS.ics(evs, `潜蛟阁流年 ${Y} · 节气与节日`));
-    Fabao.toast(`已生成 ${evs.length} 条日历事项，打开即可加入日历`, 2600);
+    const res = TS.saveICS(`liunian-${Y}.ics`, TS.ics(evs, `潜蛟阁流年 ${Y} · 节气与节日`));
+    Fabao.toast(res === 'inapp' ? '这是应用内浏览器，若没存下，请用 Safari 或 Chrome 打开本页再点' : `已生成 ${evs.length} 条日历事项，打开即可加入日历`, 3200);
   }
   function festList() {
     const out = [];
