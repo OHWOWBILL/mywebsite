@@ -93,7 +93,7 @@
     .lq-acts:empty { display: none; }
     .lq-acts .fb-btn { min-width: 8em; }
     .lq-acts .primary { min-width: 10em; letter-spacing: .3em; }
-    .lq-acts .fb-btn:disabled, .lq-racts .fb-btn:disabled { opacity: .45; cursor: default; }
+    .lq-acts .fb-btn[aria-disabled="true"] { opacity: .45; cursor: default; }
     .lq-hint { width: 100%; text-align: center; font-size: 12.5px; color: var(--muted); }
 
     /* —— 签出 —— */
@@ -308,7 +308,7 @@
     <ol class="lq-hlist" id="histList"></ol>
   </section>
 
-  <section class="fb-card lq-help" aria-label="口径">
+  <section class="fb-card lq-help" aria-label="口径" data-gloss>
     <h3>口径</h3>
     <ul id="rulesList"></ul>
     <h3>签诗出处</h3>
@@ -477,6 +477,7 @@ function renderStage() {
     const i = order.indexOf(li.dataset.step);
     li.hidden = i < 0;
     li.classList.toggle('on', i === at);
+    if (i === at) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
     li.classList.toggle('done', i >= 0 && i < at);
   });
   temple ? $('steps').querySelectorAll('li:not([hidden]) b').forEach((b, i) => { b.textContent = '一二三'[i]; })
@@ -511,20 +512,27 @@ function renderStage() {
   $('say').innerHTML = say;
   renderActs();
 }
+// 按钮重画前记下焦点在哪一个，画完放回去（键盘连按「掷 筊」不掉焦点）
+function keepFocus(box, draw) {
+  const a = document.activeElement, act = a && box.contains(a) && a.dataset ? a.dataset.act : null;
+  draw();
+  if (act) { const nb = box.querySelector(`[data-act="${act}"]`); if (nb) nb.focus({ preventScroll: true }); }
+}
+const off = c => c ? ' aria-disabled="true"' : '';
 function renderActs() {
   const st = S.step, b = S.busy;
   let h = '';
   if (st === 'jiao') {
-    h = `<button type="button" class="fb-btn primary" data-act="toss"${b || S.auto ? ' disabled' : ''}>掷 筊</button>` +
+    h = `<button type="button" class="fb-btn primary" data-act="toss"${off(b || S.auto)}>掷 筊</button>` +
         `<button type="button" class="fb-btn" data-act="auto">${S.auto ? '停' : '连掷到三圣杯'}</button>` +
-        `<button type="button" class="fb-btn ghost" data-act="jump"${b ? ' disabled' : ''}>跳过，直接摇签</button>`;
+        `<button type="button" class="fb-btn ghost" data-act="jump"${off(b)}>跳过，直接摇签</button>`;
   } else if (st === 'tube') {
-    h = `<button type="button" class="fb-btn primary" data-act="shake"${b ? ' disabled' : ''}>摇签筒</button>`;
+    h = `<button type="button" class="fb-btn primary" data-act="shake"${off(b)}>摇签筒</button>`;
     if (Motion.can && Motion.perm && !Motion.on && !Motion.denied) h += `<button type="button" class="fb-btn" data-act="motion">开启摇一摇</button>`;
   } else if (st === 'out') {
     h = `<button type="button" class="fb-btn ghost" data-act="again">再求一签</button>`;
   }
-  $('acts').innerHTML = h;
+  keepFocus($('acts'), () => { $('acts').innerHTML = h; });
 }
 function go(step) {
   S.step = step;
@@ -592,6 +600,8 @@ async function shakeTube() {
   S.view = rec; S.drawn = rec;
   go('out');
   renderResult(); renderHist();
+  const h2 = $('result').querySelector('h2');
+  if (h2) { h2.tabIndex = -1; h2.focus({ preventScroll: true }); }
   await wait(350);
   scrollToEl($('result'));
 }
@@ -641,7 +651,7 @@ function renderResult() {
     cf = `<div class="lq-confirm"><div class="lq-blks" id="cfBlks"></div><p>${say}</p>${k === 'xiao' || k === 'yin' ? '<button type="button" class="fb-btn primary" data-act="putback">放回再摇</button>' : ''}</div>`;
   }
   const okTag = v.c === 1 ? '<span class="lq-ok">✓ 掷筊确认</span>' : v.c === 0 ? '<span class="lq-ok no">未获圣杯</span>' : '';
-  box.innerHTML = `<div class="lq-rgrid">
+  keepFocus(box, () => { box.innerHTML = `<div class="lq-rgrid">
     <div class="lq-slipwrap">${slip}${L.pt ? `<button type="button" class="lq-script" data-act="script">${trad ? '看简体' : '看繁体'}</button>` : ''}</div>
     <div class="lq-rinfo tone-${tone}">
       <div class="lq-rtitle"><span class="nm">${esc(x.name)}</span><h2>${LQ.label(x, L.n)}${L.gz ? `<small>${esc(L.gz)}</small>` : ''}</h2>
@@ -657,7 +667,7 @@ function renderResult() {
       </div>
       <p class="lq-src">${esc(x.credit)}</p>
     </div>
-  </div>`;
+  </div>`; });
   if (cf) {
     const bl = makeBlocks($('cfBlks'));
     const r = S.cfToss;
@@ -677,6 +687,8 @@ async function confirmToss() {
   v.c = r.kind === 'sheng' ? 1 : 0;
   if (hist[0] && hist[0].t === v.t) { hist[0].c = v.c; saveHist(); }
   renderResult(); renderHist();
+  const nb = $('result').querySelector('[data-act="putback"]') || $('result').querySelector('[data-act="copy"]');
+  if (nb && $('result').contains(document.activeElement) === false && document.activeElement === document.body) nb.focus({ preventScroll: true });
 }
 function putBack() {
   const v = S.view;
@@ -746,7 +758,7 @@ const ACT = {
 };
 [$('acts'), $('result')].forEach(box => box.addEventListener('click', e => {
   const b = e.target.closest('button[data-act]');
-  if (b && !b.disabled && ACT[b.dataset.act]) ACT[b.dataset.act]();
+  if (b && b.getAttribute('aria-disabled') !== 'true' && ACT[b.dataset.act]) ACT[b.dataset.act]();
 }));
 $('setBox').addEventListener('click', e => {
   const b = e.target.closest('[data-set]');
