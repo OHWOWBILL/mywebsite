@@ -279,7 +279,7 @@
   <section class="tz-all" id="allBox" aria-label="一页答完" hidden></section>
 
   <div id="resultBox" hidden>
-    <section class="fb-now tz-head" id="resHead" aria-label="结果" aria-live="polite"></section>
+    <section class="fb-now tz-head" id="resHead" aria-label="结果" aria-live="polite" data-gloss></section>
     <div class="tz-grid">
       <section class="fb-card tz-card" aria-labelledby="chartTitle">
         <h2 id="chartTitle">九型转化分 <small>点一行，看那一型</small></h2>
@@ -585,6 +585,7 @@ function renderHead(e, v, prev, pv) {
       <div class="fb-row">
         <button type="button" class="fb-btn primary grow" data-go="copy">复制结果</button>
         <button type="button" class="fb-btn grow" data-go="ai">问 AI</button>
+        <button type="button" class="fb-btn grow" data-go="share" title="把结果画成一张图，可存可分享">分享图</button>
       </div>
       <button type="button" class="fb-btn" data-go="again">${cur ? `接着答（已答 ${nDone()} 题）` : '再测一次'}</button>
       <p class="fb-fine">自评问卷，只说体质倾向，不是诊断；调养建议不替代医嘱。</p>
@@ -718,6 +719,13 @@ $('resHead').addEventListener('click', e => {
   if (!g || !H[at]) return;
   if (g.dataset.go === 'copy') F.copy(resultText(), '结果已复制');
   else if (g.dataset.go === 'ai') F.askAI('中医体质辨识', resultText(), Z.RULES_TEXT);
+  else if (g.dataset.go === 'share') {
+    // 分享图：结论作金句（页上那一句），九种体质按分数排下来；不写性别与日期
+    const v = vOf(H[at]), ks = Object.keys(v.scores).sort((a, b) => v.scores[b] - v.scores[a]);
+    F.share({ title: '我的体质', meta: '中华中医药学会《中医体质分类与判定》六十问 · 自评，不替代医嘱',
+      lines: ks.slice(0, 7).map(k => [Z.TYPE[k].short, `${R(v.scores[k])} 分 · ${v.levels[k]}`]),
+      url: location.origin + '/tizhi/', qrLabel: '扫码也测一测' });
+  }
   else if (g.dataset.go === 'again') { if (cur) renderQuiz(true); else start(H[at].x || store.get(LS_X, 'f')); }
   else if (g.dataset.go === 'latest') showResult(H.length - 1, true);
 });
