@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#17131F" />
   <title>黄历 · 潜蛟阁法宝库</title>
-  <meta name="description" content="黄历通书：宜忌、冲煞、吉神方位、十二时辰吉凶、彭祖百忌；日本六曜与選日、雑節；按事项一点就亮出本月吉日。" />
+  <meta name="description" content="黄历通书：协纪辨方的全套宜忌与吉神凶煞、胎神、二十八宿、七十二候，冲煞、吉神方位、十二时辰吉凶、彭祖百忌，日出日落与月出月落；日本六曜与選日、雑節；按事项一点就亮出本月吉日，可存进手机日历。" />
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,6 +67,38 @@
     .hr.me { background: rgba(224, 122, 98, .14); }
     .d-act { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
     .d-act .fb-btn { flex: 1 1 auto; text-decoration: none; }
+
+    .yj dd .it { white-space: nowrap; }
+    .yj dd .it.hit { color: var(--fg); font-weight: 600; border-bottom: 2px solid var(--zi-2); }
+    .yj dt.ji ~ dd .it.hit { border-bottom-color: var(--zhu); }
+    .yj dd .none { color: var(--faint); }
+    .yj .more { margin-left: 4px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--rule-2); font-size: 12px; color: var(--muted); font-family: var(--font-title); letter-spacing: .05em; vertical-align: 1px; }
+    .yj .more:hover { color: var(--fg); border-color: var(--zi-2); }
+    .ss { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; margin-top: 12px; font-size: 13px; line-height: 1.7; align-items: baseline; }
+    .ss dt { font-family: var(--font-title); color: var(--faint); letter-spacing: .12em; white-space: nowrap; }
+    .ss dd { color: var(--fg-2); letter-spacing: .05em; min-width: 0; }
+    .ss dd.j span { color: var(--lv); } .ss dd.x span { color: #d79b8b; }
+    .ss dd span { white-space: nowrap; margin-right: .55em; }
+    .ss dd span.big { color: var(--jin); }
+    .facts dd small { color: var(--faint); font-size: 12px; }
+    .facts dd .lk { color: var(--lv); } .facts dd .xk { color: var(--zhu); }
+    .facts details summary { cursor: pointer; list-style: none; display: inline; }
+    .facts details summary::-webkit-details-marker { display: none; }
+    .facts details summary::after { content: " ＋"; color: var(--zi-2); font-size: 12px; }
+    .facts details[open] summary::after { content: " －"; }
+    .facts details p { margin-top: 4px; font-size: 12.5px; line-height: 1.75; color: var(--muted); }
+    .facts .hou-jp { display: block; color: var(--qing); font-size: 12.5px; }
+    .facts .hou-jp small { color: var(--faint); }
+    .sky { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 14px; padding: 10px 12px; border-radius: var(--r); background: var(--bg-3); font-size: 13px; color: var(--fg-2); }
+    .sky .k { font-family: var(--font-title); color: var(--faint); letter-spacing: .1em; margin-right: 3px; }
+    .sky b { font-family: var(--font-mark); font-weight: 500; letter-spacing: .02em; color: var(--fg); }
+    .sky .moon { display: inline-flex; align-items: center; gap: 5px; }
+    .sky .moon svg { width: 16px; height: 16px; }
+    .sky .mo-dark { fill: var(--bg-2); stroke: var(--rule-2); stroke-width: 1; } .sky .mo-lit { fill: var(--fg-2); }
+    .sky label { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: var(--faint); font-size: 12px; }
+    .sky select { padding: 3px 6px; font-size: 12.5px; max-width: 9.5em; }
+    .tg.ics { color: var(--fg-2); border-color: var(--zi-2); }
+    .tg.ics::before { content: ""; display: inline-block; width: 11px; height: 11px; margin-right: 5px; vertical-align: -1px; border: 1.5px solid currentColor; border-top-width: 3px; border-radius: 2px; box-sizing: border-box; }
 
     /* —— 找吉日 —— */
     .find { padding: 16px 18px; }
@@ -141,6 +173,8 @@
       .c .m { font-size: 9.5px; gap: 2px; }
       .c .jc, .c .rk.plain { display: none; }
       .best button { grid-template-columns: 5.2em 2.6em 1fr; font-size: 13px; }
+      .sky { gap: 4px 12px; }
+      .sky label { margin-left: 0; width: 100%; }
     }
   </style>
 </head>
@@ -150,7 +184,7 @@
     <div class="fb-seal">历</div>
     <div>
       <h1 class="fb-title">黄历 <span class="en">ALMANAC</span></h1>
-      <div class="fb-sub">宜忌 · 冲煞 · 方位 · 时辰吉凶 · 六曜選日</div>
+      <div class="fb-sub">宜忌神煞 · 冲煞方位 · 宿与候 · 日月出没 · 时辰吉凶 · 六曜選日</div>
     </div>
   </div>
 
@@ -165,6 +199,7 @@
         <div class="set">
           <label>按属相看冲 <select id="sxSel" aria-label="属相"></select></label>
           <button type="button" class="tg" id="jpTg" title="六曜、一粒万倍日、天赦日等日本历注">日本历注</button>
+          <button type="button" class="tg ics" id="icsBtn">加入日历</button>
         </div>
       </section>
 
@@ -182,14 +217,19 @@
     </div>
   </div>
 
-  <p class="fb-fine hl-fine">口径：节月以「节」换，交节那天整天算新月；建除日支同月建为「建」，交节之日重复前一日；值神（黄道黑道）日按月建、时按日支起青龙；冲煞天克地冲，申子辰煞南、寅午戌煞北、巳酉丑煞东、亥卯未煞西；喜神甲己东北、乙庚西北、丙辛西南、丁壬正南、戊癸东南，财神甲乙东北、丙丁西南、戊己正北、庚辛正东、壬癸正南，阳贵阴贵依《协纪辨方书》。宜忌取通书常见的建除简本，另标黄道黑道、岁破、四离四绝、杨公忌；天德月德等神煞全套不在此列。六曜、不成就日按日本旧暦（日本时间落朔，与中国农历偶差一天）；一粒万倍日、三隣亡、受死日、十死日按节月，母倉日按季节与土用。「找吉日」的分数只是把这些加减起来排个先后，大事仍请自己斟酌。</p>
+  <p class="fb-fine hl-fine">口径：节月以「节」换，交节那天整天算新月；建除日支同月建为「建」，交节之日重复前一日；值神（黄道黑道）日按月建、时按日支起青龙；冲煞天克地冲，申子辰煞南、寅午戌煞北、巳酉丑煞东、亥卯未煞西；喜神甲己东北、乙庚西北、丙辛西南、丁壬正南、戊癸东南，财神甲乙东北、丙丁西南、戊己正北、庚辛正东、壬癸正南，阳贵阴贵按「甲戊庚牛羊」。宜忌、吉神宜趋、凶煞宜忌、胎神占方、二十八宿取《协纪辨方书》的每日表（移植自 <a href="https://github.com/6tail/lunar-javascript" rel="noopener">lunar-javascript</a>，MIT 许可，<a href="/fabao/tongshu-shensha.LICENSE.txt">许可全文</a>）：宜忌按节月干支与日干支查，「馀事勿取」即只做所列之事；另标黄道黑道、岁破、四离四绝、杨公忌。七十二候按太阳黄经每 5° 一候，入候那天整天算新候；中国候名取《逸周书·时训解》与宣明暦本，开日本历注时并列略本暦的本朝七十二候（国立天文台暦Wiki、kotobank 核过）。日出日落用 NOAA 太阳公式（太阳上缘切地平），月出月落以月心切地平、月龄为当地正午距上一次朔的天数（与国立天文台同口径），时刻为所选地点的当地时间，地点记在本机。六曜、不成就日按日本旧暦（日本时间落朔，与中国农历偶差一天）；一粒万倍日、三隣亡、受死日、十死日按节月，母倉日按季节与土用。「找吉日」的分数只是把这些加减起来排个先后，大事仍请自己斟酌；「加入日历」存成 .ics（整天事项），手机上点开即可加入日历。</p>
 </main>
 
 <script src="/fabao/fabao.js?v=13"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/fabao/kyureki.js?v=1"></script>
-<script src="/fabao/tongshu.js?v=1"></script>
+<script src="/fabao/tongshu-shensha.js?v=1"></script>
+<script src="/fabao/tongshu-hou.js?v=1"></script>
+<script src="/fabao/tongshu.js?v=2"></script>
+<script src="/fabao/cities.js?v=1"></script>
+<script src="/xingpan/xingpan.js?v=1"></script>
+<script src="/fabao/tongshu-sky.js?v=1"></script>
 <script>
 (function () {
   'use strict';
@@ -199,8 +239,9 @@
   const pad = n => String(n).padStart(2, '0');
   const SX = TS.SX, ZHI = TS.ZHI;
   const isJpTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Tokyo'; } catch (e) { return false; } })();
+  const SKY = window.TS_SKY && window.QJ_CITIES ? window.TS_SKY : null;
 
-  // —— 状态：选中的日子、看的月份、事项、属相、日本历注 ——
+  // —— 状态：选中的日子、看的月份、事项、属相、日本历注、看日月出没的地点 ——
   const q = new URLSearchParams(location.search);
   const today = new Date(); today.setHours(0, 0, 0, 0);
   let sel = (() => { const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(q.get('d') || ''); return m ? new Date(+m[1], m[2] - 1, +m[3]) : new Date(today); })();
@@ -211,6 +252,10 @@
   const birth = window.Fabao && Fabao.birth.load(), by = birth && Fabao.birth.yearOf(birth);
   let sx = ls('huangli.sx'); sx = sx == null ? (by ? by.sx : null) : sx === '' ? null : +sx;
   const opt = () => ({ jp: jp, sx: sx });
+  const CITY0 = isJpTz ? '东京' : '北京';
+  let city = ls('tongshu.city') || CITY0;
+  if (SKY && !SKY.place(city)) city = CITY0;
+  const open = {};                                   // 收起的长单哪几张打开了
 
   // —— 设置 ——
   $('sxSel').innerHTML = '<option value="">不计</option>' + SX.split('').map((s, i) => `<option value="${i}">属${s}</option>`).join('');
@@ -221,17 +266,50 @@
   paintJp();
   $('evChips').innerHTML = `<button type="button" class="chip" data-k="">只看黄历</button>` + TS.EVENTS.map(e => `<button type="button" class="chip" data-k="${e.k}">${e.name}</button>`).join('');
   $('evChips').querySelectorAll('.chip').forEach(b => b.onclick = () => { ev = b.dataset.k; lss('tongshu.ev', ev); render(); });
+  $('icsBtn').onclick = () => monthICS();
 
   // —— 一天 ——
+  // 长单先列 n 项，其余收起；事项相关的条目一律露出并标亮
+  function list(items, key, n, hits, sep) {
+    if (!items.length) return '<span class="none">无</span>';
+    const all = open[key], vis = [], rest = [];
+    items.forEach((x, i) => (all || i < n || hits.indexOf(x) >= 0 ? vis : rest).push(x));
+    return vis.map(x => `<span class="it${hits.indexOf(x) >= 0 ? ' hit' : ''}${TS.BIG_JI.indexOf(x) >= 0 ? ' big' : ''}">${x}</span>`).join(sep) +
+      (rest.length ? `<button type="button" class="more" data-open="${key}" aria-label="再列 ${rest.length} 项">＋${rest.length}</button>` : '') +
+      (all && items.length > n ? `<button type="button" class="more" data-close="${key}">收起</button>` : '');
+  }
+  function moonSVG(age) {
+    const f = age / 29.530589, k = Math.cos(2 * Math.PI * f), r = 7, rx = Math.abs(k) * r, wax = f < 0.5;
+    const term = wax ? (k > 0 ? 0 : 1) : (k > 0 ? 1 : 0);
+    return `<svg viewBox="-8 -8 16 16" aria-hidden="true"><circle class="mo-dark" r="${r}"/><path class="mo-lit" d="M0,${-r}A${r},${r} 0 0 ${wax ? 1 : 0} 0,${r}A${rx.toFixed(2)},${r} 0 0 ${term} 0,${-r}Z"/></svg>`;
+  }
+  // 日出日落、月出月落、月龄：在选定地点、按当地时间
+  function skyOf(r) {
+    const p = SKY && SKY.place(city);
+    return p ? { p, s: SKY.day(r.y, r.m, r.d, p) } : null;
+  }
+  function skyHTML(r) {
+    const k = skyOf(r);
+    if (!k) return '';
+    const { p, s } = k, hm = t => t == null ? '<b title="这一天没有">—</b>' : `<b>${SKY.hm(t, p)}</b>`;
+    const devOff = -new Date(r.y, r.m - 1, r.d, 12).getTimezoneOffset(), cityOff = SKY.offsetMin(p, Date.UTC(r.y, r.m - 1, r.d, 3));
+    const sel = `<select id="citySel" aria-label="看日月出没的地点">${QJ_CITIES.GROUPS.map(g => `<optgroup label="${g[0]}">${g[1].map(c => `<option${c[0] === city ? ' selected' : ''}>${c[0]}</option>`).join('')}</optgroup>`).join('')}</select>`;
+    return `<div class="sky">
+      ${s.polar ? `<span><span class="k">太阳</span>${s.polar === 'day' ? '终日不落' : '终日不出'}</span>` : `<span><span class="k">日出</span>${hm(s.sunrise)}</span><span><span class="k">日落</span>${hm(s.sunset)}</span>`}
+      ${s.age != null ? `<span><span class="k">月出</span>${hm(s.moonrise)}</span><span><span class="k">月落</span>${hm(s.moonset)}</span>
+        <span class="moon" title="月龄：上一次朔到当地正午的天数">${moonSVG(s.age)}<span class="k">月龄</span><b>${s.age.toFixed(1)}</b>${s.phase}</span>` : ''}
+      <label>${cityOff !== devOff ? `${QJ_CITIES.tzLabel(cityOff / 60)} ` : ''}${sel}</label></div>`;
+  }
   function dayHTML(r) {
     const isToday = r.y === today.getFullYear() && r.m === today.getMonth() + 1 && r.d === today.getDate();
     const hrs = TS.hours(r), nowH = isToday ? TS.hourOf(new Date()) : -1;
     const me = sx != null && r.chong.zhi === sx;
     const s = ev ? TS.score(r, ev, opt()) : null;
-    const E = ev && TS.EV_BY[ev];
+    const E = ev && TS.EV_BY[ev], hits = E ? (r.yjSrc === 'xj' ? E.yi : E.jc) : [];
     const jq = r.jieqi ? `<span class="tag k">${pad(new Date(r.jieqi.t).getHours())}:${pad(new Date(r.jieqi.t).getMinutes())} 交${r.jieqi.n}</span>` : '';
     const fest = r.fest.filter(f => f.kind === 'cn' || jp).map(f => `<span class="tag ${f.kind === 'cn' ? 'k' : ''}">${f.n}</span>`).join('');
     const notes = r.notes.map(n => `<span class="warn">${n.n}：${n.d}</span>`).join('');
+    const H = r.hou;
     return `
       <div class="d-top">
         <div>
@@ -247,17 +325,25 @@
         <span class="bd ng${me ? ' me' : ''}"><small>冲煞</small>冲${r.chong.sx}（${r.chong.gz}）煞${r.chong.sha}${me ? ' · 冲你' : ''}</span>
       </div>
       <dl class="yj">
-        <dt class="yi">宜</dt><dd>${r.yi.join('　')}</dd>
-        <dt class="ji">忌</dt><dd>${r.ji.join('　')}${notes}</dd>
+        <dt class="yi">宜</dt><dd>${list(r.yi, 'yi', 12, hits, '　')}</dd>
+        <dt class="ji">忌</dt><dd>${list(r.ji, 'ji', 12, hits, '　')}${notes}</dd>
       </dl>
-      ${s ? `<div class="d-ev"><b>对「${E.name}」：</b><span class="g-${TS.grade(s.score)}">${TS.grade(s.score)}</span>（${s.score > 0 ? '+' : ''}${s.score}）
+      ${s ? `<div class="d-ev"><b>对「${E.name}」：</b><span class="g-${TS.grade(s.score, jp)}">${TS.grade(s.score, jp)}</span>（${s.score > 0 ? '+' : ''}${s.score}）
         ${s.plus.length ? `<br><span class="p">＋ ${s.plus.map(x => x.t).join('；')}</span>` : ''}
         ${s.minus.length ? `<br><span class="n">－ ${s.minus.map(x => x.t).join('；')}</span>` : ''}</div>` : ''}
+      ${r.yjSrc === 'xj' ? `<dl class="ss">
+        <dt>吉神宜趋</dt><dd class="j">${list(r.jishen, 'js', 10, [], '')}</dd>
+        <dt>凶煞宜忌</dt><dd class="x">${list(r.xiongsha, 'xs', 10, [], '')}</dd>
+      </dl>` : ''}
+      ${skyHTML(r)}
       <dl class="facts">
         <div><dt>喜神</dt><dd>${r.fang.xi}</dd></div>
         <div><dt>财神</dt><dd>${r.fang.cai}</dd></div>
         <div><dt>阳贵</dt><dd>${r.fang.yangGui}</dd></div>
         <div><dt>阴贵</dt><dd>${r.fang.yinGui}</dd></div>
+        ${r.tai ? `<div class="wide"><dt>胎神</dt><dd>${r.tai.day}${r.tai.month ? ` <small>· 本月${r.tai.month}</small>` : ''}</dd></div>` : ''}
+        ${r.xiu ? `<div class="wide"><dt>星宿</dt><dd><details><summary><span class="${r.xiu.luck === '吉' ? 'lk' : 'xk'}">${r.xiu.full} · ${r.xiu.luck}</span> <small>${r.xiu.gong}方${r.xiu.shou}</small> ${r.xiu.note}</summary><p>${r.xiu.song}</p></details></dd></div>` : ''}
+        ${H && H.cn ? `<div class="wide"><dt>七十二候</dt><dd>${H.cnName} · ${H.cn}${H.first ? ' <small>（今日入候）</small>' : ''}${jp ? `<span class="hou-jp">本朝 ${H.jpName} · ${H.jp} <small>${H.yomi}</small></span>` : ''}</dd></div>` : ''}
         <div class="wide"><dt>彭祖</dt><dd>${r.pengzu.join('；')}</dd></div>
       </dl>
       ${jp ? `<div class="jp"><span class="lab">日本历注</span><span class="tag ${r.rokuyo === '大安' ? 'g' : r.rokuyo === '仏滅' ? 'b' : ''}" title="${r.rokuyoNote}">${r.rokuyo}</span>
@@ -272,16 +358,53 @@
         <button type="button" class="fb-btn" id="copyDay">复制</button>
       </div>`;
   }
+  function skyText(r) {
+    const k = skyOf(r);
+    if (!k) return '';
+    const { p, s } = k, hm = t => t == null ? '—' : SKY.hm(t, p);
+    return `${p.name}：` + (s.polar ? (s.polar === 'day' ? '终日不落' : '终日不出') : `日出${hm(s.sunrise)} 日落${hm(s.sunset)}`) +
+      (s.age != null ? ` 月出${hm(s.moonrise)} 月落${hm(s.moonset)} 月龄${s.age.toFixed(1)}（${s.phase}）` : '');
+  }
   function dayText(r) {
-    const hrs = TS.hours(r).filter(h => h.huang).map(h => h.name).join('、');
+    const hrs = TS.hours(r).filter(h => h.huang).map(h => h.name).join('、'), H = r.hou;
     return [`${r.y}年${r.m}月${r.d}日 ${r.week} · 农历${r.lunarText}`,
       `${r.year.name}年 ${r.month.name}月 ${r.gz.name}日（${r.nayin}）`,
       `${r.jianchu}日 · 值神${r.shen}（${r.huang ? '黄道' : '黑道'}） · 冲${r.chong.sx}（${r.chong.gz}）煞${r.chong.sha}`,
-      `宜：${r.yi.join('、')}`, `忌：${r.ji.join('、')}${r.notes.length ? '（' + r.notes.map(n => n.n).join('、') + '）' : ''}`,
+      `宜：${r.yi.join('、') || '无'}`, `忌：${r.ji.join('、') || '无'}${r.notes.length ? '（' + r.notes.map(n => n.n).join('、') + '）' : ''}`,
+      r.yjSrc === 'xj' ? `吉神宜趋：${r.jishen.join('、') || '无'}\n凶煞宜忌：${r.xiongsha.join('、') || '无'}` : '',
       `喜神${r.fang.xi} 财神${r.fang.cai} 阳贵${r.fang.yangGui} 阴贵${r.fang.yinGui}`,
+      r.tai ? `胎神：${r.tai.day}${r.tai.month ? '（本月' + r.tai.month + '）' : ''}` : '',
+      r.xiu ? `星宿：${r.xiu.full}（${r.xiu.luck}）` : '',
+      H && H.cn ? `七十二候：${H.cnName} ${H.cn}${jp ? ' · 本朝 ' + H.jp : ''}` : '',
+      skyText(r),
       `黄道吉时：${hrs}`, `彭祖百忌：${r.pengzu.join('；')}`,
       jp ? `六曜${r.rokuyo}${r.sen.length ? ' · ' + r.sen.map(x => x.n).join('、') : ''}` : '',
       '—— 潜蛟阁 · 黄历 ohwowbill.com/huangli/'].filter(Boolean).join('\n');
+  }
+
+  // —— 存进日历：本月（今天起）这件事的上吉、吉日，与本月节气；都是整天事项 ——
+  function icsPlan() {
+    const E = ev && TS.EV_BY[ev], days = TS.month(vy, vm);
+    const from = (vy === today.getFullYear() && vm === today.getMonth() + 1) ? today.getDate() : 1;
+    const good = E ? days.filter(r => r.d >= from).map(r => ({ r, s: TS.score(r, ev, opt()) })).filter(x => /吉/.test(TS.grade(x.s.score, jp))) : [];
+    return { E, good, terms: days.filter(r => r.jieqi) };
+  }
+  function monthICS() {
+    const { E, good, terms } = icsPlan(), url = (r, k) => `https://ohwowbill.com/huangli/?d=${r.key}${k ? '&do=' + encodeURIComponent(k) : ''}`;
+    const head = r => `${r.y}年${r.m}月${r.d}日 ${r.week} · 农历${r.lunarText}\n${r.year.name}年 ${r.month.name}月 ${r.gz.name}日 · ${r.jianchu}日 · ${r.shen}${r.huang ? '黄道' : '黑道'} · 冲${r.chong.sx}煞${r.chong.sha}`;
+    const evs = good.map(x => {
+      const g = TS.grade(x.s.score, jp);
+      return { uid: TS.uid(x.r.key, 'ji' + TS.EVENTS.indexOf(E), E.k), date: [x.r.y, x.r.m, x.r.d], title: `${E.name} · ${g}`, url: url(x.r, E.k),
+        desc: `${head(x.r)}\n宜：${x.r.yi.join('、') || '无'}\n忌：${x.r.ji.join('、') || '无'}\n` +
+          `「${E.name}」${g}（${x.s.score > 0 ? '+' : ''}${x.s.score}）：${x.s.plus.slice(0, 4).map(p => p.t.replace(/：.*/, '')).join('，')}${x.s.minus.length ? '；但' + x.s.minus.slice(0, 2).map(p => p.t.replace(/：.*/, '')).join('，') : ''}\n潜蛟阁 · 黄历` };
+    }).concat(terms.map(r => {
+      const t = new Date(r.jieqi.t), hm = `${pad(t.getHours())}:${pad(t.getMinutes())}`;
+      return { uid: TS.uid(r.key, 'jq', r.jieqi.n), date: [r.y, r.m, r.d], title: `${r.jieqi.n} · ${hm} 交节`, url: url(r),
+        desc: `${r.jieqi.n}：${r.y}年${r.m}月${r.d}日 ${hm}（本机时区）交节${r.hou && r.hou.cn ? `\n七十二候：${r.hou.cnName} ${r.hou.cn} · 本朝 ${r.hou.jp}` : ''}\n潜蛟阁 · 黄历` };
+    }));
+    if (!evs.length) { Fabao.toast('这个月没有可加入的日子'); return; }
+    TS.saveICS(`huangli-${vy}-${pad(vm)}${E ? '-' + E.py : ''}.ics`, TS.ics(evs, `潜蛟阁黄历 ${vy}年${vm}月${E ? ' · ' + E.name : ''}`));
+    Fabao.toast(`已生成 ${evs.length} 条日历事项，打开即可加入日历`, 2600);
   }
 
   // —— 月历 ——
@@ -304,9 +427,9 @@
       const isS = r.y === sel.getFullYear() && r.m === sel.getMonth() + 1 && r.d === sel.getDate();
       const lab = r.jieqi ? `<span class="l q">${r.jieqi.n}</span>` : r.fest.find(f => f.kind === 'cn') ? `<span class="l f">${r.fest.find(f => f.kind === 'cn').n}</span>`
         : `<span class="l">${r.lunar && r.lunar.d === 1 ? r.lunarText.replace(/初一$/, '') : r.lunarText.replace(/^.*月/, '')}</span>`;
-      const g = scores ? TS.grade(scores[i].score) : '';
+      const g = scores ? TS.grade(scores[i].score, jp) : '';
       html += `<button type="button" class="c${isT ? ' today' : ''}${isS ? ' sel' : ''}${r.w === 0 || r.w === 6 ? ' wkend' : ''}${sx != null && r.chong.zhi === sx ? ' me' : ''}${g ? ' v-' + g : ''}" data-d="${r.d}"
-        title="${r.key} ${r.gz.name} ${r.jianchu}日 ${r.shen}${r.huang ? '黄道' : '黑道'}${g ? ' · ' + TS.EV_BY[ev].name + g : ''}">
+        title="${r.key} ${r.gz.name} ${r.jianchu}日 ${r.shen}${r.huang ? '黄道' : '黑道'}${r.xiu ? ' · ' + r.xiu.full : ''}${r.hou && r.hou.first ? ' · ' + r.hou.cnName : ''}${g ? ' · ' + TS.EV_BY[ev].name + g : ''}">
         <span class="n">${r.d}</span>${lab}
         <span class="m"><span class="hd${r.huang ? '' : ' k'}"></span><i class="jc">${r.jianchu}</i>${jp ? `<i class="rk${r.rokuyo === '大安' ? ' da' : r.rokuyo === '仏滅' ? ' bm' : ' plain'}">${r.rokuyo}</i>${cellMarks(r)}` : ''}</span>
       </button>`;
@@ -322,13 +445,16 @@
   }
   function renderBest() {
     $('evChips').querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.k === ev));
+    const plan = icsPlan();
+    $('icsBtn').textContent = ev ? `${vm}月吉日加入日历` : `${vm}月节气加入日历`;
+    $('icsBtn').title = (ev ? `「${TS.EV_BY[ev].name}」上吉与吉的日子 ${plan.good.length} 天，另加节气 ${plan.terms.length} 个` : `本月节气 ${plan.terms.length} 个（选上一件事就连吉日一起）`) + '，存成 .ics，手机上点开即可加入日历';
     if (!ev) { $('best').innerHTML = ''; return; }
     const from = (vy === today.getFullYear() && vm === today.getMonth() + 1) ? today.getDate() : 1;
     const rows = TS.month(vy, vm).filter(r => r.d >= from).map(r => ({ r, s: TS.score(r, ev, opt()) }))
       .sort((a, b) => b.s.score - a.s.score).slice(0, 5);
     $('best').innerHTML = `<div class="fb-fine">${vm}月${from > 1 ? '（今天起）' : ''}最宜「${TS.EV_BY[ev].name}」的日子：</div>` + rows.map(x => `<button type="button" data-d="${x.r.d}">
-      <span class="w">${x.r.m}/${x.r.d} ${x.r.week}</span><span class="g g-${TS.grade(x.s.score)}">${TS.grade(x.s.score)}</span>
-      <span class="r">${x.s.plus.slice(0, 2).map(p => p.t.replace(/：.*/, '')).join('，')}${x.s.minus.length ? '；但' + x.s.minus[0].t.replace(/：.*/, '') : ''}</span></button>`).join('');
+      <span class="w">${x.r.m}/${x.r.d} ${x.r.week}</span><span class="g g-${TS.grade(x.s.score, jp)}">${TS.grade(x.s.score, jp)}</span>
+      <span class="r">${x.s.plus.slice(0, 2).map(p => p.t.replace(/：.*/, '')).join('，')}${x.s.minus.some(m => m.v <= -1) ? '；但' + x.s.minus.find(m => m.v <= -1).t.replace(/：.*/, '') : ''}</span></button>`).join('');
     $('best').querySelectorAll('button[data-d]').forEach(b => b.onclick = () => pick(new Date(vy, vm - 1, +b.dataset.d), true));
   }
   function renderDay() {
@@ -336,10 +462,15 @@
     if (!r) { $('day').innerHTML = '<div class="fb-empty">超出可排范围（1900–2100）</div>'; return; }
     $('day').innerHTML = dayHTML(r);
     $('copyDay').onclick = () => Fabao.copy(dayText(r), '这一天的黄历已复制');
+    $('day').querySelectorAll('[data-open]').forEach(b => b.onclick = () => { open[b.dataset.open] = true; renderDay(); });
+    $('day').querySelectorAll('[data-close]').forEach(b => b.onclick = () => { open[b.dataset.close] = false; renderDay(); });
+    const cs = $('citySel');
+    if (cs) cs.onchange = () => { city = cs.value; lss('tongshu.city', city); renderDay(); };
   }
   function render() { renderDay(); renderGrid(); renderBest(); }
   function pick(d, scroll) {
     sel = d; vy = d.getFullYear(); vm = d.getMonth() + 1;
+    Object.keys(open).forEach(k => { open[k] = false; });
     const u = new URL(location.href); u.searchParams.set('d', `${vy}-${pad(vm)}-${pad(d.getDate())}`); history.replaceState(null, '', u);
     render();
     if (scroll && window.matchMedia('(max-width: 1080px)').matches) $('day').scrollIntoView({ behavior: 'smooth', block: 'start' });

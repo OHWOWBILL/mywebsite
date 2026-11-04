@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#17131F">
+<title>大六壬 · 潜蛟阁法宝库</title>
+<meta name="description" content="大六壬起课：开页即排此刻，月将以中气换（精确到分）加占时，四课三传按九宗门取，天地盘十二天将、遁干六亲、旬空神煞，课体与白话提纲；可改时刻、年命、所问，复制课式或问 AI。">
+<link rel="icon" href="/favicon-32x32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+<link rel="stylesheet" href="/fabao/fabao.css?v=6">
+<style>
+/* 大六壬 · 课式与表单（外框见 /fabao/fabao.css） */
+[data-w="0"]{--wc:var(--wx-mu)} [data-w="1"]{--wc:var(--wx-huo)} [data-w="2"]{--wc:var(--wx-tu)} [data-w="3"]{--wc:var(--wx-jin)} [data-w="4"]{--wc:var(--wx-shui)}
+
+/* ---------- 此刻面板 ---------- */
+.lr-sub{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:baseline}
+.lr-sub .sep{color:var(--faint)}
+.lr-sub b{color:var(--fg);font-weight:400;font-family:var(--font-title)}
+.lr-qi{display:flex;gap:4px 12px;flex-wrap:wrap;font-size:12px;color:var(--faint);letter-spacing:.05em}
+.lr-qi b{color:var(--muted);font-weight:400;font-family:var(--font-title)}
+.lr-ctrl{min-width:300px}
+.lr-ctrl .fb-row .grow{flex:1}
+.lr-ming{flex-wrap:nowrap}
+.lr-ming > label{font-family:var(--font-title);font-size:12px;color:var(--muted);letter-spacing:.2em;white-space:nowrap}
+.fb-main .lr-ming input[type=number]{width:6.6em;flex:1 1 6.6em}
+.lr-ming .fb-seg button{padding:5px 12px}
+.lr-ming .from{font-size:11px;color:var(--faint);white-space:nowrap}
+
+/* ---------- 白话 ---------- */
+.lr-bh{margin-bottom:18px}
+.lr-bh .bh-h .fb-tag{background:rgba(141,191,151,.16);color:var(--lv)}
+.lr-bh .r > i{flex-basis:3em}
+.lr-chips{display:flex;flex-wrap:wrap;gap:4px 6px;margin:2px 0 4px}
+.lr-chips span{font-family:var(--font-title);font-size:12px;letter-spacing:.08em;padding:1px 9px;border-radius:999px;border:1px solid var(--rule-2);color:var(--fg-2)}
+.lr-chips span.main{border-color:var(--zi-2);color:var(--fg);background:rgba(122,91,192,.18)}
+
+/* ---------- 布局：左盘右课传 ---------- */
+.lr-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start}
+.lr-pan-card{padding:14px;position:sticky;top:calc(var(--top-h) + 16px)}
+.lr-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.lr-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;margin-bottom:10px}
+.lr-h h2{font-family:var(--font-title);font-weight:600;font-size:16px;letter-spacing:.2em}
+.lr-h small{font-size:12px;color:var(--faint);letter-spacing:.06em}
+
+/* ---------- 式盘：地盘十二支四方一圈，南（午）在上 ---------- */
+.lr-pan{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,auto);gap:5px;max-width:520px;margin:0 auto}
+.lr-cell{
+  position:relative;aspect-ratio:1;min-width:0;padding:6px 7px 5px;
+  display:grid;grid-template-rows:auto 1fr auto;
+  background:var(--bg-3);border:1px solid var(--rule-2);border-radius:8px;font-family:var(--font-title);overflow:hidden
+}
+.lr-cell .gen{display:flex;align-items:center;justify-content:space-between;gap:3px;font-size:12.5px;letter-spacing:.06em;line-height:1.3;white-space:nowrap;min-height:18px}
+.lr-cell .gen .g{color:var(--zi-2)}
+.lr-cell .gen .g.x{color:var(--zhu)}
+.lr-cell .gen .g.gui{color:var(--fg);font-weight:600}
+.lr-cell .gen .g.gui::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--fg-2);margin-left:3px;vertical-align:2px}
+.lr-cell .tb{display:flex;align-items:center;justify-content:center;gap:2px;line-height:1}
+.lr-cell .tb b{font-weight:600;font-size:27px;color:var(--wc,var(--fg))}
+.lr-cell .tb .dun{font-size:11.5px;color:var(--faint);align-self:flex-start;margin-top:3px}
+.lr-cell .db{display:flex;align-items:flex-end;justify-content:space-between;gap:3px;min-height:17px}
+.lr-cell .db .d{font-size:12px;color:var(--faint);letter-spacing:.05em}
+.lr-cell .mk{display:flex;gap:2px}
+.lr-cell .mk i,.lr-cell .bd i{font-style:normal;font-size:10px;line-height:15px;min-width:15px;padding:0 3px;text-align:center;border-radius:3px;letter-spacing:0}
+.lr-cell .mk i{color:var(--muted);border:1px solid var(--rule-2)}
+.lr-cell .mk i.gan,.lr-cell .mk i.zhi{color:var(--fg-2);border-color:var(--zi-2)}
+.lr-cell .mk i.ming{background:var(--zi);border-color:var(--zi);color:#fff}
+.lr-cell .bd{display:flex;gap:2px}
+.lr-cell .bd i{background:var(--zi);color:#fff}
+.lr-cell .bd i.z,.lr-cell .bd i.m{background:none;color:var(--fg-2);box-shadow:inset 0 0 0 1px var(--zi-2)}
+.lr-cell.c1{border-color:var(--zi-2);box-shadow:0 0 0 1px var(--zi-2),0 0 18px -6px rgba(169,148,224,.55)}
+.lr-cell.c2,.lr-cell.c3{border-color:color-mix(in oklab,var(--zi-2) 55%,var(--rule-2))}
+.lr-cell.kong{background:repeating-linear-gradient(135deg,transparent 0 11px,rgba(224,122,98,.08) 11px 12px),var(--bg-3)}
+.lr-cell.kong .tb b{opacity:.72}
+.lr-center{
+  grid-column:2 / span 2;grid-row:2 / span 2;min-width:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;
+  border:1px dashed var(--rule-2);border-radius:10px;padding:8px;font-family:var(--font-title)
+}
+.lr-center .jj{font-size:22px;font-weight:600;letter-spacing:.12em;color:var(--fg)}
+.lr-center .jj small{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:.2em;margin-top:2px}
+.lr-center .ln{font-size:12.5px;color:var(--fg-2);letter-spacing:.08em;line-height:1.55}
+.lr-center .ln em{font-style:normal;color:var(--muted)}
+.lr-center .ti{margin-top:2px;font-size:13px;color:var(--zi-2);letter-spacing:.12em}
+.lr-key{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:10px;font-size:11.5px;color:var(--faint);letter-spacing:.04em}
+.lr-key i{font-style:normal;display:inline-block;font-size:10px;line-height:15px;padding:0 4px;margin-right:4px;border-radius:3px}
+.lr-key .k1{background:var(--zi);color:#fff}
+.lr-key .k2{box-shadow:inset 0 0 0 1px var(--zi-2);color:var(--fg-2)}
+.lr-key .kg{border:1px solid var(--zi-2);color:var(--fg-2)}
+.lr-key .kk{width:15px;height:11px;vertical-align:-1px;background:repeating-linear-gradient(135deg,transparent 0 3px,rgba(224,122,98,.55) 3px 4px);border:1px solid var(--rule-2)}
+.lr-key .kx{color:var(--zhu);padding:0}
+.lr-key .kj{color:var(--zi-2);padding:0}
+
+/* 设置 */
+.lr-set{margin-top:10px;border-top:1px solid var(--rule);padding-top:8px;font-size:13px;color:var(--muted)}
+.lr-set summary{cursor:pointer;text-align:center;font-family:var(--font-title);font-size:12px;letter-spacing:.15em;color:var(--faint);list-style:none}
+.lr-set summary::-webkit-details-marker{display:none}
+.lr-set summary b{font-weight:400;color:var(--zi-2)}
+.lr-set .set-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.lr-set .set-row > label{font-family:var(--font-title);font-size:12px;letter-spacing:.15em;color:var(--muted);min-width:4.5em}
+.lr-set select{flex:1;min-width:0;background:var(--bg-3);border:1px solid var(--rule-2);border-radius:var(--r-sm);padding:5px 8px;font-size:13px}
+.lr-set .fb-seg button{padding:5px 12px}
+.lr-set .hint{font-size:12px;color:var(--faint);line-height:1.7;margin-top:8px}
+
+/* ---------- 四课 ---------- */
+.lr-card{padding:14px 16px}
+.lr-ke{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.lr-ke .col{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px 7px;border-radius:var(--r);background:var(--bg-3);border:1px solid var(--rule);font-family:var(--font-title);min-width:0}
+.lr-ke .col.use{border-color:var(--zi-2);box-shadow:inset 0 0 0 1px rgba(169,148,224,.35)}
+.lr-ke .n{font-size:11px;color:var(--faint);letter-spacing:.15em}
+.lr-ke .g{font-size:12.5px;color:var(--zi-2);letter-spacing:.05em}
+.lr-ke .g.x{color:var(--zhu)}
+.lr-ke .u{font-size:24px;font-weight:600;line-height:1.15;color:var(--wc,var(--fg))}
+.lr-ke .l{font-size:17px;line-height:1.15;color:var(--wc,var(--muted));opacity:.8;padding-top:3px;border-top:1px solid var(--rule-2);min-width:1.6em;text-align:center}
+.lr-ke .l.stem{opacity:1;font-weight:600}
+.lr-ke .rel{font-size:11px;color:var(--faint);letter-spacing:.04em;white-space:nowrap}
+.lr-ke .rel.zei,.lr-ke .rel.ke{color:var(--zhu)}
+
+/* ---------- 三传 ---------- */
+.lr-sc{display:flex;flex-direction:column;gap:6px}
+.lr-sc .row{display:grid;grid-template-columns:3.2em 3.2em 1.4em 2.2em minmax(0,1fr);align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);background:var(--bg-3);border:1px solid var(--rule);font-family:var(--font-title)}
+.lr-sc .row.r0{border-color:var(--zi-2)}
+.lr-sc .lab{font-size:12px;color:var(--muted);letter-spacing:.15em}
+.lr-sc .lq{font-size:14px;color:var(--fg-2);letter-spacing:.06em}
+.lr-sc .dun{font-size:13px;color:var(--faint);text-align:center}
+.lr-sc .z{font-size:24px;font-weight:600;line-height:1.1;color:var(--wc,var(--fg));text-align:center}
+.lr-sc .ex{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;font-size:14px;color:var(--zi-2);letter-spacing:.06em}
+.lr-sc .ex .x{color:var(--zhu)}
+.lr-sc .ex small{font-size:11px;color:var(--faint);letter-spacing:.02em;font-family:var(--font-body)}
+.lr-sc .ex .kong{font-size:11px;line-height:16px;padding:0 6px;border-radius:999px;color:var(--zhu);border:1px solid rgba(224,122,98,.6)}
+.lr-why{margin-top:10px;font-size:13px;line-height:1.75;color:var(--fg-2)}
+.lr-why b{font-family:var(--font-title);font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.15em;margin-right:6px}
+
+/* ---------- 神煞 ---------- */
+.lr-ss{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.6em,1fr));gap:6px}
+.lr-ss .s{display:flex;align-items:baseline;gap:6px;padding:5px 9px;border-radius:var(--r-sm);background:var(--bg-3);border:1px solid var(--rule);font-family:var(--font-title);font-size:13px;color:var(--fg-2);min-width:0;cursor:default}
+.lr-ss .s b{font-size:16px;font-weight:600;color:var(--wc,var(--fg))}
+.lr-ss .s small{margin-left:auto;font-size:11px;color:var(--faint);white-space:nowrap}
+.lr-ss .s.in{border-color:var(--zi-2)}
+.lr-ss .s.in small{color:var(--zi-2)}
+
+/* ---------- 口径 ---------- */
+.lr-help{margin-top:18px;padding:16px 20px}
+.lr-help h3{font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:.2em;margin-bottom:8px}
+.lr-help ul{padding:0}
+.lr-help li{list-style:none;padding-left:14px;position:relative;font-size:13px;line-height:1.9;color:var(--fg-2)}
+.lr-help li::before{content:"";position:absolute;left:0;top:.9em;width:5px;height:5px;border-radius:50%;background:var(--zi-2)}
+.lr-help li b{font-family:var(--font-title);color:var(--fg);font-weight:600;margin-right:4px}
+
+@media (max-width:860px){
+  .lr-ctrl{min-width:0}
+  .lr-bh{margin-bottom:14px}
+  .lr-layout{grid-template-columns:1fr;gap:14px}
+  .lr-pan-card{padding:8px;position:static}
+  .lr-pan{gap:4px}
+  .lr-cell{padding:4px 4px 3px;border-radius:7px}
+  .lr-cell .gen{font-size:11px;letter-spacing:0}
+  .lr-cell .gen .g.gui::after{display:none}
+  .lr-cell .tb b{font-size:21px}
+  .lr-cell .tb .dun{font-size:10px;margin-top:1px}
+  .lr-cell .db .d{font-size:11px}
+  .lr-cell .mk i,.lr-cell .bd i{font-size:9px;line-height:13px;min-width:13px;padding:0 2px}
+  .lr-center{gap:3px;padding:6px 4px}
+  .lr-center .jj{font-size:18px}
+  .lr-center .jj small{font-size:11px;letter-spacing:.1em}
+  .lr-center .ln{font-size:11.5px;letter-spacing:.02em;line-height:1.5}
+  .lr-center .ti{font-size:12px;letter-spacing:.04em}
+  .lr-card{padding:12px}
+  .lr-ke{gap:4px}
+  .lr-ke .u{font-size:21px}
+  .lr-sc .row{grid-template-columns:2.8em 2.8em 1.2em 1.9em minmax(0,1fr);gap:6px;padding:7px 8px}
+  .lr-sc .z{font-size:21px}
+  .lr-sc .ex{font-size:13px;gap:4px}
+  .lr-help{padding:16px;margin-top:14px}
+}
+@media (max-width:380px){
+  .lr-ss{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+</head>
+<body data-tool="liuren">
+
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">壬</div>
+    <div>
+      <h1 class="fb-title">大六壬<span class="en">DA LIU REN</span></h1>
+      <p class="fb-sub">月将加时 · 四课三传 · 天将神煞 · 课体白话</p>
+    </div>
+  </header>
+
+  <!-- 此刻：起课 -->
+  <section class="fb-now" aria-label="起课">
+    <div class="fb-now-info">
+      <div class="fb-when"><span class="fb-tag" id="nowTag">此刻</span><span id="whenTxt"></span></div>
+      <div class="fb-pillars" id="pillars"></div>
+      <div class="fb-key" id="keyLine" aria-live="polite"></div>
+      <div class="fb-note lr-sub" id="subLine"></div>
+      <div class="lr-qi" id="qiLine"></div>
+      <div class="fb-note bad" id="qiWarn" hidden>距交中气不足一小时，月将可能有出入，请核对时刻</div>
+    </div>
+    <div class="fb-now-ctrl lr-ctrl">
+      <div class="fb-row">
+        <input type="datetime-local" id="dtIn" class="grow" min="1900-01-01T00:00" max="2100-12-31T23:59" aria-label="起课时间">
+        <button type="button" class="fb-btn" id="nowBtn">此刻</button>
+      </div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn grow" id="prevH" title="快捷键 ←">‹ 前一时</button>
+        <button type="button" class="fb-btn grow" id="nextH" title="快捷键 →">后一时 ›</button>
+      </div>
+      <div class="fb-row">
+        <input type="text" id="askIn" class="grow" maxlength="80" placeholder="所问何事（可空，复制与问 AI 时带上）" aria-label="所问">
+      </div>
+      <div class="fb-row lr-ming">
+        <label for="mingIn">年命</label>
+        <input type="number" id="mingIn" min="1900" max="2100" inputmode="numeric" placeholder="出生年" aria-label="出生年（立春前出生填上一年）">
+        <span class="fb-seg" id="sexSeg" role="group" aria-label="性别（定行年）"><button type="button" data-v="1">男</button><button type="button" data-v="0">女</button></span>
+        <span class="from" id="mingFrom"></span>
+      </div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn primary grow" id="copyBtn">复制</button>
+        <button type="button" class="fb-btn grow" id="aiBtn" title="把课式、白话和口径打包复制，贴给任意 AI">问 AI</button>
+        <button type="button" class="fb-btn grow" id="linkBtn">此课链接</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 白话 -->
+  <section class="fb-card bh lr-bh" id="bhBox" aria-label="白话"></section>
+
+  <div class="lr-layout">
+    <section class="fb-card lr-pan-card" aria-label="式盘">
+      <div class="lr-pan" id="pan" role="group" aria-label="天地盘，南（午）在上"></div>
+      <div class="lr-key">
+        <span><i class="k1">初</i><i class="k2">中末</i>三传</span>
+        <span><i class="kg">干</i><i class="kg">支</i>日干寄宫、日支</span>
+        <span><i class="kk"></i>旬空</span>
+        <span><i class="kj">青龙</i>吉将 <i class="kx">白虎</i>凶将</span>
+      </div>
+      <div class="lr-key" style="margin-top:4px">
+        <span>每格：上天将 · 中天盘支（左上小字遁干）· 下地盘支</span>
+      </div>
+      <details class="lr-set" id="setBox">
+        <summary>口径设置 · <b id="setSum"></b></summary>
+        <div class="set-row">
+          <label for="guiSel">贵人</label>
+          <select id="guiSel">
+            <option value="niuyang">甲戊庚牛羊（默认，昼丑夜未）</option>
+            <option value="yangniu">甲羊戊庚牛（《协纪辨方书》，昼未夜丑）</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <label>昼夜</label>
+          <span class="fb-seg" id="dnSeg"><button type="button" data-v="auto">按占时</button><button type="button" data-v="day">昼贵</button><button type="button" data-v="night">夜贵</button></span>
+        </div>
+        <div class="set-row">
+          <label for="shSel">涉害</label>
+          <select id="shSel">
+            <option value="mzj">孟仲季（默认，《大六壬指南》）</option>
+            <option value="shuke">数克古法（《大六壬大全》）</option>
+          </select>
+        </div>
+        <p class="hint">按占时：卯至申为昼、酉至寅为夜；日出早晚不同、自定昼夜的，选昼贵或夜贵。改了就记在本机。</p>
+      </details>
+    </section>
+
+    <div class="lr-side">
+      <section class="fb-card lr-card" aria-label="三传">
+        <div class="lr-h"><h2>三传</h2><small id="scSub"></small></div>
+        <div class="lr-sc" id="scBox"></div>
+        <p class="lr-why" id="whyBox"></p>
+      </section>
+      <section class="fb-card lr-card" aria-label="四课">
+        <div class="lr-h"><h2>四课</h2><small>自右而左：一课干上 · 二课干阴 · 三课支上 · 四课支阴</small></div>
+        <div class="lr-ke" id="keBox"></div>
+      </section>
+      <section class="fb-card lr-card" aria-label="神煞">
+        <div class="lr-h"><h2>神煞</h2><small>右侧小字：天盘所临之地，入传者标出</small></div>
+        <div class="lr-ss" id="ssBox"></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="fb-card lr-help" aria-label="口径">
+    <h3>口径</h3>
+    <ul id="rulesList"></ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/bazi/bazi.js?v=2"></script>
+<script src="/liuren/liuren.js?v=1"></script>
+<script src="/fabao/fabao.js?v=13"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, LR = window.LR, Z = LR.ZHI, G = LR.GAN;
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const WEEK = '日一二三四五六';
+const LS = 'liuren.view.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+// ming：null 取命部生辰，'' 不看年命，数字为手填；male：null 随命部
+const view = Object.assign({ gui: 'niuyang', dn: 'auto', shehai: 'mzj', ming: null, male: null }, store.get(LS, {}));
+const saveView = () => store.set(LS, view);
+let date = null, cur = null, isNow = true;
+
+/* ================ 年命 ================ */
+function birthDefault() {
+  const b = F.birth && F.birth.load();
+  const y = b && F.birth.yearOf(b);
+  return y ? { year: y.gzYear, male: b.male !== false, name: b.name || '' } : null;
+}
+function opts() {
+  const bd = birthDefault();
+  const ming = view.ming === null ? (bd ? bd.year : null) : view.ming === '' ? null : +view.ming;
+  const male = view.male === null ? (bd ? bd.male : true) : !!view.male;
+  return { gui: view.gui, dn: view.dn, shehai: view.shehai, mingYear: ming, male };
+}
+function paintMing(o) {
+  const bd = birthDefault();
+  $('mingIn').value = o.mingYear || '';
+  document.querySelectorAll('#sexSeg button').forEach(b => b.classList.toggle('on', o.mingYear != null && (b.dataset.v === '1') === o.male));
+  $('mingFrom').textContent = view.ming === null && bd ? '取自命部' : '';
+}
+
+/* ================ 起课 ================ */
+function setDate(d, now) {
+  if (!LR.inRange(d)) { F.toast('只能排 1900–2100 年'); $('dtIn').value = F.toLocalInput(date); return; }
+  date = d; isNow = !!now; render();
+}
+function render() {
+  const o = opts();
+  cur = LR.cast(date, o);
+  if (!cur) { F.toast('这一刻排不出来（超出 1900–2100）'); return; }
+  paintMing(o);
+  renderNow(); renderBh(); renderPan(); renderChuan(); renderKe(); renderSha(); renderRules(); paintSet();
+}
+const fmtMD = t => { const d = new Date(t); return `${d.getMonth() + 1}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+function renderNow() {
+  const c = cur, d = c.date;
+  $('nowTag').textContent = isNow ? '此刻' : '起课时刻';
+  $('whenTxt').textContent = `${F.fmt(d)} 周${WEEK[d.getDay()]}${c.lunarText ? ' · 农历' + c.lunarText : ''} · ${Z[c.hour]}时`;
+  $('pillars').innerHTML = [['年', 0], ['月', 1], ['日', 2], ['时', 3]].map(([l, i]) => `<span class="fb-pillar"><small>${l}</small><b>${c.pillars[i].name}</b></span>`).join('');
+  const x = c.chuan[0];
+  $('keyLine').innerHTML = `<strong>${esc(c.title)}</strong><span class="sep">·</span>初传 <strong>${Z[x.zhi]}</strong> ${x.genName}<span class="sep">·</span>${x.lq}${x.kong ? '<span class="sep">·</span>旬空' : ''}`;
+  $('subLine').innerHTML = `<span><b>${Z[c.jiang]}将</b>（${c.jiangName}）加<b>${Z[c.hour]}时</b></span><span class="sep">·</span>
+    <span>${c.gui.day ? '昼' : '夜'}贵 <b>${Z[c.gui.zhi]}</b>临${Z[c.gui.at]}${c.gui.shun ? '顺' : '逆'}布</span><span class="sep">·</span>
+    <span>旬空 <b>${c.xun.kong.map(z => Z[z]).join('')}</b></span><span class="sep">·</span>
+    <span>驿马 <b>${Z[c.shensha.find(s => s.n === '驿马').zhi]}</b></span>`;
+  const q = c.qi;
+  $('qiLine').innerHTML = `<span><b>${q.prev.n}</b> ${fmtMD(q.prev.t)} 交，${Z[c.jiang]}将</span>${q.next ? `<span>下一中气 <b>${q.next.n}</b> ${fmtMD(q.next.t)} 换${Z[LR.mod(c.jiang - 1, 12)]}将</span>` : ''}<span>（本机时区）</span>`;
+  $('qiWarn').hidden = !c.nearQi;
+}
+function renderBh() {
+  const c = cur, rows = LR.plain(c);
+  $('bhBox').innerHTML = `<div class="bh-h"><span class="fb-tag">白话 · 参考</span><small>按课体与初传读个大概；断事仍看类神、年命与所问</small></div>
+    ${c.keti.length > 1 ? `<div class="lr-chips">${c.keti.map((k, i) => `<span class="${i ? '' : 'main'}">${esc(k.n)}</span>`).join('')}</div>` : ''}
+    ${rows.map(r => `<div class="r"><i>${r.lab}</i><span>${r.html}</span></div>`).join('')}`;
+}
+
+/* ================ 式盘 ================ */
+// 地盘位在四方格里的位置（南上）：巳午未申 / 辰□□酉 / 卯□□戌 / 寅丑子亥
+const AREA = { 5: [1, 1], 6: [1, 2], 7: [1, 3], 8: [1, 4], 9: [2, 4], 10: [3, 4], 11: [4, 4], 0: [4, 3], 1: [4, 2], 2: [4, 1], 3: [3, 1], 4: [2, 1] };
+function renderPan() {
+  const c = cur, gp = LR.JI[c.day.gan], zp = c.day.zhi;
+  const ming = c.ming;
+  let h = '';
+  for (let p = 0; p < 12; p++) {
+    const b = c.sky[p], gi = c.gen[b], gn = LR.GEN[gi];
+    const ci = c.sc.map((x, i) => x === b ? i : -1).filter(i => i >= 0);
+    const cls = ['lr-cell', ci.includes(0) ? 'c1' : ci.length ? 'c' + (ci[0] + 1) : '', c.xun.kong.includes(b) ? 'kong' : ''].filter(Boolean).join(' ');
+    const bd = ci.map(i => `<i class="${['c', 'z', 'm'][i]}">${'初中末'[i]}</i>`).join('');
+    const mk = [p === gp ? '<i class="gan" title="日干寄宫">干</i>' : '', p === zp ? '<i class="zhi" title="日支">支</i>' : '',
+      ming && ming.zhi === p ? '<i class="ming" title="本命">命</i>' : '', ming && ming.xing && ming.xing.zhi === p ? '<i class="ming" title="行年">年</i>' : ''].join('');
+    const dun = c.dun[b];
+    const say = `地盘${Z[p]}上天盘${Z[b]}，乘${gn}${dun == null ? '，旬空' : '，遁' + G[dun]}${ci.length ? '，' + ci.map(i => '初中末'[i] + '传').join('、') : ''}`;
+    h += `<div class="${cls}" style="grid-row:${AREA[p][0]};grid-column:${AREA[p][1]}" role="img" aria-label="${say}" title="${say}">
+      <div class="gen"><span class="g${gi === 0 ? ' gui' : LR.GEN_JI[gi] ? '' : ' x'}">${gn}</span><span class="bd">${bd}</span></div>
+      <div class="tb" data-w="${LR.ZHI_WX[b]}"><span class="dun">${dun == null ? '空' : G[dun]}</span><b>${Z[b]}</b></div>
+      <div class="db"><span class="d">${Z[p]}</span><span class="mk">${mk}</span></div>
+    </div>`;
+  }
+  h += `<div class="lr-center" style="grid-row:2 / span 2;grid-column:2 / span 2">
+    <div class="jj">${Z[c.jiang]}将加${Z[c.hour]}<small>${c.jiangName} · ${c.qi.prev.n}后</small></div>
+    <div class="ln">${c.gui.day ? '昼' : '夜'}贵${Z[c.gui.zhi]} · ${c.gui.shun ? '顺' : '逆'}布<br><em>旬首</em>${c.xun.name} <em>旬空</em>${c.xun.kong.map(z => Z[z]).join('')}</div>
+    <div class="ti">${esc(c.title)}</div>
+  </div>`;
+  $('pan').innerHTML = h;
+}
+
+/* ================ 三传 · 四课 · 神煞 ================ */
+function renderChuan() {
+  const c = cur;
+  $('scSub').textContent = c.keti.slice(1).map(k => k.n).join(' · ') || c.gate + '法';
+  $('scBox').innerHTML = c.chuan.map((x, i) => `<div class="row r${i}">
+    <span class="lab">${'初中末'[i]}传</span><span class="lq">${x.lq}</span><span class="dun">${x.dun == null ? '空' : G[x.dun]}</span>
+    <b class="z" data-w="${LR.ZHI_WX[x.zhi]}">${Z[x.zhi]}</b>
+    <span class="ex"><span class="${LR.GEN_JI[x.gen] ? '' : 'x'}">${x.genName}</span>${x.kong ? '<span class="kong">旬空</span>' : ''}${x.ws ? `<small>${LR.WX[LR.ZHI_WX[x.zhi]]}${x.ws}</small>` : ''}<small>临${Z[x.at]}</small></span>
+  </div>`).join('');
+  $('whyBox').innerHTML = `<b>发用</b>${esc(c.why)}`;
+}
+function renderKe() {
+  const c = cur, use = ['贼克', '比用', '涉害', '遥克'].includes(c.gate) || (c.gate === '返吟' && c.sub === '无依');
+  $('keBox').innerHTML = [3, 2, 1, 0].map(i => {
+    const k = c.ke[i];
+    const hit = use && k.up === c.sc[0] && (k.zei || k.ke || c.gate === '遥克');
+    const lw = k.stem != null ? LR.GAN_WX[k.stem] : LR.ZHI_WX[k.low];
+    return `<div class="col${hit ? ' use' : ''}">
+      <span class="n">${k.name}</span>
+      <span class="g${LR.GEN_JI[k.gen] ? '' : ' x'}">${k.genName}</span>
+      <b class="u" data-w="${LR.ZHI_WX[k.up]}">${Z[k.up]}</b>
+      <span class="l${k.stem != null ? ' stem' : ''}" data-w="${lw}">${k.lowName}</span>
+      <span class="rel${k.zei ? ' zei' : k.ke ? ' ke' : ''}">${k.rel}</span>
+    </div>`;
+  }).join('');
+}
+function renderSha() {
+  const c = cur;
+  $('ssBox').innerHTML = c.shensha.map(s => {
+    const where = s.inSc.length ? '入' + s.inSc.join('') + '传' : '临' + Z[s.at];
+    return `<div class="s${s.inSc.length ? ' in' : ''}" title="${esc(s.how)}">${s.n}<b data-w="${LR.ZHI_WX[s.zhi]}">${Z[s.zhi]}</b><small>${where}${s.kong ? ' · 空' : ''}</small></div>`;
+  }).join('') + `<div class="s" title="以日旬">旬空<b>${c.xun.kong.map(z => Z[z]).join('')}</b><small>${c.xun.name}旬</small></div>`;
+}
+function rulesText() { return LR.rules(opts()).map(r => `· ${r[0]}：${r[1]}`).join('\n'); }
+function renderRules() { $('rulesList').innerHTML = LR.rules(opts()).map(r => `<li><b>${r[0]}</b>${esc(r[1])}</li>`).join(''); }
+
+/* ================ 口径设置 ================ */
+function paintSet() {
+  $('guiSel').value = view.gui; $('shSel').value = view.shehai;
+  document.querySelectorAll('#dnSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === view.dn));
+  $('setSum').textContent = [LR.GUI[view.gui].name, view.dn === 'auto' ? '昼夜按占时' : view.dn === 'day' ? '定昼贵' : '定夜贵', '涉害' + LR.SHEHAI[view.shehai]].join(' · ');
+}
+$('guiSel').onchange = () => { view.gui = $('guiSel').value; saveView(); render(); };
+$('shSel').onchange = () => { view.shehai = $('shSel').value; saveView(); render(); };
+document.querySelectorAll('#dnSeg button').forEach(b => b.onclick = () => { view.dn = b.dataset.v; saveView(); render(); });
+
+/* ================ 年命 · 所问 ================ */
+$('mingIn').addEventListener('change', () => {
+  const v = $('mingIn').value.trim();
+  if (v && !(+v >= 1900 && +v <= 2100)) { F.toast('出生年请填 1900–2100'); paintMing(opts()); return; }
+  const bd = birthDefault();
+  view.ming = !v ? '' : bd && +v === bd.year ? null : +v;     // 填回命部那一年，就仍跟着命部走
+  saveView(); render();
+});
+document.querySelectorAll('#sexSeg button').forEach(b => b.onclick = () => {
+  view.male = b.dataset.v === '1';
+  if (!opts().mingYear) { F.toast('先填出生年，行年才排得出'); }
+  saveView(); render();
+});
+// 命部换了人、改了生辰：跟着换（只在年命未手填时）
+window.addEventListener('storage', e => { if (e.key && e.key.indexOf('mingbu.') === 0 && cur) render(); });
+document.addEventListener('fabao:person', () => { if (cur) render(); });
+
+/* ================ 时间 ================ */
+date = F.bindWhen($('dtIn'), $('nowBtn'), (d, now) => setDate(d, now));
+isNow = !F.linkedTime();
+function step(k) {
+  const d = new Date(date.getTime() + k * 2 * 3600e3);
+  if (!LR.inRange(d)) { F.toast('只能排 1900–2100 年'); return; }
+  $('dtIn').value = F.toLocalInput(d); setDate(d, false);
+}
+$('prevH').onclick = () => step(-1);
+$('nextH').onclick = () => step(1);
+// 开着不关：「此刻」跟着钟走；课只在换日、换时辰、换将时重排
+setInterval(() => {
+  if (!isNow || !cur || document.activeElement === $('dtIn')) return;
+  const d = new Date(); d.setSeconds(0, 0);
+  if (d.getTime() === date.getTime() || !LR.inRange(d)) return;
+  const c = LR.cast(d, opts());
+  if (!c) return;
+  const same = c.day.idx === cur.day.idx && c.hour === cur.hour && c.jiang === cur.jiang;
+  date = d; $('dtIn').value = F.toLocalInput(d);
+  if (same) { cur = c; renderNow(); } else render();
+}, 30000);
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,textarea,select') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+});
+
+/* ================ 复制 · 问 AI · 链接 ================ */
+const ask = () => $('askIn').value.trim();
+const plainText = () => LR.plain(cur).map(r => `${r.lab}：${r.html.replace(/<[^>]+>/g, '')}`).join('\n');
+$('copyBtn').onclick = () => { if (cur) F.copy(LR.text(cur, { ask: ask() }), '课式已复制'); };
+$('aiBtn').onclick = () => {
+  if (!cur) return;
+  F.askAI('大六壬', LR.text(cur, { ask: ask() }) + '\n\n本站白话（参考）：\n' + plainText(), rulesText());
+};
+$('linkBtn').onclick = () => {
+  const u = new URL(location.href); u.search = ''; u.hash = '';
+  u.searchParams.set('t', F.toLocalInput(date));
+  F.copy(u.toString(), '此课链接已复制');
+};
+
+render();
+})();
+</script>
+</body>
+</html>

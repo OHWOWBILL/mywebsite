@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#17131F" />
   <title>星盘 · 潜蛟阁法宝库</title>
-  <meta name="description" content="西洋占星本命盘：出生地经纬度与时区，回归黄道，Placidus、整宫、等宫、波菲利宫制；行星星座宫位、逆行、庙旺陷弱，主要相位与入相出相；昼夜、福点、法达（含子运）与小限年主星。" />
+  <meta name="description" content="西洋占星本命盘与推运：出生地经纬度与时区，回归黄道，Placidus、整宫、等宫、波菲利宫制；行星星座宫位、逆行、庙旺陷弱，主要相位与入相出相；昼夜、福点、法达（含子运）与小限年主星。行运（今天最要紧的三条、外行星十二个月精确日期、次限）、太阳回归盘、逆行日历（含水逆影子期）与月亮空亡。" />
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,7 +56,15 @@
     .xp-wheel .asp.conj { stroke: var(--jin); }
     .xp-wheel .asp.dim { opacity: .14; }
     .xp-wheel .asp.hl { opacity: 1; stroke-width: 1.8; }
+    .xp-wheel .asp.tr { stroke-dasharray: 5 4; }
     .xp-wheel .inner { fill: var(--bg); stroke: var(--rule-2); }
+    /* 行运盘：外圈画行运星（青） */
+    .xp-wheel .tg { font-family: var(--glyph); font-size: 20px; text-anchor: middle; dominant-baseline: central; fill: var(--qing); cursor: pointer; }
+    .xp-wheel .tpin { stroke: var(--qing); stroke-width: 1; }
+    .xp-wheel .tdot { fill: none; stroke: var(--qing); stroke-width: 1.2; }
+    .xp-wheel .tr-r { font-family: var(--font-mark); font-size: 9px; fill: var(--zhu); text-anchor: middle; dominant-baseline: central; }
+    .xp-legend { text-align: center; font-size: 12px; color: var(--muted); letter-spacing: .08em; margin-top: 4px; }
+    .xp-legend i { font-style: normal; color: var(--qing); }
 
     .xp-card { padding: 16px 18px; }
     .xp-card h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
@@ -77,7 +85,7 @@
     .xp-asps button:hover, .xp-asps button.on { border-color: var(--zi-2); }
     .xp-asps .g { font-family: var(--glyph); font-size: 14px; color: var(--fg); margin-right: 3px; }
     .xp-asps .t { font-family: var(--glyph); font-size: 15px; text-align: center; }
-    .xp-asps .t.hard { color: var(--zhu); } .xp-asps .t.soft { color: var(--lv); } .xp-asps .t.conj { color: var(--jin); }
+    .xp-asps .t.hard, .xp-tr .t.hard { color: var(--zhu); } .xp-asps .t.soft, .xp-tr .t.soft { color: var(--lv); } .xp-asps .t.conj, .xp-tr .t.conj { color: var(--jin); }
     .xp-asps .o { font-family: var(--font-mark); font-size: 11px; color: var(--muted); }
     .xp-dl { font-size: 13px; line-height: 1.75; color: var(--fg-2); }
     .xp-dl > div { display: grid; grid-template-columns: 4em minmax(0, 1fr); gap: 8px; padding: 4px 0; border-top: 1px dashed var(--rule); }
@@ -110,6 +118,105 @@
     /* 白话：盘上几句大白话，随盘重画（八字、紫微同式） */
     .bh .r em { font-style: normal; font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .08em; margin: 0 4px; }
 
+    /* —— 视图切换：本命 · 行运 · 回归 · 逆行 · 空亡 —— */
+    .xp-views { display: flex; width: 100%; max-width: 620px; margin: 0 0 16px; }
+    .xp-views button { padding: 7px 8px; font-size: 14px; }
+    .xp-views .badge { font-family: var(--font-title); }
+    /* 非本命视图：生辰面板收成一行，要改再展开 */
+    .xp-who { display: none; min-width: 0; font-size: 13.5px; color: var(--muted); letter-spacing: .04em; line-height: 1.8; }
+    .xp-who b { font-family: var(--font-title); font-weight: 600; color: var(--fg); letter-spacing: .1em; }
+    .xp-who .fb-btn, .xp-fold { padding: 2px 10px; font-size: 12.5px; letter-spacing: .1em; vertical-align: 1px; }
+    .xp-who .fb-btn { color: var(--zi-2); }
+    .fb-now.compact { padding-top: 14px; padding-bottom: 14px; align-items: center; }
+    .fb-now.compact .xp-form, .fb-now.compact #libSel, .fb-now.compact .xp-side-ctrl .fb-fine { display: none; }
+    .fb-now.compact .xp-who { display: block; }
+
+    .xp-view { display: flex; flex-direction: column; gap: 14px; }
+    .xp-lead-h { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 10px; }
+    .xp-lead-h h3 { margin-bottom: 0; }
+    .xp-ctl { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+    .xp-ctl .fb-btn { padding: 5px 11px; font-size: 13px; letter-spacing: .08em; }
+    .fb-main .xp-ctl input, .fb-main .xp-ctl select { padding: 5px 8px; font-size: 13px; }
+    .xp-ctl .yr { font-family: var(--font-mark); font-weight: 800; font-size: 15px; min-width: 3.4em; text-align: center; color: var(--fg); }
+    .xp-lead .fb-key { margin: 2px 0 12px; font-size: 18px; }
+    .xp-lead .fb-key small { font-size: 13px; color: var(--muted); letter-spacing: .06em; font-weight: 400; }
+    .xp-badge { display: inline-block; padding: 1px 12px; margin-right: 6px; border-radius: 999px; font-family: var(--font-title); font-size: 14px; letter-spacing: .12em; vertical-align: 2px; white-space: nowrap; }
+    .xp-badge.on { background: rgba(224, 122, 98, .16); color: var(--zhu); box-shadow: inset 0 0 0 1px rgba(224, 122, 98, .55); }
+    .xp-badge.half { background: rgba(217, 174, 78, .12); color: var(--jin); box-shadow: inset 0 0 0 1px rgba(217, 174, 78, .45); }
+    .xp-badge.off { background: rgba(141, 191, 151, .12); color: var(--lv); box-shadow: inset 0 0 0 1px rgba(141, 191, 151, .45); }
+    .xp-note { font-size: 13px; color: var(--fg-2); line-height: 1.8; }
+    .xp-note b { font-family: var(--font-title); color: var(--fg); font-weight: 600; }
+
+    /* 今天最要紧的三条 */
+    .xp-top3 { list-style: none; display: flex; flex-direction: column; gap: 8px; counter-reset: k; }
+    .xp-top3 li { display: grid; grid-template-columns: 1.6em minmax(0, 1fr); gap: 4px 10px; padding: 10px 12px; border-radius: var(--r); background: var(--bg-3); }
+    .xp-top3 li::before { counter-increment: k; content: counter(k); font-family: var(--font-mark); font-weight: 800; font-size: 18px; line-height: 1.4; color: var(--zi-2); text-align: center; }
+    .xp-top3 .h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; }
+    .xp-top3 b { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .06em; color: var(--fg); }
+    .xp-top3 b .g { font-family: var(--glyph); font-weight: 400; margin-right: 2px; }
+    .xp-top3 .g.q { color: var(--qing); }
+    .xp-top3 .g.ax { font-family: var(--font-mark); font-size: 11px; font-weight: 800; }
+    .xp-top3 .meta { font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+    .xp-top3 p { font-size: 13.5px; color: var(--fg-2); line-height: 1.75; margin-top: 2px; }
+
+    /* 行运相位列表、外行星十二个月 */
+    .xp-tr { display: flex; flex-direction: column; gap: 3px; }
+    .xp-tr .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; text-align: left; padding: 5px 8px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent; font-size: 12.5px; color: var(--fg-2); width: 100%; }
+    .xp-tr button.row:hover, .xp-tr .row.on { border-color: var(--zi-2); }
+    .xp-tr .row.now { box-shadow: inset 3px 0 0 var(--jin); }
+    .xp-tr .g { font-family: var(--glyph); font-size: 14px; color: var(--fg); margin-right: 2px; }
+    .xp-tr .g.q { color: var(--qing); }
+    .xp-tr .g.ax { font-family: var(--font-mark); font-size: 10px; font-weight: 800; }
+    .xp-tr .t { font-family: var(--glyph); font-size: 14px; margin: 0 5px; }
+    .xp-tr .o { font-family: var(--font-mark); font-size: 11px; color: var(--muted); text-align: right; white-space: nowrap; }
+    .xp-tr .o b { font-weight: 500; color: var(--fg-2); }
+    .xp-tr .d { display: flex; flex-wrap: wrap; gap: 3px 6px; font-family: var(--font-mark); font-size: 11.5px; color: var(--fg-2); justify-content: flex-end; }
+    .xp-tr .d span { white-space: nowrap; }
+    .xp-tr .d .r { color: var(--zhu); }
+    .xp-tr .d .past { color: var(--faint); }
+    .xp-tr em { font-style: normal; font-size: 11.5px; color: var(--muted); margin-left: 4px; }
+    .xp-tr .tag { font-size: 10.5px; color: var(--jin); font-family: var(--font-title); margin-left: 6px; white-space: nowrap; }
+    .xp-scroll { max-height: 420px; overflow-y: auto; }
+
+    /* 逆行时间轴 */
+    .xp-rt { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+    .xp-rt .ln { display: grid; grid-template-columns: 4.4em minmax(0, 1fr); gap: 8px; align-items: center; }
+    .xp-rt .lab { font-family: var(--font-title); font-size: 12.5px; color: var(--fg-2); white-space: nowrap; }
+    .xp-rt .lab .g { font-family: var(--glyph); margin-right: 3px; color: var(--fg); }
+    .xp-rt .ln.mer .lab { color: var(--fg); font-weight: 600; }
+    .xp-rt .mon { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); font-family: var(--font-mark); font-size: 10px; color: var(--faint); text-align: center; }
+    .xp-rt .mon i { font-style: normal; }
+    .xp-rt .trk { position: relative; height: 16px; border-radius: 4px; background-color: var(--bg-3);
+      background-image: repeating-linear-gradient(to right, transparent 0, transparent calc(100% / 12 - 1px), var(--rule) calc(100% / 12 - 1px), var(--rule) calc(100% / 12)); }
+    .xp-rt .ln.mer .trk { height: 20px; box-shadow: inset 0 0 0 1px rgba(224, 122, 98, .35); }
+    .xp-rt .trk i { position: absolute; top: 2px; bottom: 2px; border-radius: 3px; background: var(--zhu); opacity: .85; }
+    .xp-rt .trk i.sh { background: var(--zhu); opacity: .22; }
+    .xp-rt .trk b { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--jin); border-radius: 1px; }
+    .xp-rt-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+    .xp-rt-key i { display: inline-block; width: 18px; height: 9px; border-radius: 2px; background: var(--zhu); opacity: .85; margin-right: 5px; vertical-align: 0; }
+    .xp-rt-key i.sh { opacity: .22; } .xp-rt-key i.tdy { width: 2px; height: 12px; background: var(--jin); opacity: 1; vertical-align: -2px; }
+    .xp-mer { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+    .xp-mer .p { padding: 10px 12px; border-radius: var(--r); background: var(--bg-3); border: 1px solid transparent; font-size: 12.5px; color: var(--fg-2); line-height: 1.75; }
+    .xp-mer .p.now { border-color: var(--zhu); }
+    .xp-mer .p.near { border-color: rgba(217, 174, 78, .6); }
+    .xp-mer .p h4 { font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .1em; color: var(--fg); margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+    .xp-mer .p h4 small { font-weight: 400; font-size: 11.5px; color: var(--muted); letter-spacing: .04em; }
+    .xp-mer .st { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 0 8px; }
+    .xp-mer .st dt { font-family: var(--font-title); font-size: 12px; color: var(--faint); }
+    .xp-mer .st dd { font-family: var(--font-mark); font-size: 12px; }
+    .xp-mer .st dd.r { color: var(--zhu); }
+    .xp-mer .fine { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* 月亮空亡 */
+    .xp-vc { display: flex; flex-direction: column; gap: 4px; }
+    .xp-vc .v { display: grid; grid-template-columns: 6.6em minmax(0, 1fr) auto; gap: 2px 10px; align-items: baseline; padding: 7px 10px; border-radius: var(--r-sm); background: var(--bg-3); font-size: 13px; color: var(--fg-2); }
+    .xp-vc .v.now { background: rgba(224, 122, 98, .12); box-shadow: inset 3px 0 0 var(--zhu); color: var(--fg); }
+    .xp-vc .v .day { font-family: var(--font-title); color: var(--fg); letter-spacing: .06em; white-space: nowrap; }
+    .xp-vc .v .tm { font-family: var(--font-mark); font-size: 13px; color: var(--fg); white-space: nowrap; }
+    .xp-vc .v .du { font-family: var(--font-mark); font-size: 11.5px; color: var(--muted); white-space: nowrap; text-align: right; }
+    .xp-vc .v .why { grid-column: 2 / -1; font-size: 12px; color: var(--muted); }
+    .xp-vc .v .why .g { font-family: var(--glyph); color: var(--fg-2); }
+
     @media (max-width: 1100px) {
       .xp-wrap { grid-template-columns: 1fr; }
       .xp-side { position: static; display: grid; grid-template-columns: 1fr 1fr; }
@@ -124,7 +231,27 @@
       .xp-wheel .sg { font-size: 24px; }
       .xp-wheel .hn { font-size: 15px; }
       .xp-wheel .ax { font-size: 15px; }
+      .xp-wheel .tg { font-size: 26px; }
+      .xp-wheel .tr-r { font-size: 12px; }
       .xp-form input[type=text] { width: 100%; }
+      .xp-views { max-width: none; }
+      .xp-views button { padding: 7px 2px; letter-spacing: .08em; }
+      .xp-views .badge { margin-left: 2px; padding: 0 4px; min-width: 0; }
+      .xp-lead .fb-key { font-size: 16px; }
+      .xp-card { padding: 14px 14px; }
+      .xp-ctl { width: 100%; }
+      .xp-ctl input[type=datetime-local] { flex: 1 1 100%; order: -1; }
+      .xp-ctl.dates .fb-btn { flex: 1; padding: 6px 4px; }
+      .xp-ctl select { flex: 1 1 10em; min-width: 0; }
+      .xp-tr .row { grid-template-columns: minmax(0, 1fr); }
+      .xp-tr .o, .xp-tr .d { text-align: left; justify-content: flex-start; }
+      .xp-vc .v { grid-template-columns: minmax(0, 1fr) auto; }
+      .xp-vc .v .tm { grid-column: 1; }
+      .xp-vc .v .why { grid-column: 1 / -1; }
+      .xp-rt .ln { grid-template-columns: 3.6em minmax(0, 1fr); gap: 6px; }
+      .xp-rt .lab .g, .xp-rt .mon i { display: none; }
+      .fb-now.compact { gap: 10px; }
+      .xp-who { font-size: 13px; }
     }
   </style>
 </head>
@@ -134,16 +261,26 @@
     <div class="fb-seal" aria-hidden="true">星</div>
     <div>
       <h1 class="fb-title">星盘<span class="en">NATAL CHART</span></h1>
-      <p class="fb-sub">本命盘 · 宫位相位 · 庙旺陷弱 · 法达 · 小限</p>
+      <p class="fb-sub">本命 · 行运 · 太阳回归 · 逆行 · 月亮空亡</p>
     </div>
   </header>
 
-  <section class="fb-now" aria-label="起盘">
+  <div class="fb-seg xp-views" id="viewSeg" role="tablist" aria-label="看什么">
+    <button type="button" role="tab" data-v="natal" class="on" aria-selected="true">本命</button>
+    <button type="button" role="tab" data-v="transit" aria-selected="false">行运</button>
+    <button type="button" role="tab" data-v="return" aria-selected="false">回归</button>
+    <button type="button" role="tab" data-v="retro" aria-selected="false">逆行</button>
+    <button type="button" role="tab" data-v="void" aria-selected="false">空亡</button>
+  </div>
+
+  <section class="fb-now" id="nowPanel" aria-label="起盘">
+    <div class="xp-who" id="whoBar"><span id="whoTxt"></span> <button class="fb-btn ghost" id="openForm" type="button">改生辰</button></div>
     <div class="xp-form">
       <div class="fb-row">
         <input type="datetime-local" id="whenIn" aria-label="出生时间（出生地钟表时间）">
         <button class="fb-btn" id="nowBtn" type="button">此刻</button>
         <input type="text" id="nameIn" placeholder="姓名或备注" maxlength="24" aria-label="姓名或备注">
+        <button class="fb-btn ghost xp-fold" id="foldForm" type="button" hidden>收起</button>
       </div>
       <div class="fb-row">
         <select id="cityIn" aria-label="出生地"></select>
@@ -169,7 +306,8 @@
     </div>
   </section>
 
-  <div class="xp-wrap">
+  <!-- 本命 -->
+  <div class="xp-wrap" id="v-natal">
     <div class="xp-main">
       <section class="fb-card bh" id="bhCard" aria-label="白话" hidden></section>
       <section class="fb-card xp-board" aria-label="星盘">
@@ -198,21 +336,148 @@
     </aside>
   </div>
 
+  <!-- 行运 -->
+  <div class="xp-view" id="v-transit" hidden>
+    <section class="fb-card xp-card xp-lead" aria-label="今天最要紧的三条">
+      <div class="xp-lead-h">
+        <h3>行运<small id="trSub"></small></h3>
+        <div class="xp-ctl dates" role="group" aria-label="行运日期">
+          <button class="fb-btn" type="button" data-tr="-M" title="前一个月">‹ 月</button>
+          <button class="fb-btn" type="button" data-tr="-D" title="前一天">‹ 日</button>
+          <input type="datetime-local" id="trWhen" aria-label="行运时刻（本机时间）">
+          <button class="fb-btn" type="button" data-tr="+D" title="后一天">日 ›</button>
+          <button class="fb-btn" type="button" data-tr="+M" title="后一个月">月 ›</button>
+          <button class="fb-btn primary" type="button" data-tr="0">今天</button>
+        </div>
+      </div>
+      <p class="fb-key" id="trKey"></p>
+      <div class="bh-h"><span class="fb-tag" id="trTopTag">今天最要紧的三条</span><small>按行运星轻重、落点、相位与紧密排 · 白话为常见说法，参考</small></div>
+      <ol class="xp-top3" id="trTop"></ol>
+    </section>
+    <div class="xp-wrap">
+      <div class="xp-main">
+        <section class="fb-card xp-card" aria-label="行运相位">
+          <h3>行运相位<small>行运星对本命十星与上升、中天 · 由紧到松 · 点一条，盘上只亮那一条</small></h3>
+          <div class="xp-tr" id="trAsp"></div>
+        </section>
+        <section class="fb-card xp-card" aria-label="外行星未来十二个月">
+          <h3>外行星 · 未来十二个月<small>木土天海冥与本命精确成相之日 · ℞ 为逆行经过</small></h3>
+          <div class="xp-tr xp-scroll" id="trHits"></div>
+        </section>
+        <section class="fb-card xp-board" aria-label="行运盘">
+          <div class="xp-bhead"><h2>行运盘</h2><p id="trWheelSub"></p></div>
+          <div class="xp-wheel" id="trWheel"></div>
+          <p class="xp-legend">内圈本命 · 外圈<i>行运</i> · 虚线为行运相位</p>
+        </section>
+      </div>
+      <aside class="xp-side">
+        <section class="fb-card xp-card" aria-label="行运星">
+          <h3>行运星<small>此刻落本命第几宫</small></h3>
+          <div style="overflow-x:auto"><table class="xp-t" id="trPos"></table></div>
+        </section>
+        <section class="fb-card xp-card" aria-label="次限">
+          <h3>次限<small id="progSub">一日一年</small></h3>
+          <div class="xp-dl" id="progBox"></div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <!-- 太阳回归 -->
+  <div class="xp-view" id="v-return" hidden>
+    <section class="fb-card xp-card xp-lead" aria-label="太阳回归">
+      <div class="xp-lead-h">
+        <h3>太阳回归<small>太阳回到出生时的黄经，起一年之盘</small></h3>
+        <div class="xp-ctl" role="group" aria-label="回归年份与地点">
+          <button class="fb-btn" type="button" data-sy="-1" title="前一年">‹</button>
+          <span class="yr" id="srYearTxt"></span>
+          <button class="fb-btn" type="button" data-sy="1" title="后一年">›</button>
+          <select id="srLoc" aria-label="回归盘地点"></select>
+        </div>
+      </div>
+      <p class="fb-key" id="srKey"></p>
+      <div class="xp-dl" id="srPoints"></div>
+    </section>
+    <div class="xp-wrap">
+      <div class="xp-main">
+        <section class="fb-card xp-board" aria-label="回归盘">
+          <div class="xp-bhead"><h2 id="srTitle">回归盘</h2><p id="srSub"></p></div>
+          <div class="xp-wheel" id="srWheel"></div>
+        </section>
+      </div>
+      <aside class="xp-side">
+        <section class="fb-card xp-card" aria-label="回归盘行星">
+          <h3>回归盘行星<small>星座 · 度数 · 回归盘宫位</small></h3>
+          <div style="overflow-x:auto"><table class="xp-t" id="srT"></table></div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <!-- 逆行日历 -->
+  <div class="xp-view" id="v-retro" hidden>
+    <section class="fb-card xp-card xp-lead" aria-label="逆行日历">
+      <div class="xp-lead-h">
+        <h3>逆行日历<small id="rtSub"></small></h3>
+        <div class="xp-ctl" role="group" aria-label="年份">
+          <button class="fb-btn" type="button" data-ry="-1" title="前一年">‹</button>
+          <span class="yr" id="rtYearTxt"></span>
+          <button class="fb-btn" type="button" data-ry="1" title="后一年">›</button>
+          <button class="fb-btn" type="button" data-ry="0">今年</button>
+        </div>
+      </div>
+      <p class="fb-key" id="rtKey"></p>
+      <p class="xp-note" id="rtNow"></p>
+      <div class="xp-rt" id="rtTL"></div>
+      <div class="xp-rt-key"><span><i></i>逆行（留逆至留顺）</span><span><i class="sh"></i>影子期</span><span><i class="tdy"></i>今天</span></div>
+    </section>
+    <section class="fb-card xp-card" aria-label="水逆">
+      <h3>水逆<small>留逆 · 留顺 · 前后影子期 · 落本命第几宫</small></h3>
+      <div class="xp-mer" id="rtMer"></div>
+    </section>
+    <section class="fb-card xp-card" aria-label="各星留">
+      <h3>各星之留<small id="rtAllSub"></small></h3>
+      <div style="overflow-x:auto"><table class="xp-t" id="rtAll"></table></div>
+    </section>
+  </div>
+
+  <!-- 月亮空亡 -->
+  <div class="xp-view" id="v-void" hidden>
+    <section class="fb-card xp-card xp-lead" aria-label="月亮空亡">
+      <div class="xp-lead-h">
+        <h3>月亮空亡<small id="vcSub"></small></h3>
+        <div class="xp-ctl"><button class="fb-btn" type="button" id="vcRefresh">刷新</button></div>
+      </div>
+      <p class="fb-key" id="vcKey"></p>
+      <p class="xp-note" id="vcNow"></p>
+    </section>
+    <section class="fb-card xp-card" aria-label="未来七天">
+      <h3>未来七天<small>自末一相位起，至月亮入下一座止</small></h3>
+      <div class="xp-vc" id="vcList"></div>
+    </section>
+  </div>
+
   <section class="fb-card xp-help">
     <h3>用法与口径</h3>
     <ul>
       <li><b>出生时间</b>填出生地当时的钟表时间，再选出生地（或填经纬度与时区）；当地若行夏令时，勾「夏令时」。1986–1991 年大陆夏令时期间会提示。</li>
-      <li><b>位置</b>回归黄道（当日分点）。日、月与八大行星按 Paul Schlyter 的轨道根数与摄动项计算，冥王星用其 1885–2099 年级数；已对照两百年节气、2020 年木土大合相、2024 年日全食、水金留逆等天象核对，误差约一至二角分。北交点取平均交点。</li>
+      <li><b>位置</b>回归黄道（当日分点）。日、月与八大行星按 Paul Schlyter 的轨道根数与摄动项计算，冥王星用其 1885–2099 年级数；已对照两百年节气、2020 年木土大合相、2024 年日全食、水金留逆等天象核对，误差约一至二角分（月亮偶至数角分）。北交点取平均交点。</li>
       <li><b>宫制</b>默认 Placidus（纬度超过 66° 时改用波菲利）；整宫、等宫、波菲利可切换。上升、中天由格林尼治平恒星时推得。</li>
       <li><b>相位</b>容许度：合、冲 8°，刑、拱 7°，六合 5°，日月参与再加 2°；注明入相（渐准）或出相。点任一条，盘上只亮那一条线。</li>
       <li><b>法达</b>以太阳在地平上下分昼夜：昼生日、金、水、月、土、木、火、北交、南交；夜生月、土、木、火、北交、南交、日、金、水（亦可改用波那提序，交点殿后）。七政主运各分七个子运，依迦勒底序（土木火日金水月）自主运之星起。</li>
       <li><b>小限</b>每满一岁，上升推进一宫（整宫），该宫星座之主星为当年年主星。福点昼生取「上升 + 月 − 日」，夜生取「上升 + 日 − 月」。仅供学习参考。</li>
+      <li><b>行运</b>某一刻（默认此刻，可前后挪日、挪月）天上十星对本命十星与上升、中天的五种主要相位。容许度只看行运星：月亮 1°，日、水、金、火、木、土 2°，天、海、冥 1.5°；按紧密排，入相出相看一分钟后是否更准；「最准」为该星精确成相之日（逆行往返则有几次）。「今天最要紧的三条」按行运星分量（土天海冥最重、月亮最轻）、本命点分量（日、月、上升、中天与命主星最重）、相位（合冲刑重于拱、六合）、紧密与否打分取前三，文字是常见说法，参考。「外行星十二个月」列木、土、天、海、冥与本命各点精确成相之日。</li>
+      <li><b>次限</b>出生后第 N 日的天象对应第 N 岁（一日一年，年取回归年 365.2422 日）；推运中天用太阳弧（本命中天加推运太阳所走度数），推运上升由推运中天按出生地纬度反推。</li>
+      <li><b>太阳回归</b>求太阳回到本命黄经的时刻（同一星历，夹逼到一秒内，读回太阳黄经与本命相差不到 0.1″），再按所选地点排盘（默认出生地，可换城市），宫制随上面所选。看回归上升（并看它落本命第几宫）、太阳落回归盘第几宫、角宫（1、4、7、10 宫）有哪些星。与用 Swiss Ephemeris 的软件相比，回归时刻一般差十分钟内、偶至半小时（两边星历之差，主要是章动）。</li>
+      <li><b>逆行</b>留＝行星视速度（地心黄经日行）过零之刻；留逆至留顺为逆行。影子期以度数定：留逆之前行星头一回走到「留顺度数」起为前影，留顺之后再走回「留逆度数」止为后影。与公开星历比，水星之留差十分钟上下，金星半小时上下，木、土约一小时，天、海、冥可差数小时（留时行星几乎不动，时刻本就难定）。</li>
+      <li><b>月亮空亡</b>采现代通行定义：月亮在一座之内，与日、水、金、火、木、土、天、海、冥九星的最后一个托勒密相位（合、六合、刑、拱、冲，以精确成相为准）之后，至月亮入下一座为止；整座不成相位则自入座起即空。不计交点、小行星与次要相位，也不用古典的容许度（「光体半径」）算法，故比只看七政的古法空亡要长些。与公开空亡表比，起讫多差几分钟、偶至十分钟（月亮位置误差所致）。</li>
+      <li><b>时区</b>行运、逆行、空亡的时刻都按本机时区显示；回归时刻按所选地点的标准时（不计夏令时）。</li>
     </ul>
   </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
-<script src="/xingpan/xingpan.js?v=1"></script>
+<script src="/xingpan/xingpan.js?v=2"></script>
 <script src="/fabao/cities.js?v=1"></script>
 <script src="/fabao/fabao.js?v=13"></script>
 <script>
@@ -227,10 +492,14 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&am
 const BODY = {}; XP.BODIES.forEach(b => { BODY[b.id] = b; });
 BODY.snode = { id: 'snode', n: '南交点', g: '☋' };
 const G = id => BODY[id].g + T;
+// 本命点（十星之外加上升、中天）：名字与符号
+const PT = id => id === 'asc' ? { n: '上升', g: 'AC' } : id === 'mc' ? { n: '中天', g: 'MC' } : BODY[id];
+const GL = (id, cls) => id === 'asc' || id === 'mc' ? `<span class="g ax">${PT(id).g}</span>` : `<span class="g${cls ? ' ' + cls : ''}">${G(id)}</span>`;
+const DAY = 864e5;
 
 // 出生地：共用 /fabao/cities.js（[名, 东经, 北纬, 时区]），与八字同一张
 const CITIES = window.QJ_CITIES.GROUPS, CITY_LIST = window.QJ_CITIES.LIST, TZS = window.QJ_CITIES.TZS, tzLabel = window.QJ_CITIES.tzLabel;
-const LS_LIB = 'xingpan.lib.v1', LS_VIEW = 'xingpan.view.v1';
+const LS_LIB = 'xingpan.lib.v1', LS_VIEW = 'xingpan.view.v1', SS_TAB = 'xingpan.tab.v1';
 const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
@@ -238,7 +507,7 @@ const store = {
 const guessTz = -new Date().getTimezoneOffset() / 60;
 const guess = CITY_LIST.find(c => c[3] === guessTz) || CITY_LIST[0];
 let view = Object.assign({ city: guess[0], lon: guess[1], lat: guess[2], tz: guess[3], house: 'placidus', bonatti: false }, store.get(LS_VIEW, {}));
-let C = null, hlAsp = -1;
+let C = null, hlAsp = -1, nowCast = false;   // nowCast：盘是按「此刻」起的（没填生辰），天象页就不套本命宫位
 
 $('cityIn').innerHTML = CITIES.map(([g, l]) => `<optgroup label="${g}">${l.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('') + '<option value="">自定义经纬度</option>';
 $('tzIn').innerHTML = TZS.map(z => `<option value="${z}">${tzLabel(z)}</option>`).join('');
@@ -259,24 +528,28 @@ function cast() {
   if (y < 1885 || y > 2099) { toast('只排 1885–2099 年（冥王星级数适用范围）'); return; }
   C = XP.chart({ y, mo, d, h, mi, tz: +view.tz, dst: $('dstIn').checked, lat: +view.lat, lon: +view.lon, house: view.house, bonatti: view.bonatti });
   C.name = $('nameIn').value.trim();
-  hlAsp = -1;
+  hlAsp = -1; trHl = -1;
   const dn = $('dstNote');
   if (+view.tz === 8 && !$('dstIn').checked && isChinaDST(y, mo, d)) {
     dn.hidden = false;
     dn.innerHTML = `此日在大陆夏令时期间（${y} 年），当时钟表比北京标准时快一小时。若所报为当时钟表读数，应勾「夏令时」。<button class="fb-btn" type="button" id="dstBtn">勾上夏令时</button>`;
     $('dstBtn').onclick = () => { $('dstIn').checked = true; cast(); toast('已按夏令时减一小时'); };
   } else dn.hidden = true;
-  render(); writeURL();
+  render(); renderView(); writeURL();
   Fabao.birth.save({ when: $('whenIn').value, name: C.name, tz: +view.tz, lon: +view.lon, lat: +view.lat, dst: $('dstIn').checked, city: view.city || '' });
 }
 
 /* ================ 星盘轮 ================ */
 const CX = 300;
-function P(lon, r) { const a = (180 + lon - C.angles.asc) * Math.PI / 180; return [CX + r * Math.cos(a), CX - r * Math.sin(a)]; }
 const f1 = x => x.toFixed(1);
-function wheel() {
-  const R1 = 290, R2 = 252, R3 = 226, R4 = 150;
-  let s = `<svg viewBox="0 0 600 600" role="img" aria-label="星盘">`;
+// X：要画的盘（本命、回归）。opt.hl 只亮第几条相位；opt.outer 外圈再画行运星 [{ id, lon, retro }]，
+// 此时盘内只画 opt.links（行运相位线，{ a 本命点黄经, b 行运黄经, type }），opt.hlLink 亮哪条
+function wheelSVG(X, opt) {
+  opt = opt || {};
+  const asc = X.angles.asc, hl = opt.hl == null ? -1 : opt.hl, outer = opt.outer;
+  const P = (lon, r) => { const a = (180 + lon - asc) * Math.PI / 180; return [CX + r * Math.cos(a), CX - r * Math.sin(a)]; };
+  const R1 = 290, R2 = 252, R3 = 226, R4 = 150, RO = 340;
+  let s = outer ? `<svg viewBox="-66 -66 732 732" role="img" aria-label="行运盘">` : `<svg viewBox="0 0 600 600" role="img" aria-label="星盘">`;
   // 黄道十二宫
   for (let k = 0; k < 12; k++) {
     const a0 = k * 30, a1 = a0 + 30, [x0, y0] = P(a0, R1), [x1, y1] = P(a1, R1), [x2, y2] = P(a1, R2), [x3, y3] = P(a0, R2);
@@ -294,47 +567,73 @@ function wheel() {
   // 宫头
   s += `<circle class="ring" cx="${CX}" cy="${CX}" r="${R3}"/>`;
   for (let i = 1; i <= 12; i++) {
-    const c = C.cusps[i], axis = i === 1 || i === 4 || i === 7 || i === 10;
+    const c = X.cusps[i], axis = i === 1 || i === 4 || i === 7 || i === 10;
     const [ax, ay] = P(c, R2), [bx, by] = P(c, axis ? 40 : R4);
     s += `<line class="${axis ? 'axis' : 'cusp'}" x1="${f1(ax)}" y1="${f1(ay)}" x2="${f1(bx)}" y2="${f1(by)}"/>`;
-    const nx = C.cusps[i % 12 + 1], mid = c + mod(nx - c, 360) / 2, [hx, hy] = P(mid, (R3 + R4) / 2 + 52);
+    const nx = X.cusps[i % 12 + 1], mid = c + mod(nx - c, 360) / 2, [hx, hy] = P(mid, (R3 + R4) / 2 + 52);
     s += `<text class="hn" x="${f1(hx)}" y="${f1(hy)}">${i}</text>`;
   }
-  [['ASC', C.angles.asc], ['MC', C.angles.mc], ['DSC', mod(C.angles.asc + 180, 360)], ['IC', mod(C.angles.mc + 180, 360)]].forEach(([n, l]) => {
-    const [x, y] = P(l, R1 + 14); s += `<text class="ax" x="${f1(x)}" y="${f1(y)}">${n}</text>`;
+  [['ASC', X.angles.asc], ['MC', X.angles.mc], ['DSC', mod(X.angles.asc + 180, 360)], ['IC', mod(X.angles.mc + 180, 360)]].forEach(([n, l]) => {
+    const [x, y] = P(l, outer ? RO + 15 : R1 + 14); s += `<text class="ax" x="${f1(x)}" y="${f1(y)}">${n}</text>`;
   });
   // 行星：按黄经排开，挤在一起的往旁边让
-  const ids = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'node'];
-  const items = ids.map(id => ({ id, lon: C.bodies[id].lon })).sort((a, b) => a.lon - b.lon);
-  items.forEach(it => { it.pos = it.lon; });
-  for (let pass = 0; pass < 6; pass++) {
-    for (let k = 0; k < items.length; k++) {
-      const a = items[k], b = items[(k + 1) % items.length], gap = mod(b.pos - a.pos, 360);
-      if (gap < 7 && items.length > 1) { a.pos = mod(a.pos - (7 - gap) / 2, 360); b.pos = mod(b.pos + (7 - gap) / 2, 360); }
+  const spread = list => {
+    const items = list.slice().sort((a, b) => a.lon - b.lon);
+    items.forEach(it => { it.pos = it.lon; });
+    for (let pass = 0; pass < 6; pass++) {
+      for (let k = 0; k < items.length; k++) {
+        const a = items[k], b = items[(k + 1) % items.length], gap = mod(b.pos - a.pos, 360);
+        if (gap < 7 && items.length > 1) { a.pos = mod(a.pos - (7 - gap) / 2, 360); b.pos = mod(b.pos + (7 - gap) / 2, 360); }
+      }
     }
-  }
+    return items;
+  };
+  const ids = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'node'];
+  const items = spread(ids.map(id => ({ id, lon: X.bodies[id].lon })));
   s += `<circle class="inner" cx="${CX}" cy="${CX}" r="${R4 - 6}"/>`;
-  // 相位线
-  C.aspects.forEach((a, i) => {
-    const t = a.type.a === 0 ? 'conj' : (a.type.a === 90 || a.type.a === 180) ? 'hard' : 'soft';
-    if (a.type.a === 0) return;
-    const [x1, y1] = P(C.bodies[a.a].lon, R4 - 6), [x2, y2] = P(C.bodies[a.b].lon, R4 - 6);
-    s += `<line class="asp ${t}${hlAsp >= 0 ? (hlAsp === i ? ' hl' : ' dim') : ''}" x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}"/>`;
-  });
+  // 相位线：本命盘画盘内相位；行运盘只画行运相位（虚线）
+  const cls = a => a === 0 ? 'conj' : (a === 90 || a === 180) ? 'hard' : 'soft';
+  if (!outer) {
+    X.aspects.forEach((a, i) => {
+      if (a.type.a === 0) return;
+      const [x1, y1] = P(X.bodies[a.a].lon, R4 - 6), [x2, y2] = P(X.bodies[a.b].lon, R4 - 6);
+      s += `<line class="asp ${cls(a.type.a)}${hl >= 0 ? (hl === i ? ' hl' : ' dim') : ''}" x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}"/>`;
+    });
+  } else {
+    const hlL = opt.hlLink == null ? -1 : opt.hlLink;
+    (opt.links || []).forEach((l, i) => {
+      if (l.type.a === 0 && hlL !== i) return;
+      const [x1, y1] = P(l.a, R4 - 6), [x2, y2] = P(l.b, R4 - 6);
+      s += `<line class="asp tr ${cls(l.type.a)}${hlL >= 0 ? (hlL === i ? ' hl' : ' dim') : ''}" x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}"/>`;
+    });
+    outer.forEach(o => { const [x, y] = P(o.lon, R4 - 6); s += `<circle class="tdot" cx="${f1(x)}" cy="${f1(y)}" r="2.6"/>`; });
+  }
   items.forEach(it => {
-    const b = C.bodies[it.id], [px, py] = P(b.lon, R3), [qx, qy] = P(b.lon, R3 - 8), [gx, gy] = P(it.pos, R3 - 26), [dx, dy] = P(it.pos, R3 - 50), [rx, ry] = P(it.pos, R3 - 63);
+    const b = X.bodies[it.id], [px, py] = P(b.lon, R3), [qx, qy] = P(b.lon, R3 - 8), [gx, gy] = P(it.pos, R3 - 26), [dx, dy] = P(it.pos, R3 - 50), [rx, ry] = P(it.pos, R3 - 63);
     const dd = XP.fmtDeg(b.lon);
     s += `<line class="pin" x1="${f1(px)}" y1="${f1(py)}" x2="${f1(qx)}" y2="${f1(qy)}"/><circle class="dot" cx="${f1(P(b.lon, R4 - 6)[0])}" cy="${f1(P(b.lon, R4 - 6)[1])}" r="1.8"/>`;
     s += `<text class="pg${it.id === 'sun' || it.id === 'moon' ? ' lum' : ''}" x="${f1(gx)}" y="${f1(gy)}" data-id="${it.id}"><title>${BODY[it.id].n} ${dd.text}${b.retro ? ' 逆行' : ''}</title>${G(it.id)}</text>`;
     s += `<text class="pd" x="${f1(dx)}" y="${f1(dy)}">${dd.d}°${pad(dd.m)}</text>`;
     if (b.retro) s += `<text class="pr" x="${f1(rx)}" y="${f1(ry)}">℞</text>`;
   });
-  s += '</svg>';
-  $('wheel').innerHTML = s;
+  // 外圈：行运星
+  if (outer) {
+    s += `<circle class="ring" cx="${CX}" cy="${CX}" r="${RO}"/>`;
+    spread(outer.map(o => ({ id: o.id, lon: o.lon, retro: o.retro }))).forEach(it => {
+      const [ax, ay] = P(it.lon, R1), [bx, by] = P(it.lon, R1 + 9), [gx, gy] = P(it.pos, R1 + 25), [rx, ry] = P(it.pos, R1 + 25 + 14);
+      s += `<line class="tpin" x1="${f1(ax)}" y1="${f1(ay)}" x2="${f1(bx)}" y2="${f1(by)}"/>`;
+      s += `<text class="tg" x="${f1(gx)}" y="${f1(gy)}" data-tid="${it.id}"><title>行运${BODY[it.id].n} ${XP.fmtDeg(it.lon).text}${it.retro ? ' 逆行' : ''}</title>${G(it.id)}</text>`;
+      if (it.retro) s += `<text class="tr-r" x="${f1(rx)}" y="${f1(ry)}">℞</text>`;
+    });
+  }
+  return s + '</svg>';
 }
+function wheel() { $('wheel').innerHTML = wheelSVG(C, { hl: hlAsp }); }
 
 /* ================ 表格 ================ */
 const HOUSE_NAME = { placidus: 'Placidus', whole: '整宫', equal: '等宫', porphyry: '波菲利' };
+const signCell = lon => { const dd = XP.fmtDeg(lon); return `<td class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span>${XP.SIGNS[dd.sign]}</td>`; };
+const degTxt = lon => { const dd = XP.fmtDeg(lon); return `${dd.d}°${pad(dd.m)}′`; };
 function render() {
   const A = C.angles, inp = C.input;
   $('title').innerHTML = `${C.name ? esc(C.name) + ' · ' : ''}本命盘`;
@@ -351,7 +650,7 @@ function render() {
   $('houseNote').textContent = HOUSE_NAME[C.house] + (C.placidusFallback ? '（纬度过高，改用波菲利）' : '');
   const hrow = from => `<tr>${[0, 1, 2, 3, 4, 5].map(k => { const i = from + k, dd = XP.fmtDeg(C.cusps[i]); return `<td><span class="n">${i}</span> <span class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span></span><span class="deg">${dd.d}°${pad(dd.m)}′</span></td>`; }).join('')}</tr>`;
   $('houseT').innerHTML = hrow(1) + hrow(7);
-  renderInfo(); renderAsp(); renderFd(); renderBH();
+  renderInfo(); renderAsp(); renderFd(); renderBH(); renderWho();
 }
 function ageNow() {
   const now = Date.now(), b = new Date(C.utc + (+C.input.tz) * 3600e3), n = new Date(now + (+C.input.tz) * 3600e3);
@@ -437,9 +736,350 @@ function renderBH() {
   $('bhCard').hidden = false;
 }
 
+/* ================ 视图：本命 · 行运 · 回归 · 逆行 · 空亡 ================ */
+// 一个分段切换；本命以外的几页，生辰面板收成一行（要改再展开），各页最上面先给结论
+const VIEWS = ['natal', 'transit', 'return', 'retro', 'void'];
+const VIEW_NAME = { natal: '本命', transit: '行运', return: '太阳回归', retro: '逆行', void: '月亮空亡' };
+let tab = 'natal', formOpen = false;
+function setTab(v, quiet) {
+  if (VIEWS.indexOf(v) < 0) v = 'natal';
+  tab = v; formOpen = false;
+  document.querySelectorAll('#viewSeg button').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+  VIEWS.forEach(k => { $('v-' + k).hidden = k !== v; });
+  foldPanel();
+  try { sessionStorage.setItem(SS_TAB, v); } catch (e) { /* 无痕模式 */ }
+  if (C) renderView();      // 起盘前（初次载入）由 cast() 来画
+  if (!quiet && C) writeURL();
+}
+function foldPanel() {
+  $('nowPanel').classList.toggle('compact', tab !== 'natal' && !formOpen);
+  $('foldForm').hidden = tab === 'natal' || !formOpen;
+}
+function renderWho() {
+  if (!C) return;
+  const inp = C.input, place = view.city || `${Math.abs(inp.lat).toFixed(2)}°${inp.lat >= 0 ? 'N' : 'S'} ${Math.abs(inp.lon).toFixed(2)}°${inp.lon >= 0 ? 'E' : 'W'}`;
+  $('whoTxt').innerHTML = `${nowCast ? '此刻盘' : '本命'}${C.name ? ` <b>${esc(C.name)}</b>` : ''} · ${inp.y}-${pad(inp.mo)}-${pad(inp.d)} ${pad(inp.h)}:${pad(inp.mi)}${inp.dst ? '（夏令时）' : ''} ${tzLabel(+inp.tz)} · ${esc(place)} · 日${XP.SIGNS[C.bodies.sun.sign]} 月${XP.SIGNS[C.bodies.moon.sign]} 升${XP.SIGNS[Math.floor(C.angles.asc / 30)]}`;
+}
+function renderView() {
+  renderBadges();
+  if (!C && tab !== 'retro' && tab !== 'void') return;
+  if (tab === 'transit') renderTransit();
+  else if (tab === 'return') renderReturn();
+  else if (tab === 'retro') renderRetro();
+  else if (tab === 'void') renderVoid();
+}
+// 分段上的小标：此刻水逆、此刻月亮空亡
+let badgeAt = 0, nowMer = null, nowVoid = null;
+function renderBadges() {
+  const now = Date.now();
+  if (now - badgeAt > 60e3) { badgeAt = now; nowMer = merState(now); nowVoid = voidState(now); }
+  const set = (v, txt, title) => {
+    const b = document.querySelector(`#viewSeg button[data-v="${v}"]`); let s = b.querySelector('.badge');
+    if (!txt) { if (s) s.remove(); return; }
+    if (!s) { s = document.createElement('span'); s.className = 'badge'; b.appendChild(s); }
+    s.textContent = txt; s.title = title;
+  };
+  set('retro', nowMer.k === 'in' ? '水' : '', '此刻水星逆行');
+  set('void', nowVoid.cur ? '空' : '', '此刻月亮空亡');
+}
+
+// —— 时间（本机时区）——
+const WK = '日一二三四五六';
+const rm = t => Math.round(t / 60e3) * 60e3;
+const LD = t => new Date(rm(t));
+const ymd = t => { const d = LD(t); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const md = t => { const d = LD(t); return `${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const hm = t => { const d = LD(t); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const wk = t => '周' + WK[LD(t).getDay()];
+const tzOf = t => tzLabel(-new Date(t).getTimezoneOffset() / 60);
+const dur = ms => { const m = Math.round(ms / 60e3); return m >= 1440 ? `${Math.floor(m / 1440)} 天 ${Math.floor(m % 1440 / 60)} 小时` : m >= 60 ? `${Math.floor(m / 60)} 小时${m % 60 ? ' ' + m % 60 + ' 分' : ''}` : `${m} 分`; };
+const dm = o => { const m = Math.round(o * 60); return `${Math.floor(m / 60)}°${pad(m % 60)}′`; };
+const toLocal = t => Fabao.toLocalInput(new Date(t));
+const aspCls = a => a === 0 ? 'conj' : (a === 90 || a === 180) ? 'hard' : 'soft';
+const natLon = id => id === 'asc' ? C.angles.asc : id === 'mc' ? C.angles.mc : C.bodies[id].lon;
+
+/* ================ 行运 ================ */
+// 白话素材：行运星带来什么、落到本命哪一块、相位怎么起作用（常见说法，参考）
+const TR_THEME = { sun: '关注与精力', moon: '一时的情绪', mercury: '思路、消息与文书', venus: '人缘、感情与花费', mars: '干劲与火气', jupiter: '机会与扩张', saturn: '压力、责任与考验', uranus: '突变与求新', neptune: '迷惘、理想与灵感', pluto: '深层的转变与权力' };
+const NA_THEME = { sun: '自我与目标', moon: '情绪、家庭与安全感', mercury: '思考与沟通', venus: '感情与钱财', mars: '行动与欲望', jupiter: '信念与机会', saturn: '责任与规矩', uranus: '求变之心', neptune: '理想与想象', pluto: '内在的力量', asc: '身体与个人方向', mc: '事业与名声' };
+const ASP_ADV = { 0: '两股力量叠在一处，这方面的事会被放大', 60: '有小机会，主动一点才抓得住', 90: '有摩擦和压力，逼你调整', 120: '顺势而为，容易得助力', 180: '来自他人或外部的拉扯，要找平衡' };
+// 打分：行运星分量 × 本命点分量（命主星再加）× 相位分量 × 紧密 × 入相
+const W_TR = { moon: .8, sun: 2, mercury: 1.8, venus: 1.8, mars: 2.4, jupiter: 3, saturn: 3.8, uranus: 3.6, neptune: 3.3, pluto: 3.6 };
+const W_NA = { sun: 3, moon: 3, asc: 3, mc: 2.6, mercury: 1.8, venus: 1.8, mars: 1.8, jupiter: 1.4, saturn: 1.4, uranus: 1, neptune: 1, pluto: 1 };
+const W_AS = { 0: 1, 180: .9, 90: .9, 120: .7, 60: .55 };
+// 求「最准」的窗口：往前几日、往后几日、扫描步长
+const EX_WIN = { moon: [1.2, 1.2, 2 * 3600e3], sun: [4, 4, DAY], mercury: [45, 45, DAY], venus: [50, 50, DAY], mars: [90, 90, DAY], jupiter: [200, 366, DAY], saturn: [260, 366, DAY], uranus: [300, 366, DAY], neptune: [300, 366, DAY], pluto: [300, 366, DAY] };
+let trAt = null, trHl = -1, trData = null;
+const trNow = () => trAt == null ? Date.now() : trAt;
+function trPasses(a, t) {
+  const nat = natLon(a.na), sgn = mod(a.lon - nat + 180, 360) - 180 >= 0 ? 1 : -1;
+  const target = mod(nat + (a.type.a % 180 === 0 ? a.type.a : sgn * a.type.a), 360), w = EX_WIN[a.tr];
+  return XP.exactTimes(a.tr, target, t - w[0] * DAY, t + w[1] * DAY, w[2]);
+}
+function trScore(a) {
+  const ruler = XP.RULER[Math.floor(C.angles.asc / 30)];
+  return W_TR[a.tr] * W_NA[a.na] * (a.na === ruler ? 1.3 : 1) * W_AS[a.type.a] * (1 - .6 * a.orb / XP.TRANSIT_ORB[a.tr]) * (a.applying ? 1.1 : 1);
+}
+const fast = id => id === 'moon';
+const passTxt = (p, id) => `${fast(id) ? md(p.t) + ' ' + hm(p.t) : md(p.t)}${p.retro ? '℞' : ''}`;
+// 一条行运的「最准」说明：已准、将准、几次往返
+function exactTxt(a, t) {
+  const past = a.passes.filter(p => p.t <= t), fut = a.passes.filter(p => p.t > t);
+  const last = past[past.length - 1], parts = [];
+  if (last && (!fut.length || !a.applying)) parts.push(`${passTxt(last, a.tr)} 已准`);
+  if (fut.length) parts.push((parts.length ? '再准 ' : '最准 ') + fut.slice(0, fast(a.tr) ? 1 : 3).map(p => passTxt(p, a.tr)).join('、'));
+  else if (a.applying) parts.push('这回不到准点就转向');   // 入相却在留前止步
+  return parts.join(' · ');
+}
+function trCompute(t) {
+  const list = XP.transits(C, t);
+  list.forEach(a => { a.passes = trPasses(a, t); a.score = trScore(a); a.link = { a: natLon(a.na), b: a.lon, type: a.type }; });
+  const top = list.slice().sort((x, y) => y.score - x.score).slice(0, 3);
+  const T0 = XP.bodies(t), pos = XP.PLANETS.map(id => ({ id, lon: T0[id].lon, retro: XP.speedOf(id, t) < 0 }));
+  const groups = [], gi = {};
+  XP.transitHits(C, t, t + 365 * DAY).forEach(h => {
+    const k = h.tr + '|' + h.na + '|' + h.A;
+    if (!(k in gi)) { gi[k] = groups.length; groups.push({ tr: h.tr, na: h.na, type: h.type, A: h.A, list: [] }); }
+    groups[gi[k]].list.push(h);
+  });
+  return { t, list, top, pos, groups, prog: XP.progressed(C, t) };
+}
+function renderTransit() {
+  const t = trNow(), D = trData = trCompute(t), isNow = trAt == null;
+  $('trWhen').value = toLocal(t);
+  $('trSub').textContent = `${isNow ? '此刻' : ymd(t) + ' ' + wk(t)} · 本机时间 ${tzOf(t)}`;
+  // 结论：最要紧的一条
+  const k = D.top[0];
+  $('trKey').innerHTML = k ? `${isNow ? '今天' : ymd(t)}最要紧：<span class="jin">${BODY[k.tr].n}${k.type.n}本命${PT(k.na).n}</span><small>（${k.applying ? '入相' : '出相'}，差 ${dm(k.orb)}）</small>`
+    : `${isNow ? '今天' : ymd(t)}行运星与本命没有紧的相位<small>（容许度见口径）</small>`;
+  $('trTopTag').textContent = `${isNow ? '今天' : '这一天'}最要紧的三条`;
+  $('trTop').innerHTML = D.top.map(a => `<li><div><div class="h"><b>${GL(a.tr, 'q')}${BODY[a.tr].n} ${a.type.n} ${GL(a.na)}本命${PT(a.na).n}</b><span class="meta">${a.applying ? '入相' : '出相'} · 差 ${dm(a.orb)}${a.passes.length ? ' · ' + exactTxt(a, t) : ''}</span></div>
+    <p>${TR_THEME[a.tr]}碰上你的${NA_THEME[a.na]}：${ASP_ADV[a.type.a]}。</p></div></li>`).join('');
+  // 全部行运相位
+  $('trAsp').innerHTML = D.list.length ? D.list.map((a, i) => `<button type="button" class="row${trHl === i ? ' on' : ''}" data-i="${i}">
+      <span>${GL(a.tr, 'q')}${BODY[a.tr].n}<span class="t ${aspCls(a.type.a)}">${a.type.g}${T}</span>${GL(a.na)}${PT(a.na).n}<em>${a.type.n}</em></span>
+      <span class="o"><b>${dm(a.orb)}</b> ${a.applying ? '入' : '出'}${a.passes.length ? ' · ' + exactTxt(a, t) : ''}</span></button>`).join('')
+    : '<p class="fb-fine">此刻行运星与本命十星、上升、中天都不在容许度内。</p>';
+  // 外行星十二个月
+  const live = new Set(D.list.map(a => a.tr + '|' + a.na + '|' + a.type.a));
+  $('trHits').innerHTML = D.groups.length ? D.groups.map(g => `<div class="row${live.has(g.tr + '|' + g.na + '|' + g.type.a) ? ' now' : ''}">
+      <span>${GL(g.tr, 'q')}${BODY[g.tr].n}<span class="t ${aspCls(g.type.a)}">${g.type.g}${T}</span>${GL(g.na)}${PT(g.na).n}<em>${g.type.n}</em>${live.has(g.tr + '|' + g.na + '|' + g.type.a) ? '<span class="tag">正在容许度内</span>' : ''}</span>
+      <span class="d">${g.list.map(h => `<span class="${h.retro ? 'r' : ''}">${ymd(h.t)}${h.retro ? '℞' : ''}</span>`).join('')}</span></div>`).join('')
+    : '<p class="fb-fine">未来十二个月，木土天海冥与本命各点都不成精确相位。</p>';
+  // 行运盘
+  $('trWheelSub').textContent = `${ymd(t)} ${hm(t)} ${tzOf(t)} · 宫位按本命`;
+  trWheel();
+  // 行运星落本命第几宫
+  $('trPos').innerHTML = `<tr><th>行运星</th><th>星座</th><th>度数</th><th>本命宫</th></tr>` + D.pos.map(p => `<tr><td><span class="g">${G(p.id)}</span><span class="n">${BODY[p.id].n}</span></td>${signCell(p.lon)}<td class="deg">${degTxt(p.lon)} ${p.retro ? '<span class="r">℞</span>' : ''}</td><td>${XP.houseOf(p.lon, C.cusps)}</td></tr>`).join('');
+  renderProg(D);
+}
+function trWheel() {
+  const D = trData; if (!D) return;
+  $('trWheel').innerHTML = wheelSVG(C, { outer: D.pos, links: D.list.map(a => a.link), hlLink: trHl });
+}
+$('trAsp').onclick = e => { const b = e.target.closest('button[data-i]'); if (!b) return; const i = +b.dataset.i; trHl = trHl === i ? -1 : i; trWheel(); $('trAsp').querySelectorAll('.row').forEach((r, k) => r.classList.toggle('on', k === trHl)); };
+// 次限：推运日月与上升中天，推运月亮下回换座，推运日月上升中天对本命的相位（1° 内）
+function renderProg(D) {
+  const p = D.prog, B = p.bodies, S = XP.SIGNS, Y = XP.TROP_YEAR;
+  $('progSub').textContent = `一日一年 · ${p.age.toFixed(1)} 岁`;
+  if (p.age < 0) { $('progBox').innerHTML = '<p class="fb-fine">所选日期在出生之前。</p>'; return; }
+  const toReal = tp => C.utc + (tp - C.utc) * Y;   // 推运日 → 真实日期
+  const mIng = XP.moonIngresses(p.t, p.t + 3 * DAY)[0];
+  const sunIn = B.sun.sign === C.bodies.sun.sign ? null : XP.exactTimes('sun', B.sun.sign * 30, C.utc, p.t, DAY).filter(x => !x.retro).pop();
+  const row = (k, html) => `<div><dt>${k}</dt><dd>${html}</dd></div>`;
+  const pl = (id, lon) => `<span class="g">${G(id)}</span> <b>${S[Math.floor(lon / 30)]}</b> ${degTxt(lon)}`;
+  // 推运点对本命十星与上升、中天的相位（容许 1°）
+  const pts = [['sun', '推运太阳', B.sun.lon], ['moon', '推运月亮', B.moon.lon], ['asc', '推运上升', p.asc], ['mc', '推运中天', p.mc]];
+  const asp = [];
+  pts.forEach(([pid, pn, lon]) => XP.natalPoints(C).forEach(q => {
+    if (q.id === pid) return;
+    const sep = Math.abs(mod(lon - q.lon + 180, 360) - 180);
+    XP.ASPECTS.forEach(as => { const o = Math.abs(sep - as.a); if (o <= 1) asp.push({ pn, q: q.id, as, o }); });
+  }));
+  asp.sort((x, y) => x.o - y.o);
+  $('progBox').innerHTML =
+    row('太阳', `${pl('sun', B.sun.lon)} <span class="fine">本命第 ${B.sun.house} 宫${sunIn ? `；约 ${Math.floor((sunIn.t - C.utc) / DAY)} 岁入${S[B.sun.sign]}` : ''}</span>`) +
+    row('月亮', `${pl('moon', B.moon.lon)} <span class="fine">本命第 ${B.moon.house} 宫${mIng ? `；约 ${ymd(toReal(mIng.t)).slice(0, 7)} 入${S[mIng.sign]}` : ''}</span>`) +
+    row('上升', `<b>${S[Math.floor(p.asc / 30)]}</b> ${degTxt(p.asc)} <span class="fine">· 中天 ${S[Math.floor(p.mc / 30)]} ${degTxt(p.mc)}（太阳弧 ${p.arc.toFixed(1)}°）</span>`) +
+    row('相位', asp.length ? asp.slice(0, 6).map(x => `${x.pn}${x.as.n}本命${PT(x.q).n} <span class="fine">${dm(x.o)}</span>`).join('；') : '<span class="fine">推运日月、上升、中天与本命都不在 1° 内</span>');
+}
+function trShift(k) {
+  const t = trNow();
+  if (k === '0') trAt = null;
+  else if (k === '-D' || k === '+D') trAt = t + (k === '-D' ? -1 : 1) * DAY;
+  else {   // 挪一个月：日子不变，月底不够就落到当月最后一天（1 月 31 日 → 2 月 28 日）
+    const d = new Date(t), day = d.getDate();
+    d.setDate(1); d.setMonth(d.getMonth() + (k === '-M' ? -1 : 1));
+    d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()));
+    trAt = d.getTime();
+  }
+  trHl = -1; renderTransit(); writeURL();
+}
+document.querySelector('#v-transit .xp-ctl').addEventListener('click', e => { const b = e.target.closest('button[data-tr]'); if (b) trShift(b.dataset.tr); });
+$('trWhen').addEventListener('change', () => {
+  const d = new Date($('trWhen').value);
+  if (isNaN(d)) return;
+  if (d.getFullYear() < 1885 || d.getFullYear() > 2099) { toast('只排 1885–2099 年'); $('trWhen').value = toLocal(trNow()); return; }
+  trAt = d.getTime(); trHl = -1; renderTransit(); writeURL();
+});
+
+/* ================ 太阳回归 ================ */
+const HOUSE_TXT = ['', '自我、身体与新的开始', '钱财、资源与自我价值', '沟通、学习、短途与手足', '家庭、居所与根基', '恋爱、创作、子女与玩乐', '工作日常、健康与服务',
+  '伴侣、合作与对手', '共同财务、亲密关系与危机转化', '远行、进修、信仰与出版', '事业、名声与地位', '朋友、团体与愿望', '独处、休养、幕后与潜意识'];
+const PL_KEY = { sun: '自我与存在感', moon: '情绪与家庭生活', mercury: '沟通、学习与往来', venus: '人缘、感情与享受', mars: '干劲、竞争与冲突', jupiter: '机会、扩张与好运', saturn: '责任、压力与定型', uranus: '变动与意外', neptune: '理想、迷惘与灵感', pluto: '深层转变与掌控' };
+let srYear = null, srCity = '', srData = null;
+const birthYear = () => new Date(C.utc).getUTCFullYear();
+function srTime(Y) {
+  const b = new Date(C.utc);
+  return XP.solarReturn(C.bodies.sun.lon, Date.UTC(Y, b.getUTCMonth(), b.getUTCDate(), b.getUTCHours(), b.getUTCMinutes()));
+}
+// 默认看「正管着」的这一年：今年的回归若还没到，就看去年的
+function srAuto() { const now = Date.now(), y = new Date(now).getFullYear(); return srTime(y) > now ? y - 1 : y; }
+function srPlace() {
+  const c = srCity && CITY_LIST.find(x => x[0] === srCity);
+  if (c) return { name: c[0], lon: c[1], lat: c[2], tz: c[3] };
+  const inp = C.input;
+  return { name: view.city ? view.city + ' · 出生地' : '出生地', lon: +inp.lon, lat: +inp.lat, tz: +inp.tz, birth: true };
+}
+function srOptions() {
+  const cur = srCity, bp = view.city ? `出生地（${view.city}）` : `出生地（${(+C.input.lat).toFixed(2)}, ${(+C.input.lon).toFixed(2)}）`;
+  $('srLoc').innerHTML = `<option value="">${esc(bp)}</option>` + CITIES.map(([g, l]) => `<optgroup label="${g}">${l.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('');
+  $('srLoc').value = CITY_LIST.some(c => c[0] === cur) ? cur : '';
+}
+function renderReturn() {
+  const Y0 = birthYear(), Y = Math.max(Y0, Math.min(2099, srYear == null ? srAuto() : srYear));
+  const t = srTime(Y), pl = srPlace(), w = new Date(t + pl.tz * 3600e3);
+  const SR = XP.chartAt(t, { y: w.getUTCFullYear(), mo: w.getUTCMonth() + 1, d: w.getUTCDate(), h: w.getUTCHours(), mi: w.getUTCMinutes(), tz: pl.tz, lat: pl.lat, lon: pl.lon, house: view.house });
+  const next = srTime(Y + 1), now = Date.now();
+  srData = { Y, t, pl, SR, next };
+  srOptions();
+  $('srYearTxt').textContent = Y;
+  const S = XP.SIGNS, asc = Math.floor(SR.angles.asc / 30), sunH = SR.bodies.sun.house, inp = SR.input;
+  const when = `${inp.y}-${pad(inp.mo)}-${pad(inp.d)} ${pad(inp.h)}:${pad(inp.mi)}`;
+  const state = t <= now && now < next ? '正管着这一年' : t > now ? '还没到' : '已过';
+  $('srKey').innerHTML = `${Y} 年回归 <span class="jin">${when}</span><small>（${tzLabel(pl.tz)} · ${esc(pl.name)} · ${state}）</small>`;
+  const ang = XP.PLANETS.filter(id => [1, 4, 7, 10].indexOf(SR.bodies[id].house) >= 0);
+  const row = (k, html) => `<div><dt>${k}</dt><dd>${html}</dd></div>`;
+  $('srPoints').innerHTML =
+    row('上升', `<b>${S[asc]}</b> ${degTxt(SR.angles.asc)} <span class="fine">回归上升，落本命第 ${XP.houseOf(SR.angles.asc, C.cusps)} 宫</span><br>这一年待人处事偏「${ASC_TXT[asc]}」。`) +
+    row('太阳', `回归盘第 <b>${sunH}</b> 宫：这一年的重心在${HOUSE_TXT[sunH]}。`) +
+    row('角宫', ang.length ? ang.map(id => `<span class="g">${G(id)}</span><b>${BODY[id].n}</b> ${SR.bodies[id].house} 宫<span class="fine">（${PL_KEY[id]}）</span>`).join('；') + '。<span class="fine">角宫（1、4、7、10 宫）的星这一年最显。</span>' : '无星落角宫（1、4、7、10 宫），这一年少有一枝独秀之事。') +
+    row('月亮', `<b>${S[SR.bodies.moon.sign]}</b> 回归盘第 ${SR.bodies.moon.house} 宫 <span class="fine">· 情绪多落在${HOUSE_TXT[SR.bodies.moon.house]}</span>`) +
+    row('管期', `<span class="fine">${ymd(t)} 至 ${ymd(next)}（本机时间）· 回归太阳 ${XP.fmtDeg(SR.bodies.sun.lon).text}，与本命相差 ${(Math.abs(mod(SR.bodies.sun.lon - C.bodies.sun.lon + 180, 360) - 180) * 3600).toFixed(2)}″</span>`);
+  $('srTitle').textContent = `${C.name ? C.name + ' · ' : ''}${Y} 回归盘`;
+  $('srSub').textContent = `${when} ${tzLabel(pl.tz)} · ${Math.abs(pl.lat).toFixed(2)}°${pl.lat >= 0 ? 'N' : 'S'} ${Math.abs(pl.lon).toFixed(2)}°${pl.lon >= 0 ? 'E' : 'W'} · ${HOUSE_NAME[SR.house]}${SR.placidusFallback ? '（高纬改波菲利）' : ''}`;
+  $('srWheel').innerHTML = wheelSVG(SR, {});
+  $('srT').innerHTML = `<tr><th>天体</th><th>星座</th><th>度数</th><th>宫</th></tr>` + XP.PLANETS.map(id => {
+    const b = SR.bodies[id];
+    return `<tr class="${[1, 4, 7, 10].indexOf(b.house) >= 0 ? 'hl' : ''}"><td><span class="g">${G(id)}</span><span class="n">${BODY[id].n}</span></td>${signCell(b.lon)}<td class="deg">${degTxt(b.lon)} ${b.retro ? '<span class="r">℞</span>' : ''}</td><td>${b.house}</td></tr>`;
+  }).join('') + `<tr><td><span class="n">上升 ASC</span></td>${signCell(SR.angles.asc)}<td class="deg">${degTxt(SR.angles.asc)}</td><td>1</td></tr><tr><td><span class="n">中天 MC</span></td>${signCell(SR.angles.mc)}<td class="deg">${degTxt(SR.angles.mc)}</td><td>10</td></tr>`;
+}
+document.querySelector('#v-return .xp-ctl').addEventListener('click', e => {
+  const b = e.target.closest('button[data-sy]'); if (!b || !C) return;
+  srYear = Math.max(birthYear(), Math.min(2099, (srYear == null ? srAuto() : srYear) + (+b.dataset.sy)));
+  renderReturn(); writeURL();
+});
+$('srLoc').onchange = () => { srCity = $('srLoc').value; renderReturn(); writeURL(); };
+
+/* ================ 逆行日历 ================ */
+const RT_IDS = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+let rtYear = null, rtData = null;
+// 此刻水星：逆行中、前影、后影，或不在水逆（给下一回）
+function merState(now) {
+  const list = XP.retrogrades('mercury', now - 90 * DAY, now + 240 * DAY);
+  for (const r of list) {
+    if (now >= r.R.t && now < r.D.t) return { k: 'in', r };
+    if (r.pre != null && now >= r.pre && now < r.R.t) return { k: 'pre', r };
+    if (r.post != null && now >= r.D.t && now < r.post) return { k: 'post', r };
+  }
+  return { k: 'out', r: list.find(r => r.R.t > now) };
+}
+const stTxt = (t, lon) => `${md(t)} ${hm(t)} · ${XP.fmtDeg(lon).text}`;
+function natHouses(a, b) {
+  if (!C || nowCast) return '';
+  const h1 = XP.houseOf(a, C.cusps), h2 = XP.houseOf(b, C.cusps);
+  return h1 === h2 ? `落本命第 ${h1} 宫（${HOUSE_TXT[h1]}）` : `落本命第 ${h2}–${h1} 宫`;
+}
+function renderRetro() {
+  const now = Date.now(), Y = rtYear == null ? new Date(now).getFullYear() : rtYear;
+  const t0 = new Date(Y, 0, 1).getTime(), t1 = new Date(Y + 1, 0, 1).getTime();
+  // 时间轴连影子期一起算（影子期跨进本年的也画）；详表与留只列逆行本身落在本年的
+  const R = {}, RS = {};
+  RT_IDS.forEach(id => {
+    RS[id] = XP.retrogrades(id, t0 - 200 * DAY, t1 + 200 * DAY).filter(p => (p.post != null ? p.post : p.D.t) >= t0 && (p.pre != null ? p.pre : p.R.t) < t1);
+    R[id] = RS[id].filter(p => p.D.t >= t0 && p.R.t < t1);
+  });
+  const M = merState(now);
+  rtData = { Y, R, M };
+  $('rtYearTxt').textContent = Y;
+  $('rtSub').textContent = `${Y} 年 · 本机时间 ${tzOf(t0 + 180 * DAY)}`;
+  // 结论：此刻是否水逆
+  const left = ms => ms > DAY ? `还有 ${Math.ceil(ms / DAY)} 天` : `还有 ${dur(ms)}`;
+  const r = M.r;
+  $('rtKey').innerHTML = M.k === 'in' ? `<span class="xp-badge on">水逆中</span><span class="jin">${md(r.R.t)} 至 ${md(r.D.t)}</span><small>（${left(r.D.t - now)}留顺${r.post != null ? '；后影到 ' + md(r.post) : ''}）</small>`
+    : M.k === 'pre' ? `<span class="xp-badge half">水逆前影</span><span class="jin">${md(r.R.t)}</span> 起逆行<small>（${left(r.R.t - now)}；${md(r.R.t)}–${md(r.D.t)} 逆行）</small>`
+      : M.k === 'post' ? `<span class="xp-badge half">水逆后影</span>${md(r.D.t)} 已留顺<small>（后影到 <span class="jin">${md(r.post)}</span>，${left(r.post - now)}）</small>`
+        : `<span class="xp-badge off">不在水逆</span>${r ? `下回 <span class="jin">${ymd(r.R.t)}</span> 起<small>（${left(r.R.t - now)}${r.pre != null ? '；前影 ' + md(r.pre) + ' 起' : ''}）</small>` : ''}`;
+  const retroNow = RT_IDS.filter(id => XP.speedOf(id, now) < 0);
+  $('rtNow').innerHTML = `此刻逆行：${retroNow.length ? retroNow.map(id => `<b>${BODY[id].n}</b>`).join('、') : '无'}${retroNow.length ? `（${retroNow.length} 颗）` : ''}。`;
+  // 时间轴
+  const pct = t => Math.max(0, Math.min(100, (t - t0) / (t1 - t0) * 100));
+  const bar = (a, b, cls, title) => { const x = pct(a), y = pct(b); return y > x ? `<i class="${cls}" style="left:${x.toFixed(2)}%;width:${(y - x).toFixed(2)}%" title="${title}"></i>` : ''; };
+  const today = now >= t0 && now < t1 ? `<b style="left:${pct(now).toFixed(2)}%" title="今天"></b>` : '';
+  $('rtTL').innerHTML = `<div class="ln"><span></span><div class="mon">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => `<span>${m}<i>月</i></span>`).join('')}</div></div>` +
+    RT_IDS.map(id => `<div class="ln${id === 'mercury' ? ' mer' : ''}"><span class="lab"><span class="g">${G(id)}</span>${BODY[id].n}</span><div class="trk">${RS[id].map(p =>
+      (p.pre != null ? bar(p.pre, p.R.t, 'sh', `前影 ${ymd(p.pre)} 起`) : '') + bar(p.R.t, p.D.t, '', `逆行 ${ymd(p.R.t)} – ${ymd(p.D.t)}`) + (p.post != null ? bar(p.D.t, p.post, 'sh', `后影至 ${ymd(p.post)}`) : '')).join('')}${today}</div></div>`).join('');
+  // 水逆详表
+  $('rtMer').innerHTML = R.mercury.length ? R.mercury.map((p, i) => {
+    const cur = now >= p.R.t && now < p.D.t, near = !cur && ((p.pre != null && now >= p.pre && now < p.R.t) || (p.post != null && now >= p.D.t && now < p.post));
+    return `<div class="p${cur ? ' now' : near ? ' near' : ''}"><h4>第 ${i + 1} 回 · ${XP.SIGNS[Math.floor(p.R.lon / 30)]}${Math.floor(p.D.lon / 30) !== Math.floor(p.R.lon / 30) ? '退回' + XP.SIGNS[Math.floor(p.D.lon / 30)] : ''}<small>${cur ? '此刻在逆行' : near ? '此刻在影子期' : ''}</small></h4>
+      <dl class="st"><dt>前影</dt><dd>${p.pre != null ? ymd(p.pre) + ' ' + hm(p.pre) : '—'}</dd><dt>留逆</dt><dd class="r">${ymd(p.R.t)} ${hm(p.R.t)} · ${XP.fmtDeg(p.R.lon).text}</dd>
+      <dt>留顺</dt><dd class="r">${ymd(p.D.t)} ${hm(p.D.t)} · ${XP.fmtDeg(p.D.lon).text}</dd><dt>后影止</dt><dd>${p.post != null ? ymd(p.post) + ' ' + hm(p.post) : '—'}</dd></dl>
+      <p class="fine">逆行 ${Math.round((p.D.t - p.R.t) / DAY)} 天，影子期首尾共 ${p.pre != null && p.post != null ? Math.round((p.post - p.pre) / DAY) : '—'} 天${C && !nowCast ? '；' + natHouses(p.R.lon, p.D.lon) : ''}</p></div>`;
+  }).join('') : '<p class="fb-fine">这一年水星不逆行。</p>';
+  // 各星之留
+  const rows = [];
+  RT_IDS.forEach(id => R[id].forEach(p => { [p.R, p.D].forEach(s => { if (s.t >= t0 && s.t < t1) rows.push({ id, s }); }); }));
+  rows.sort((a, b) => a.s.t - b.s.t);
+  $('rtAllSub').textContent = `${Y} 年 · 共 ${rows.length} 次 · ${RT_IDS.filter(id => !R[id].length).map(id => BODY[id].n).join('、') || '无'}${RT_IDS.some(id => !R[id].length) ? '本年不逆行' : ''}`;
+  const degCell = lon => { const dd = XP.fmtDeg(lon); return `<td class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span>${XP.SIGNS[dd.sign]} <span class="deg">${dd.d}°${pad(dd.m)}′</span></td>`; };
+  $('rtAll').innerHTML = `<tr><th>${Y} 年</th><th>星</th><th>留</th><th>度数</th>${C && !nowCast ? '<th title="落本命第几宫">宫</th>' : ''}</tr>` + rows.map(({ id, s }) => `<tr class="${id === 'mercury' ? 'hl' : ''}"><td class="deg">${md(s.t)} ${hm(s.t)}</td><td><span class="g">${G(id)}</span><span class="n">${BODY[id].n}</span></td><td class="${s.kind === 'R' ? 'r' : ''}">${s.kind === 'R' ? '留逆℞' : '留顺'}</td>${degCell(s.lon)}${C && !nowCast ? `<td>${XP.houseOf(s.lon, C.cusps)}</td>` : ''}</tr>`).join('');
+}
+document.querySelector('#v-retro .xp-ctl').addEventListener('click', e => {
+  const b = e.target.closest('button[data-ry]'); if (!b) return;
+  const cy = new Date().getFullYear(), y = rtYear == null ? cy : rtYear;
+  rtYear = b.dataset.ry === '0' ? null : Math.max(1886, Math.min(2098, y + (+b.dataset.ry)));
+  if (rtYear === cy) rtYear = null;
+  renderRetro(); writeURL();
+});
+
+/* ================ 月亮空亡 ================ */
+let vcData = null;
+function voidState(now) {
+  const list = XP.voidMoon(now, now + 7 * DAY);
+  return { list, cur: list.find(p => p.start <= now && now < p.end), next: list.find(p => p.start > now) };
+}
+function renderVoid() {
+  const now = Date.now(), V = nowVoid = vcData = voidState(now);
+  const S = XP.SIGNS, ml = XP.lonOf('moon', now), ing = XP.moonIngresses(now - 3 * DAY, now).pop();
+  $('vcSub').textContent = `${ymd(now)} ${hm(now)} 起七天 · 本机时间 ${tzOf(now)}`;
+  const c = V.cur, n = V.next;
+  $('vcKey').innerHTML = c ? `<span class="xp-badge on">月亮空亡中</span>至 <span class="jin">${md(c.end)} ${hm(c.end)}</span> 入${S[c.sign]}<small>（还有 ${dur(c.end - now)}）</small>`
+    : `<span class="xp-badge off">月亮不空</span>${n ? `下一段 <span class="jin">${md(n.start)} ${hm(n.start)}</span> 起<small>（${dur(n.start - now)}后，空 ${dur(n.end - n.start)}）</small>` : ''}`;
+  const lastTxt = p => p.last ? `末相：月亮${p.last.type.n}<span class="g">${G(p.last.id)}</span>${BODY[p.last.id].n}（${md(p.last.t)} ${hm(p.last.t)}）` : '入座后整座不成相位';
+  $('vcNow').innerHTML = `此刻月亮在<b>${S[Math.floor(ml / 30)]}</b> ${degTxt(ml)}${ing ? `（${md(ing.t)} ${hm(ing.t)} 入座）` : ''}。${c ? lastTxt(c) + '，之后入' + S[c.sign] + '前不再成相：古来说此时起事多落空，宜收尾、休整，不宜开新局。' : '空亡时段（月亮最后一个相位之后、换座之前）宜收尾、休整，不宜开新局，下表供避开。'}`;
+  $('vcList').innerHTML = V.list.length ? V.list.map(p => {
+    const cur = p.start <= now && now < p.end, sameDay = ymd(p.start) === ymd(p.end);
+    return `<div class="v${cur ? ' now' : ''}"><span class="day">${md(p.start)} ${wk(p.start)}</span><span class="tm">${hm(p.start)} → ${sameDay ? '' : md(p.end) + ' '}${hm(p.end)}</span><span class="du">${dur(p.end - p.start)}${cur ? ' · 此刻' : ''}</span>
+      <span class="why">${lastTxt(p)} · 入${S[p.sign]}</span></div>`;
+  }).join('') : '<p class="fb-fine">七天内无空亡。</p>';
+}
+$('vcRefresh').onclick = () => { badgeAt = 0; renderBadges(); renderVoid(); toast('已按此刻重算'); };
+
 /* ================ 盘库 · 复制 · 网址 ================ */
 function snap() { return { when: $('whenIn').value, name: $('nameIn').value.trim(), city: view.city, lat: +view.lat, lon: +view.lon, tz: +view.tz, dst: $('dstIn').checked, house: view.house, bonatti: view.bonatti }; }
 function apply(s) {
+  nowCast = false;
   $('whenIn').value = s.when; $('nameIn').value = s.name || ''; $('dstIn').checked = !!s.dst;
   Object.assign(view, { city: s.city || '', lat: s.lat, lon: s.lon, tz: s.tz, house: s.house || 'placidus', bonatti: !!s.bonatti });
   syncUI(); cast();
@@ -476,7 +1116,35 @@ function chartText() {
   L.push('相位 ' + C.aspects.map(a => `${BODY[a.a].n}${a.type.n}${BODY[a.b].n}(${a.orb.toFixed(1)}°)`).join(' '));
   return L.join('\n');
 }
-$('copyBtn').onclick = () => { if (C) copy(chartText(), '星盘已复制'); };
+// 当前视图的文字（行运、回归、逆行、空亡），接在盘面之后
+function viewText() {
+  const L = [], S = XP.SIGNS;
+  if (tab === 'transit' && trData) {
+    const D = trData, t = D.t;
+    L.push(`【行运】${ymd(t)} ${hm(t)}（${tzOf(t)}）`);
+    D.top.forEach((a, i) => L.push(`要紧${i + 1}：行运${BODY[a.tr].n}${a.type.n}本命${PT(a.na).n}（差 ${dm(a.orb)}，${a.applying ? '入相' : '出相'}${a.passes.length ? '，' + exactTxt(a, t).replace(/℞/g, '逆') : ''}）`));
+    L.push('行运相位 ' + D.list.map(a => `${BODY[a.tr].n}${a.type.n}${PT(a.na).n}(${a.orb.toFixed(1)}°${a.applying ? '入' : '出'})`).join(' '));
+    L.push('行运星 ' + D.pos.map(p => `${BODY[p.id].n}${XP.fmtDeg(p.lon).text}${p.retro ? '℞' : ''}(本命${XP.houseOf(p.lon, C.cusps)}宫)`).join(' '));
+    if (D.groups.length) L.push('未来十二个月外行星精确成相 ' + D.groups.map(g => `${BODY[g.tr].n}${g.type.n}${PT(g.na).n}：${g.list.map(h => ymd(h.t) + (h.retro ? '逆' : '')).join('、')}`).join('；'));
+    const p = D.prog;
+    if (p.age >= 0) L.push(`次限（${p.age.toFixed(1)} 岁）：推运太阳 ${XP.fmtDeg(p.bodies.sun.lon).text}，推运月亮 ${XP.fmtDeg(p.bodies.moon.lon).text}（本命 ${p.bodies.moon.house} 宫），推运上升 ${XP.fmtDeg(p.asc).text}，推运中天 ${XP.fmtDeg(p.mc).text}`);
+  } else if (tab === 'return' && srData) {
+    const { Y, SR, pl } = srData, inp = SR.input;
+    L.push(`【太阳回归 ${Y}】${inp.y}-${pad(inp.mo)}-${pad(inp.d)} ${pad(inp.h)}:${pad(inp.mi)} ${tzLabel(pl.tz)} · ${pl.name} · ${HOUSE_NAME[SR.house]}`);
+    L.push(`回归上升 ${XP.fmtDeg(SR.angles.asc).text}（落本命第 ${XP.houseOf(SR.angles.asc, C.cusps)} 宫）· 中天 ${XP.fmtDeg(SR.angles.mc).text}`);
+    XP.PLANETS.forEach(id => { const b = SR.bodies[id]; L.push(`回归${BODY[id].n} ${XP.fmtDeg(b.lon).text}${b.retro ? ' ℞' : ''} · ${b.house} 宫`); });
+  } else if (tab === 'retro' && rtData) {
+    const { Y, R, M } = rtData;
+    L.push(`【逆行日历 ${Y}】时刻为 ${tzOf(Date.now())}`);
+    L.push(`此刻水星：${{ in: '逆行中', pre: '逆行前影', post: '逆行后影', out: '不在水逆' }[M.k]}`);
+    RT_IDS.forEach(id => R[id].forEach(p => L.push(`${BODY[id].n}：前影 ${p.pre != null ? ymd(p.pre) : '—'}，留逆 ${ymd(p.R.t)} ${hm(p.R.t)} ${XP.fmtDeg(p.R.lon).text}，留顺 ${ymd(p.D.t)} ${hm(p.D.t)} ${XP.fmtDeg(p.D.lon).text}，后影止 ${p.post != null ? ymd(p.post) : '—'}`)));
+  } else if (tab === 'void' && vcData) {
+    L.push(`【月亮空亡 · 未来七天】时刻为 ${tzOf(Date.now())}`);
+    vcData.list.forEach(p => L.push(`${md(p.start)} ${hm(p.start)} → ${md(p.end)} ${hm(p.end)}（${dur(p.end - p.start)}）${p.last ? '末相月亮' + p.last.type.n + BODY[p.last.id].n : '整座无相'}，入${S[p.sign]}`));
+  }
+  return L.join('\n');
+}
+$('copyBtn').onclick = () => { if (C) { const v = tab === 'natal' ? '' : viewText(); copy(chartText() + (v ? '\n\n' + v : ''), (tab === 'natal' ? '星盘' : VIEW_NAME[tab]) + '已复制'); } };
 // 问 AI：盘面文字再补元素模式分布、命主星、今年的小限与法达，连同本页口径一并复制
 function aiText() {
   const L = [chartText()], { el, md } = spread();
@@ -488,29 +1156,40 @@ function aiText() {
   if (pf) L.push(`今 ${age} 岁（${new Date().getFullYear()} 年）：小限到第 ${pf.house} 宫${XP.SIGNS[pf.sign]}，年主星${BODY[pf.lord].n}` + (fd ? `；法达主运${BODY[fd.lord].n}${sub ? '、子运' + BODY[sub.lord].n : ''}` : ''));
   const g = guessNote();
   if (g) L.push('注意：' + g);
+  const v = tab === 'natal' ? '' : viewText();
+  if (v) L.push('', v);
   return L.join('\n');
 }
 function rulesText() {
-  return [
+  const L = [
     '回归黄道（当日分点）；日月与八大行星按 Paul Schlyter 的轨道根数与摄动项计算，冥王星用其 1885–2099 年级数，误差约一至二角分；北交点取平均交点。',
     `宫制 ${HOUSE_NAME[C.house]}${C.placidusFallback ? '（纬度超过 66°，改用波菲利）' : ''}；上升、中天由格林尼治平恒星时推得。`,
     '相位容许度：合、冲 8°，刑、拱 7°，六合 5°，日月参与再加 2°；只取这五种主要相位。',
     '庙旺陷弱只论传统七政（守护为庙、对宫为陷，旺与弱亦然），三王星不论。',
     `法达以太阳在地平上下分昼夜${C.day ? '' : C.input.bonatti ? '，夜生用波那提序（交点殿后）' : '，夜生交点排在火星之后'}；小限每满一岁上升推进一宫（整宫）；福点昼生取上升 + 月 − 日，夜生取上升 + 日 − 月。`
-  ].join('\n');
+  ];
+  if (tab === 'transit') L.push('行运容许度：月亮 1°，日水金火木土 2°，天海冥 1.5°；「要紧」按行运星分量、本命点分量、相位轻重与紧密打分排出；外行星精确成相列木土天海冥；次限一日一年，推运中天用太阳弧，推运上升由推运中天按出生地纬度反推。');
+  if (tab === 'return') L.push('太阳回归：太阳回到本命黄经（同一星历）之刻，回归盘按所选地点、同一宫制排；看回归上升、太阳所落宫、角宫行星。');
+  if (tab === 'retro') L.push('逆行：留为视速度过零之刻；前影自留逆前行星到达留顺度数起，后影至留顺后回到留逆度数止。');
+  if (tab === 'void') L.push('月亮空亡：月亮在本座内与日水金火木土天海冥的最后一个托勒密相位（合、六合、刑、拱、冲，精确成相）之后，至入下一座为止。');
+  return L.join('\n');
 }
-$('aiBtn').onclick = () => { if (C) Fabao.askAI('西洋占星（本命盘）', aiText(), rulesText()); };
+$('aiBtn').onclick = () => { if (C) Fabao.askAI(tab === 'natal' ? '西洋占星（本命盘）' : `西洋占星（本命盘与${VIEW_NAME[tab]}）`, aiText(), rulesText()); };
 function writeURL() {
   const s = snap(), q = new URLSearchParams();
   q.set('d', s.when); q.set('lat', s.lat); q.set('lon', s.lon); q.set('tz', s.tz);
   if (s.dst) q.set('dst', '1'); if (s.house !== 'placidus') q.set('h', s.house); if (s.bonatti) q.set('b', '1'); if (s.name) q.set('n', s.name);
+  if (tab !== 'natal') q.set('v', tab);
+  if (tab === 'transit' && trAt != null) q.set('at', toLocal(trAt));
+  if (tab === 'return') { if (srYear != null) q.set('sy', srYear); if (srCity) q.set('sc', srCity); }
+  if (tab === 'retro' && rtYear != null) q.set('ry', rtYear);
   history.replaceState(null, '', '?' + q.toString());
 }
 
 /* ================ 绑定 ================ */
-$('whenIn').addEventListener('change', cast);
-$('nowBtn').onclick = () => { const t = new Date(Date.now() + (+view.tz) * 3600e3); $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`; cast(); };
-$('nameIn').addEventListener('change', () => { if (C) { C.name = $('nameIn').value.trim(); render(); writeURL(); } });
+$('whenIn').addEventListener('change', () => { nowCast = false; cast(); });
+$('nowBtn').onclick = () => { nowCast = true; const t = new Date(Date.now() + (+view.tz) * 3600e3); $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`; cast(); };
+$('nameIn').addEventListener('change', () => { if (C) { C.name = $('nameIn').value.trim(); render(); renderView(); writeURL(); } });
 $('cityIn').onchange = () => { const c = CITY_LIST.find(x => x[0] === $('cityIn').value); if (c) { Object.assign(view, { city: c[0], lon: c[1], lat: c[2], tz: c[3] }); saveView(); syncUI(); cast(); } else { view.city = ''; $('latIn').focus(); } };
 $('latIn').onchange = () => { const v = parseFloat($('latIn').value); if (isFinite(v) && Math.abs(v) < 90) { view.lat = v; view.city = ''; saveView(); syncUI(); cast(); } else toast('纬度应在 −90 到 90 之间'); };
 $('lonIn').onchange = () => { const v = parseFloat($('lonIn').value); if (isFinite(v) && Math.abs(v) <= 180) { view.lon = v; view.city = ''; saveView(); syncUI(); cast(); } else toast('经度应在 −180 到 180 之间'); };
@@ -519,9 +1198,30 @@ $('dstIn').onchange = cast;
 $('houseIn').onchange = () => { view.house = $('houseIn').value; saveView(); cast(); };
 $('fdIn').onchange = () => { view.bonatti = $('fdIn').value === '1'; saveView(); cast(); };
 $('wheel').addEventListener('click', e => { const t = e.target.closest('[data-id]'); if (t) { const b = C.bodies[t.dataset.id]; toast(`${BODY[t.dataset.id].n} ${XP.fmtDeg(b.lon).text}${b.retro ? ' 逆行' : ''} · ${b.house} 宫${b.dig ? ' · ' + b.dig : ''}`, 2600); } });
+$('trWheel').addEventListener('click', e => {
+  const t = e.target.closest('[data-tid],[data-id]'); if (!t || !trData) return;
+  if (t.dataset.tid) { const p = trData.pos.find(x => x.id === t.dataset.tid); toast(`行运${BODY[p.id].n} ${XP.fmtDeg(p.lon).text}${p.retro ? ' 逆行' : ''} · 本命第 ${XP.houseOf(p.lon, C.cusps)} 宫`, 2600); }
+  else { const b = C.bodies[t.dataset.id]; toast(`本命${BODY[t.dataset.id].n} ${XP.fmtDeg(b.lon).text} · ${b.house} 宫`, 2600); }
+});
+$('srWheel').addEventListener('click', e => { const t = e.target.closest('[data-id]'); if (t && srData) { const b = srData.SR.bodies[t.dataset.id]; toast(`回归${BODY[t.dataset.id].n} ${XP.fmtDeg(b.lon).text}${b.retro ? ' 逆行' : ''} · 回归盘 ${b.house} 宫`, 2600); } });
+$('viewSeg').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (b && b.dataset.v !== tab) setTab(b.dataset.v); });
+$('openForm').onclick = () => { formOpen = true; foldPanel(); $('whenIn').focus(); };
+$('foldForm').onclick = () => { formOpen = false; foldPanel(); };
 
 syncUI(); renderLib();
 const q = new URLSearchParams(location.search);
+// 视图：网址带 v= 就开那一页；从本页换人（命部条上点人会重开本页）时沿用刚才那一页
+(() => {
+  let v = q.get('v');
+  if (!v) { try { const r = document.referrer && new URL(document.referrer); if (r && r.origin === location.origin && r.pathname === location.pathname) v = sessionStorage.getItem(SS_TAB); } catch (e) { /* 无痕模式 */ } }
+  if (VIEWS.indexOf(v) >= 0) tab = v;
+  const at = q.get('at'), d = at ? new Date(at) : null;
+  if (d && !isNaN(d) && d.getFullYear() >= 1885 && d.getFullYear() <= 2099) trAt = d.getTime();
+  if (+q.get('sy')) srYear = +q.get('sy');
+  if (q.get('sc') && CITY_LIST.some(c => c[0] === q.get('sc'))) srCity = q.get('sc');
+  if (+q.get('ry')) rtYear = +q.get('ry');
+})();
+setTab(tab, true);
 if (q.get('d')) {
   const c = CITY_LIST.find(x => Math.abs(x[2] - (+q.get('lat'))) < 0.005 && Math.abs(x[1] - (+q.get('lon'))) < 0.005);
   const lat = +q.get('lat') || view.lat, lon = +q.get('lon') || view.lon;

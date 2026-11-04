@@ -2,13 +2,14 @@
    择日 · 择时 —— 只管算，不碰页面
    ---------------------------------------------------------
    某件事放在某个时刻好不好，合看三层：
-     一、日：通书底座（/fabao/tongshu.js）给这一天对这件事的分（建除宜忌、黄道黑道、冲本命、
-        岁破四离四绝杨公忌、彭祖百忌，开了日本历注再加六曜選日）；
+     一、日：通书底座（/fabao/tongshu.js）给这一天对这件事的分（协纪辨方的每日宜忌、黄道黑道、大吉神、
+        二十八宿、冲本命、岁破四离四绝杨公忌、彭祖百忌，开了日本历注再加六曜選日）；
      二、时：这个时辰的值神黄道黑道、时辰冲本命；开了日本历注再看六曜的上午下午（先勝、先負、赤口）；
      三、奇门：按事项取题型（面试→求职、考试面谈→考试……），用奇门手记的白话断语（QM.verdict）打分，
         年命填了也一并看。
    三层相加排先后；23 点以后按奇门惯例算次日子时。
-   另有 parse()：把「11/18 20:00」「１１月１８日（水）２０：００」「11/16 夕方」这类写法读成时刻。
+   另有 parse()：把「11/18 20:00」「１１月１８日（水）２０：００」「11/16 夕方」这类写法读成时刻；
+   toEvent()：把一条结果写成日历事项（UTC 起止，交给 TS.ics 存 .ics）。
    浏览器里挂 window.ZR；node 里 require 即得同一对象。
    ========================================================= */
 (function (root) {
@@ -88,15 +89,16 @@
     var cons = items.filter(function (x) { return x.v < 0; }).sort(function (a, b) { return a.v - b.v; });
     return {
       date: date, day: r, hour: hr, ev: ev,
-      dayScore: dayS.score, dayGrade: TS.grade(dayS.score), dayPlus: dayS.plus, dayMinus: dayS.minus,
+      dayScore: dayS.score, dayGrade: TS.grade(dayS.score, opt.jp), dayPlus: dayS.plus, dayMinus: dayS.minus,
       hourScore: Math.round(hourS * 10) / 10, hourItems: hourItems,
       qm: v, qmScore: Math.round(qmS * 10) / 10, chart: c,
-      total: total, grade: grade(total), pros: pros, cons: cons
+      total: total, grade: grade(total, opt.jp), pros: pros, cons: cons
     };
   }
-  // 分档按试算的分布定（两周逐时辰、十种事项合算：中位约 −3，前一成约 +3.3，后一成半约 −8.7）：
-  // 上吉约一成、吉约两成、平三成余、次两成、凶一成半
-  function grade(s) { return s >= 3.2 ? '上吉' : s >= 0.3 ? '吉' : s >= -4.5 ? '平' : s >= -8.5 ? '次' : '凶'; }
+  // 分档按试算的分布定（2026-11-04 起一整年逐时辰、十种事项合算，每档约 4.4 万个时刻）：
+  //   日本历注关：上吉 10.5%、吉 21.5%、平 35.7%、次 17.6%、凶 14.7%（中位约 −1.1）
+  //   日本历注开：上吉 9.6%、吉 19.4%、平 34.6%、次 21.7%、凶 14.7%（六曜選日多扣分，凶的门槛放低 0.7）
+  function grade(s, jp) { return s >= 4.7 ? '上吉' : s >= 1.2 ? '吉' : s >= -3.3 ? '平' : s >= (jp ? -6.8 : -6.1) ? '次' : '凶'; }
 
   // —— 在一段日子里逐时辰找 ——
   // win: [起点钟, 止点钟)（如 [9, 18]）；days: 'all' | 'work' | 'weekend'
@@ -120,6 +122,32 @@
     return out;
   }
 
-  var api = { parse: parse, evalTime: evalTime, search: search, grade: grade, half: half };
+  // —— 写成日历事项 ——
+  // 起止：找时辰时用那一段（span，整点）；自己给的时刻从那一刻到该时辰末（至少半小时）。时刻一律 UTC
+  var WEEK = '日一二三四五六';
+  function p2(n) { return (n < 10 ? '0' : '') + n; }
+  function toEvent(e) {
+    var d = e.date, start = d.getTime(), end;
+    if (e.span) end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), e.span[1], 0).getTime();
+    else {
+      var h0 = 2 * Math.floor((d.getHours() + 1) / 2) - 1;       // 所在时辰的起点（子时起于前一日 23 点）
+      end = Math.max(new Date(d.getFullYear(), d.getMonth(), d.getDate(), h0 + 2, 0).getTime(), start + 30 * 60000);
+    }
+    var E = e.ev, ed = new Date(end), short = function (t) { return t.replace(/：.*/, '').replace(/（[^）]*）$/, ''); };
+    var when = (d.getMonth() + 1) + '月' + d.getDate() + '日 周' + WEEK[d.getDay()] + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + '–' + p2(ed.getHours()) + ':' + p2(ed.getMinutes());
+    var iso = d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + 'T' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+    return {
+      uid: new Date(start).toISOString().replace(/[-:]/g, '').slice(0, 13) + '-zr-' + (E.py || 'ev') + '@ohwowbill.com',
+      start: start, end: end,
+      title: E.name + ' · ' + e.grade + '（' + e.hour.name + '）',
+      url: 'https://ohwowbill.com/qimen/?t=' + iso + (E.qm !== '自由' ? '&type=' + encodeURIComponent(E.qm) : ''),
+      desc: when + ' ' + e.hour.name + ' · ' + e.day.gz.name + '日\n' +
+        '黄历' + e.dayGrade + '（' + e.day.jianchu + '日 · ' + e.day.shen + (e.day.huang ? '黄道' : '黑道') + '），时辰' + e.hour.shen + (e.hour.huang ? '黄道' : '黑道') + '，奇门' + (e.qm ? e.qm.grade : '—') + '\n' +
+        '好在' + (e.pros.slice(0, 3).map(function (x) { return short(x.t); }).join('、') || '—') + '；要留意' + (e.cons.slice(0, 2).map(function (x) { return short(x.t); }).join('、') || '—') + '\n' +
+        '链接是这一刻的奇门盘 · 潜蛟阁择日'
+    };
+  }
+
+  var api = { parse: parse, evalTime: evalTime, search: search, grade: grade, half: half, toEvent: toEvent };
   if (NODE) module.exports = api; else root.ZR = api;
 })(this);

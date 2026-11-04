@@ -1,8 +1,8 @@
 /* =========================================================
-   通书 · 黄历底座 —— 只管算，不碰页面
+   通书 · 黄历底座 —— 只管算，不碰页面（另附一个存 .ics 的小工具）
    ---------------------------------------------------------
-   给日课、黄历、择日、流年共用：某一天的干支纳音、建除、值神（黄道黑道）、
-   冲煞、吉神方位、彭祖百忌、宜忌、十二时辰吉凶，以及日本历注（六曜、選日、雑節）。
+   给日课、黄历、择日、流年共用：某一天的干支纳音、建除、值神（黄道黑道）、冲煞、吉神方位、彭祖百忌，
+   协纪辨方的全套宜忌与神煞、胎神占方、二十八宿、七十二候，十二时辰吉凶，以及日本历注（六曜、選日、雑節）。
    口径
      · 节月以「节」换：交节那一天整天算新月（日本暦注同此）；节气取 /qimen/jieqi.js（精确到分）。
      · 建除：日支与月建同为「建」，顺数；交节之日自然重复前一日。
@@ -11,9 +11,14 @@
      · 冲煞：天克地冲（冲干为日干后四位，冲支对冲）；申子辰煞南、寅午戌煞北、巳酉丑煞东、亥卯未煞西。
      · 喜神：甲己东北、乙庚西北、丙辛西南、丁壬正南、戊癸东南；
        财神：甲乙东北、丙丁西南、戊己正北、庚辛正东、壬癸正南；
-       阳贵阴贵：《协纪辨方书》表。
-     · 宜忌：以建除十二神为主（通书常见简本，与 data/rike.yaml 同一份），
-       再标黄道黑道、岁破、四离四绝、杨公忌。神煞全套（天德月德、往亡、归忌……）不在此列。
+       阳贵阴贵：甲戊庚牛羊（庚日阳贵丑、阴贵未，与天气网老黄历同；lunar-javascript 作庚日午寅，不取）。
+     · 宜忌、吉神宜趋、凶煞宜忌、胎神、二十八宿：《协纪辨方书》的每日表，取自 lunar-javascript 1.7.7
+       （6tail，MIT，移植在 /fabao/tongshu-shensha.js）：宜忌按节月干支与日干支、神煞按月建与日干支、
+       胎神按日干支（月胎神按农历月）、二十八宿按日支与星期。与该库逐日对照，1901–2099 年全同。
+       没载入该件时退回建除十二神的简本宜忌（与 data/rike.yaml 同一份）。
+       另标黄道黑道、岁破、四离四绝、杨公忌（这几样不在协纪的每日表里）。
+     · 七十二候：太阳黄经每 5° 一候（立春初候 315°），两端用精确节气、中间按低精度太阳黄经插值；
+       入候那一天整天算新候。候名中国取《逸周书·时训解》与宣明暦本，日本取略本暦的本朝七十二候（/fabao/tongshu-hou.js）。
      · 六曜、不成就日按日本旧暦（/fabao/kyureki.js，日本时间落朔）；
        一粒万倍日、天赦日、三隣亡、受死日、十死日按节月；母倉日按季节与土用；
        土用、入梅、半夏生用低精度太阳黄经（误差一刻钟内）。
@@ -26,8 +31,12 @@
   var J = NODE ? require('../qimen/jieqi.js') : root.QM_JIEQI;
   // 农历、旧暦月表用时再取：首页的脚本包里农历表在本文件之后才载入
   var LUNAR0 = NODE ? require('./lunar.js') : null, KYU0 = NODE ? require('./kyureki.js') : null;
+  // 协纪宜忌神煞表、七十二候名：另两件数据（/fabao/tongshu-shensha.js、/fabao/tongshu-hou.js），在就用
+  var SS0 = NODE ? require('./tongshu-shensha.js') : null, HOU0 = NODE ? require('./tongshu-hou.js') : null;
   function LUNAR() { return LUNAR0 || root.QJ_LUNAR || null; }
   function KYU() { return KYU0 || root.QJ_KYUREKI || null; }
+  function SS() { return SS0 || root.TS_SHENSHA || null; }
+  function HOU() { return HOU0 || root.TS_HOU || null; }
   var DAY = 86400000;
   function mod(a, n) { return ((a % n) + n) % n; }
 
@@ -48,7 +57,8 @@
   var PENG_ZHI = ['子不问卜，自惹祸殃', '丑不冠带，主不还乡', '寅不祭祀，神鬼不尝', '卯不穿井，水泉不香', '辰不哭泣，必主重丧',
     '巳不远行，财物伏藏', '午不苫盖，屋主更张', '未不服药，毒气入肠', '申不安床，鬼祟入房', '酉不会客，醉坐颠狂',
     '戌不吃犬，作怪上床', '亥不嫁娶，不利新郎'];
-  // 建除宜忌：通书常见简本。与 data/rike.yaml（首页日课）是同一份，改一处另一处也要改（scripts/tongshu/check.js 会核对）
+  // 建除宜忌：通书常见简本，只在协纪全表（tongshu-shensha.js）没载入时顶用。
+  // 与 data/rike.yaml（首页日课的退路）是同一份，改一处另一处也要改（scripts/tongshu/check.js 会核对）
   var YIJI = {
     建: { yi: ['出行', '上任', '谒贵', '求谋'], ji: ['动土', '开仓', '嫁娶', '安葬'] },
     除: { yi: ['祭祀', '扫舍', '求医', '治病', '沐浴'], ji: ['嫁娶', '远行', '移徙', '开市'] },
@@ -104,6 +114,42 @@
   function termOn(y, m, d) {                // 这一天交的节气（{ n, t } 或 null）
     var k = lastBefore(TERMS, endOf(y, m, d));
     return k >= 0 && TERMS[k].t >= startOf(y, m, d) ? TERMS[k] : null;
+  }
+
+  /* —— 七十二候：黄经每 5° 一候 ——
+     初候即节气本身（精确到分）；二候、三候按低精度太阳黄经在前后两个精确节气之间插值，误差在一两分钟。
+     k 为候序，立春初候 0 …… 大寒三候 71 */
+  var houCache = {};
+  function houMarks(Y) {                    // 覆盖公历 Y 年前后各一个多月
+    if (houCache[Y]) return houCache[Y];
+    var from = Date.UTC(Y - 1, 10, 15), to = Date.UTC(Y + 1, 1, 15), out = [];
+    for (var i = 0; i + 1 < TERMS.length; i++) {
+      var a = TERMS[i], b = TERMS[i + 1];
+      if (a.t < from || a.t > to) continue;
+      var idx = J.NAMES.indexOf(a.n), lon = idx * 15, q = mod(idx - 21, 24);
+      var sa = sunAt(lon, a.t - 3 * DAY), sb = sunAt(lon + 15, a.t);
+      out.push({ t: a.t, k: q * 3 });
+      for (var n = 1; n < 3; n++) out.push({ t: a.t + (b.t - a.t) * (sunAt(lon + 5 * n, a.t) - sa) / (sb - sa), k: q * 3 + n });
+    }
+    return (houCache[Y] = out);
+  }
+  function houNamed(x) {
+    var H = HOU(), o = H ? H.of(x.k) : { i: x.k, n: x.k % 3 };
+    o.k = x.k; o.t = x.t;
+    return o;
+  }
+  // 这一天的候（这一天结束前最后入的一候；入候那天整天算新候）：{ k, t, first, cn, jp, yomi, cnName, jpName … }
+  function houOf(y, m, d) {
+    var M = houMarks(y), k = lastBefore(M, endOf(y, m, d));
+    if (k < 0) return null;
+    var o = houNamed(M[k]);
+    o.first = M[k].t >= startOf(y, m, d);
+    return o;
+  }
+  // 某公历年里入的各候（排全年表用），按时刻先后
+  function houOfYear(Y) {
+    var a = startOf(Y, 1, 1), b = startOf(Y + 1, 1, 1);
+    return houMarks(Y).filter(function (x) { return x.t >= a && x.t < b; }).map(houNamed);
   }
 
   /* —— 干支 —— */
@@ -235,7 +281,9 @@
     ['春分', '夏至', '秋分', '冬至'].forEach(function (n) { if (nextT(n)) notes.push({ n: '四离', d: '明日' + n + '，大事勿用' }); });
     ['立春', '立夏', '立秋', '立冬'].forEach(function (n) { if (nextT(n)) notes.push({ n: '四绝', d: '明日' + n + '，大事勿用' }); });
     if (L && !L.leap) { var yg = YANGGONG[L.m]; if (yg === L.d || (yg && yg.indexOf && yg.indexOf(L.d) >= 0)) notes.push({ n: '杨公忌', d: '杨公十三忌，大事勿用' }); }
-    var yj = YIJI[jc];
+    // 宜忌：有协纪全表用全表（「无」即空），否则用建除简本
+    var S = SS(), none = function (a) { return a.length === 1 && a[0] === '无' ? [] : a; };
+    var yj = S ? S.yiji(jm.month.i, g.i) : YIJI[jc], sha = S ? S.shensha(jm.zhi, g.i) : null;
     var r = {
       key: key, y: y, m: m, d: d, w: w, week: '周' + WEEK[w],
       gz: g, nayin: nayin(g.i), year: jm.year, yearNum: jm.yearNum, month: jm.month, jie: jm,
@@ -245,15 +293,35 @@
       chong: chongOf(g),
       fang: { xi: XI[g.gan % 5], cai: CAI[g.gan], yangGui: ZHI_DIR[YANG_GUI[g.gan]], yinGui: ZHI_DIR[YIN_GUI[g.gan]] },
       pengzu: [PENG_GAN[g.gan], PENG_ZHI[g.zhi]],
-      yi: yj.yi.slice(), ji: yj.ji.slice(), notes: notes,
+      yi: none(yj.yi.slice()), ji: none(yj.ji.slice()), yjSrc: S ? 'xj' : 'jc', notes: notes,
+      jishen: sha ? none(sha.ji) : [], xiongsha: sha ? none(sha.xiong) : [],
+      tai: S ? S.tai(g.i, L && !L.leap ? L.m : 0) : null,
+      xiu: S ? S.xiu(g.zhi, w) : null,
+      hou: houOf(y, m, d),
       rokuyo: K ? ROKUYO[(K.m + K.d) % 6] : null,
       sen: senjitsu(g, jm, K, season, doyo),
       fest: festOf(y, m, d, L)
     };
     if (doyo && g.zhi === 1) r.fest.push({ n: '土用の丑', kind: 'jp' });
-    if (jc === '破' || notes.length) r.ji.unshift('诸事不宜');
+    if (!S && (jc === '破' || notes.length)) r.ji.unshift('诸事不宜');   // 简本才补；协纪全表自有「诸事不宜」「馀事勿取」
     r.rokuyoNote = r.rokuyo ? ROKUYO_NOTE[r.rokuyo] : '';
     return (cache[key] = r);
+  }
+
+  // 宜忌摘要（首页日课、日签用）：常用的排前面，「诸事不宜」「馀事勿取」照留；
+  // 以顿号连起来总长不过 max 字。回 { items, more }（more：有没列出的）
+  var PRI = ['诸事不宜', '嫁娶', '出行', '移徙', '入宅', '开市', '交易', '立券', '纳财', '动土', '修造', '安床', '祭祀', '祈福',
+    '求医', '治病', '会亲友', '赴任', '入学', '订盟', '纳采', '安葬', '破土', '栽种', '沐浴', '裁衣', '理发', '解除', '扫舍', '开光', '求嗣', '上梁', '作灶'];
+  function brief(list, max) {
+    max = max || 14;
+    var tail = list.indexOf('馀事勿取') >= 0 ? ['馀事勿取'] : [], room = max - (tail.length ? 5 : 0), n = -1, out = [];
+    var rest = list.filter(function (x) { return x !== '馀事勿取'; }).map(function (x, i) { var p = PRI.indexOf(x); return { x: x, p: p < 0 ? 100 + i : p }; })
+      .sort(function (a, b) { return a.p - b.p; });
+    for (var i = 0; i < rest.length; i++) {
+      if (n + 1 + rest[i].x.length > room && out.length) break;
+      out.push(rest[i].x); n += 1 + rest[i].x.length;
+    }
+    return { items: out.concat(tail), more: out.length < rest.length };
   }
 
   // 十二时辰：干支（五鼠遁）、值神、冲
@@ -275,18 +343,19 @@
   }
 
   /* —— 事项：黄历「找吉日」与择日共用 ——
-     yi：通书里对应的条目；jp：日本历注的加减；qm：奇门题型（择日用） */
+     yi：协纪宜忌里对应的条目，前 main 个为正项（宜得最重、忌也最重），其余为旁项；
+     jc：建除简本里的条目（协纪全表没载入时用）；jp：日本历注的加减；qm：奇门题型（择日用）；py：存日历文件时用的拼音名 */
   var EVENTS = [
-    { k: '面试', name: '面试求职', yi: ['上任', '谒贵', '求谋', '会友'], qm: '求职', jp: { 一粒万倍日: 1, 十方暮: -1 } },
-    { k: '考试', name: '考试面谈', yi: ['入学', '求谋', '谒贵'], qm: '考试', jp: { 一粒万倍日: 0.5 } },
-    { k: '签约', name: '签约交易', yi: ['立契', '交易', '纳财'], qm: '签约', jp: { 一粒万倍日: 1, 巳の日: 0.5, 己巳の日: 1, 十方暮: -1.5 } },
-    { k: '开业', name: '开业开市', yi: ['开市', '纳财'], qm: '开业', jp: { 一粒万倍日: 1.5, 寅の日: 0.5, 巳の日: 0.5, 己巳の日: 1, 甲子の日: 0.5, 仏滅: -1 } },
-    { k: '搬家', name: '搬家入宅', yi: ['移徙', '入宅'], qm: '搬家', jp: { 三隣亡: -1.5, 仏滅: -0.5 } },
-    { k: '出行', name: '出行旅行', yi: ['出行'], qm: '出行', jp: { 寅の日: 0.5, 一粒万倍日: 0.5 } },
-    { k: '嫁娶', name: '嫁娶提亲', yi: ['嫁娶'], qm: '婚姻', jp: { 母倉日: 1, 八専: -1, 仏滅: -1.5, 友引: 0.5 } },
-    { k: '求医', name: '求医治病', yi: ['求医', '治病'], qm: '疾病', jp: { 一粒万倍日: -0.5 } },
-    { k: '动土', name: '动土装修', yi: ['动土', '修造', '修饰垣墙'], qm: '自由', jp: { 三隣亡: -2, 大犯土: -2, 小犯土: -1.5, 八専: -1, 母倉日: 1 } },
-    { k: '祭祀', name: '祭祀祈福', yi: ['祭祀', '祈福'], qm: '自由', jp: { 八専: -1 } }
+    { k: '面试', py: 'mianshi', name: '面试求职', yi: ['赴任', '会亲友', '见贵'], main: 2, jc: ['上任', '谒贵', '求谋', '会友'], qm: '求职', jp: { 一粒万倍日: 1, 十方暮: -1 } },
+    { k: '考试', py: 'kaoshi', name: '考试面谈', yi: ['入学', '习艺', '见贵'], main: 1, jc: ['入学', '求谋', '谒贵'], qm: '考试', jp: { 一粒万倍日: 0.5 } },
+    { k: '签约', py: 'qianyue', name: '签约交易', yi: ['立券', '交易', '纳财'], main: 2, jc: ['立契', '交易', '纳财'], qm: '签约', jp: { 一粒万倍日: 1, 巳の日: 0.5, 己巳の日: 1, 十方暮: -1.5 } },
+    { k: '开业', py: 'kaiye', name: '开业开市', yi: ['开市', '挂匾', '纳财'], main: 1, jc: ['开市', '纳财'], qm: '开业', jp: { 一粒万倍日: 1.5, 寅の日: 0.5, 巳の日: 0.5, 己巳の日: 1, 甲子の日: 0.5, 仏滅: -1 } },
+    { k: '搬家', py: 'banjia', name: '搬家入宅', yi: ['移徙', '入宅', '安香'], main: 2, jc: ['移徙', '入宅'], qm: '搬家', jp: { 三隣亡: -1.5, 仏滅: -0.5 } },
+    { k: '出行', py: 'chuxing', name: '出行旅行', yi: ['出行'], main: 1, jc: ['出行'], qm: '出行', jp: { 寅の日: 0.5, 一粒万倍日: 0.5 } },
+    { k: '嫁娶', py: 'jiaqu', name: '嫁娶提亲', yi: ['嫁娶', '纳采', '订盟'], main: 1, jc: ['嫁娶'], qm: '婚姻', jp: { 母倉日: 1, 八専: -1, 仏滅: -1.5, 友引: 0.5 } },
+    { k: '求医', py: 'qiuyi', name: '求医治病', yi: ['求医', '治病', '针灸'], main: 2, jc: ['求医', '治病'], qm: '疾病', jp: { 一粒万倍日: -0.5 } },
+    { k: '动土', py: 'dongtu', name: '动土装修', yi: ['动土', '修造', '破土', '起基', '修饰垣墙'], main: 2, jc: ['动土', '修造', '修饰垣墙'], qm: '自由', jp: { 三隣亡: -2, 大犯土: -2, 小犯土: -1.5, 八専: -1, 母倉日: 1 } },
+    { k: '祭祀', py: 'jisi', name: '祭祀祈福', yi: ['祭祀', '祈福'], main: 2, jc: ['祭祀', '祈福'], qm: '自由', jp: { 八専: -1 } }
   ];
   var EV_BY = {}; EVENTS.forEach(function (e) { EV_BY[e.k] = e; });
   // 彭祖百忌与事项的抵触
@@ -295,20 +364,45 @@
   var JP_BASE = { 天赦日: 2, 天恩日: 0.5, 母倉日: 0.5, 不成就日: -2, 受死日: -2, 十死日: -1.5 };
   var RK_BASE = { 大安: 1, 仏滅: -1, 赤口: -0.5 };
 
+  // 大吉神：遇之加分（协纪宜忌里已有其效，这里只轻加）
+  var BIG_JI = ['天赦', '天愿', '天德', '月德', '天德合', '月德合'];
+
   /* 某天对某事的打分。opt: { jp: 计日本历注, sx: 本命年支（0 子 … 11 亥）或 null }
-     返回 { score, plus: [{t, v}], minus: [{t, v}] }；分数大致在 −10 到 +8 之间 */
+     返回 { score, plus: [{t, v, src}], minus: [{t, v, src}] }；分数大致在 −12 到 +8 之间。
+     有协纪全表时：正项入宜 +3、只旁项入宜 +2（多一项再加 0.5，至多加 1）；正项入忌 −4、只旁项入忌 −2.5；
+     都不在而这天「诸事不宜」−3.5、「馀事勿取」−2，否则看建除吉凶 ±0.5。
+     另计：黄道黑道 ±1、破日 −1.5（求医与宜此事者不计）、岁破四离四绝杨公忌各 −4、大吉神每个 +0.5（至多 +1）、
+     二十八宿吉凶 ±0.5、冲本命 −3、彭祖百忌 −1；开日本历注再加六曜選日。
+     分档（grade）按 2025–2034 十年、十种事项试算的分布定，见 scripts/tongshu/check.js */
   function score(r, k, opt) {
     opt = opt || {};
     var ev = EV_BY[k] || null, plus = [], minus = [], put = function (t, v, src) { (v >= 0 ? plus : minus).push({ t: t, v: v, src: src }); };
-    if (ev) {
-      var yi = ev.yi.filter(function (x) { return r.yi.indexOf(x) >= 0; }), ji = ev.yi.filter(function (x) { return YIJI[r.jianchu].ji.indexOf(x) >= 0; });
-      if (yi.length) put(r.jianchu + '日宜' + yi.join('、'), 3, '建除');
-      if (ji.length) put(r.jianchu + '日忌' + ji.join('、'), -3.5, '建除');
-      if (!yi.length && !ji.length) put(r.jianchu + '日（建除' + (r.jcTone > 0 ? '吉' : '凶') + '日）', r.jcTone * 0.5, '建除');
-    } else put(r.jianchu + '日（建除' + (r.jcTone > 0 ? '吉' : '凶') + '日）', r.jcTone, '建除');
-    if (r.jianchu === '破' && !(ev && ev.k === '求医')) put('月破（破日）大事勿用', -3, '建除');
-    put((r.huang ? '黄道日（' : '黑道日（') + r.shen + '）', r.huang ? 1.5 : -1.5, '值神');
-    r.notes.forEach(function (x) { put(x.n + '：' + x.d, -3.5, '通书'); });        // 岁破、四离四绝、杨公忌：大事勿用
+    var tone = function (w) { put(r.jianchu + '日（建除' + (r.jcTone > 0 ? '吉' : '凶') + '日）', r.jcTone * w, '建除'); };
+    var inYi = false;
+    if (ev && r.yjSrc === 'xj') {
+      var main = ev.yi.slice(0, ev.main), has = function (list) { return ev.yi.filter(function (x) { return list.indexOf(x) >= 0; }); };
+      var yi = has(r.yi), ji = has(r.ji), mainYi = yi.some(function (x) { return main.indexOf(x) >= 0; });
+      inYi = yi.length > 0;
+      if (yi.length) put('宜' + yi.join('、'), (mainYi ? 3 : 2) + Math.min(1, 0.5 * (yi.length - 1)), '宜忌');
+      if (ji.length) put('忌' + ji.join('、'), ji.some(function (x) { return main.indexOf(x) >= 0; }) ? -4 : -2.5, '宜忌');
+      if (!yi.length && !ji.length) {
+        if (r.yi.indexOf('诸事不宜') >= 0 || r.ji.indexOf('诸事不宜') >= 0) put('诸事不宜', -3.5, '宜忌');
+        else if (r.yi.indexOf('馀事勿取') >= 0 || r.ji.indexOf('馀事勿取') >= 0) put('宜忌未列此事（馀事勿取）', -2, '宜忌');
+        else tone(0.5);
+      }
+    } else if (ev) {                                   // 建除简本
+      var yj = YIJI[r.jianchu], y2 = ev.jc.filter(function (x) { return yj.yi.indexOf(x) >= 0; }), j2 = ev.jc.filter(function (x) { return yj.ji.indexOf(x) >= 0; });
+      inYi = y2.length > 0;
+      if (y2.length) put(r.jianchu + '日宜' + y2.join('、'), 3, '建除');
+      if (j2.length) put(r.jianchu + '日忌' + j2.join('、'), -3.5, '建除');
+      if (!y2.length && !j2.length) tone(0.5);
+    } else tone(1);
+    if (r.jianchu === '破' && !(ev && (ev.k === '求医' || inYi))) put('月破（破日）大事勿用', r.yjSrc === 'xj' ? -1.5 : -3, '建除');
+    put((r.huang ? '黄道日（' : '黑道日（') + r.shen + '）', r.huang ? 1 : -1, '值神');
+    r.notes.forEach(function (x) { put(x.n + '：' + x.d, -4, '通书'); });        // 岁破、四离四绝、杨公忌：大事勿用
+    var big = (r.jishen || []).filter(function (x) { return BIG_JI.indexOf(x) >= 0; });
+    if (big.length) put(big.join('、') + '（大吉神）', Math.min(1, 0.5 * big.length), '神煞');
+    if (r.xiu) put('二十八宿' + r.xiu.full + '（' + r.xiu.luck + '）', r.xiu.luck === '吉' ? 0.25 : -0.25, '星宿');
     if (opt.sx != null && opt.sx === r.chong.zhi) put('日冲本命（属' + SX[opt.sx] + '）', -3, '冲');
     if (ev) {
       if ((PENG_HIT[r.gz.gan] || []).indexOf(ev.k) >= 0) put('彭祖：' + r.pengzu[0], -1, '彭祖');
@@ -329,15 +423,71 @@
     plus.sort(function (a, b) { return b.v - a.v; }); minus.sort(function (a, b) { return a.v - b.v; });
     return { score: Math.round(s * 10) / 10, plus: plus, minus: minus };
   }
-  function grade(s) { return s >= 4.5 ? '上吉' : s >= 2 ? '吉' : s >= -0.5 ? '平' : s >= -3.5 ? '次' : '凶'; }
+  // 分档：2025–2034 十年 × 十种事项试算（分数皆为 0.25 的倍数）。开日本历注时六曜選日多扣分，凶的门槛放低半分：
+  // 日本历注关：上吉 11.4%、吉 22.4%、平 29.5%、次 22.3%、凶 14.4%
+  // 日本历注开：上吉 10.6%、吉 20.6%、平 27.9%、次 25.1%、凶 15.8%
+  function grade(s, jp) { return s >= 3.75 ? '上吉' : s >= 1.25 ? '吉' : s >= -1.75 ? '平' : s >= (jp ? -4.75 : -4.25) ? '次' : '凶'; }
 
   // 年里的节气（排节气表用）：[{ n, t }]
   function termsOfYear(Y) { return TERMS.filter(function (x) { return new Date(x.t).getFullYear() === Y; }); }
 
+  /* —— 日历文件（.ics，RFC 5545）——
+     events: [{ uid, title, desc?, url?, date: [y, m, d]（整天）| start, end（UTC 毫秒，定时） }]
+     整天的写 DTSTART;VALUE=DATE 与次日的 DTEND；定时的一律写 UTC（…Z）。行以 CRLF 断，过 75 字节折行（按 UTF-8 计，不拆字） */
+  function icsText(s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+  function icsFold(line) {
+    var out = [], cur = '', n = 0, lim = 75;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i], c = line.charCodeAt(i);
+      if (c >= 0xD800 && c <= 0xDBFF && i + 1 < line.length) ch += line[++i];
+      var b = c < 0x80 ? 1 : c < 0x800 ? 2 : ch.length > 1 ? 4 : 3;
+      if (n + b > lim) { out.push(cur); cur = ''; n = 0; lim = 74; }     // 续行以一个空格开头，空格也算一字节
+      cur += ch; n += b;
+    }
+    out.push(cur);
+    return out.join('\r\n ');
+  }
+  function icsDate(a) { var t = new Date(Date.UTC(a[0], a[1] - 1, a[2])); return t.getUTCFullYear() + pad2(t.getUTCMonth() + 1) + pad2(t.getUTCDate()); }
+  function icsUTC(ms) { return new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+  function ics(events, name) {
+    var L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ohwowbill.com//Qianjiao Tongshu//ZH', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+    if (name) L.push('X-WR-CALNAME:' + icsText(name));
+    var stamp = icsUTC(Date.now());
+    events.forEach(function (e) {
+      L.push('BEGIN:VEVENT', 'UID:' + e.uid, 'DTSTAMP:' + stamp);
+      if (e.date) L.push('DTSTART;VALUE=DATE:' + icsDate(e.date), 'DTEND;VALUE=DATE:' + icsDate([e.date[0], e.date[1], e.date[2] + 1]), 'TRANSP:TRANSPARENT');
+      else L.push('DTSTART:' + icsUTC(e.start), 'DTEND:' + icsUTC(e.end > e.start ? e.end : e.start + 3600e3));
+      L.push('SUMMARY:' + icsText(e.title));
+      if (e.desc) L.push('DESCRIPTION:' + icsText(e.desc));
+      if (e.url) L.push('URL:' + e.url);
+      L.push('END:VEVENT');
+    });
+    L.push('END:VCALENDAR');
+    return L.map(icsFold).join('\r\n') + '\r\n';
+  }
+  // 浏览器里存成文件：Blob + <a download>。iOS Safari 下载后点开即进「日历」；不支持 download 的老浏览器直接打开。
+  // 文件名用 ASCII（有的浏览器遇到中文文件名会改成 download）
+  function saveICS(filename, text) {
+    if (typeof document === 'undefined') return false;
+    var blob = new Blob([text], { type: 'text/calendar;charset=utf-8' }), url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; a.rel = 'noopener'; a.style.display = 'none';
+    if (!('download' in a)) { location.href = url; return true; }
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+    return true;
+  }
+  // 整天事项的 UID：日期 + 种类 + 名目的短散列（同一天同一名目再导入时日历会认作同一条）
+  function uid(dateKey, kind, name) {
+    var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+    return dateKey.replace(/\D/g, '') + '-' + kind + '-' + h.toString(36) + '@ohwowbill.com';
+  }
+
   var api = {
     GAN: GAN, ZHI: ZHI, SX: SX, WEEK: WEEK, NAYIN: NAYIN, JIANCHU: JIANCHU, SHEN12: SHEN12, HUANG: HUANG, ZHI_DIR: ZHI_DIR,
     YIJI: YIJI, ROKUYO: ROKUYO, ROKUYO_NOTE: ROKUYO_NOTE, EVENTS: EVENTS, EV_BY: EV_BY,
-    day: day, month: month, hours: hours, hourOf: hourOf, score: score, grade: grade, jieMonth: jieMonth,
+    day: day, month: month, hours: hours, hourOf: hourOf, score: score, grade: grade, jieMonth: jieMonth, brief: brief, BIG_JI: BIG_JI,
+    hou: houOf, houOfYear: houOfYear, ics: ics, saveICS: saveICS, uid: uid,
     dayGZ: dayGZ, gzOf: gzOf, nayin: nayin, chongOf: chongOf, sunLon: sunLon, sunAt: sunAt, termsOfYear: termsOfYear, yearMarks: yearMarks, mod: mod
   };
   if (NODE) module.exports = api; else root.TS = api;

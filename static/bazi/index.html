@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#17131F" />
   <title>八字排盘 · 潜蛟阁法宝库</title>
-  <meta name="description" content="八字排盘：公历、农历、四柱反推皆可起；出生地时区与真太阳时、早晚子时、夏令时提示；四柱十神、藏干、星运自坐、纳音空亡、神煞；精确到分的起运交运，大运流年流月逐层叠看，合冲刑害一目了然。" />
+  <meta name="description" content="八字排盘：公历、农历、四柱反推皆可起；出生地时区与真太阳时、早晚子时、夏令时提示；四柱十神、藏干、星运自坐、纳音空亡、神煞；《穷通宝鉴》调候用神；精确到分的起运交运，大运流年流月逐层叠看，合冲刑害一目了然。" />
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -167,6 +167,27 @@
     .bz-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
 
     /* 白话：盘上几句大白话，随盘重画（紫微、占星同式） */
+    /* 调候（《穷通宝鉴》）：白话卡里一行，下面一块折叠细看（原文、盘中有无、忌） */
+    .bh .r b.th-g, .bh-th b.th-g { color: var(--wc); }
+    .th-tag { display: inline-block; font-style: normal; font-family: var(--font-title); font-size: 11px; line-height: 1.5; padding: 0 5px; margin: 0 1px; border-radius: 4px; letter-spacing: 0; vertical-align: 1px; white-space: nowrap; }
+    .th-tag.tou { color: var(--lv); box-shadow: inset 0 0 0 1px rgba(141, 191, 151, .55); }
+    .th-tag.cang { color: var(--qing); box-shadow: inset 0 0 0 1px rgba(143, 176, 216, .5); }
+    .th-tag.wu { color: var(--faint); box-shadow: inset 0 0 0 1px var(--rule-2); }
+    .bh-th { margin: 8px 0 2px; border: 1px solid var(--rule); border-radius: var(--r); padding: 0 12px; }
+    .bh-th[open] { padding-bottom: 10px; }
+    .bh-th > summary { cursor: pointer; list-style: none; padding: 8px 0; font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; color: var(--fg-2); display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+    .bh-th > summary::-webkit-details-marker { display: none; }
+    .bh-th > summary::before { content: "＋"; color: var(--zi-2); font-size: 12px; letter-spacing: 0; }
+    .bh-th[open] > summary::before { content: "－"; }
+    .bh-th > summary small { font-size: 11px; color: var(--faint); letter-spacing: .04em; }
+    .bh-th blockquote { margin: 2px 0 10px; padding: 6px 12px; border-left: 2px solid var(--zi-2); background: rgba(122, 91, 192, .07); border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: 14px; line-height: 1.85; color: var(--fg); }
+    .bh-th ul { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
+    .bh-th li { display: grid; grid-template-columns: 1.2em auto minmax(0, 1fr); gap: 8px; align-items: baseline; font-size: 13px; line-height: 1.6; color: var(--fg-2); }
+    .bh-th li b { font-family: var(--font-title); font-weight: 600; font-size: 15px; }
+    .bh-th p { display: flex; gap: 8px; padding: 4px 0; border-top: 1px dashed var(--rule); font-size: 13px; line-height: 1.7; color: var(--fg-2); }
+    .bh-th p > i { flex: 0 0 3.6em; font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 22px; color: var(--faint); letter-spacing: .08em; white-space: nowrap; }
+    .bh-th p > span { min-width: 0; }
+    .bh-th p.fb-fine { display: block; border-top: none; padding: 0; margin-top: 6px; font-size: 12px; color: var(--faint); }
 
     @media (max-width: 1100px) {
       .bz-wrap { grid-template-columns: 1fr; }
@@ -286,7 +307,8 @@
       <li><b>起运</b>以出生到下一节（顺排）或上一节（逆排）的分钟数折算：三日一年、一日四月、一时辰十日。交运日按出生钟点推得。</li>
       <li><b>神煞</b>只列常用的二三十种，鼠标停在神煞上可看查法。羊刃取「禄前一位」；三合类（驿马、桃花、华盖、将星等）以年支、日支两查；天乙、太极、文昌、国印以日干、年干两查。各家口径不一，以自家所学为准。</li>
       <li><b>四柱反推</b>逐级点选：先选年干，年支只剩同阴阳的六个（下注对应的公历年）；月干由五虎遁定出，直接选月；再选日干、日支；时干由五鼠遁定出，直接选时，记不清时辰就选「时辰不详」。选齐即列出 1900–2100 年间合得上的时段，点任一条即按那一刻排盘；点上面已选的一柱可从那一柱改起。</li>
-      <li><b>口径</b>节气表与奇门手记同一张（太阳视黄经算出，与寿星万年历相差一分钟内）；农历为寿星万年历口径；人元司令依《渊海子平》分野。仅供学习参考。</li>
+      <li><b>调候</b>取《穷通宝鉴》十干配十二月令（以节换月）所列的调候用神，按书中先后，主用在前；白话里看它们在盘中是透出天干、藏在地支还是没有，「调候细看」里有原文、书中言忌之处与附注。原文据殆知阁本与维基文库本互校，参徐乐吾《造化元钥评注》；网上常见速查表与原文先后不合处，以原文为准并注出。只是诸法之一，参考。</li>
+      <li><b>口径</b>节气表与奇门手记同一张（太阳视黄经算出，与寿星万年历相差一分钟内）；农历为寿星万年历口径；人元司令依《渊海子平》分野；调候依《穷通宝鉴》。仅供学习参考。</li>
     </ul>
   </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
@@ -294,7 +316,8 @@
 
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
-<script src="/bazi/bazi.js?v=1"></script>
+<script src="/bazi/qiongtong.js?v=1"></script>
+<script src="/bazi/bazi.js?v=2"></script>
 <script src="/fabao/cities.js?v=1"></script>
 <script src="/fabao/fabao.js?v=13"></script>
 <script>
@@ -667,6 +690,54 @@ function strength() {
   return { ws, de, root, help, score, level: score > 5 ? '偏强' : score <= 3 ? '偏弱' : '中和' };
 }
 const bhRow = (k, html) => `<div class="r"><i>${k}</i><span>${html}</span></div>`;
+
+// —— 调候（《穷通宝鉴》）：书中按日干、月令所取的用神，在盘中透干、藏支还是没有 ——
+// 引擎给出 A.tiaohou（表在 /bazi/qiongtong.js）；这里只管写成白话、细看与复制的那一行
+let thOpen = false;                                      // 细看默认收起；本次打开后，换运换年重画时保持
+const thWX = g => g + WX[GAN_WX[GAN.indexOf(g)]];        // 丙 → 丙火
+const thStem = g => `<b class="th-g wx-${GAN_WX[GAN.indexOf(g)]}">${g}</b>`;
+const thTag = s => `<em class="th-tag ${s.state === '透' ? 'tou' : s.state === '藏' ? 'cang' : 'wu'}">${s.state}</em>`;
+// 最显的一处：透干先说，不透再说藏在哪支；都没有就说不见
+const thWhere = s => s.state === '透' ? `透${s.tou.join('、')}干` : s.state === '藏' ? `藏${s.cang.map(c => c.pillar + '支' + c.zhi).join('、')}` : '不见';
+// 用神与日干同字（如壬日取壬）时，说明指的是日干以外的那个
+const thSelf = (th, s) => s.gan === th.gan ? '（日干以外）' : '';
+// 一句白话：为首的那个透、藏、无，再看其余
+function thPlain(th) {
+  const S = th.stems, m = S[0], rest = S.slice(1), lead = S.length > 1 ? '为首的' : '所取的';
+  const names = list => list.map(s => thWX(s.gan)).join('、');
+  const tou = rest.filter(s => s.state === '透'), miss = rest.filter(s => s.state === '无'), have = S.filter(s => s.state !== '无');
+  const head = lead + thWX(m.gan) + thSelf(th, m);
+  let t;
+  if (m.state === '透') t = `${head}透在天干，这一层调得开${miss.length ? `；${names(miss)}则盘中没有` : ''}`;
+  else if (m.state === '藏') t = `${head}只藏在地支，有其气而不显${tou.length ? `，好在${names(tou)}透出，可补一二` : '，力量要打些折扣'}`;
+  else if (have.length) t = `${head}盘中没有，退而靠${names(have)}，调候偏弱`;
+  else t = S.length > 1 ? '书中所取的这几样盘中都没有，按调候说是缺，要看大运流年来补' : `${head}盘中没有，按调候说是缺，要看大运流年来补`;
+  return `调候看生月的寒暖燥湿，${t}。`;
+}
+function thLine(th) {
+  return `${th.stems.map(s => thStem(s.gan)).join('')}（《穷通宝鉴》${th.gan}${th.wx}${th.zhi}月，参考）：` +
+    th.stems.map(s => `${thStem(s.gan)}${thSelf(th, s)}${thTag(s)}${s.state === '无' ? '' : thWhere(s).slice(1)}`).join('，') + '。' + thPlain(th);
+}
+function thDetail(th) {
+  const li = th.stems.map(s => {
+    const pos = [];
+    if (s.tou.length) pos.push(`透${s.tou.join('、')}干`);
+    if (s.cang.length) pos.push(`藏${s.cang.map(c => `${c.pillar}支${c.zhi}（${c.qi}）`).join('、')}`);
+    const none = s.gan === th.gan ? '日干以外，天干、地支藏干都不见' : '天干、地支藏干都不见';
+    return `<li>${thStem(s.gan)}${thTag(s)}<span>${s.ss}${s.main && th.stems.length > 1 ? ' · 为首' : ''} · ${pos.length ? pos.join('；') + (s.gan === th.gan && s.tou.length ? '（日干本身不算）' : '') : none}</span></li>`;
+  }).join('');
+  return `<details class="bh-th" id="thBox"${thOpen ? ' open' : ''}><summary>调候细看<small>《穷通宝鉴·${th.chapter}》${th.month}（${th.zhi}月）· 原文与盘中有无 · 参考</small></summary>` +
+    `<blockquote>「${esc(th.q)}」</blockquote><ul>${li}</ul>` +
+    (th.ji ? `<p><i>忌</i><span>「${esc(th.ji)}」</span></p>` : '') +
+    (th.n ? `<p><i>附注</i><span>${esc(th.n)}</span></p>` : '') +
+    (th.v ? `<p><i>速查表</i><span>网上常见的速查表作「${esc(th.v)}」，与原文先后或取舍不同，此处从原文。</span></p>` : '') +
+    `<p class="fb-fine">据${esc(th.cite)}。月令以节换；透指年、月、时三干，藏指四支藏干，日干本身不算。只查有无，未论旺衰、合冲与岁运，仅供参考。</p></details>`;
+}
+// 复制、问 AI 用的那一行
+function thText(th) {
+  return `调候 《穷通宝鉴》${th.gan}${th.wx}${th.zhi}月取${th.y}：${th.stems.map(s => s.gan + thSelf(th, s) + thWhere(s)).join('，')}（参考）`;
+}
+
 function renderBH() {
   const P = C.pillars, dg = P[2].gan, x = GAN_WX[dg], dw = WX[x], ling = WX[ZHI_WX[P[1].zhi]], S = strength();
   const lingTxt = S.ws === '旺' ? `正当${ling}旺之时，得令` : `${ling}当令，${dw}在此为「${S.ws}」，${S.de ? '得令' : '不得令'}`;
@@ -677,13 +748,17 @@ function renderBH() {
     : `${tops.map(w => w.name).join('、')}最多（${tops.length > 1 ? '各 ' : ''}${maxN} 个${tops.some(w => w.ws === '旺') ? (tops.length > 1 ? `，${ling}又当令` : '，又当令') : ''}）`;
   if (miss.length) wx += '；' + miss.map(w => w.weight ? `明面缺${w.name}（只藏在地支里）` : `缺${w.name}（藏干里也没有）`).join('，');
   else wx += `，${lows.map(w => w.name).join('、')}最弱；五行俱全`;
-  const G = A.geju;
+  const G = A.geju, TH = A.tiaohou;
   $('bhCard').innerHTML = `<div class="bh-h"><span class="fb-tag">白话</span><small>一眼看个大概 · 参考</small></div>` +
     bhRow('日主', `<b>${GAN[dg]}${dw}</b>（${GAN_XIANG[dg]}）生于${ZHI[P[1].zhi]}月（${C.jie.prev.n}后），${lingTxt}；通根 ${A.roots.length} 处、天干印比 ${S.help} 个，按简单计数<b>${S.level}</b>。`) +
     bhRow('格局', G ? `<b>${G.name}</b>（月令取格，参考）${GE_TXT[G.name] ? '，' + GE_TXT[G.name] : ''}。` : '月令无格可取。') +
+    (TH ? bhRow('调候', thLine(TH)) : '') +
     bhRow('五行', wx + '。') +
     bhRow('性格', `${dw}主${WX_DE[x]}，多半${XING[x][0]}；身${S.level}，${XING[x][S.level === '偏强' ? 1 : S.level === '偏弱' ? 2 : 3]}。`) +
+    (TH ? thDetail(TH) : '') +
     `<p class="fb-fine">强弱是简单计数：得令（月令旺相）3 分，地支每处通根 1 分（中气、余气根半分），天干每个印比 1 分；过 5 分偏强，3 分及以下偏弱，其间中和，本盘 ${S.score} 分。未计合冲刑害与调候；性格取日主五行的常见说法。</p>`;
+  const tb = $('thBox');
+  if (tb) tb.addEventListener('toggle', () => { thOpen = tb.open; });
   $('bhCard').hidden = false;
 }
 
@@ -768,6 +843,7 @@ function chartText() {
   const Y = C.yun;
   Lr.push(`起运 出生后${Y.span.y}年${Y.span.m}个月${Y.span.d}天${Y.span.h}时，${Y.start.y}-${pad(Y.start.mo)}-${pad(Y.start.d)} 交运（${Y.forward ? '顺' : '逆'}排）`);
   Lr.push('大运 ' + Y.dayun.slice(0, 8).map(d => `${d.name}(${d.startYear})`).join(' '));
+  if (A.tiaohou) Lr.push(thText(A.tiaohou));
   return Lr.join('\n');
 }
 $('copyBtn').onclick = () => { if (C) copy(chartText(), '命盘已复制'); };
@@ -790,7 +866,8 @@ function rulesText() {
     `日柱、时柱按出生地${C.solar ? '真太阳时（经度时差 + 均时差）' : '钟表时间'}${C.input.dst ? '，已扣夏令时一小时' : ''}；${C.zi === 'same' ? '晚子时（23–24 点）日柱仍算本日，时柱接次日子时' : '23 点即换日（子时作次日）'}。`,
     '大运阳男阴女顺排、阴男阳女逆排；起运按出生到前后节的时间折算：三日一年、一日四月、一时辰十日。',
     '藏干分本气、中气、余气（五行力量按 0.6 / 0.3 / 0.1 分，二藏 0.7 / 0.3）；人元司令依《渊海子平》；取格依《子平真诠》月令取格法，仅供参考。',
-    '神煞只列常用者：羊刃取禄前一位；驿马、桃花、华盖等三合类以年支、日支两查；天乙、太极、文昌、国印以日干、年干两查。'
+    '神煞只列常用者：羊刃取禄前一位；驿马、桃花、华盖等三合类以年支、日支两查；天乙、太极、文昌、国印以日干、年干两查。',
+    '调候取《穷通宝鉴》（余春台编订本）日干配月令所列用神，按书中先后；只查各用神在原局透干（年、月、时干）、藏支与否，未论旺衰，仅供参考。'
   ].join('\n');
 }
 $('aiBtn').onclick = () => { if (C) Fabao.askAI('八字（子平）', aiText(), rulesText()); };
