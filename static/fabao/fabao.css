@@ -12,6 +12,8 @@
      三 页首（印 + 标题）
      四 「此刻」面板：时间 + 起法 + 动作
      五 通用构件：按钮、分段、卡片、输入、提示
+     六 共用小件：术语小词典、印章落笔、分享图与存档的弹层
+     七 换页过场（View Transitions）
    =========================================================== */
 
 /* 〇 token ------------------------------------------------- */
@@ -24,7 +26,7 @@
   --fg:     #EDEBF2;   /* 月白 */
   --fg-2:   #CFCAD9;
   --muted:  #A39DB0;   /* 雾 */
-  --faint:  #6E6780;
+  --faint:  #857E96;   /* 淡：注脚（紫夜底上对比约 4.7:1，过 WCAG AA） */
   --zi:     #7A5BC0;   /* 紫府：按钮、印 */
   --zi-2:   #A994E0;   /* 紫，夜底写字 */
   --jin:    #D9AE4E;   /* 金：一屏一处 */
@@ -276,24 +278,32 @@ a { color: var(--zi-2); }
 
 @keyframes fbIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+/* 手机底栏：顶栏的法宝在手机上收成常用四件 + 「全部」（fabao.js mountDock），电脑上不出 */
+.fb-dock { display: none; }
+
 /* 手机：法宝切换沉到底部，面板改为上下排 --------------------- */
 @media (max-width: 860px) {
   .fb-main { padding: 18px 16px calc(var(--nav-h) + 36px + env(safe-area-inset-bottom)); }
-  /* 顶栏不能带 backdrop-filter，否则底栏的 fixed 会被它困住 */
   .fb-top { padding: 0 16px; height: 48px; background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
-  .fb-tabs {
-    position: fixed; left: 0; right: 0; bottom: 0; margin: 0; gap: 0;
+  .fb-tabs { display: none; }
+  .fb-dock {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
     height: calc(var(--nav-h) + env(safe-area-inset-bottom));
     padding-bottom: env(safe-area-inset-bottom);
     background: rgba(30, 24, 40, .96); border-top: 1px solid var(--rule);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
-  .fb-tab { flex: 1 0 56px; flex-direction: column; justify-content: center; gap: 3px; border-radius: 0; font-size: 12px; letter-spacing: .1em; padding: 6px 0; }
-  .fb-tab svg { width: 20px; height: 20px; }
-  .fb-tab:hover, .fb-tab.on { background: none; box-shadow: none; }
-  .fb-tab.on { color: var(--fg); }
-  .fb-tab.on::before { content: ""; position: absolute; top: 0; width: 28px; height: 2px; background: var(--zi-2); border-radius: 0 0 2px 2px; }
-  .fb-tab { position: relative; }
+  .fb-dock .fb-tab {
+    flex: 1 1 0; min-width: 0; position: relative;
+    flex-direction: column; justify-content: center; gap: 3px; border-radius: 0; padding: 6px 0;
+    font-size: 12px; letter-spacing: .1em;
+  }
+  .fb-dock .fb-tab svg { width: 20px; height: 20px; }
+  .fb-dock .fb-tab:hover, .fb-dock .fb-tab.on { background: none; box-shadow: none; }
+  .fb-dock .fb-tab.on { color: var(--fg); }
+  .fb-dock .fb-tab.on svg { color: var(--zi-2); }
+  .fb-dock .fb-tab.on::before { content: ""; position: absolute; top: 0; left: 50%; width: 28px; margin-left: -14px; height: 2px; background: var(--zi-2); border-radius: 0 0 2px 2px; }
+  .fb-dock .fb-tab.all:not(.on) { color: var(--muted); }
   .fb-mingbu { padding: 12px 16px 0; gap: 8px 10px; }
   .fb-mingbu .seg { flex: 1 1 100%; }
   .fb-mingbu .seg a { flex: 1; justify-content: center; padding: 7px 4px; letter-spacing: .08em; gap: 4px; }
@@ -312,4 +322,77 @@ a { color: var(--zi-2); }
   .bh .r { font-size: 13.5px; gap: 6px; }
   .bh .r > i { font-size: 11.5px; }
 }
+
+/* 六 共用小件 --------------------------------------------- */
+/* 术语小词典：白话卡里的术语描一道虚线，点了在旁边浮一张小签（fabao.js glossStart） */
+fb-t {
+  display: inline; cursor: help;
+  border-bottom: 1px dotted rgba(169, 148, 224, .6);
+  transition: color .15s, border-color .15s;
+}
+fb-t:hover, fb-t[aria-describedby] { color: var(--fg); border-bottom-color: var(--zi-2); border-bottom-style: solid; }
+fb-t:focus { outline: none; }
+fb-t:focus-visible { outline: 2px solid var(--zi-2); outline-offset: 1px; border-radius: 2px; }
+.fb-gloss {
+  position: fixed; left: 0; top: 0; z-index: 95;
+  padding: 10px 14px 11px; border-radius: var(--r);
+  background: #2A2238; color: var(--fg-2); border: 1px solid var(--rule-2);
+  box-shadow: 0 14px 36px -12px rgba(0, 0, 0, .85);
+  font-size: 13.5px; line-height: 1.75; letter-spacing: .03em;
+  opacity: 0; transform: translateY(4px); visibility: hidden; pointer-events: none;
+  transition: opacity .16s, transform .16s, visibility 0s .16s;
+}
+.fb-gloss.on { opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition: opacity .16s, transform .16s; }
+.fb-gloss b { display: block; margin-bottom: 2px; font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .15em; color: var(--zi-2); }
+
+/* 印章落笔：本标签页头一回打开时，印里的字一笔一笔写出来，写完淡回原字 */
+.fb-seal-w { position: absolute; left: 19%; top: 19%; width: 62%; height: 62%; pointer-events: none; transition: opacity .5s ease; }
+.fb-seal-w .st {
+  fill: none; stroke: #fff; stroke-width: 140; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: var(--l) var(--l); stroke-dashoffset: var(--l);
+  animation-name: fbStroke; animation-timing-function: cubic-bezier(.45, .05, .4, 1); animation-fill-mode: forwards;
+}
+@keyframes fbStroke { to { stroke-dashoffset: 0; } }
+.fb-seal.writing { color: transparent; transition: color .5s ease; }
+.fb-seal.writing.written { color: #fff; }
+.fb-seal.written .fb-seal-w { opacity: 0; }
+
+/* 分享图、扫码带走的弹层 */
+html.fb-noscroll { overflow: hidden; }
+.fb-modal {
+  position: fixed; inset: 0; z-index: 96; display: none; align-items: center; justify-content: center;
+  padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+  background: rgba(10, 8, 14, .8); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.fb-modal.on { display: flex; animation: fbIn .2s ease both; }
+.fb-modal-card {
+  width: min(440px, 100%); max-height: 100%; overflow: auto;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 16px; background: var(--bg-2); border: 1px solid var(--rule-2); border-radius: var(--r-lg);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .9);
+}
+.fb-modal-card h2 { font-family: var(--font-title); font-weight: 600; font-size: 17px; letter-spacing: .2em; color: var(--fg); }
+.fb-modal-card img, .fb-modal-card canvas { display: block; max-width: 100%; height: auto; border-radius: var(--r-sm); }
+.fb-modal-card img.pic { width: 100%; max-height: 62vh; object-fit: contain; }
+.fb-modal-card canvas.qr { width: min(300px, 78vw); background: #fff; padding: 0; image-rendering: pixelated; }
+.fb-modal-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.fb-modal-acts .fb-btn { min-width: 6em; text-decoration: none; }
+.fb-modal .fb-fine { text-align: center; }
+
+/* 七 换页过场：同站跳转时顶栏、底栏、家族条不动，正文淡入；家族条上那颗紫色滑到新的一件，印也跟着换字
+   （View Transitions，Chrome 126+ / Safari 18.2+；其余浏览器照常硬切） */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  .fb-top { view-transition-name: fb-top; }
+  .fb-dock { view-transition-name: fb-dock; }
+  .fb-fam { view-transition-name: fb-fam; }
+  .fb-fam .seg a.on { view-transition-name: fb-fam-on; }
+  .fb-head .fb-seal { view-transition-name: fb-seal; }
+  ::view-transition-old(root) { animation: fbVtOut .16s ease-in both; }
+  ::view-transition-new(root) { animation: fbVtIn .36s cubic-bezier(.2, .7, .2, 1) both; }
+  ::view-transition-group(fb-fam-on), ::view-transition-group(fb-seal) { animation-duration: .34s; animation-timing-function: cubic-bezier(.3, .8, .3, 1); }
+}
+@keyframes fbVtOut { to { opacity: 0; } }
+@keyframes fbVtIn { from { opacity: 0; transform: translateY(8px); } }
+
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

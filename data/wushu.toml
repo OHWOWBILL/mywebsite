@@ -51,7 +51,7 @@
     href = "/yunqi/"
     desc = "查一年岁运、司天在泉、六步主客"
   [[door.tools]]
-    seal = "体"
+    seal = "质"
     name = "体质辨识"
     href = "/tizhi/"
     desc = "九种体质问卷（中华中医药学会标准），附调养"
@@ -68,6 +68,11 @@
     name = "命部 · 星命同参"
     href = "/bazi/"
     desc = "八字、紫微、占星、合盘、姓名一处切换，存过的人一点就换；读盘持诀可开"
+  [[door.tools]]
+    seal = "名"
+    name = "姓名学"
+    href = "/xingming/"
+    desc = "五格剖象与三才，康熙笔画，几个候选名一起比"
   [[door.tools]]
     seal = "生"
     name = "十二长生"
