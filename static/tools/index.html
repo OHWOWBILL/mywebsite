@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#17131F" />
   <title>法宝库 · 潜蛟阁</title>
-  <meta name="description" content="潜蛟阁法宝库：阁主自制的术数工具，梅花、六爻、奇门、命部（八字 · 紫微 · 占星）、十二长生、子午流注、五运六气、堪舆、相部，打开即用。" />
+  <meta name="description" content="潜蛟阁法宝库：阁主自制的术数工具，通书（黄历 · 择日 · 流年）、梅花、六爻、奇门、命部（八字 · 紫微 · 占星 · 合盘）、十二长生、子午流注、五运六气、堪舆（玄空 · 九星）、相部，打开即用。" />
   <meta property="og:title" content="法宝库 · 潜蛟阁" />
   <meta property="og:description" content="阁主自制的术数工具，按山医命卜相分门，打开即用。" />
   <link rel="canonical" href="https://ohwowbill.com/tools/" />
@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=4">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
   <style>
     /* 法宝库大堂：一屏小牌，按五门分行；牌子由 /fabao/fabao.js 的 TOOLS 现排（与顶栏同一份名单） */
     .ku-now { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 4px; color: var(--muted); font-size: 14px; letter-spacing: .12em; margin: -6px 0 22px; }
@@ -21,6 +21,14 @@
     .ku-now b { font-family: var(--font-title); font-weight: 600; color: var(--fg); font-size: 16px; }
     .ku-again { margin-left: auto; color: var(--jin); text-decoration: none; font-family: var(--font-title); letter-spacing: .15em; padding: 6px 14px; border: 1px solid rgba(217,174,78,.4); border-radius: 999px; }
     .ku-again:hover { background: rgba(217,174,78,.1); }
+
+    /* 我想问：一排问句，点了直达（名单在 data/wenti.yaml） */
+    .ku-ask { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: -8px 0 22px; }
+    .ku-ask-h { font-family: var(--font-title); font-size: 13px; color: var(--faint); letter-spacing: .2em; margin-right: 4px; }
+    .ku-ask a { font-size: 13.5px; color: var(--fg-2); text-decoration: none; padding: 5px 12px; border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-2); white-space: nowrap; transition: border-color .2s, color .2s; }
+    .ku-ask a:hover { color: var(--fg); border-color: var(--zi-2); }
+    .ku-ask-more { font-size: 13px; color: var(--zi-2); padding: 5px 10px; font-family: var(--font-title); letter-spacing: .1em; }
+    .ku-ask-more:hover { color: var(--fg); }
 
     .ku-men { display: flex; flex-direction: column; gap: 14px; }
     .ku-row { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; }
@@ -60,6 +68,8 @@
       .ku-s { grid-column: 1 / 3; font-size: 12px; }
       .ku-s { white-space: normal; }
       .ku-again { margin-left: 0; }
+      .ku-ask { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; }
+      .ku-ask::-webkit-scrollbar { display: none; }
     }
   </style>
 </head>
@@ -75,7 +85,7 @@
   </div>
 
   <div id="fbKu">
-    <noscript><p class="fb-empty">法宝要开脚本才能用。<br>顶栏各件：<a href="/meihua/">梅花</a> · <a href="/liuyao/">六爻</a> · <a href="/qimen/">奇门</a> · <a href="/bazi/">命部</a> · <a href="/changsheng/">长生</a> · <a href="/ziwu/">流注</a> · <a href="/yunqi/">运气</a> · <a href="/kanyu/">堪舆</a> · <a href="/xiangbu/">相部</a></p></noscript>
+    <noscript><p class="fb-empty">法宝要开脚本才能用。<br>顶栏各件：<a href="/huangli/">通书</a> · <a href="/meihua/">梅花</a> · <a href="/liuyao/">六爻</a> · <a href="/qimen/">奇门</a> · <a href="/bazi/">命部</a> · <a href="/changsheng/">长生</a> · <a href="/ziwu/">流注</a> · <a href="/yunqi/">运气</a> · <a href="/kanyu/">堪舆</a> · <a href="/xiangbu/">相部</a></p></noscript>
   </div>
 
   <p class="ku-else">
@@ -84,6 +94,7 @@
   </p>
 </main>
 
-<script src="/fabao/fabao.js?v=12"></script>
+<script src="/fabao/wenti.js"></script>
+<script src="/fabao/fabao.js?v=13"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=4">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
   <style>
     :root { --el-fire: #E07A62; --el-earth: #C9A578; --el-air: #8FB0D8; --el-water: #7FA3D6; --glyph: "Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", "Symbola", serif; }
     .el-0 { --ec: var(--el-fire); } .el-1 { --ec: var(--el-earth); } .el-2 { --ec: var(--el-air); } .el-3 { --ec: var(--el-water); }
@@ -107,6 +107,9 @@
     .xp-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
     .xp-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
 
+    /* 白话：盘上几句大白话，随盘重画（八字、紫微同式） */
+    .bh .r em { font-style: normal; font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .08em; margin: 0 4px; }
+
     @media (max-width: 1100px) {
       .xp-wrap { grid-template-columns: 1fr; }
       .xp-side { position: static; display: grid; grid-template-columns: 1fr 1fr; }
@@ -159,6 +162,7 @@
       <div class="fb-row">
         <button class="fb-btn primary" id="saveBtn" type="button">存盘</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
+        <button class="fb-btn" id="aiBtn" type="button" title="把星盘连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
       </div>
       <select id="libSel" aria-label="盘库"><option value="">盘库（存过的盘）</option></select>
       <p class="fb-fine">回归黄道。行星位置按 Schlyter 算法，精度约一至二角分；排盘全在本机计算，不上传。</p>
@@ -167,6 +171,7 @@
 
   <div class="xp-wrap">
     <div class="xp-main">
+      <section class="fb-card bh" id="bhCard" aria-label="白话" hidden></section>
       <section class="fb-card xp-board" aria-label="星盘">
         <div class="xp-bhead"><h2 id="title"></h2><p id="subtitle"></p></div>
         <div class="xp-wheel" id="wheel"></div>
@@ -209,7 +214,7 @@
 
 <script src="/xingpan/xingpan.js?v=1"></script>
 <script src="/fabao/cities.js?v=1"></script>
-<script src="/fabao/fabao.js?v=12"></script>
+<script src="/fabao/fabao.js?v=13"></script>
 <script>
 (function () {
 'use strict';
@@ -346,7 +351,7 @@ function render() {
   $('houseNote').textContent = HOUSE_NAME[C.house] + (C.placidusFallback ? '（纬度过高，改用波菲利）' : '');
   const hrow = from => `<tr>${[0, 1, 2, 3, 4, 5].map(k => { const i = from + k, dd = XP.fmtDeg(C.cusps[i]); return `<td><span class="n">${i}</span> <span class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span></span><span class="deg">${dd.d}°${pad(dd.m)}′</span></td>`; }).join('')}</tr>`;
   $('houseT').innerHTML = hrow(1) + hrow(7);
-  renderInfo(); renderAsp(); renderFd();
+  renderInfo(); renderAsp(); renderFd(); renderBH();
 }
 function ageNow() {
   const now = Date.now(), b = new Date(C.utc + (+C.input.tz) * 3600e3), n = new Date(now + (+C.input.tz) * 3600e3);
@@ -382,6 +387,56 @@ function renderFd() {
   }).join('');
 }
 
+/* ================ 白话 ================ */
+// 日、月、升各一句（核心自我 / 情绪需要 / 外在印象），日月五星的元素与模式分布。只作参考，随盘重画。
+const SUN_TXT = ['直率果敢，喜欢开创、抢先一步', '踏实有耐性，重安稳与实在的享受', '好奇机敏，爱交流，兴趣广而多变', '重感情、念家，保护欲强',
+  '自信大方，乐于表现，看重尊严', '细致务实，讲究条理，力求做好', '重和谐与分寸，讲公平，审美好', '专注深沉，爱憎分明，意志坚定',
+  '乐观爱自由，向往远方与见识', '务实负责，目标明确，能吃苦', '独立理性，有主见，不随大流', '敏感温柔，富同理心与想象力'];
+const MOON_TXT = ['情绪来得快去得快，需要直接表达', '需要安稳熟悉的环境，慢热而长情', '需要说出来、有新鲜感，靠交流排解', '需要家与亲密感，照顾人也想被照顾',
+  '需要被看见、被欣赏，情感热烈', '需要秩序与被需要，焦虑时爱操心细节', '需要和气与陪伴，不喜冲突', '情感深而不外露，需要信任与全心投入',
+  '需要空间与乐趣，不喜被拘束', '情绪内敛克制，靠把事做好来安心', '需要空间与自由，情感偏理性、重友谊', '情感细腻易共鸣，需要安静与包容'];
+const ASC_TXT = ['爽快、有冲劲', '沉稳、可靠、温和', '灵活、健谈、显年轻', '亲切、温柔、好相处', '大方、有存在感', '干净、细心、低调',
+  '优雅、随和、有礼', '神秘、有气场、不易看透', '开朗、直爽、爱冒险', '稳重、认真、少年老成', '独特、友善又有距离感', '柔和、浪漫、有点飘忽'];
+const EL_TXT = ['热情、行动快', '务实、求稳', '爱思考、重交流', '重感受、善体察'];   // 火土风水（XP.ELEM 序）
+const MODE = ['本位', '固定', '变动'], MODE_TXT = ['主动、爱开头', '有定力、能坚持', '灵活、善应变'];
+const QIZHENG = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'];
+// 网址只带了生时、没带全经纬（如从紫微切过来）：上升按本页记着的地点估，白话里要说一声；改了地点就不算
+let placeGuess = null;
+function guessNote() {
+  const g = placeGuess;
+  if (!g || +view.lat !== g.lat || +view.lon !== g.lon) return '';
+  return `出生地${g.noLat && g.noLon ? '经纬度' : g.noLat ? '纬度' : '经度'}没给，上升与宫位按 ${Math.abs(g.lat).toFixed(2)}°${g.lat >= 0 ? 'N' : 'S'} ${Math.abs(g.lon).toFixed(2)}°${g.lon >= 0 ? 'E' : 'W'}${view.city ? '（' + view.city + '）' : ''} 估算`;
+}
+function spread() {
+  const el = [0, 0, 0, 0], md = [0, 0, 0];
+  QIZHENG.forEach(id => { const s = C.bodies[id].sign; el[s % 4]++; md[s % 3]++; });
+  return { el, md };
+}
+const bhRow = (k, html) => `<div class="r"><i>${k}</i><span>${html}</span></div>`;
+function renderBH() {
+  const S = XP.SIGNS, sunL = C.bodies.sun.lon, moonL = C.bodies.moon.lon, sun = Math.floor(sunL / 30), moon = Math.floor(moonL / 30);
+  const ascL = C.angles && C.angles.asc, ascOK = isFinite(ascL), asc = ascOK ? Math.floor(ascL / 30) : -1;
+  const { el, md } = spread();
+  const tops = arr => { const m = Math.max(...arr); return arr.map((v, i) => v === m ? i : -1).filter(i => i >= 0); };
+  const te = tops(el), tm = tops(md), E = XP.ELEM;
+  const elTxt = te.length > 2 ? `元素分布较匀（${te.map(i => E[i]).join('、')}象各 ${el[te[0]]} 颗）`
+    : te.length === 2 ? `${E[te[0]]}、${E[te[1]]}象各 ${el[te[0]]} 颗，${EL_TXT[te[0]]}，也${EL_TXT[te[1]]}`
+      : `${E[te[0]]}象最多（${el[te[0]]} 颗），${EL_TXT[te[0]]}`;
+  const miss = el.map((v, i) => v ? '' : E[i] + '象').filter(Boolean);
+  const mdTxt = tm.length === 2 ? `${MODE[tm[0]]}、${MODE[tm[1]]}星座各 ${md[tm[0]]} 颗，${MODE_TXT[tm[0]]}，也${MODE_TXT[tm[1]]}` : `${MODE[tm[0]]}星座最多（${md[tm[0]]} 颗），${MODE_TXT[tm[0]]}`;
+  // 靠近座界的提醒：上升约四分钟走一度，月亮约两小时走一度
+  const near = (lon, tol) => { const x = lon % 30; return x < tol ? -1 : x > 30 - tol ? 1 : 0; };
+  const edge = (n, lon, tol, when) => { const k = near(lon, tol), s = Math.floor(lon / 30); return k ? `${n}在${S[s]} ${Math.floor(lon % 30)}°，贴着${S[(s + k + 12) % 12]}，出生时间${when}就可能换座` : ''; };
+  const notes = [ascOK ? edge('上升', ascL, 1.5, '差几分钟') : '', edge('月亮', moonL, 0.6, '差一两个小时'), edge('太阳', sunL, 0.15, '差几个小时'), guessNote()].filter(Boolean);
+  $('bhCard').innerHTML = `<div class="bh-h"><span class="fb-tag">白话</span><small>一眼看个大概 · 参考</small></div>` +
+    bhRow('太阳', `<b>${S[sun]}</b><em>核心自我</em>${SUN_TXT[sun]}。`) +
+    bhRow('月亮', `<b>${S[moon]}</b><em>情绪需要</em>${MOON_TXT[moon]}。`) +
+    bhRow('上升', ascOK ? `<b>${S[asc]}</b><em>外在印象</em>给人${ASC_TXT[asc]}的第一印象。` : '出生时间或地点不详，定不了上升（外在印象）与宫位。') +
+    bhRow('分布', `日月五星里${elTxt}${miss.length ? '；没有' + miss.join('、') : ''}；${mdTxt}。`) +
+    `<p class="fb-fine">${notes.length ? notes.join('；') + '。' : ''}分布只数日月与水金火木土七星，三王星一代人大致相同，不计；星座性情为常见说法，参考。</p>`;
+  $('bhCard').hidden = false;
+}
+
 /* ================ 盘库 · 复制 · 网址 ================ */
 function snap() { return { when: $('whenIn').value, name: $('nameIn').value.trim(), city: view.city, lat: +view.lat, lon: +view.lon, tz: +view.tz, dst: $('dstIn').checked, house: view.house, bonatti: view.bonatti }; }
 function apply(s) {
@@ -410,8 +465,8 @@ $('libSel').onchange = () => {
   if (v === '') return;
   libCur = +v; apply(lib[libCur]); renderLib(); $('libSel').value = String(libCur);
 };
-$('copyBtn').onclick = () => {
-  if (!C) return;
+// 盘面文字：「复制」与「问 AI」共用
+function chartText() {
   const inp = C.input, L = [];
   L.push(`星盘 · ${C.name || '本命盘'} · ${inp.y}-${pad(inp.mo)}-${pad(inp.d)} ${pad(inp.h)}:${pad(inp.mi)}${inp.dst ? '（夏令时）' : ''} ${tzLabel(+inp.tz)} · ${inp.lat}, ${inp.lon} · ${HOUSE_NAME[C.house]} · ${C.day ? '昼生' : '夜生'}`);
   L.push(`上升 ${XP.fmtDeg(C.angles.asc).text} · 中天 ${XP.fmtDeg(C.angles.mc).text} · 福点 ${XP.fmtDeg(C.fortune).text}`);
@@ -419,8 +474,32 @@ $('copyBtn').onclick = () => {
     const b = C.bodies[id]; L.push(`${BODY[id].n} ${XP.fmtDeg(b.lon).text}${b.retro ? ' ℞' : ''} · ${b.house} 宫${b.dig ? ' · ' + b.dig : ''}`);
   });
   L.push('相位 ' + C.aspects.map(a => `${BODY[a.a].n}${a.type.n}${BODY[a.b].n}(${a.orb.toFixed(1)}°)`).join(' '));
-  copy(L.join('\n'), '星盘已复制');
-};
+  return L.join('\n');
+}
+$('copyBtn').onclick = () => { if (C) copy(chartText(), '星盘已复制'); };
+// 问 AI：盘面文字再补元素模式分布、命主星、今年的小限与法达，连同本页口径一并复制
+function aiText() {
+  const L = [chartText()], { el, md } = spread();
+  L.push(`元素（日月五星）：火${el[0]} 土${el[1]} 风${el[2]} 水${el[3]} · 模式：本位${md[0]} 固定${md[1]} 变动${md[2]}`);
+  const lord = XP.RULER[Math.floor(C.angles.asc / 30)];
+  L.push(`命主星（上升之主）${BODY[lord].n}，落${XP.SIGNS[C.bodies[lord].sign]} ${C.bodies[lord].house} 宫`);
+  const age = ageNow(), pf = age >= 0 ? XP.profection(C, age) : null, now = Date.now();
+  const fd = C.firdaria.find(p => now >= p.from && now < p.to), sub = fd && fd.subs.find(s => now >= s.from && now < s.to);
+  if (pf) L.push(`今 ${age} 岁（${new Date().getFullYear()} 年）：小限到第 ${pf.house} 宫${XP.SIGNS[pf.sign]}，年主星${BODY[pf.lord].n}` + (fd ? `；法达主运${BODY[fd.lord].n}${sub ? '、子运' + BODY[sub.lord].n : ''}` : ''));
+  const g = guessNote();
+  if (g) L.push('注意：' + g);
+  return L.join('\n');
+}
+function rulesText() {
+  return [
+    '回归黄道（当日分点）；日月与八大行星按 Paul Schlyter 的轨道根数与摄动项计算，冥王星用其 1885–2099 年级数，误差约一至二角分；北交点取平均交点。',
+    `宫制 ${HOUSE_NAME[C.house]}${C.placidusFallback ? '（纬度超过 66°，改用波菲利）' : ''}；上升、中天由格林尼治平恒星时推得。`,
+    '相位容许度：合、冲 8°，刑、拱 7°，六合 5°，日月参与再加 2°；只取这五种主要相位。',
+    '庙旺陷弱只论传统七政（守护为庙、对宫为陷，旺与弱亦然），三王星不论。',
+    `法达以太阳在地平上下分昼夜${C.day ? '' : C.input.bonatti ? '，夜生用波那提序（交点殿后）' : '，夜生交点排在火星之后'}；小限每满一岁上升推进一宫（整宫）；福点昼生取上升 + 月 − 日，夜生取上升 + 日 − 月。`
+  ].join('\n');
+}
+$('aiBtn').onclick = () => { if (C) Fabao.askAI('西洋占星（本命盘）', aiText(), rulesText()); };
 function writeURL() {
   const s = snap(), q = new URLSearchParams();
   q.set('d', s.when); q.set('lat', s.lat); q.set('lon', s.lon); q.set('tz', s.tz);
@@ -445,7 +524,9 @@ syncUI(); renderLib();
 const q = new URLSearchParams(location.search);
 if (q.get('d')) {
   const c = CITY_LIST.find(x => Math.abs(x[2] - (+q.get('lat'))) < 0.005 && Math.abs(x[1] - (+q.get('lon'))) < 0.005);
-  apply({ when: q.get('d'), name: q.get('n') || '', lat: +q.get('lat') || view.lat, lon: +q.get('lon') || view.lon, tz: q.get('tz') != null ? +q.get('tz') : view.tz, city: c ? c[0] : '', dst: q.get('dst') === '1', house: q.get('h') || 'placidus', bonatti: q.get('b') === '1' });
+  const lat = +q.get('lat') || view.lat, lon = +q.get('lon') || view.lon;
+  if (!+q.get('lat') || !+q.get('lon')) placeGuess = { lat: +lat, lon: +lon, noLat: !+q.get('lat'), noLon: !+q.get('lon') };
+  apply({ when: q.get('d'), name: q.get('n') || '', lat, lon, tz: q.get('tz') != null ? +q.get('tz') : view.tz, city: c ? c[0] : '', dst: q.get('dst') === '1', house: q.get('h') || 'placidus', bonatti: q.get('b') === '1' });
 } else $('nowBtn').click();
 })();
 </script>

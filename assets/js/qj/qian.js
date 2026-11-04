@@ -122,7 +122,10 @@
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--jin').trim() || '#D9AE4E';
     ctx.fillRect(W / 2 - 160, 1150, 320, 2);
 
-    text(ctx, r.day + ' · 值' + r.jc + ' · ' + r.qi + ' · ' + r.moon.name, W / 2, 1204, '30px ' + BODY, C.fg2, 'center', 2);
+    var line1 = r.ts
+      ? r.day + ' · ' + r.jc + '日 · ' + r.ts.shen + (r.ts.huang ? '黄道' : '黑道') + ' · 冲' + r.ts.chong.sx + '煞' + r.ts.chong.sha + ' · ' + r.qi
+      : r.day + ' · 值' + r.jc + ' · ' + r.qi + ' · ' + r.moon.name;
+    text(ctx, line1, W / 2, 1204, '30px ' + BODY, C.fg2, 'center', 2);
     if (r.yi) text(ctx, '宜 ' + r.yi + '　　忌 ' + r.ji, W / 2, 1250, '28px ' + BODY, C.mute, 'center', 1);
 
     // 二维码：月白底，紫夜点

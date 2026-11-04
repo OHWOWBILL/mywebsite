@@ -1,7 +1,8 @@
 {{- /* ===========================================================
      日课 · 首页小卡（assets/js/qj/rike.js 现算填入）
-     农历、日柱与建除、节气进度、月相、此时一卦，每次打开都不一样。
-     宜忌取自 data/rike.yaml；「生成日签」见 assets/js/qj/qian.js。
+     农历、日柱与建除、值神冲煞、吉神方位、时辰吉凶、日本历注、节气进度、月相、此时一卦，每次打开都不一样。
+     黄历各项由法宝库的通书底座（static/fabao/tongshu.js，首页另行载入）现算；没有它时退回 data/rike.yaml 的建除宜忌。
+     「生成日签」见 assets/js/qj/qian.js。
      没有脚本时整块不显示。
      =========================================================== */ -}}
 {{- $hero := (resources.Get "img/ge-hero.jpg").Process "webp q80" -}}
@@ -11,15 +12,26 @@
     <div class="qj-rike-moon" data-k="moon"></div>
     <dl class="qj-rike-facts">
       <div><dt>日</dt><dd data-k="day"></dd></div>
-      <div><dt>气</dt><dd data-k="qi"></dd></div>
+      <div data-row="shen" hidden><dt>神</dt><dd data-k="shen"></dd></div>
       <div><dt>宜</dt><dd data-k="yi"></dd></div>
       <div><dt>忌</dt><dd data-k="ji"></dd></div>
+      <div data-row="shi" hidden><dt>时</dt><dd data-k="shi"></dd></div>
+      <div data-row="fang" hidden><dt>方</dt><dd data-k="fang"></dd></div>
+      <div data-row="jp" hidden><dt>暦</dt><dd data-k="jp"></dd></div>
+      <div><dt>气</dt><dd data-k="qi"></dd></div>
     </dl>
     <a class="qj-rike-gua" href="{{ "meihua/" | relURL }}" data-k="gua" title="去梅花排盘看全卦"></a>
   </div>
   <div class="qj-rike-foot">
     <button type="button" class="qj-rike-qian">生成日签</button>
+    <a class="qj-rike-link" href="{{ "huangli/" | relURL }}">完整黄历</a>
+    <a class="qj-rike-link" href="{{ "zeri/" | relURL }}">挑日子</a>
     <span class="qj-rike-note">卦随时辰换，日课每日换</span>
   </div>
   <script type="application/json" id="qj-rike-data">{{ site.Data.rike | jsonify | safeJS }}</script>
 </section>
+{{- /* 日课用法宝库的通书底座（值神冲煞、方位、时辰、日本历注）：节气表、日本旧暦表与底座本身。
+       写在这里而不是页脚：页脚是 partialCached，分不出首页；这几行在脚本包之前载入，日课一画就用得上 */}}
+<script src="{{ "qimen/jieqi.js" | relURL }}?v=1"></script>
+<script src="{{ "fabao/kyureki.js" | relURL }}?v=1"></script>
+<script src="{{ "fabao/tongshu.js" | relURL }}?v=1"></script>

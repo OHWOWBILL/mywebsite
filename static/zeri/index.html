@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>择日 · 潜蛟阁法宝库</title>
+  <meta name="description" content="择日择时：选好事项，贴上几个候选时间或给一段日子，合看黄历宜忌、时辰黄道与奇门用神，排出先后并说明理由。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
+  <style>
+    .zr-wrap { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr); gap: 22px; align-items: start; }
+    .zr-in { display: flex; flex-direction: column; gap: 14px; position: sticky; top: calc(var(--top-h) + 14px); }
+    @media (max-width: 1000px) { .zr-wrap { grid-template-columns: 1fr; } .zr-in { position: static; } }
+    .box { padding: 16px 18px; }
+    .box-h { font-family: var(--font-title); font-size: 15px; letter-spacing: .2em; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .box-h small { font-family: var(--font-body); font-size: 12px; color: var(--faint); letter-spacing: .08em; }
+    .box-h .no { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--zi); color: #fff; font-size: 12px; letter-spacing: 0; font-family: var(--font-mark); }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip { border: 1px solid var(--rule-2); border-radius: 999px; padding: 6px 13px; font-size: 14px; color: var(--muted); background: var(--bg-3); font-family: var(--font-title); letter-spacing: .06em; }
+    .chip:hover { color: var(--fg); }
+    .chip.on { border-color: var(--zi-2); color: var(--fg); background: rgba(122, 91, 192, .25); }
+    .chip.sm { padding: 4px 11px; font-size: 13px; }
+    .seg2 { display: flex; margin-top: 10px; }
+    .seg2 .fb-seg { width: 100%; } .seg2 .fb-seg button { padding: 7px 0; }
+    .cands { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .cand { display: inline-flex; align-items: center; gap: 2px; border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-3); font-family: var(--font-title); font-size: 13.5px; }
+    .cand span { padding: 4px 4px 4px 12px; white-space: nowrap; }
+    .cand button { padding: 4px 10px 4px 4px; color: var(--faint); font-size: 15px; }
+    .cand button:hover { color: var(--zhu); }
+    .addrow { display: flex; gap: 6px; margin-top: 10px; }
+    .addrow textarea { flex: 1; min-height: 42px; height: 42px; resize: vertical; line-height: 1.6; font-size: 14px; }
+    .hint { font-size: 12px; color: var(--faint); margin-top: 6px; line-height: 1.7; }
+    .range { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; font-size: 13px; color: var(--muted); }
+    .range input[type=date] { font-family: var(--font-title); padding: 6px 8px; }
+    .who { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; color: var(--muted); }
+    .who input[type=number] { width: 6.5em; padding: 4px 8px; }
+    .who select { padding: 4px 8px; }
+    .tg { border: 1px solid var(--rule-2); border-radius: 999px; padding: 2px 11px; font-size: 12.5px; color: var(--faint); font-family: var(--font-title); }
+    .tg.on { color: var(--fg-2); border-color: var(--zi-2); }
+
+    .res-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .res-h b { font-family: var(--font-title); font-size: 18px; letter-spacing: .15em; }
+    .res-h .sp { flex: 1; }
+    .res-h .fb-btn { padding: 6px 12px; font-size: 13px; }
+    .rk { padding: 14px 16px; margin-bottom: 10px; border-left: 3px solid var(--rule-2); --gc: var(--muted); }
+    .rk.g-上吉 { --gc: var(--jin); } .rk.g-吉 { --gc: var(--lv); } .rk.g-次 { --gc: #c99a8c; } .rk.g-凶 { --gc: var(--zhu); }
+    .rk { border-left-color: var(--gc); }
+    .rk-top { display: flex; align-items: baseline; gap: 10px; }
+    .rk-top .no { font-family: var(--font-mark); font-weight: 800; font-size: 13px; color: var(--faint); min-width: 1.4em; }
+    .rk-top .when { font-family: var(--font-title); font-size: 17px; letter-spacing: .06em; flex: 1; min-width: 0; }
+    .rk-top .when small { font-size: 12.5px; color: var(--muted); margin-left: 6px; letter-spacing: .1em; }
+    .rk-top .gr { font-family: var(--font-title); font-weight: 900; font-size: 20px; color: var(--gc); letter-spacing: .08em; white-space: nowrap; }
+    .bar { height: 5px; border-radius: 3px; background: var(--bg-3); margin-top: 8px; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: var(--gc); border-radius: 3px; }
+    .lay { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 12.5px; color: var(--faint); font-family: var(--font-title); letter-spacing: .08em; }
+    .lay b { font-weight: 600; color: var(--fg-2); }
+    .lay b.g-上吉 { color: var(--jin); } .lay b.g-吉 { color: var(--lv); } .lay b.g-次, .lay b.g-凶 { color: var(--zhu); }
+    .why { margin-top: 8px; font-size: 13.5px; line-height: 1.75; color: var(--fg-2); }
+    .why .p { color: var(--lv); } .why .n { color: var(--zhu); }
+    .rk details { margin-top: 6px; }
+    .rk summary { cursor: pointer; font-size: 12px; color: var(--faint); letter-spacing: .15em; list-style: none; }
+    .rk summary::-webkit-details-marker { display: none; }
+    .rk summary::before { content: "＋ "; color: var(--zi-2); }
+    .rk details[open] summary::before { content: "－ "; }
+    .dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin-top: 6px; font-size: 13px; line-height: 1.6; }
+    .dl dt { font-family: var(--font-title); color: var(--faint); letter-spacing: .12em; }
+    .dl dd { color: var(--fg-2); }
+    .dl .p { color: var(--lv); } .dl .n { color: var(--zhu); }
+    .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .acts a, .acts button { font-size: 12.5px; padding: 4px 11px; border: 1px solid var(--rule-2); border-radius: 999px; color: var(--muted); text-decoration: none; font-family: var(--font-title); letter-spacing: .08em; }
+    .acts a:hover, .acts button:hover { color: var(--fg); border-color: var(--zi-2); }
+    .more { width: 100%; }
+    @media (max-width: 860px) {
+      .rk-top .when { font-size: 15.5px; }
+      .addrow { flex-direction: column; }
+    }
+  </style>
+</head>
+<body data-tool="zeri">
+<main class="fb-main">
+  <div class="fb-head">
+    <div class="fb-seal">择</div>
+    <div>
+      <h1 class="fb-title">择日 <span class="en">ELECTION</span></h1>
+      <div class="fb-sub">选好事项，给几个时间或一段日子 · 黄历 × 时辰 × 奇门 排出先后</div>
+    </div>
+  </div>
+
+  <div class="zr-wrap">
+    <div class="zr-in">
+      <section class="fb-card box">
+        <div class="box-h"><span class="no">1</span>什么事</div>
+        <div class="chips" id="evChips"></div>
+      </section>
+
+      <section class="fb-card box">
+        <div class="box-h"><span class="no">2</span>哪些时间</div>
+        <div class="seg2"><div class="fb-seg" id="modeSeg"><button type="button" data-m="cand">我有几个候选</button><button type="button" data-m="find">帮我在一段日子里找</button></div></div>
+        <div id="candBox">
+          <div class="cands" id="cands"></div>
+          <div class="addrow">
+            <textarea id="addIn" rows="1" placeholder="贴上时间，如 11/18 20:00（可多行）"></textarea>
+            <button type="button" class="fb-btn primary" id="addBtn">加入</button>
+          </div>
+          <p class="hint">「１１月１８日（水）２０：００」「11/16 夕方」「明年 1/5 下午3点」这类写法都认得，一次可贴好几行；下一行只写「18日」就接上一行的月份。只写日子不写钟点的按中午算，夕方、晚上按 17 点、20 点算。时辰两小时一换，19–21 点同属戌时。</p>
+        </div>
+        <div id="findBox" hidden>
+          <div class="range">从 <input type="date" id="fromIn" aria-label="起"> 到 <input type="date" id="toIn" aria-label="止"></div>
+          <div class="chips" id="winChips"></div>
+          <div class="chips" id="dayChips"></div>
+        </div>
+      </section>
+
+      <section class="fb-card box">
+        <div class="box-h"><span class="no">3</span>是谁<small>计冲本命、奇门年命；不填也能排</small></div>
+        <div class="who" style="margin-top:10px">
+          <label>出生年 <input type="number" id="byIn" min="1900" max="2100" inputmode="numeric" placeholder="如 1993"></label>
+          <span id="byOut"></span>
+          <button type="button" class="tg" id="jpTg" title="六曜、一粒万倍日、天赦日、不成就日等">日本历注</button>
+        </div>
+      </section>
+    </div>
+
+    <section>
+      <div class="res-h"><b id="resT">排名</b><span class="fb-fine" id="resSub"></span><span class="sp"></span>
+        <button type="button" class="fb-btn" id="copyBtn">复制</button><button type="button" class="fb-btn" id="aiBtn">问 AI</button></div>
+      <div id="res"></div>
+    </section>
+  </div>
+
+  <p class="fb-fine" style="margin-top:26px">口径：一个时刻的分数＝这一天对此事的黄历分（建除宜忌、黄道黑道、冲本命、岁破四离四绝杨公忌、彭祖百忌；开日本历注再加六曜選日）＋这个时辰的值神黄道黑道与冲本命（日本历注另看先勝、先負、赤口的上午下午）＋奇门白话断语分（按事项取题型：面试→求职、考试面谈→考试、签约→签约、开业→开业、搬家→搬家、出行→出行、嫁娶→婚姻、求医→疾病，动土与祭祀只看日干时干、权重减半；先挪到以常见时辰为零再计）。23 点后算次日子时；奇门按钟点起局，不开真太阳时。分数只排先后、给理由，不是定论；吉时之外，准备与状态更要紧。</p>
+</main>
+
+<script src="/fabao/fabao.js?v=13"></script>
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/fabao/kyureki.js?v=1"></script>
+<script src="/fabao/tongshu.js?v=1"></script>
+<script src="/qimen/core.js?v=4"></script>
+<script src="/zeri/zeri.js?v=1"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const ls = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const pad = n => String(n).padStart(2, '0');
+  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const iso = d => `${ymd(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const WEEK = '日一二三四五六';
+  const isJpTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Tokyo'; } catch (e) { return false; } })();
+  const q = new URLSearchParams(location.search);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  // —— 状态 ——
+  let ev = q.get('do') || ls('tongshu.ev') || '面试';
+  if (!TS.EV_BY[ev]) ev = '面试';
+  let jp = ls('tongshu.jp') == null ? isJpTz : ls('tongshu.jp') === '1';
+  let cands = [];
+  try { cands = (JSON.parse(ls('zeri.c')) || []).map(s => new Date(s)).filter(d => !isNaN(d)); } catch (e) {}
+  if (q.get('c')) cands = q.get('c').split(',').map(s => new Date(s)).filter(d => !isNaN(d));
+  let mode = q.get('m') === 'cand' || q.get('m') === 'find' ? q.get('m') : q.get('d') ? 'find' : q.get('c') || cands.length ? 'cand' : (ls('zeri.mode') || 'find');
+  let from = new Date(today), to = new Date(today); to.setDate(to.getDate() + 13);
+  if (q.get('d')) { const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(q.get('d')); if (m) { from = new Date(+m[1], m[2] - 1, +m[3]); to = new Date(from); } }
+  const WINS = [['全天', [0, 24]], ['9–22 点', [9, 22]], ['上午', [7, 12]], ['下午', [12, 18]], ['晚上', [18, 23]]];
+  let win = +(ls('zeri.win') || 1); if (!WINS[win]) win = 1;
+  if (q.get('d')) win = 0;
+  const DAYS = [['不挑日子', 'all'], ['只看工作日', 'work'], ['只看周末', 'weekend']];
+  let dsel = ls('zeri.days') || 'all';
+  const birth = window.Fabao && Fabao.birth.load(), by0 = birth && Fabao.birth.yearOf(birth);
+  let byear = ls('zeri.by') ? +ls('zeri.by') : by0 ? by0.gzYear : null;
+  const sxOf = y => y ? ((y - 4) % 12 + 12) % 12 : null;
+  let showN = 10;
+
+  // —— 输入区 ——
+  $('evChips').innerHTML = TS.EVENTS.map(e => `<button type="button" class="chip" data-k="${e.k}">${e.name}</button>`).join('');
+  $('evChips').querySelectorAll('.chip').forEach(b => b.onclick = () => { ev = b.dataset.k; lss('tongshu.ev', ev); render(); });
+  $('modeSeg').querySelectorAll('button').forEach(b => b.onclick = () => { mode = b.dataset.m; lss('zeri.mode', mode); showN = 10; render(); });
+  $('winChips').innerHTML = WINS.map((w, i) => `<button type="button" class="chip sm" data-i="${i}">${w[0]}</button>`).join('');
+  $('winChips').querySelectorAll('.chip').forEach(b => b.onclick = () => { win = +b.dataset.i; lss('zeri.win', win); showN = 10; render(); });
+  $('dayChips').innerHTML = DAYS.map(d => `<button type="button" class="chip sm" data-k="${d[1]}">${d[0]}</button>`).join('');
+  $('dayChips').querySelectorAll('.chip').forEach(b => b.onclick = () => { dsel = b.dataset.k; lss('zeri.days', dsel); showN = 10; render(); });
+  $('fromIn').value = ymd(from); $('toIn').value = ymd(to);
+  const readRange = () => {
+    const a = new Date($('fromIn').value + 'T00:00'), b = new Date($('toIn').value + 'T00:00');
+    if (isNaN(a) || isNaN(b)) return;
+    from = a; to = b < a ? new Date(a) : b;
+    if ((to - from) / 864e5 > 62) { to = new Date(from); to.setDate(to.getDate() + 62); $('toIn').value = ymd(to); Fabao.toast('一次最多找两个月'); }
+    showN = 10; render();
+  };
+  $('fromIn').onchange = readRange; $('toIn').onchange = readRange;
+  const saveC = () => lss('zeri.c', JSON.stringify(cands.map(iso)));
+  function addFromText() {
+    const got = ZR.parse($('addIn').value, new Date());
+    if (!got.length) { Fabao.toast('没读出日子，试试「11/18 20:00」这样写'); return; }
+    got.forEach(d => { if (!cands.some(x => x.getTime() === d.getTime())) cands.push(d); });
+    cands.sort((a, b) => a - b); saveC(); $('addIn').value = ''; render();
+    Fabao.toast(`加入 ${got.length} 个时间`);
+  }
+  $('addBtn').onclick = addFromText;
+  $('addIn').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addFromText(); } });
+  $('addIn').addEventListener('paste', () => setTimeout(() => { if (/\n/.test($('addIn').value)) addFromText(); }, 0));
+  $('byIn').value = byear || '';
+  $('byIn').onchange = () => { const v = +$('byIn').value; byear = v >= 1900 && v <= 2100 ? v : null; lss('zeri.by', byear || ''); render(); };
+  const paintJp = () => { $('jpTg').classList.toggle('on', jp); $('jpTg').textContent = '日本历注 · ' + (jp ? '开' : '关'); };
+  $('jpTg').onclick = () => { jp = !jp; lss('tongshu.jp', jp ? '1' : '0'); paintJp(); render(); };
+  paintJp();
+
+  // —— 结果 ——
+  const opt = () => ({ ev, jp, sx: sxOf(byear), ming: byear });
+  const short = t => t.replace(/：.*/, '').replace(/（[^）]*）$/, '');
+  const pct = s => Math.max(3, Math.min(100, Math.round((s + 12) / 20 * 100)));
+  let last = [];
+  function card(e, i) {
+    const d = e.date, E = e.ev, v = e.qm;
+    const hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const span = e.span ? `${pad(e.span[0])}–${pad(e.span[1] % 24)} 点` : hm;
+    const pros = e.pros.slice(0, 3).map(x => short(x.t)), cons = e.cons.slice(0, 2).map(x => short(x.t));
+    const li = (arr, cls) => arr.map(x => `<span class="${cls}">${x.t}</span>`).join('；');
+    return `<article class="fb-card rk g-${e.grade}">
+      <div class="rk-top"><span class="no">${i + 1}</span><span class="when">${d.getMonth() + 1}月${d.getDate()}日 周${WEEK[d.getDay()]} ${mode === 'find' ? span : hm}<small>${e.hour.name} · ${e.day.gz.name}日</small></span><span class="gr">${e.grade}</span></div>
+      <div class="bar"><i style="width:${pct(e.total)}%"></i></div>
+      <div class="lay"><span>黄历 <b class="g-${e.dayGrade}">${e.dayGrade}</b></span><span>时辰 <b class="${e.hour.huang ? 'g-吉' : 'g-凶'}">${e.hour.shen}${e.hour.huang ? '黄道' : '黑道'}</b></span><span>奇门 <b class="g-${v ? v.grade : '平'}">${v ? v.grade : '—'}</b></span>${jp && e.day.rokuyo ? `<span>六曜 <b>${e.day.rokuyo}</b></span>` : ''}</div>
+      <p class="why">${pros.length ? `<span class="p">${pros.join('，')}</span>` : ''}${cons.length ? `${pros.length ? '；' : ''}<span class="n">但${cons.join('，')}</span>` : ''}</p>
+      <details><summary>细看理由</summary><dl class="dl">
+        <dt>黄历</dt><dd>${e.day.jianchu}日 · ${e.day.shen} · 冲${e.day.chong.sx}${e.dayPlus.length ? '<br>' + li(e.dayPlus, 'p') : ''}${e.dayMinus.length ? '<br>' + li(e.dayMinus, 'n') : ''}</dd>
+        <dt>时辰</dt><dd>${e.hourItems.map(x => `<span class="${x.v > 0 ? 'p' : 'n'}">${x.t}</span>`).join('；')}</dd>
+        <dt>奇门</dt><dd>${v ? `${E.qm === '考试' ? '考试·面谈' : E.qm}题：${v.lines.map(l => l.text).join('；')}${v.items.filter(x => /吟|五不遇/.test(x.t)).length ? '；<span class="n">' + v.items.filter(x => /吟|五不遇/.test(x.t)).map(x => x.t).join('、') + '</span>' : ''}` : '—'}</dd>
+      </dl></details>
+      <div class="acts">
+        <a href="/qimen/?t=${iso(d)}${E.qm !== '自由' ? '&type=' + encodeURIComponent(E.qm) : ''}">看奇门盘</a>
+        <a href="/huangli/?d=${ymd(d)}&do=${encodeURIComponent(E.k)}">看这天黄历</a>
+        ${mode === 'cand' ? `<button type="button" data-rm="${d.getTime()}">移除</button>` : ''}
+      </div>
+    </article>`;
+  }
+  function render() {
+    $('evChips').querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.k === ev));
+    $('modeSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === mode));
+    $('candBox').hidden = mode !== 'cand'; $('findBox').hidden = mode !== 'find';
+    $('winChips').querySelectorAll('.chip').forEach(b => b.classList.toggle('on', +b.dataset.i === win));
+    $('dayChips').querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.k === dsel));
+    $('cands').innerHTML = cands.map(d => `<span class="cand"><span>${d.getMonth() + 1}/${d.getDate()} 周${WEEK[d.getDay()]} ${pad(d.getHours())}:${pad(d.getMinutes())}</span><button type="button" data-rm="${d.getTime()}" aria-label="移除">×</button></span>`).join('') || '<span class="hint">还没有候选——在下面贴上几个时间。</span>';
+    $('cands').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { cands = cands.filter(x => x.getTime() !== +b.dataset.rm); saveC(); render(); });
+    const sx = sxOf(byear);
+    $('byOut').textContent = byear ? `属${TS.SX[sx]} · 计冲与年命` + (by0 && by0.gzYear === byear ? '（取自命部生辰）' : '') : '';
+    const E = TS.EV_BY[ev];
+    let list;
+    if (mode === 'cand') {
+      list = cands.map(d => ZR.evalTime(d, opt())).filter(Boolean).sort((a, b) => b.total - a.total || a.date - b.date);
+      $('resT').textContent = cands.length ? `「${E.name}」${cands.length} 个时间排名` : `「${E.name}」排名`;
+      $('resSub').textContent = '';
+    } else {
+      list = ZR.search(from, to, WINS[win][1], opt(), dsel);
+      $('resT').textContent = `「${E.name}」最好的时辰`;
+      $('resSub').textContent = `${from.getMonth() + 1}/${from.getDate()}–${to.getMonth() + 1}/${to.getDate()} · ${WINS[win][0]} · 共 ${list.length} 个时辰`;
+    }
+    last = list;
+    const shown = mode === 'find' ? list.slice(0, showN) : list;
+    $('res').innerHTML = shown.length ? shown.map(card).join('') + (mode === 'find' && list.length > showN ? `<button type="button" class="fb-btn more" id="moreBtn">再看 ${Math.min(10, list.length - showN)} 个</button>` : '')
+      : `<div class="fb-card fb-empty">${mode === 'cand' ? '先在左边贴上候选时间' : '这段日子里没有合适的时辰（或都已过去）'}</div>`;
+    $('res').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { cands = cands.filter(x => x.getTime() !== +b.dataset.rm); saveC(); render(); });
+    const mb = $('moreBtn'); if (mb) mb.onclick = () => { showN += 10; render(); };
+  }
+  function resultText() {
+    const E = TS.EV_BY[ev];
+    return [`择日 ·「${E.name}」${byear ? '（' + byear + '年生，属' + TS.SX[sxOf(byear)] + '）' : ''}`]
+      .concat(last.slice(0, mode === 'find' ? showN : 99).map((e, i) => {
+        const d = e.date;
+        return `${i + 1}. ${d.getMonth() + 1}月${d.getDate()}日 周${WEEK[d.getDay()]} ${pad(d.getHours())}:${pad(d.getMinutes())}（${e.hour.name}，${e.day.gz.name}日）${e.grade}：黄历${e.dayGrade}，${e.hour.shen}${e.hour.huang ? '黄道' : '黑道'}，奇门${e.qm ? e.qm.grade : '—'}。` +
+          `好在${e.pros.slice(0, 3).map(x => short(x.t)).join('、') || '—'}；要留意${e.cons.slice(0, 2).map(x => short(x.t)).join('、') || '—'}`;
+      })).concat(['—— 潜蛟阁 · 择日 ohwowbill.com/zeri/']).join('\n');
+  }
+  $('copyBtn').onclick = () => last.length ? Fabao.copy(resultText(), '排名已复制') : Fabao.toast('还没有结果');
+  $('aiBtn').onclick = () => last.length ? Fabao.askAI('择日（通书与奇门）', resultText(),
+    '日：建除十二神宜忌（通书简本）、值神黄道黑道、冲本命、岁破四离四绝杨公忌、彭祖百忌；时：时辰值神与冲；奇门：时家转盘拆补，按事项取用神（面试看开门值符日干时干，考试面谈看景门丁奇天辅日干），用神与日干宫生克、空墓刑迫、神将格局，伏吟反吟五不遇时扣分。' + (jp ? '另计日本六曜選日。' : '')) : Fabao.toast('还没有结果');
+  render();
+})();
+</script>
+</body>
+</html>

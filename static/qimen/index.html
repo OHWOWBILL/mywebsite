@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-<link rel="stylesheet" href="/fabao/fabao.css?v=4">
+<link rel="stylesheet" href="/fabao/fabao.css?v=6">
 <style>
 /* 奇门手记 · 盘面与表单（外框见 /fabao/fabao.css） */
 :root{ --qi:#E7C77E; }  /* 三奇：淡金，比局数那一处金轻一档 */
@@ -49,6 +49,28 @@
 .qm-set input[type=number]{width:7.5em}
 .qm-set .out{font-size:12px;color:var(--zi-2);font-family:var(--font-title)}
 .qm-side .fb-seg{display:flex;width:100%}
+/* 白话断语 */
+.qm-verdict{background:var(--bg-2);border:1px solid var(--rule);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:12px;--vc:var(--muted)}
+.qm-verdict.g-上吉,.qm-verdict.g-吉{--vc:var(--lv)}
+.qm-verdict.g-次,.qm-verdict.g-凶{--vc:var(--zhu)}
+.qm-verdict .v-top{display:flex;align-items:center;gap:10px}
+.qm-verdict .v-g{font-family:var(--font-title);font-weight:700;font-size:20px;color:var(--vc);letter-spacing:.1em;min-width:2.4em}
+.qm-verdict .v-t{font-family:var(--font-title);font-size:12px;color:var(--muted);letter-spacing:.2em;white-space:nowrap}
+.qm-verdict .v-bar{flex:1;height:6px;border-radius:3px;background:var(--bg-3);overflow:hidden;min-width:40px}
+.qm-verdict .v-bar i{display:block;height:100%;background:var(--vc);border-radius:3px}
+.qm-verdict .v-n{font-family:var(--font-mark);font-size:12px;color:var(--faint);min-width:2em;text-align:right}
+.qm-verdict .v-s{margin-top:6px;font-size:14px;line-height:1.7;color:var(--fg-2)}
+.qm-verdict .v-s .con{color:var(--zhu)}
+.qm-verdict details{margin-top:4px}
+.qm-verdict summary{cursor:pointer;font-size:12px;color:var(--faint);letter-spacing:.15em;list-style:none}
+.qm-verdict summary::-webkit-details-marker{display:none}
+.qm-verdict summary::before{content:"＋ ";color:var(--zi-2)}
+.qm-verdict details[open] summary::before{content:"－ "}
+.qm-verdict ul{list-style:none;margin-top:4px}
+.qm-verdict li button{display:flex;gap:8px;width:100%;text-align:left;padding:5px 0;border-top:1px solid var(--rule);font-size:13px;color:var(--fg-2);line-height:1.6}
+.qm-verdict li button:hover{color:var(--fg)}
+.qm-verdict li .sc{font-family:var(--font-mark);font-size:11px;min-width:3em;text-align:right;margin-left:auto;color:var(--faint)}
+.qm-verdict li .sc.p{color:var(--lv)} .qm-verdict li .sc.n{color:var(--zhu)}
 .qm-side .fb-seg button{padding:8px 0;font-size:14px}
 
 /* ---------- 盘 ---------- */
@@ -281,6 +303,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
       <div class="fb-row">
         <button type="button" class="fb-btn grow" id="copyPan">复制盘面</button>
         <button type="button" class="fb-btn grow" id="copyLink">此盘链接</button>
+        <button type="button" class="fb-btn grow" id="askAI" title="把盘面、题型断语和口径打包复制，贴给任意 AI">问 AI</button>
       </div>
       <div class="override" id="overrideRow">
         <select id="ovDun" aria-label="阴阳遁"><option value="yang">阳遁</option><option value="yin">阴遁</option></select>
@@ -340,6 +363,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
     </div>
 
     <div class="qm-side">
+      <div class="qm-verdict" id="verdict" hidden></div>
       <div class="fb-seg" id="secSeg">
         <button type="button" data-s="new" class="on">起局</button>
         <button type="button" data-s="ge">格局</button>
@@ -351,9 +375,13 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
         <div class="field"><label>题型</label>
           <div class="chips" id="typeChips">
             <button class="chip on" data-t="天气">天气</button>
+            <button class="chip" data-t="求职">求职</button>
+            <button class="chip" data-t="考试">考试·面谈</button>
             <button class="chip" data-t="求财">求财</button>
+            <button class="chip" data-t="签约">签约</button>
+            <button class="chip" data-t="开业">开业</button>
             <button class="chip" data-t="婚姻">婚姻</button>
-            <button class="chip" data-t="考试">考试</button>
+            <button class="chip" data-t="搬家">搬家</button>
             <button class="chip" data-t="疾病">疾病</button>
             <button class="chip" data-t="官司">官司</button>
             <button class="chip" data-t="出行">出行</button>
@@ -428,10 +456,10 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
   </div>
 </main>
 
-<script src="/fabao/fabao.js?v=12"></script>
+<script src="/fabao/fabao.js?v=13"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
-<script src="/qimen/core.js?v=3"></script>
+<script src="/qimen/core.js?v=4"></script>
 <script>
 /* ================= state ================= */
 const LS='qmsj.v1', LSV='qmsj.view';
@@ -637,9 +665,22 @@ function renderHeader(){
 }
 
 /* ================= 格局 ================= */
+function renderVerdict(c){
+  const box=$('verdict');
+  if(curType==='天气'){box.hidden=true;return}
+  const v=QM.verdict(c,curType);
+  const tx=a=>a.slice(0,2).map(x=>x.t).join('；');
+  box.className='qm-verdict g-'+v.grade; box.hidden=false;
+  box.innerHTML=`<div class="v-top"><span class="v-g">${v.grade}</span><span class="v-t">${curType==='考试'?'考试·面谈':curType} · 白话</span><span class="v-bar"><i style="width:${v.pct}%"></i></span><span class="v-n">${v.pct}</span></div>
+    <p class="v-s">${v.pros.length?tx(v.pros)+'。':''}${v.cons.length?`<span class="con">${v.pros.length?'但':''}${tx(v.cons)}。</span>`:''}</p>
+    <details><summary>逐个用神看</summary><ul>${v.lines.map(l=>`<li><button type="button"${l.p?` data-p="${l.p}"`:''}><span>${l.text}</span><span class="sc ${l.v>0?'p':l.v<0?'n':''}">${l.v>0?'+':''}${l.v}</span></button></li>`).join('')}</ul>
+    <p class="hint">按题型取用神，看它与日干宫的生克、落宫的空墓刑迫、所临神将与格局，另扣伏吟、反吟、五不遇时，合成一个分数。只作读盘提纲，断事仍以用神为主。</p></details>`;
+  box.querySelectorAll('li button[data-p]').forEach(b=>b.onclick=()=>selectPalace(+b.dataset.p,true));
+}
 function renderGe(){
   const c=cur; if(!c) return;
   const all=QM.analyze(c);
+  renderVerdict(c);
   renderYs(c);
   const det=$('palDetail');
   if(selP==null){
@@ -812,6 +853,17 @@ function panText(c){
   return L.join('\n');
 }
 $('copyPan').onclick=()=>{ if(cur) Fabao.copy(panText(cur),'盘面已复制'); };
+$('askAI').onclick=()=>{
+  if(!cur) return;
+  let body=panText(cur);
+  if(curType!=='天气'){
+    const v=QM.verdict(cur,curType);
+    body+=`\n\n题型：${curType==='考试'?'考试·面谈':curType}（本站白话断语：${v.grade}，${v.score}）\n`+v.lines.map(l=>'· '+l.text).join('\n');
+  }
+  const q=($('fQ')&&$('fQ').value.trim())||'';
+  if(q) body='所问：'+q+'\n\n'+body;
+  Fabao.askAI('时家奇门遁甲', body, '时家转盘，拆补定局；隐干按地盘干随八门同转；入墓按十二长生阳顺阴逆（乙丙戊墓乾，丁己庚墓艮，辛壬墓巽，癸墓坤）；击刑：戊震、己坤、庚艮、辛离、壬巽、癸巽；门迫为门克宫。用神按题型取，看与日干宫的生克、空亡、入墓、击刑、门迫与格局。');
+};
 $('copyLink').onclick=()=>{
   const u=new URL(location.href); u.search=''; u.hash='';
   u.searchParams.set('t',Fabao.toLocalInput(curDate));
@@ -1078,6 +1130,8 @@ document.querySelectorAll('#secSeg button').forEach(b=>b.onclick=()=>{
 
 /* ================= boot ================= */
 renderHeader(); renderNewFb(); renderLib();
+// 网址带 ?type=求职 时直接选好题型（择日、法宝库「我想问」从这里链进来）
+(()=>{const t=new URLSearchParams(location.search).get('type');const b=t&&document.querySelector(`#typeChips .chip[data-t="${t}"]`);if(b)b.click();})();
 </script>
 </body>
 </html>

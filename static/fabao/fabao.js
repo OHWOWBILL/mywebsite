@@ -2,6 +2,7 @@
 // 法宝库 · 共用外框
 // 顶栏与法宝切换只在这里写一次；各件法宝都在 <body data-tool="…">
 // 里引入本文件，就会得到同一套导航、提示条与干支小工具。
+// 几件同类的法宝合成「一家」（命部、堪舆、通书）：顶栏只留一个标签，进来后在家族条里切换。
 // =========================================================
 
 (function () {
@@ -19,34 +20,64 @@
     liuyao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><rect x="9.6" y="9.6" width="4.8" height="4.8"/><path d="M12 3.5v2.3M12 18.2v2.3M3.5 12h2.3M18.2 12h2.3"/></svg>',
     kanyu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 19.5l6-10 3.6 5.6 2.6-3.6 6.2 8z"/><path d="M8.8 9.5l1.3 2.1"/><circle cx="17.5" cy="6" r="1.6"/></svg>',
     xingpan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.3"/><ellipse cx="12" cy="12" rx="9.6" ry="3.5" transform="rotate(-22 12 12)"/></svg>',
-    xiangbu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 12c2.4-4 5.5-6 9.2-6s6.8 2 9.2 6c-2.4 4-5.5 6-9.2 6s-6.8-2-9.2-6z"/><circle cx="12" cy="12" r="2.6"/></svg>'
+    xiangbu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 12c2.4-4 5.5-6 9.2-6s6.8 2 9.2 6c-2.4 4-5.5 6-9.2 6s-6.8-2-9.2-6z"/><circle cx="12" cy="12" r="2.6"/></svg>',
+    tongshu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 9.5h16M8.5 3.5v3M15.5 3.5v3"/><circle cx="12" cy="14.6" r="1.7" fill="currentColor" stroke="none"/></svg>',
+    huangli: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 9.5h16M8.5 3.5v3M15.5 3.5v3M8 13h2M14 13h2M8 16.5h2M14 16.5h2"/></svg>',
+    zeri: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 9.5h16M8.5 3.5v3M15.5 3.5v3M9 14.6l2.1 2 3.9-4"/></svg>',
+    liunian: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.5 1.5M16.5 16.5L18 18M6 18l1.5-1.5M16.5 7.5L18 6"/></svg>',
+    jiuxing: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.5"/><circle cx="12" cy="6" r="1.5"/><circle cx="18" cy="6" r="1.5"/><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="2.6"/><circle cx="18" cy="12" r="1.5"/><circle cx="6" cy="18" r="1.5"/><circle cx="12" cy="18" r="1.5"/><circle cx="18" cy="18" r="1.5"/></svg>',
+    hepan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="5.6"/><circle cx="15" cy="12" r="5.6"/></svg>'
   };
   // men = 归哪一门（五术门庭 data/wushu.toml）；desc = 法宝库大堂（/tools/）上那一行，短到一眼看完即可
   const TOOLS = [
+    { id: 'tongshu', name: '通书', href: '/huangli/', men: '卜', desc: '黄历、择日、流年' },  // 黄历、择日、流年三件在通书里切换
     { id: 'meihua', name: '梅花', href: '/meihua/', men: '卜', desc: '此刻起卦，本互变并排' },
     { id: 'liuyao', name: '六爻纳甲', short: '六爻', href: '/liuyao/', men: '卜', desc: '摇卦装卦，旺衰逐爻标' },
+    { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/', men: '卜', desc: '起局看断语，回头复盘' },
+    { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字 · 紫微 · 占星 · 合盘' },     // 星命同参：八字、紫微、占星、合盘、读盘都在命部里切换
+    { id: 'kanyu', name: '堪舆', href: '/kanyu/', men: '山', desc: '玄空飞星、八宅、九星气学' },     // 玄空八宅、九星气学
     { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/', men: '命', desc: '干支旺衰速查' },
-    { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/', men: '卜', desc: '起局记断，回头复盘' },
     { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/', men: '医', desc: '按时开穴，四法并排' },
     { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/', men: '医', desc: '岁运、司天在泉、六步' },
-    { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字 · 紫微 · 占星同参' },     // 星命同参：八字、紫微、占星、读盘四件都在命部里切换
-    { id: 'kanyu', name: '堪舆', href: '/kanyu/', men: '山', desc: '玄空飞星、八宅、罗盘' },
     { id: 'xiangbu', name: '相部', href: '/xiangbu/', men: '相', lock: true, desc: '相法读书卡与字相九宫' }  // 口令加密页，未解禁时为锁屏
   ];
 
-  // 命部 · 星命同参：顶栏只留「命部」一个标签，进来后在这一排里切换。
-  // 八字、紫微、占星公开；读盘是口令加密页（/mingbu/），未解禁时为锁屏。
-  const MINGBU = [
-    { id: 'bazi', name: '八字', href: '/bazi/' },
-    { id: 'ziwei', name: '紫微', href: '/ziwei/' },
-    { id: 'xingpan', name: '占星', href: '/xingpan/' },
-    { id: 'mingbu', name: '读盘', href: '/mingbu/', lock: true }
-  ];
-  const LS_LAST = 'mingbu.last', LS_BIRTH = 'mingbu.birth.v1', LS_KU_LAST = 'fabao.last';
+  // —— 一家：顶栏一个标签，进来后在家族条里切换 ——
+  // 命部：八字、紫微、占星、合盘公开；读盘是口令加密页（/mingbu/），未解禁时为锁屏。
+  const FAMILIES = {
+    mingbu: {
+      name: '命部', sub: '星命同参', hint: '同一生辰，几种看法；换一件，人跟着走', people: true, lsLast: 'mingbu.last',
+      items: [
+        { id: 'bazi', name: '八字', href: '/bazi/' },
+        { id: 'ziwei', name: '紫微', href: '/ziwei/' },
+        { id: 'xingpan', name: '占星', href: '/xingpan/' },
+        { id: 'hepan', name: '合盘', href: '/hepan/' },
+        { id: 'mingbu', name: '读盘', href: '/mingbu/', lock: true }
+      ]
+    },
+    kanyu: {
+      name: '堪舆', sub: '方位', hint: '玄空看宅，九星看人走的方位', lsLast: 'kanyu.last',
+      items: [
+        { id: 'kanyu', name: '玄空八宅', short: '玄空', href: '/kanyu/' },
+        { id: 'jiuxing', name: '九星气学', short: '九星', href: '/jiuxing/' }
+      ]
+    },
+    tongshu: {
+      name: '通书', sub: '选择', hint: '黄历看日子，择日排时辰，流年看一年', lsLast: 'tongshu.last',
+      items: [
+        { id: 'huangli', name: '黄历', href: '/huangli/' },
+        { id: 'zeri', name: '择日', href: '/zeri/' },
+        { id: 'liunian', name: '流年', href: '/liunian/' }
+      ]
+    }
+  };
+  const MINGBU = FAMILIES.mingbu.items;
+  const LS_BIRTH = 'mingbu.birth.v1', LS_PEOPLE = 'mingbu.people.v1', LS_KU_LAST = 'fabao.last';
   const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* 无痕模式 */ } };
+  const famOf = id => { for (const k in FAMILIES) { const it = FAMILIES[k].items.find(t => t.id === id); if (it) return { key: k, fam: FAMILIES[k], item: it }; } return null; };
 
-  // —— 共享生辰：命部三件谁起了盘就记下来，换一件时带过去，同一个人三种看法 ——
+  // —— 共享生辰：命部几件谁起了盘就记下来，换一件时带过去，同一个人几种看法 ——
   // { when: 出生地钟表时间 'YYYY-MM-DDTHH:MM', male, name, tz, lon, lat, sun（真太阳时）, dst（夏令时）, city }
   function loadBirth() { try { return JSON.parse(lsGet(LS_BIRTH)) || null; } catch (e) { return null; } }
   function saveBirth(b) {
@@ -56,7 +87,20 @@
     // 换了地方又没给纬度（八字自定义经度、紫微），旧纬度作废
     if (b.lon != null && old.lon != null && Math.abs(b.lon - old.lon) > 0.005 && b.lat == null) delete nb.lat;
     lsSet(LS_BIRTH, JSON.stringify(nb));
+    // 正在看的是存过的某人：同一生辰就顺手更新他的记录（改了城市、名字之类）
+    const list = loadPeople(), i = list.findIndex(p => personKey(p) === personKey(nb));
+    if (i >= 0) { list[i] = Object.assign({ id: list[i].id, name: list[i].name }, nb, { name: nb.name || list[i].name }); savePeople(list); }
     refreshMingbuLinks();
+    renderPeople();
+  }
+  // 整份替换共享生辰（不与上一个人的经纬度、城市混在一起）；合盘「对调」之类用
+  function replaceBirth(b) {
+    const nb = {};
+    Object.keys(b || {}).forEach(k => { if (b[k] !== undefined && b[k] !== null && b[k] !== '') nb[k] = b[k]; });
+    delete nb.id;
+    lsSet(LS_BIRTH, JSON.stringify(nb));
+    refreshMingbuLinks();
+    renderPeople();
   }
   const pad2 = n => String(n).padStart(2, '0');
   function minusHour(when) {
@@ -67,7 +111,7 @@
   }
   // 把共享生辰写成某件法宝认得的网址参数
   function birthQuery(id, b) {
-    if (!b || !b.when || id === 'mingbu') return '';
+    if (!b || !b.when || id === 'mingbu' || id === 'hepan') return '';
     const q = new URLSearchParams();
     if (id === 'bazi') {
       q.set('d', b.when); q.set('g', b.male === false ? '0' : '1');
@@ -84,26 +128,93 @@
       if (b.lon != null) q.set('lon', b.lon);
       if (b.tz != null) q.set('tz', b.tz);
       if (b.dst) q.set('dst', '1');
-    }
+    } else return '';
     if (b.name) q.set('n', b.name);
     return '?' + q.toString();
   }
-  function mingbuHref(id) { const t = MINGBU.find(x => x.id === id) || MINGBU[0]; return t.href + birthQuery(t.id, loadBirth()); }
+  function famHref(famKey, id) {
+    const F = FAMILIES[famKey], t = F.items.find(x => x.id === id) || F.items[0];
+    return t.href + (famKey === 'mingbu' ? birthQuery(t.id, loadBirth()) : '');
+  }
+  function mingbuHref(id) { return famHref('mingbu', id); }
   function refreshMingbuLinks() {
-    document.querySelectorAll('[data-mingbu]').forEach(a => { a.href = mingbuHref(a.dataset.mingbu); });
-    const tab = document.querySelector('.fb-tab[data-tab="mingbu"]');
-    if (tab) tab.href = mingbuHref(lsGet(LS_LAST) || 'bazi');
+    document.querySelectorAll('[data-fam-item]').forEach(a => { a.href = famHref(a.dataset.fam, a.dataset.famItem); });
+    Object.keys(FAMILIES).forEach(k => {
+      const tab = document.querySelector('.fb-tab[data-tab="' + k + '"]');
+      if (tab) tab.href = famHref(k, lsGet(FAMILIES[k].lsLast) || FAMILIES[k].items[0].id);
+    });
+  }
+
+  // —— 多人命盘：本机存几个人，命部条上一点就换人 ——
+  // [{ id, name, when, male, tz, lon, lat, sun, dst, city }]
+  function loadPeople() { try { return JSON.parse(lsGet(LS_PEOPLE)) || []; } catch (e) { return []; } }
+  function savePeople(list) { lsSet(LS_PEOPLE, JSON.stringify(list)); }
+  function personKey(b) { return b && b.when ? b.when + '|' + (b.male === false ? 0 : 1) : ''; }
+  function currentPerson() { const k = personKey(loadBirth()); return k ? loadPeople().find(p => personKey(p) === k) || null : null; }
+  function addPerson(name, b) {
+    b = b || loadBirth();
+    if (!b || !b.when) return null;
+    const list = loadPeople(), k = personKey(b), i = list.findIndex(p => personKey(p) === k);
+    const rec = Object.assign({}, b, { id: i >= 0 ? list[i].id : Date.now().toString(36), name: name || b.name || '未名' });
+    if (i >= 0) list[i] = rec; else list.push(rec);
+    savePeople(list);
+    return rec;
+  }
+  function removePerson(id) { savePeople(loadPeople().filter(p => p.id !== id)); }
+  // 换成某人：整份替换共享生辰（不与上一个人的经纬度混在一起）
+  function usePerson(id) {
+    const p = loadPeople().find(x => x.id === id);
+    if (!p) return null;
+    const b = Object.assign({}, p); delete b.id;
+    lsSet(LS_BIRTH, JSON.stringify(b));
+    return b;
+  }
+  // 生辰里的年份、属相（立春前出生算上一年，按 2 月 4 日粗分；要准的另调八字）
+  function birthYearOf(b) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec((b && b.when) || '');
+    if (!m) return null;
+    const y = +m[1], early = +m[2] < 2 || (+m[2] === 2 && +m[3] < 4);
+    return { y: y, gzYear: early ? y - 1 : y, sx: ((early ? y - 1 : y) - 4) % 12 };
+  }
+
+  let famBar = null, curTool = null;
+  function renderPeople() {
+    if (!famBar) return;
+    const box = famBar.querySelector('.ppl');
+    if (!box) return;
+    const list = loadPeople(), cur = currentPerson(), b = loadBirth();
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    box.innerHTML = list.map(p => `<span class="pc${cur && cur.id === p.id ? ' on' : ''}"><button type="button" data-pid="${p.id}" title="换成${esc(p.name)}的命盘">${esc(p.name)}</button>${cur && cur.id === p.id ? `<button type="button" class="x" data-del="${p.id}" title="删掉这个人" aria-label="删掉${esc(p.name)}">×</button>` : ''}</span>`).join('') +
+      (b && b.when && !cur ? `<button type="button" class="add" title="把当前这一盘存成一个人，下次一点就换">＋ 存为…</button>` : list.length ? '' : `<span class="none">起一盘后可存，下次一点就换人</span>`);
+    box.querySelectorAll('[data-pid]').forEach(btn => btn.onclick = () => {
+      const nb = usePerson(btn.dataset.pid);
+      const t = famOf(curTool);
+      if (nb && t && t.key === 'mingbu' && !t.item.lock) location.href = t.item.href + birthQuery(t.item.id, nb);
+      else { refreshMingbuLinks(); renderPeople(); document.dispatchEvent(new CustomEvent('fabao:person')); }
+    });
+    box.querySelectorAll('[data-del]').forEach(btn => btn.onclick = () => {
+      const p = loadPeople().find(x => x.id === btn.dataset.del);
+      if (p && confirm(`把「${p.name}」从本机删掉？（只删存档，不影响当前这一盘）`)) { removePerson(p.id); renderPeople(); }
+    });
+    const add = box.querySelector('.add');
+    if (add) add.onclick = () => {
+      add.outerHTML = `<span class="ask"><input type="text" maxlength="12" placeholder="叫什么" value="${esc((b && b.name) || (list.length ? '' : '本人'))}" aria-label="名字"><button type="button">存</button></span>`;
+      const inp = box.querySelector('.ask input'), go = () => { if (addPerson(inp.value.trim() || '未名')) { toast('已存，下次在这里一点就换'); renderPeople(); } };
+      inp.focus(); inp.select();
+      inp.onkeydown = e => { if (e.key === 'Enter') go(); if (e.key === 'Escape') renderPeople(); };
+      box.querySelector('.ask button').onclick = go;
+    };
   }
 
   function mountShell() {
-    const cur = document.body.dataset.tool;
-    const fam = MINGBU.find(t => t.id === cur);
-    const curTab = fam ? 'mingbu' : cur;
+    const cur = curTool = document.body.dataset.tool;
+    const F = famOf(cur);
+    const curTab = F ? F.key : cur;
     const isKu = cur === 'ku';   // 法宝库大堂 /tools/：顶栏照旧，正文由 mountKu 现排
-    // 记下上回用的是哪一件，大堂上给「接着用」；锁屏页不算
+    // 记下上回用的是哪一件（一家记家名），大堂上给「接着用」；锁屏页不算
     if (!isKu && TOOLS.some(t => t.id === curTab) && !document.querySelector('.lock-wrap')) lsSet(LS_KU_LAST, curTab);
-    // 记下上次用的是哪件；读盘只在真解开了才记（锁屏页上有 .lock-wrap），免得访客每次点「命部」都落到锁屏
-    if (fam && !(fam.lock && document.querySelector('.lock-wrap'))) lsSet(LS_LAST, fam.id);
+    // 记下这一家上次用的是哪件；锁屏页（.lock-wrap）不记，免得访客每次点进来都落到锁屏
+    if (F && !(F.item.lock && document.querySelector('.lock-wrap'))) lsSet(F.fam.lsLast, F.item.id);
     const top = document.createElement('header');
     top.className = 'fb-top';
     top.innerHTML = `
@@ -117,19 +228,20 @@
           </a>`).join('')}
       </nav>`;
     document.body.insertBefore(top, document.body.firstChild);
-    // 命部四件：顶栏下加一排「星命同参」切换
-    if (fam) {
-      const bar = document.createElement('nav');
-      bar.className = 'fb-mingbu';
-      bar.setAttribute('aria-label', '命部 · 星命同参');
+    // 一家的几件：顶栏下加一排切换（命部还带一排「人」）
+    if (F) {
+      const bar = famBar = document.createElement('nav');
+      bar.className = 'fb-mingbu fb-fam fam-' + F.key;
+      bar.setAttribute('aria-label', F.fam.name + ' · ' + F.fam.sub);
       bar.innerHTML = `
-        <span class="lab">命部<small>星命同参</small></span>
-        <span class="seg">${MINGBU.map(t => `
-          <a data-mingbu="${t.id}" href="${t.href}" class="${t.id === cur ? 'on' : ''}"${t.id === cur ? ' aria-current="page"' : ''}>
+        <span class="lab">${F.fam.name}<small>${F.fam.sub}</small></span>
+        <span class="seg">${F.fam.items.map(t => `
+          <a data-fam="${F.key}" data-fam-item="${t.id}" href="${t.href}" class="${t.id === cur ? 'on' : ''}"${t.id === cur ? ' aria-current="page"' : ''}>
             ${ICONS[t.id] || ''}<span>${t.name}</span>${t.lock ? '<i title="此宝被阁主下了禁制">禁</i>' : ''}
           </a>`).join('')}</span>
-        <span class="hint">同一生辰，三种看法；换一件，人跟着走</span>`;
+        ${F.fam.people ? '<span class="ppl" aria-label="存过的人"></span>' : `<span class="hint">${F.fam.hint}</span>`}`;
       top.after(bar);
+      renderPeople();
     }
     refreshMingbuLinks();
     // 法宝一多，顶栏（与手机底栏）都用两字简称；当前这件滚进视野
@@ -222,13 +334,27 @@
     }
   }
 
+  // —— 问 AI：把盘面连同本站口径包成一段提示词，复制后贴给任意 AI ——
+  function askAI(kind, body, rules) {
+    const text = `你是熟悉${kind}的老师。下面是我用「潜蛟阁 · 法宝库」（ohwowbill.com）排出的盘${rules ? '，后面附了排盘口径' : ''}。
+请这样回答：
+1. 先用两三句话说整体；
+2. 再分条讲要点，每条说清依据（盘上的哪一项）；
+3. 最后说可以怎么做。
+盘里没有的信息别编；拿不准就直说。
+
+${body}${rules ? '\n\n【口径】\n' + rules : ''}`;
+    (window.Fabao && window.Fabao.copy || copy)(text, '已复制，贴给任意 AI 即可');   // 走 Fabao.copy，测试时可替换
+  }
+
   // —— 法宝库大堂（/tools/，body data-tool="ku"）——
-  // 不再逐件写说明：按五门排成一屏小牌，一件一行字，点了就进；上回用过的放最前「接着用」。
+  // 不逐件写说明：按五门排成一屏小牌，一件一行字，点了就进；上回用过的放最前「接着用」；
+  // 另有一排「我想问」（名单在 data/wenti.yaml，构建时出成 /fabao/wenti.js 的 window.QJ_WENTI）。
   const MEN = [['山', '堪舆'], ['医', '方脉针灸'], ['命', '推命'], ['卜', '占断'], ['相', '观形']];
   function mountKu() {
     const box = document.getElementById('fbKu');
     if (!box) return;
-    const href = t => t.id === 'mingbu' ? mingbuHref(lsGet(LS_LAST) || 'bazi') : t.href;
+    const href = t => FAMILIES[t.id] ? famHref(t.id, lsGet(FAMILIES[t.id].lsLast) || FAMILIES[t.id].items[0].id) : t.href;
     const tile = t => `
       <a class="ku-tile${t.lock ? ' is-lock' : ''}" href="${href(t)}">
         <span class="ku-ico">${ICONS[t.id]}</span>
@@ -237,9 +363,11 @@
       </a>`;
     const last = TOOLS.find(t => t.id === lsGet(LS_KU_LAST));
     const dh = dayHour(new Date());
+    const ask = Array.isArray(window.QJ_WENTI) ? window.QJ_WENTI : [];
     box.innerHTML = `
       <p class="ku-now"><span>此刻</span><b>${dh.day.name}</b>日<b>${dh.hour.name}</b>时${last ? `
         <a class="ku-again" href="${href(last)}">接着用 · ${last.name} →</a>` : ''}</p>
+      ${ask.length ? `<nav class="ku-ask" aria-label="我想问"><span class="ku-ask-h">我想问</span>${ask.map(a => `<a href="${a.href}" title="${a.a || ''}"${a.home ? '' : ' class="more" hidden'}>${a.q}</a>`).join('')}${ask.some(a => !a.home) ? '<button type="button" class="ku-ask-more">更多 ▾</button>' : ''}</nav>` : ''}
       <div class="ku-men">${MEN.map(([seal, name]) => {
         const ts = TOOLS.filter(t => t.men === seal);
         return ts.length ? `
@@ -248,9 +376,15 @@
           <div class="ku-tiles">${ts.map(tile).join('')}</div>
         </section>` : '';
       }).join('')}</div>`;
+    const more = box.querySelector('.ku-ask-more');
+    if (more) more.onclick = () => { box.querySelectorAll('.ku-ask a.more').forEach(a => { a.hidden = false; }); more.remove(); };
   }
 
-  window.Fabao = { GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy, birth: { save: saveBirth, load: loadBirth, query: birthQuery, minusHour } };
+  window.Fabao = {
+    GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy, askAI, FAMILIES,
+    birth: { save: saveBirth, replace: replaceBirth, load: loadBirth, query: birthQuery, minusHour, yearOf: birthYearOf },
+    people: { list: loadPeople, add: addPerson, remove: removePerson, use: usePerson, current: currentPerson, key: personKey, refresh: () => { refreshMingbuLinks(); renderPeople(); } }
+  };
   mountShell();
   if (document.body.dataset.tool === 'ku') mountKu();
 })();

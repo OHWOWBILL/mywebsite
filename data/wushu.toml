@@ -18,7 +18,7 @@
 [[door]]
   seal = "山"
   name = "堪舆"
-  blurb = "堪舆风水：玄空飞星、八宅、罗盘"
+  blurb = "堪舆风水：玄空飞星、八宅、罗盘；九星气学看方位"
   categories = ["山"]
   lamp = "feixing"
   shut = "此门尚封，时至自开。"
@@ -27,6 +27,11 @@
     name = "堪舆"
     href = "/kanyu/"
     desc = "玄空飞星下卦替卦、流年流月、八宅命卦、手机罗盘"
+  [[door.tools]]
+    seal = "九"
+    name = "九星气学"
+    href = "/jiuxing/"
+    desc = "本命星月命星，年盘月盘吉方凶方，搬家出行看方位"
 
 [[door]]
   seal = "医"
@@ -52,12 +57,12 @@
   blurb = "八字、紫微、星盘诸法互证"
   categories = ["命", "知识点做题法"]
   lamp = "changsheng"
-  # 八字、紫微、占星（与禁制的读盘）都并在命部里切换，这里只挂一件
+  # 八字、紫微、占星、合盘（与禁制的读盘）都并在命部里切换，这里只挂一件
   [[door.tools]]
     seal = "参"
     name = "命部 · 星命同参"
     href = "/bazi/"
-    desc = "八字、紫微、占星一处切换，同一生辰三种看法；读盘持诀可开"
+    desc = "八字、紫微、占星、合盘一处切换，存过的人一点就换；读盘持诀可开"
   [[door.tools]]
     seal = "生"
     name = "十二长生"
@@ -67,7 +72,7 @@
 [[door]]
   seal = "卜"
   name = "占断"
-  blurb = "以梅花易数为主，兼及六爻、奇门"
+  blurb = "以梅花易数为主，兼及六爻、奇门；通书选吉"
   categories = ["卜"]
   lamp = "gua"
   [[door.tools]]
@@ -84,7 +89,12 @@
     seal = "奇"
     name = "奇门手记"
     href = "/qimen/"
-    desc = "起局、记反馈、写复盘"
+    desc = "起局看白话断语，记反馈、写复盘"
+  [[door.tools]]
+    seal = "历"
+    name = "通书 · 黄历择日流年"
+    href = "/huangli/"
+    desc = "黄历宜忌与吉时，按事项挑日子、排候选时间，一年流年方位"
 
 [[door]]
   seal = "相"

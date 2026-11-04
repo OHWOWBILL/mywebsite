@@ -417,15 +417,23 @@
       { k: 'day', l: '我', d: '日干为求测人' }, { k: 'hour', l: '事', d: '时干为所谋之事' }],
     婚姻: [{ k: 'stem', v: '乙', l: '女', d: '乙为女方' }, { k: 'stem', v: '庚', l: '男', d: '庚为男方' },
       { k: 'god', v: '六合', l: '媒', d: '六合为婚姻、媒妁' }, { k: 'day', l: '我', d: '日干为求测人' }],
-    考试: [{ k: 'door', v: '景门', l: '卷', d: '景门为试卷' }, { k: 'stem', v: '丁', l: '榜', d: '丁为成绩、录取文书' },
-      { k: 'star', v: '天辅', l: '学', d: '天辅为学业、考官' }, { k: 'day', l: '我', d: '日干为考生' }],
-    疾病: [{ k: 'star', v: '天芮', l: '病', d: '天芮为病症' }, { k: 'star', v: '天心', l: '医', d: '天心为医生' },
+    考试: [{ k: 'door', v: '景门', l: '卷', d: '景门为试卷、陈述与材料' }, { k: 'stem', v: '丁', l: '榜', d: '丁为成绩、录取文书' },
+      { k: 'star', v: '天辅', l: '师', d: '天辅为考官、老师、教授' }, { k: 'day', l: '我', d: '日干为考生' }],
+    求职: [{ k: 'door', v: '开门', l: '职', d: '开门为职位、单位' }, { k: 'god', v: '值符', l: '官', d: '值符为面试官、上司' },
+      { k: 'day', l: '我', d: '日干为求职者' }, { k: 'hour', l: '事', d: '时干为这次面试' }],
+    签约: [{ k: 'god', v: '六合', l: '约', d: '六合为契约、中间人' }, { k: 'door', v: '生门', l: '利', d: '生门为利益' },
+      { k: 'day', l: '我', d: '日干为己方' }, { k: 'hour', l: '彼', d: '时干为对方' }],
+    开业: [{ k: 'door', v: '开门', l: '张', d: '开门为开张' }, { k: 'door', v: '生门', l: '利', d: '生门为生意、利润' },
+      { k: 'stem', v: '戊', l: '本', d: '戊为本钱' }, { k: 'day', l: '我', d: '日干为东家' }],
+    搬家: [{ k: 'door', v: '生门', l: '宅', d: '生门为新宅' }, { k: 'horse', l: '马', d: '驿马为迁动' },
+      { k: 'day', l: '我', d: '日干为宅主' }, { k: 'hour', l: '事', d: '时干为这次搬迁' }],
+    疾病: [{ k: 'star', v: '天芮', l: '病', d: '天芮为病症', adv: true }, { k: 'star', v: '天心', l: '医', d: '天心为医生' },
       { k: 'stem', v: '乙', l: '药', d: '乙为药物' }, { k: 'day', l: '我', d: '日干为病人' }],
     官司: [{ k: 'door', v: '开门', l: '官', d: '开门为法官' }, { k: 'door', v: '惊门', l: '讼', d: '惊门为诉讼、律师' },
-      { k: 'stem', v: '辛', l: '罪', d: '辛为罪名' }, { k: 'day', l: '我', d: '日干为己方' }, { k: 'hour', l: '彼', d: '时干为对方' }],
+      { k: 'stem', v: '辛', l: '罪', d: '辛为罪名', adv: true }, { k: 'day', l: '我', d: '日干为己方' }, { k: 'hour', l: '彼', d: '时干为对方', adv: true }],
     出行: [{ k: 'door', v: '开门', l: '行', d: '开门为出行' }, { k: 'horse', l: '马', d: '驿马主动、行程' },
       { k: 'day', l: '我', d: '日干为出行人' }, { k: 'hour', l: '地', d: '时干为目的地、所办之事' }],
-    失物: [{ k: 'hour', l: '物', d: '时干为失物' }, { k: 'god', v: '玄武', l: '贼', d: '玄武为盗贼' },
+    失物: [{ k: 'hour', l: '物', d: '时干为失物' }, { k: 'god', v: '玄武', l: '贼', d: '玄武为盗贼', adv: true },
       { k: 'day', l: '我', d: '日干为失主' }],
     寻人: [{ k: 'hour', l: '人', d: '时干为所寻之人' }, { k: 'god', v: '六合', l: '踪', d: '六合为走失、藏匿' },
       { k: 'horse', l: '马', d: '驿马为动向' }, { k: 'day', l: '我', d: '日干为求测人' }],
@@ -456,11 +464,88 @@
         if (hit) ps.push(p);
       }
       var stem = r.k === 'stem' ? r.v : r.k === 'day' ? c.use.day : r.k === 'hour' ? c.use.hour : null;
-      return { k: r.k, name: r.v || { day: '日干', hour: '时干', horse: '驿马' }[r.k], label: r.l, desc: r.d, stem: stem, ps: ps,
+      return { k: r.k, name: r.v || { day: '日干', hour: '时干', horse: '驿马' }[r.k], label: r.l, desc: r.d, stem: stem, ps: ps, adv: !!r.adv,
         rel: r.k !== 'day' && dayP ? ps.map(function (p) { return p === dayP ? '同宫' : relPalace(p, dayP); }) : [] };
     });
   }
   function stemPalaces(c, x) { var o = []; for (var p = 1; p <= 9; p++) if (p !== 5 && stemsOf(c, p).indexOf(x) >= 0) o.push(p); return o; }
+
+  /* ================= 白话断语 =================
+     按题型把用神逐个看一遍，给个分数和几句话。口径：
+     · 全盘：伏吟、反吟、五不遇时先扣分；
+     · 用神对日干：生你、同宫最好，比和次之，你克它尚可，你生它要付出，克你最忌；首个用神加重；
+       「病、贼、罪名、对方」这类对头用神反着看：你能制它为好，它克你、缠身为凶；
+     · 用神落宫：空亡、入墓、击刑、门迫扣分（对头用神逢之反为好），门的旺衰、临吉神凶神、本宫吉凶格加减；
+     · 日干本宫、年命宫逢空墓刑，另扣。
+     分数大致在 −20 到 +15 之间，常见时辰多在 −10 到 +3；只作读盘的提纲，断事仍以用神为主。 */
+  var REL = { 生日干: ['生你', 3], 同宫: ['与你同宫', 3], 比和: ['与你比和', 2], 日干克之: ['你克它', 0.5], 日干生之: ['你生它，要你付出', -1], 克日干: ['克你', -3] };
+  var REL_ADV = { 生日干: ['生你', 0], 同宫: ['与你同宫，缠身', -2], 比和: ['与你比和', -1], 日干克之: ['你能制它', 2], 日干生之: ['你去生它', -1], 克日干: ['克你', -3] };
+  var VBAD = { 伏吟: -4, 星伏吟: -2.5, 门伏吟: -3, 反吟: -3.5, 星反吟: -2, 门反吟: -2.5, 五不遇时: -4 };
+  var GOOD_GOD = { 值符: 1, 太阴: 1, 六合: 1, 九天: 1, 九地: 1 }, BAD_GOD = { 腾蛇: 1, 白虎: 1, 玄武: 1 };
+  function verdict(c, topic) {
+    var ge = analyze(c), ys = yongshen(c, topic), dayP = stemPalaces(c, c.use.day)[0];
+    var items = [], lines = [];
+    var put = function (v, t) { if (v) items.push({ v: v, t: t }); return v; };
+    ge.forEach(function (g) { if (VBAD[g.name]) put(VBAD[g.name], g.name); });
+    var spoilt = { 六仪击刑: 1, 三奇入墓: 1, 六仪入墓: 1, 门迫: 1 };
+    function palaceState(p, y) {         // 返回 [{ v, t }]，adv 为对头用神
+      var out = [], m = c.marks[p], adv = y && y.adv, k = adv ? -0.6 : 1;
+      if (c.kongP.indexOf(p) >= 0) out.push({ v: -2 * k, t: '时空' });
+      else if (c.dayKongP.indexOf(p) >= 0) out.push({ v: -1.5 * k, t: '日空' });
+      var st = y ? y.stem : null;
+      if (st && m.mu.indexOf(st) >= 0) out.push({ v: -2 * k, t: '入墓' });
+      else if (!st && m.mu.length) out.push({ v: -1 * k, t: '宫逢入墓' });          // 星门神所乘之干入墓，减等
+      if (st && m.xing.indexOf(st) >= 0) out.push({ v: -2 * k, t: '击刑' });
+      else if (!st && m.xing.length) out.push({ v: -1 * k, t: '宫逢击刑' });
+      if (y && y.k === 'door') {
+        if (m.po) out.push({ v: -1.5 * k, t: '门迫' });
+        else if (KE[PALACE_WX[p]] === DOOR_WX[c.doors[p]]) out.push({ v: -0.5 * k, t: '门受制' });
+        var w = c.ws.door[p]; if (w === '旺' || w === '相') out.push({ v: 0.5 * k, t: '门' + w }); else if (w === '囚' || w === '死') out.push({ v: -0.5 * k, t: '门' + w });
+      }
+      if (y && y.k === 'star') { var ws = c.ws.star[p]; if (ws === '旺' || ws === '相') out.push({ v: 0.5 * k, t: '星' + ws }); else if (ws === '囚' || ws === '废') out.push({ v: -0.5 * k, t: '星' + ws }); }
+      var god = c.gods[p];
+      if (!(y && y.k === 'god' && y.name === god)) {
+        if (GOOD_GOD[god]) out.push({ v: 0.5 * k, t: '临' + god }); else if (BAD_GOD[god]) out.push({ v: -1 * k, t: '临' + god });
+      }
+      var gs = 0;
+      ge.filter(function (g) { return g.p === p && !spoilt[g.name]; }).forEach(function (g) {
+        if (g.tone === '吉' && gs < 3) { gs += 1.5; out.push({ v: 1.5 * k, t: g.name }); }
+        else if (g.tone === '凶') out.push({ v: -1 * k, t: g.name });
+      });
+      return out;
+    }
+    ys.forEach(function (y, i) {
+      var p = y.ps[0];
+      if (p == null) { lines.push({ y: y, text: y.name + '（' + y.label + '）不现', v: 0 }); return; }
+      var sum = 0, bits = [];
+      if (y.k !== 'day') {
+        var rel = y.rel[0], R = (y.adv ? REL_ADV : REL)[rel === '同宫' ? '同宫' : rel] || ['', 0];
+        var w = i === 0 ? 1.5 : i === 1 ? 1.2 : y.k === 'hour' ? 0.8 : 1;   // 首用神最重，次用神次之，时干稍轻
+        sum += put(R[1] * w, y.name + '（' + y.label + '）' + R[0]);
+        bits.push(R[0]);
+      }
+      palaceState(p, y).forEach(function (s) { sum += put(s.v * (y.k === 'day' ? 1 : 0.8), y.name + s.t); bits.push(s.t); });
+      lines.push({ y: y, p: p, v: Math.round(sum * 10) / 10, text: y.name + '（' + y.label + '）落' + PALACE_NAME[p] + '：' + (bits.join('，') || '平平') });
+    });
+    if (dayP != null && !ys.some(function (y) { return y.k === 'day'; })) {
+      palaceState(dayP, { k: 'day', stem: c.use.day }).forEach(function (s) { if (s.v < 0) put(s.v, '日干' + s.t); });
+    }
+    if (c.ming) {
+      c.ming.skyP.forEach(function (p) {
+        var m = c.marks[p];
+        if (c.kongP.indexOf(p) >= 0 || c.dayKongP.indexOf(p) >= 0) put(-1, '年命落空');
+        if (m.mu.indexOf(c.ming.stem) >= 0) put(-1, '年命入墓');
+        if (m.xing.indexOf(c.ming.stem) >= 0) put(-1, '年命击刑');
+      });
+    }
+    var score = 0; items.forEach(function (x) { score += x.v; });
+    score = Math.round(score * 10) / 10;
+    // 分档按一般时辰的分布定（两周逐时辰试算：中位约 −5，前一成约 +3）：上吉约一成，吉一成半，凶一成半
+    var grade = score >= 3 ? '上吉' : score >= -0.5 ? '吉' : score >= -5.5 ? '平' : score >= -10 ? '次' : '凶';
+    var pros = items.filter(function (x) { return x.v > 0; }).sort(function (a, b) { return b.v - a.v; });
+    var cons = items.filter(function (x) { return x.v < 0; }).sort(function (a, b) { return a.v - b.v; });
+    return { topic: topic, score: score, grade: grade, pct: Math.max(0, Math.min(100, Math.round(60 + score * 3.6))), lines: lines, pros: pros, cons: cons, items: items };
+  }
 
   var PALACE_BRANCHES = { 1: ['子'], 8: ['丑', '寅'], 3: ['卯'], 4: ['辰', '巳'], 9: ['午'], 2: ['未', '申'], 7: ['酉'], 6: ['戌', '亥'] };
   var MU_BRANCH = { 乙: '戌', 丙: '戌', 戊: '戌', 丁: '丑', 己: '丑', 庚: '丑', 辛: '辰', 壬: '辰', 癸: '未' };
@@ -534,7 +619,7 @@
 
   var api = {
     computeChart: computeChart, analyze: analyze, palaceDetail: palaceDetail, inRange: inRange, RANGE: RANGE,
-    solarClock: solarClock, findHours: findHours, yongshen: yongshen, yingqi: yingqi, TOPICS: TOPICS, dayIndexOf: dayIndexOf,
+    solarClock: solarClock, findHours: findHours, yongshen: yongshen, verdict: verdict, yingqi: yingqi, TOPICS: TOPICS, dayIndexOf: dayIndexOf,
     TERMS: TERMS, STEMS: STEMS, BRANCHES: BRANCHES, GRID: GRID, PNUM: PNUM, PALACE_NAME: PALACE_NAME, GOD_SHORT: GOD_SHORT,
     STEM_WX: STEM_WX, STAR_WX: STAR_WX, DOOR_WX: DOOR_WX, GOD_WX: GOD_WX
   };
