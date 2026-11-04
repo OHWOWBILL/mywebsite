@@ -276,7 +276,7 @@
     [['主', 'zd', 'zc', c.zsI], ['客', 'kd', 'kc', c.ksI]].forEach(function (x) {
       var w = x[0], d = s[x[1]], p = s[x[2]], I = x[3], nm = w + '大将', pn = w + '参将';
       var bad = d.filter(function (y) { return y === '囚' || y === '杜' || /迫|挟/.test(y); });
-      if (I.du) { ok[w] = false; put(w, -1, w + '算' + I.n + '，大将参将不出中宫（杜塞无门）'); return; }
+      if (I.du) { ok[w] = false; put(w, -1, w + '算 ' + I.n + '，大将参将不出中宫（杜塞无门）'); return; }
       if (bad.length) { ok[w] = false; put(w, -1, nm + bad.join('、')); }
       else if (d.indexOf('格') >= 0) {
         ok[w] = p.indexOf('发') >= 0;
@@ -287,7 +287,7 @@
         if (soft.length) put(w, -0.5, nm + soft.join('、')); else put(w, 0.5, nm + '发');
       }
       if (ok[w] && d.indexOf('格') < 0) { if (p.indexOf('发') >= 0) put(w, 0.5, pn + '发'); else put(w, -0.5, pn + p.join('、')); }
-      put(w, I.he ? 1 : -0.5, w + '算' + I.n + (I.he ? I.name : '不和'));
+      put(w, I.he ? 1 : -0.5, w + '算 ' + I.n + ' ' + (I.he ? I.name : '不和'));
       if (I.chang) put(w, 0.5, w + '算长');
     });
     if (!c.zsI.du && !c.ksI.du && c.zs !== c.ks) put(c.zs > c.ks ? '主' : '客', 0.5, (c.zs > c.ks ? '主' : '客') + '算多');

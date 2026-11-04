@@ -1,7 +1,10 @@
 {{- /* ===========================================================
      日课 · 首页小卡（assets/js/qj/rike.js 现算填入）
-     农历、日柱与建除、值神冲煞、吉神方位、时辰吉凶、日本历注、节气进度、月相、此时一卦，每次打开都不一样。
-     黄历各项由法宝库的通书底座（static/fabao/tongshu.js，首页另行载入）现算；没有它时退回 data/rike.yaml 的建除宜忌。
+     农历、日柱与建除、值神冲煞、协纪宜忌摘要、吉神方位、时辰吉凶、日本历注、节气进度、七十二候、月相、此时一卦，
+     每次打开都不一样。
+     黄历各项由法宝库的通书底座（static/fabao/tongshu.js，首页另行载入）现算，宜忌取协纪全表
+     （static/fabao/tongshu-shensha.js）、候名取 static/fabao/tongshu-hou.js；
+     没有底座时退回 data/rike.yaml 的建除宜忌。
      「生成日签」见 assets/js/qj/qian.js。
      没有脚本时整块不显示。
      =========================================================== */ -}}
@@ -19,6 +22,7 @@
       <div data-row="fang" hidden><dt>方</dt><dd data-k="fang"></dd></div>
       <div data-row="jp" hidden><dt>暦</dt><dd data-k="jp"></dd></div>
       <div><dt>气</dt><dd data-k="qi"></dd></div>
+      <div data-row="hou" hidden><dt>候</dt><dd data-k="hou"></dd></div>
     </dl>
     <a class="qj-rike-gua" href="{{ "meihua/" | relURL }}" data-k="gua" title="去梅花排盘看全卦"></a>
   </div>
@@ -30,8 +34,17 @@
   </div>
   <script type="application/json" id="qj-rike-data">{{ site.Data.rike | jsonify | safeJS }}</script>
 </section>
-{{- /* 日课用法宝库的通书底座（值神冲煞、方位、时辰、日本历注）：节气表、日本旧暦表与底座本身。
+{{- /* 宜忌摘要后的「…」链去黄历；本朝候名用浅青，与暦行的旧暦同色系 */}}
+<style>
+  .qj-rike-facts dd .more { color: var(--ge-muted); text-decoration: none; border-bottom: 1px dotted var(--ge-rule); margin-left: .2em; }
+  .qj-rike-facts dd .more:hover { color: var(--ge-fg); }
+  .qj-rike-facts dd .jph { color: #9cc7c9; white-space: nowrap; }
+</style>
+{{- /* 日课用法宝库的通书底座（值神冲煞、协纪宜忌、方位、时辰、七十二候、日本历注）：节气表、日本旧暦表、
+       协纪宜忌神煞表、七十二候名与底座本身。
        写在这里而不是页脚：页脚是 partialCached，分不出首页；这几行在脚本包之前载入，日课一画就用得上 */}}
 <script src="{{ "qimen/jieqi.js" | relURL }}?v=1"></script>
 <script src="{{ "fabao/kyureki.js" | relURL }}?v=1"></script>
-<script src="{{ "fabao/tongshu.js" | relURL }}?v=1"></script>
+<script src="{{ "fabao/tongshu-shensha.js" | relURL }}?v=1"></script>
+<script src="{{ "fabao/tongshu-hou.js" | relURL }}?v=1"></script>
+<script src="{{ "fabao/tongshu.js" | relURL }}?v=2"></script>

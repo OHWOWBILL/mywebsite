@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>姓名学 · 潜蛟阁法宝库</title>
+  <meta name="description" content="姓名学：五格剖象与三才配置。按《康熙字典》笔画（简体自动转繁体、部首按原字、数字按数意），排天格、人格、地格、外格、总格的 81 数理吉凶与三才五行，一句白话总评；几个候选名一框比较排序，可复制、可问 AI。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
+  <style>
+    .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
+    .t-good { --tc: var(--lv); } .t-bad { --tc: var(--zhu); } .t-mid { --tc: var(--qing); }
+
+    /* —— 输入 —— */
+    .fb-now.xm-in { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: start; }
+    .xm-in-l { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .xm-field { position: relative; }
+    .fb-main .xm-field input { width: 100%; padding: 10px 46px 10px 16px; font-family: var(--font-title); font-weight: 600; font-size: 24px; letter-spacing: .22em; }
+    .fb-main .xm-field input::placeholder { font-weight: 400; font-size: 17px; letter-spacing: .1em; color: var(--faint); }
+    .xm-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; color: var(--faint); font-size: 20px; line-height: 1; }
+    .xm-clear:hover { color: var(--fg); background: var(--bg-2); }
+    .xm-split { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 26px; font-size: 13px; color: var(--muted); letter-spacing: .05em; }
+    .xm-split b { font-family: var(--font-title); font-weight: 600; color: var(--fg); letter-spacing: .12em; }
+    .xm-split .err { color: var(--zhu); }
+    .xm-mini { padding: 2px 10px; border-radius: var(--r-sm); border: 1px solid var(--rule-2); font-family: var(--font-title); font-size: 12.5px; letter-spacing: .08em; color: var(--zi-2); white-space: nowrap; }
+    .xm-mini:hover { border-color: var(--zi-2); color: var(--fg); }
+    .xm-in-r { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .xm-in-r .fb-label { margin-bottom: 0; }
+    .xm-chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+    .xm-chip { padding: 4px 13px; border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-3); font-family: var(--font-title); font-size: 13px; letter-spacing: .1em; color: var(--fg-2); white-space: nowrap; transition: border-color .2s, color .2s; }
+    .xm-chip:hover { border-color: var(--zi-2); color: var(--fg); }
+    .xm-chip.me { border-style: dashed; color: var(--zi-2); }
+
+    /* —— 总评 —— */
+    .fb-card.bh.xm-verdict { padding: 18px 24px 16px; margin-bottom: 18px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 18px; align-items: center; animation: fbIn .35s ease both; }
+    .xm-verdict > * { grid-column: 1 / -1; }
+    .xm-verdict > .xm-vhead { grid-column: 1; grid-row: 1; }
+    .xm-verdict > .acts { grid-column: 2; grid-row: 1; display: flex; gap: 8px; }
+    .xm-vhead { display: flex; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; min-width: 0; }
+    .xm-vhead .who { font-family: var(--font-title); font-weight: 600; font-size: 22px; letter-spacing: .2em; color: var(--fg); overflow-wrap: anywhere; }
+    .xm-vhead .sub { font-size: 13px; color: var(--muted); letter-spacing: .06em; }
+    .xm-vhead .pts { font-size: 12.5px; color: var(--muted); letter-spacing: .06em; white-space: nowrap; }
+    .xm-vhead .pts b { font-family: var(--font-mark); font-weight: 800; font-size: 15px; color: var(--fg-2); margin: 0 2px; letter-spacing: 0; }
+    .xm-verdict .fb-key { font-size: 20px; line-height: 1.6; }
+    .xm-verdict .xm-lines { display: flex; flex-direction: column; }
+    .xm-verdict .fb-empty { padding: 22px 10px; }
+
+    /* —— 三栏 —— */
+    .xm-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 18px; align-items: start; margin-bottom: 18px; }
+    .xm-col { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+    .xm-sec { padding: 16px 20px 14px; min-width: 0; }
+    .xm-sec h3, .xm-cmp h3, .xm-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+    .xm-sec h3 small, .xm-cmp h3 small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
+    .xm-wait { font-size: 13px; color: var(--faint); padding: 6px 0; }
+
+    /* 每个字 */
+    .xm-chars { display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: 8px; }
+    .xm-ch { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; padding: 8px 3px 9px; border-radius: var(--r); background: var(--bg-3); border: 1px solid var(--rule); }
+    .xm-ch.is-user { border-color: var(--zi-2); }
+    .xm-ch.is-miss { border-color: var(--zhu); border-style: dashed; }
+    .xm-ch .pos { font-family: var(--font-title); font-size: 11px; color: var(--faint); letter-spacing: .25em; }
+    .xm-ch .t { font-family: var(--font-title); font-weight: 600; font-size: 34px; line-height: 1.15; color: var(--fg); }
+    .xm-ch .s { min-height: 1.4em; font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .xm-stp { display: inline-flex; align-items: center; gap: 2px; }
+    .xm-stp button { width: 21px; height: 26px; border-radius: 5px; border: 1px solid var(--rule-2); color: var(--muted); font-size: 15px; line-height: 1; }
+    .xm-stp button:hover { color: var(--fg); border-color: var(--zi-2); }
+    .fb-main .xm-stp input { width: 2.2em; height: 26px; padding: 0; text-align: center; font-family: var(--font-mark); font-weight: 800; font-size: 15px; -moz-appearance: textfield; appearance: textfield; }
+    .xm-stp input::-webkit-outer-spin-button, .xm-stp input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .xm-ch .src { font-size: 11px; color: var(--faint); letter-spacing: .06em; text-align: center; line-height: 1.4; }
+    .xm-ch.is-user .src { color: var(--zi-2); }
+    .xm-ch .opt { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; }
+    .xm-ch .opt button { padding: 0 6px; border-radius: 4px; border: 1px solid var(--rule-2); font-family: var(--font-title); font-size: 12px; line-height: 20px; color: var(--muted); white-space: nowrap; }
+    .xm-ch .opt button:hover { color: var(--fg); border-color: var(--zi-2); }
+    .xm-ch .opt button.on { background: var(--zi); border-color: var(--zi); color: #fff; }
+    .xm-ch .opt button small { font-family: var(--font-mark); font-size: 10px; margin-left: 2px; }
+    .xm-ch .opt .alt, .xm-ch .opt .undo { border-style: dashed; color: var(--qing); }
+    .xm-note { margin-top: 10px; font-size: 12px; color: var(--faint); line-height: 1.7; }
+
+    /* 五格 */
+    .xm-ge { display: grid; grid-template-columns: 3.3em minmax(0, 1fr) auto; gap: 2px 12px; padding: 11px 0; border-top: 1px dashed var(--rule); align-items: baseline; }
+    .xm-ge:first-child { border-top: none; padding-top: 2px; }
+    .xm-ge .lab { grid-row: span 3; display: flex; flex-direction: column; font-family: var(--font-title); font-size: 14.5px; line-height: 1.45; color: var(--fg); letter-spacing: .12em; }
+    .xm-ge .lab small { font-size: 11.5px; color: var(--faint); letter-spacing: .12em; }
+    .xm-ge .num { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; min-width: 0; }
+    .xm-ge .num b { font-family: var(--font-mark); font-weight: 800; font-size: 22px; line-height: 1.2; color: var(--fg); letter-spacing: 0; }
+    .xm-ge .num small { font-size: 12px; color: var(--faint); }
+    .xm-wx { font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 19px; padding: 0 6px; border-radius: 3px; color: var(--wc); background: color-mix(in oklab, var(--wc) 16%, transparent); white-space: nowrap; }
+    .xm-ge .f { grid-column: 2 / 4; font-size: 12px; color: var(--faint); letter-spacing: .03em; overflow-wrap: anywhere; }
+    .xm-ge .why { grid-column: 2 / 4; font-size: 13.5px; line-height: 1.75; color: var(--fg-2); }
+    .xm-ge.is-tian .num b, .xm-ge.is-tian .why { color: var(--muted); }
+    .xm-word { justify-self: end; display: inline-block; padding: 1px 11px 2px; border-radius: 999px; font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; white-space: nowrap; color: var(--tc); background: color-mix(in oklab, var(--tc) 16%, transparent); }
+    .xm-word.dim { color: var(--muted); background: var(--bg-3); }
+
+    /* 三才 */
+    .xm-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .xm-node { display: inline-flex; flex-direction: column; align-items: center; min-width: 50px; padding: 4px 8px 5px; border-radius: var(--r-sm); line-height: 1.25; background: color-mix(in oklab, var(--wc) 12%, var(--bg-3)); border: 1px solid color-mix(in oklab, var(--wc) 40%, var(--rule)); }
+    .xm-node small { font-size: 10.5px; color: var(--faint); letter-spacing: .2em; }
+    .xm-node b { font-family: var(--font-title); font-weight: 600; font-size: 19px; color: var(--wc); }
+    .xm-node em { font-style: normal; font-family: var(--font-mark); font-size: 11px; color: var(--muted); }
+    .xm-arr { font-family: var(--font-title); font-size: 12.5px; color: var(--muted); letter-spacing: .04em; white-space: nowrap; }
+    .xm-arr.sheng { color: var(--lv); } .xm-arr.ke { color: var(--zhu); }
+    .xm-flow .xm-word { margin-left: auto; }
+    .xm-sc .r { display: flex; gap: 8px; padding: 3px 0; font-size: 13.5px; line-height: 1.75; color: var(--fg-2); }
+    .xm-sc .r > i { flex: 0 0 3.6em; font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 23px; color: var(--faint); letter-spacing: .1em; white-space: nowrap; }
+    .xm-sc .r > span { min-width: 0; }
+
+    /* —— 候选名 —— */
+    .xm-cmp { padding: 16px 20px 16px; }
+    .fb-main .xm-cmp textarea { display: block; width: 100%; min-height: 66px; resize: vertical; font-family: var(--font-title); font-size: 16px; line-height: 1.7; letter-spacing: .12em; }
+    .fb-main .xm-cmp textarea::placeholder { color: var(--faint); letter-spacing: .06em; font-size: 14px; }
+    .xm-cmp-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 8px; font-size: 12.5px; color: var(--faint); }
+    .xm-rank { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .xm-rh, .xm-rr { display: grid; grid-template-columns: 2.2em minmax(0, 1.5fr) minmax(0, .9fr) repeat(4, minmax(0, .7fr)) minmax(0, 1.1fr) minmax(0, 1fr); gap: 4px 10px; align-items: center; }
+    .xm-rh { padding: 0 12px 2px; font-family: var(--font-title); font-size: 12px; color: var(--faint); letter-spacing: .12em; }
+    .xm-rh span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .xm-rr { padding: 8px 12px; border-radius: var(--r-sm); background: var(--bg-3); color: var(--fg-2); text-decoration: none; border: 1px solid transparent; transition: border-color .2s, background .2s; }
+    .xm-rr:hover { border-color: var(--rule-2); background: color-mix(in oklab, var(--zi) 8%, var(--bg-3)); }
+    .xm-rr.cur { border-color: var(--zi-2); }
+    .xm-rr .rk { font-family: var(--font-mark); font-weight: 800; font-size: 14px; color: var(--muted); text-align: center; }
+    .xm-rr.top .rk { color: #fff; background: var(--zi); border-radius: 50%; width: 24px; height: 24px; line-height: 24px; justify-self: center; font-size: 13px; }
+    .xm-rr .nm { min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; }
+    .xm-rr .nm b { font-family: var(--font-title); font-weight: 600; font-size: 17px; letter-spacing: .14em; color: var(--fg); }
+    .xm-rr .nm small { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+    .xm-rr .bs { font-family: var(--font-mark); font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+    .xm-rr .gs { display: contents; }
+    .xm-g { display: inline-flex; align-items: baseline; gap: 4px; white-space: nowrap; font-family: var(--font-title); font-size: 13px; color: var(--tc); }
+    .xm-g b { font-family: var(--font-mark); font-weight: 800; font-size: 14px; color: var(--fg-2); }
+    .xm-g i { display: none; font-style: normal; color: var(--faint); font-size: 11.5px; }
+    .xm-sv { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .xm-sv b { font-family: var(--font-mark); font-weight: 800; font-size: 16px; color: var(--fg); min-width: 1.6em; text-align: right; }
+    .xm-sv span { flex: 1; height: 5px; border-radius: 3px; background: var(--rule); overflow: hidden; min-width: 24px; }
+    .xm-sv span i { display: block; height: 100%; background: var(--zi-2); border-radius: 3px; }
+    .xm-rr.bad-row { grid-template-columns: 2.2em minmax(0, 1fr); }
+    .xm-rr.bad-row .why { color: var(--zhu); font-size: 13px; }
+
+    /* —— 口径 —— */
+    .xm-help { padding: 16px 20px; margin-top: 18px; }
+    .xm-help ul { padding: 0; }
+    .xm-help li { list-style: none; padding-left: 14px; position: relative; font-size: 13px; line-height: 1.9; color: var(--fg-2); }
+    .xm-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .xm-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
+
+    @media (max-width: 1100px) {
+      .xm-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 860px) {
+      .fb-now.xm-in { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .fb-main .xm-field input { font-size: 21px; padding: 9px 44px 9px 12px; }
+      .fb-card.bh.xm-verdict { padding: 16px 16px 14px; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+      .xm-verdict > .acts { grid-column: 1; grid-row: auto; }
+      .xm-verdict > .acts .fb-btn { flex: 1; }
+      .xm-verdict .fb-key { font-size: 17.5px; }
+      .xm-vhead .who { font-size: 20px; }
+      .xm-sec { padding: 14px 14px 12px; }
+      .xm-grid, .xm-col { gap: 14px; }
+      .xm-grid { margin-bottom: 14px; }
+      .xm-chars { gap: 6px; }
+      .xm-ch .t { font-size: 30px; }
+      .xm-ge { grid-template-columns: 2.9em minmax(0, 1fr) auto; gap: 2px 8px; }
+      .xm-ge .lab { font-size: 14px; letter-spacing: .06em; }
+      .xm-ge .why { font-size: 13px; }
+      .xm-cmp { padding: 14px 14px 14px; }
+      .xm-help { padding: 14px 16px; margin-top: 14px; }
+      .xm-rh { display: none; }
+      .xm-rr { grid-template-columns: 1.9em minmax(0, 1fr) auto; grid-template-areas: "rk nm sv" "rk gs gs"; gap: 4px 8px; padding: 8px 10px; }
+      .xm-rr .rk { grid-area: rk; align-self: start; margin-top: 2px; }
+      .xm-rr .nm { grid-area: nm; }
+      .xm-rr .bs { display: none; }
+      .xm-rr .nm .bs-m { display: inline; }
+      .xm-rr .gs { grid-area: gs; display: flex; flex-wrap: wrap; gap: 2px 10px; }
+      .xm-g i { display: inline; }
+      .xm-sv { grid-area: sv; }
+      .xm-sv span { width: 40px; flex: none; }
+      .xm-rr.bad-row { grid-template-columns: 1.9em minmax(0, 1fr); grid-template-areas: "rk nm" "rk gs"; }
+    }
+    .xm-rr .nm .bs-m { display: none; font-family: var(--font-mark); font-size: 11.5px; color: var(--faint); }
+  </style>
+</head>
+<body data-tool="xingming">
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">名</div>
+    <div>
+      <h1 class="fb-title">姓名学<span class="en">XINGMING · WUGE</span></h1>
+      <p class="fb-sub">五格剖象 · 三才配置 · 康熙笔画 · 候选名比较</p>
+    </div>
+  </header>
+
+  <section class="fb-now xm-in" aria-label="姓名">
+    <div class="xm-in-l">
+      <label class="fb-label" for="nameIn">姓名</label>
+      <div class="xm-field">
+        <input id="nameIn" type="text" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="如 张伟、欧阳娜娜" aria-describedby="splitOut">
+        <button class="xm-clear" id="clearBtn" type="button" aria-label="清空姓名" title="清空" hidden>×</button>
+      </div>
+      <p class="xm-split" id="splitOut" aria-live="polite"></p>
+    </div>
+    <div class="xm-in-r" id="quickBox"></div>
+  </section>
+
+  <section class="fb-card bh xm-verdict" id="verdict" aria-live="polite"></section>
+
+  <div class="xm-grid" id="detail" hidden>
+    <div class="xm-col">
+      <section class="fb-card xm-sec" aria-labelledby="hChars">
+        <h3 id="hChars">康熙笔画<small>点 − ＋ 或直接改数；字下可换繁体</small></h3>
+        <div class="xm-chars" id="charsBox"></div>
+        <p class="xm-note" id="charsNote"></p>
+      </section>
+      <section class="fb-card xm-sec xm-sc" aria-labelledby="hSc">
+        <h3 id="hSc">三才配置<small>天格 · 人格 · 地格的五行</small></h3>
+        <div id="scBox"></div>
+      </section>
+    </div>
+    <section class="fb-card xm-sec" aria-labelledby="hGe">
+      <h3 id="hGe">五格数理<small>熊崎氏 · 81 数</small></h3>
+      <div id="geBox"></div>
+    </section>
+  </div>
+
+  <section class="fb-card xm-cmp" aria-labelledby="hCmp">
+    <h3 id="hCmp">候选名比较<small>起名时把几个备选一起排</small></h3>
+    <textarea id="candIn" rows="2" autocomplete="off" spellcheck="false" aria-labelledby="hCmp" aria-describedby="cmpHint"></textarea>
+    <div class="xm-cmp-foot" id="cmpHint"></div>
+    <div id="cmpBox"></div>
+  </section>
+
+  <section class="fb-card xm-help" aria-label="口径">
+    <h3>口径</h3>
+    <ul id="rulesList"></ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/xingming/data/kangxi.js?v=1"></script>
+<script src="/xingming/data/st.js?v=1"></script>
+<script src="/xingming/xingming.js?v=1"></script>
+<script src="/fabao/fabao.js?v=13"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, XM = window.XM;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LS = 'xingming.v1';
+const store = {
+  get() { try { const v = JSON.parse(localStorage.getItem(LS)); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } },
+  set(v) { try { localStorage.setItem(LS, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const S = Object.assign({ name: '', cands: '', fix: {}, pick: {} }, store.get());
+if (!S.fix || typeof S.fix !== 'object') S.fix = {};
+if (!S.pick || typeof S.pick !== 'object') S.pick = {};
+Object.keys(S.fix).forEach(k => { const n = +S.fix[k]; if (!(Number.isInteger(n) && n >= 1 && n <= 64)) delete S.fix[k]; });
+const save = () => store.set({ name: S.name, cands: S.cands, fix: S.fix, pick: S.pick });
+
+const WXI = { 木: 0, 火: 1, 土: 2, 金: 3, 水: 4 };
+const tone = lv => lv === '吉' || lv === '大吉' ? 'good' : lv === '凶' || lv === '大凶' ? 'bad' : 'mid';
+const EXAMPLES = ['张伟', '欧阳娜娜', '诸葛亮', '王菲'];
+const CAND_EG = '子涵 梓萱 一诺 浩然 欣怡';
+const opt = () => ({ fix: S.fix, pick: S.pick });
+
+/* ================ 人名 ================ */
+// 命部存的名字像一个完整姓名（认得出姓）才拿来用
+function looksFull(n) {
+  if (!/^\p{Script=Han}{2,4}$/u.test(n)) return false;
+  const p = XM.split(n);
+  return !p.err && p.sur.length > 0 && p.giv.length > 0 && XM.isSurname(p.sur.join(''));
+}
+function birthName() {
+  const b = F.birth.load(), n = b && b.name ? String(b.name).trim() : '';
+  return looksFull(n) ? n : '';
+}
+// 姓、名写回一个字串：自动拆分会拆错的，中间留空格
+function nameString(sur, giv) {
+  const a = sur.join(''), b = giv.join(''), p = XM.split(a + b);
+  return p.sur.join('') === a && p.giv.join('') === b ? a + b : a + ' ' + b;
+}
+
+/* ================ 状态 ================ */
+let P = null, R = null, C = [], refocus = null;
+function compute() {
+  P = XM.split($('nameIn').value);
+  R = P.sur.length && P.giv.length && !P.err ? XM.analyze(P.sur, P.giv, opt()) : null;
+  C = XM.compare($('candIn').value, P.err ? [] : P.sur, opt());
+}
+function update() {
+  compute();
+  renderSplit(); renderQuick(); renderVerdict(); renderDetail(); renderCands();
+  $('clearBtn').hidden = !$('nameIn').value;
+  if (refocus) { const el = document.querySelector(refocus); if (el) el.focus(); refocus = null; }
+}
+
+/* ================ 输入 ================ */
+function renderSplit() {
+  const el = $('splitOut');
+  if (!P.sur.length) { el.innerHTML = P.err ? `<span class="err">${esc(P.err)}</span>` : '简体、繁体都行；复姓自动认，要手分就在姓和名之间加空格。'; return; }
+  const sur = P.sur.join(''), giv = P.giv.join('');
+  let h = `姓「<b>${esc(sur)}</b>」` + (giv ? ` · 名「<b>${esc(giv)}</b>」` : '');
+  if (P.err) h += ` <span class="err">${esc(P.err)}</span>`;
+  else if (!giv) h += ' · 还没写名';
+  else h += ` · ${P.sur.length > 1 ? '复姓' : '单姓'}${P.giv.length > 1 ? '双名' : '单名'}`;
+  // 一键改拆法：认成复姓的可改按单姓；手分过、而自动拆法不同的可改回自动
+  let btn = '';
+  if (!P.err && (P.how === 'fu' || P.how === 'fu4') && P.giv.length === 1) btn = `<button type="button" class="xm-mini" data-split="${esc(P.sur[0] + ' ' + P.sur[1] + giv)}">按单姓「${esc(P.sur[0])}」算</button>`;
+  else if (P.how === 'sep') {
+    const auto = XM.split(sur + giv);
+    if (!auto.err && auto.sur.join('') !== sur) btn = `<button type="button" class="xm-mini" data-split="${esc(sur + giv)}">按${auto.sur.length > 1 ? '复姓' : '单姓'}「${esc(auto.sur.join(''))}」算</button>`;
+  }
+  el.innerHTML = h + btn;
+}
+function renderQuick() {
+  const box = $('quickBox'), cur = $('nameIn').value.trim(), bn = birthName();
+  const me = bn && bn !== cur ? `<button type="button" class="xm-chip me" data-name="${esc(bn)}" title="命部里存的名字">命部 · ${esc(bn)}</button>` : '';
+  const eg = !cur ? EXAMPLES.map(n => `<button type="button" class="xm-chip" data-name="${esc(n)}">${esc(n)}</button>`).join('') : '';
+  box.innerHTML = me || eg ? `<span class="fb-label">${eg ? '试一个' : '换成'}</span><div class="xm-chips">${me}${eg}</div>` +
+    (eg ? '<p class="fb-fine">只写姓也行：下面「候选名比较」会用这个姓，一次排几个备选名。</p>' : '') : '';
+}
+
+/* ================ 总评 ================ */
+function renderVerdict() {
+  const V = $('verdict');
+  if (!R || !R.ok) {
+    let msg;
+    if (P.err) msg = esc(P.err);
+    else if (!P.sur.length) msg = '写下姓名，五格与三才即出';
+    else if (!P.giv.length) msg = `只写了姓「${esc(P.sur.join(''))}」。<br>写上名字看五格，或在下面一次比较几个候选名`;
+    else msg = `「${esc(R.missing.join('、'))}」查不到康熙笔画，<br>请在下方「康熙笔画」里手填`;
+    V.innerHTML = `<div class="fb-empty">${msg}</div>`;
+    return;
+  }
+  const s = R.say;
+  V.innerHTML = `
+    <div class="xm-vhead"><span class="fb-tag">姓名 · 五格</span><span class="who">${esc(R.tname)}</span>
+      <span class="sub">${R.tname !== R.name ? esc(R.name) + ' · ' : ''}${R.kind}</span><span class="pts">参考分<b>${R.score}</b>/ 100</span></div>
+    <p class="fb-key"><span class="jin">${esc(s.head)}</span>：${esc(s.tail)}</p>
+    <div class="xm-lines">${s.lines.map(l => `<p class="r"><i>${esc(l[0])}</i><span>${esc(l[1])}</span></p>`).join('')}</div>
+    <div class="acts"><button class="fb-btn" id="copyBtn" type="button">复制</button><button class="fb-btn primary" id="aiBtn" type="button">问 AI</button></div>`;
+  $('copyBtn').onclick = () => F.copy(XM.toText(R, C), '已复制');
+  $('aiBtn').onclick = () => F.askAI('姓名学（五格剖象）', XM.toText(R, C), XM.RULES_TEXT);
+}
+
+/* ================ 笔画 · 五格 · 三才 ================ */
+function charHTML(x, i) {
+  const opts = [];
+  if (x.cands.length > 1) x.cands.slice(0, 3).forEach(v => opts.push(`<button type="button" class="${v.t === x.t ? 'on' : ''}" data-i="${i}" data-act="pick" data-v="${esc(v.t)}" aria-pressed="${v.t === x.t}" title="按「${esc(v.t)}」算">${esc(v.t)}<small>${v.n != null ? v.n : '?'}</small></button>`));
+  if (x.alt != null && !x.user) opts.push(`<button type="button" class="alt" data-i="${i}" data-act="alt" title="另一种算法：${x.alt} 画">另说 ${x.alt}</button>`);
+  if (x.user && x.base != null) opts.push(`<button type="button" class="undo" data-i="${i}" data-act="undo" title="还原表中的 ${x.base} 画">还原 ${x.base}</button>`);
+  const src = x.user ? '手改' : x.src === 'num' ? `按数意（康熙 ${x.kxRaw}）` : x.src === 'est' ? '原书未收 · 估' : x.src === 'fix' ? '康熙 · 校' : x.src ? '康熙' : '表中无此字';
+  return `<div class="xm-ch${x.user ? ' is-user' : ''}${x.n ? '' : ' is-miss'}">
+    <span class="pos">${x.sur ? '姓' : '名'}</span>
+    <b class="t">${esc(x.t)}</b>
+    <span class="s">${x.c !== x.t ? esc(x.c) : ''}</span>
+    <span class="xm-stp" role="group" aria-label="${esc(x.t)} 的笔画">
+      <button type="button" data-i="${i}" data-act="dec" aria-label="${esc(x.t)} 减一画">−</button>
+      <input type="number" inputmode="numeric" min="1" max="64" value="${x.n || ''}" placeholder="?" data-i="${i}" aria-label="${esc(x.t)} 的笔画">
+      <button type="button" data-i="${i}" data-act="inc" aria-label="${esc(x.t)} 加一画">＋</button>
+    </span>
+    <span class="src">${src}</span>
+    ${opts.length ? `<span class="opt">${opts.join('')}</span>` : ''}
+  </div>`;
+}
+function renderDetail() {
+  const D = $('detail');
+  if (!R) { D.hidden = true; return; }
+  D.hidden = false;
+  $('charsBox').innerHTML = R.chars.map(charHTML).join('');
+  const notes = [];
+  if (R.chars.some(x => x.c !== x.t)) notes.push('简体已转繁体再数');
+  if (R.chars.some(x => x.src === 'num')) notes.push('数字一至十按数意计');
+  if (R.chars.some(x => x.alt != null)) notes.push('「另说」是另一家的数，点了即改用');
+  if (R.chars.some(x => x.user)) notes.push('手改的笔画记在本机，下次照用');
+  $('charsNote').textContent = notes.length ? notes.join('；') + '。' : '笔画按《康熙字典》，部首按原字计（如氵4、艹6、阝左8）。';
+  if (!R.ok) {
+    $('geBox').innerHTML = '<p class="xm-wait">补齐笔画后即出。</p>';
+    $('scBox').innerHTML = '<p class="xm-wait">补齐笔画后即出。</p>';
+    return;
+  }
+  $('geBox').innerHTML = XM.GE.map(g => {
+    const x = R.ge[g.k], tian = g.k === 'tian';
+    return `<div class="xm-ge${tian ? ' is-tian' : ''}">
+      <span class="lab">${x.name}<small>${x.role}</small></span>
+      <span class="num"><b>${x.n}</b>${x.num !== x.n ? `<small>过 81 减 80 → ${x.num}</small>` : ''}<i class="xm-wx wx-${WXI[x.wx]}">${x.wx}·${x.yy}</i></span>
+      <span class="xm-word t-${tone(x.lv)}${tian ? ' dim' : ''}">${x.lv}</span>
+      <p class="f">${esc(x.formula)} · ${esc(x.d)}</p>
+      <p class="why">${esc(x.text)}</p>
+    </div>`;
+  }).join('');
+  const sc = R.sancai, arr = r => r === '生' ? ['sheng', '生 →'] : r === '被生' ? ['sheng', '← 生'] : r === '克' ? ['ke', '克 →'] : r === '被克' ? ['ke', '← 克'] : ['', '比和'];
+  const node = (lab, w, n) => `<span class="xm-node wx-${WXI[w]}"><small>${lab}</small><b>${w}</b><em>${n}</em></span>`;
+  const a1 = arr(sc.upRel), a2 = arr(sc.downRel);
+  $('scBox').innerHTML = `<div class="xm-flow" aria-label="三才 ${sc.key}，${sc.lv}">
+      ${node('天', sc.wx[0], R.ge.tian.n)}<span class="xm-arr ${a1[0]}">${a1[1]}</span>${node('人', sc.wx[1], R.ge.ren.n)}<span class="xm-arr ${a2[0]}">${a2[1]}</span>${node('地', sc.wx[2], R.ge.di.n)}
+      <span class="xm-word t-${tone(sc.lv)}">${sc.lv}</span>
+    </div>
+    <p class="r"><i>成功运</i><span>${esc(sc.up)}。</span></p>
+    <p class="r"><i>基础运</i><span>${esc(sc.down)}。</span></p>
+    <p class="r"><i>合看</i><span>${esc(sc.say)}</span></p>`;
+}
+
+/* ================ 候选名 ================ */
+function renderCands() {
+  const sur = P && !P.err ? P.sur.join('') : '', box = $('cmpBox');
+  $('candIn').placeholder = sur ? `只写名，空格或逗号隔开：${CAND_EG}（姓取上面的「${sur}」）` : `写全名，空格或逗号隔开：张子涵 张梓萱 欧阳一诺`;
+  const ok = C.filter(c => c.ok);
+  $('cmpHint').innerHTML = !C.length
+    ? `${sur ? `姓取上面的「${esc(sur)}」；两字以内当名，三字以上当全名。` : '上面没写姓时，这里请写全名。'}<button type="button" class="xm-mini" id="egBtn">填几个试试</button>`
+    : `共 ${C.length} 个${ok.length < C.length ? `（${C.length - ok.length} 个排不了）` : ''} · 按参考分排，点一行看详解 · 分数是本页的简单加权，只作比较`;
+  const eg = $('egBtn'); if (eg) eg.onclick = () => { $('candIn').value = sur ? CAND_EG : '张子涵 张梓萱 欧阳一诺'; onCand(); };
+  if (!C.length) { box.innerHTML = ''; return; }
+  const curKey = R && R.ok ? R.tname : '';
+  let n = 0;
+  box.innerHTML = `<div class="xm-rank">
+    <div class="xm-rh" aria-hidden="true"><span>#</span><span>姓名</span><span>笔画</span><span>人格</span><span>地格</span><span>外格</span><span>总格</span><span>三才</span><span>参考分</span></div>
+    ${C.map(c => {
+      if (!c.ok) return `<div class="xm-rr bad-row"><span class="rk">–</span><span class="nm"><b>${esc(c.name || c.raw)}</b><span class="why">${esc(c.err || (c.missing && c.missing.length ? '「' + c.missing.join('、') + '」查不到笔画' : '排不了'))}</span></span></div>`;
+      n++;
+      const g = (k, lab) => `<span class="xm-g t-${tone(c.ge[k].lv)}" title="${lab} ${c.ge[k].n}：${esc(c.ge[k].text)}"><i>${lab}</i><b>${c.ge[k].n}</b>${c.ge[k].lv}</span>`;
+      const strokes = c.chars.map(x => x.n).join('·');
+      return `<a class="xm-rr${n === 1 && ok.length > 1 ? ' top' : ''}${c.tname === curKey ? ' cur' : ''}" href="?n=${encodeURIComponent(nameString(c.sur, c.giv))}" data-sur="${esc(c.sur.join(''))}" data-giv="${esc(c.giv.join(''))}" aria-label="第 ${n}：${esc(c.tname)}，参考分 ${c.score}">
+        <span class="rk">${n}</span>
+        <span class="nm"><b>${esc(c.tname)}</b>${c.tname !== c.name ? `<small>${esc(c.name)}</small>` : ''}<span class="bs-m">${strokes}</span></span>
+        <span class="bs">${strokes}</span>
+        <span class="gs">${g('ren', '人')}${g('di', '地')}${g('wai', '外')}${g('zong', '总')}<span class="xm-g t-${tone(c.sancai.lv)}" title="三才 ${c.sancai.key}"><i>三才</i>${c.sancai.key}${c.sancai.lv}</span></span>
+        <span class="xm-sv"><b>${c.score}</b><span><i style="width:${c.score}%"></i></span></span>
+      </a>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ================ 口径 ================ */
+$('rulesList').innerHTML = XM.RULES.map(r => `<li><b>${esc(r[0])}</b>${esc(r[1])}</li>`).join('');
+
+/* ================ 绑定 ================ */
+function setName(v, scroll) {
+  $('nameIn').value = v; S.name = v.trim(); save(); update();
+  if (scroll) {
+    const top = $('verdict').getBoundingClientRect().top;
+    if (top < 60 || top > window.innerHeight * 0.6) window.scrollBy({ top: top - 72, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+}
+$('nameIn').addEventListener('input', () => { S.name = $('nameIn').value.trim(); save(); update(); });
+$('clearBtn').onclick = () => { setName(''); $('nameIn').focus(); };
+function onCand() { S.cands = $('candIn').value; save(); compute(); renderCands(); }
+$('candIn').addEventListener('input', onCand);
+$('splitOut').addEventListener('click', e => { const b = e.target.closest('[data-split]'); if (b) { setName(b.dataset.split); $('nameIn').focus(); } });
+$('quickBox').addEventListener('click', e => { const b = e.target.closest('[data-name]'); if (b) setName(b.dataset.name); });
+$('cmpBox').addEventListener('click', e => {
+  const a = e.target.closest('a.xm-rr');
+  if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+  e.preventDefault();
+  setName(nameString(Array.from(a.dataset.sur), Array.from(a.dataset.giv)), true);
+});
+// 改笔画、换繁体、另说
+function setFix(x, n) {
+  if (n == null || n === x.base) delete S.fix[x.t]; else S.fix[x.t] = n;
+  save(); update();
+}
+$('charsBox').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]'); if (!b || !R) return;
+  const i = +b.dataset.i, x = R.chars[i], act = b.dataset.act; if (!x) return;
+  if (act === 'pick') {
+    if (b.dataset.v === x.cands[0].t) delete S.pick[x.c]; else S.pick[x.c] = b.dataset.v;
+    refocus = `#charsBox button[data-i="${i}"][data-act="pick"][data-v="${CSS.escape(b.dataset.v)}"]`;
+    save(); update(); return;
+  }
+  refocus = `#charsBox button[data-i="${i}"][data-act="${act === 'alt' || act === 'undo' ? 'inc' : act}"]`;
+  if (act === 'inc') setFix(x, Math.min(64, (x.n || 0) + 1));
+  else if (act === 'dec') setFix(x, Math.max(1, (x.n || 2) - 1));
+  else if (act === 'alt') { F.toast(`「${x.t}」改按 ${x.alt} 画`); setFix(x, x.alt); }
+  else if (act === 'undo') setFix(x, null);
+});
+$('charsBox').addEventListener('change', e => {
+  const inp = e.target.closest('input[data-i]'); if (!inp || !R) return;
+  const x = R.chars[+inp.dataset.i], v = parseInt(inp.value, 10);
+  if (!x) return;
+  if (!(v >= 1 && v <= 64)) { inp.value = x.n || ''; F.toast('笔画请填 1–64'); return; }
+  setFix(x, v);
+});
+// 命部里换了人：「命部 · 某某」跟着换
+document.addEventListener('fabao:person', renderQuick);
+window.addEventListener('storage', e => { if (!e.key || e.key.indexOf('mingbu.') === 0) renderQuick(); });
+
+// 网址可带 ?n=姓名 &c=候选（逗号或空格分隔）
+const Q = new URLSearchParams(location.search);
+const qn = Q.get('n'), qc = Q.get('c');
+$('nameIn').value = qn != null ? qn : S.name || birthName() || '';
+$('candIn').value = qc != null ? qc.replace(/[,，]/g, ' ') : S.cands || '';
+S.name = $('nameIn').value.trim(); S.cands = $('candIn').value;
+update();
+})();
+</script>
+</body>
+</html>

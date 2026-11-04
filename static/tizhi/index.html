@@ -46,7 +46,10 @@
     .tz-prog { flex: 1; min-width: 40px; height: 4px; border-radius: 2px; background: var(--bg-3); overflow: hidden; }
     .tz-prog i { display: block; height: 100%; border-radius: 2px; background: var(--zi-2); transition: width .3s; }
     .tz-sw { padding: 6px 10px; font-size: 13px; letter-spacing: .1em; }
-    .tz-q { padding: 24px 26px 18px; animation: fbIn .22s ease; }
+    /* 换题时只让题干淡入；选项按钮不动、不淡，手指一直点在同一处 */
+    .tz-q { padding: 24px 26px 18px; }
+    .tz-qt { animation: tzQ .2s ease; }
+    @keyframes tzQ { from { opacity: .2; } to { opacity: 1; } }
     .tz-hint { font-family: var(--font-title); font-size: 12px; color: var(--faint); letter-spacing: .15em; margin-bottom: 8px; }
     .tz-qt { font-family: var(--font-title); font-weight: 600; font-size: 23px; line-height: 1.6; letter-spacing: .05em; color: var(--fg); min-height: 3.2em; }
     .tz-qt .p, .tz-li .p { font-weight: 400; font-size: .74em; color: var(--muted); letter-spacing: .02em; }

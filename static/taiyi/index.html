@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#17131F">
+<title>太乙神数 · 潜蛟阁法宝库</title>
+<meta name="description" content="太乙神数：开页即排此刻，年计、月计、日计、时计一键切换；积年依《太乙金镜式经》，算太乙所在、文昌始击、主客定算与大将参将，十六神九宫盘，掩迫囚击关格对提挟四郭诸格局，三门五将，主客倾向白话；可复制、问 AI。">
+<link rel="icon" href="/favicon-32x32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+<link rel="stylesheet" href="/fabao/fabao.css?v=6">
+<style>
+/* 太乙神数 · 式盘与表单（外框见 /fabao/fabao.css） */
+:root{ --zhu-c:var(--qing); --ke-c:var(--wx-tu); }   /* 主方青、客方赭；朱只用于凶格 */
+
+/* ---------- 此刻面板 ---------- */
+.ty-sub{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:baseline}
+.ty-sub .sep{color:var(--faint)}
+.ty-sub b{color:var(--fg);font-weight:400;font-family:var(--font-title)}
+.ty-qi{display:flex;gap:4px 12px;flex-wrap:wrap;font-size:12px;color:var(--faint);letter-spacing:.05em}
+.ty-qi b{color:var(--muted);font-weight:400;font-family:var(--font-title)}
+.ty-ctrl{min-width:300px}
+.ty-ctrl .fb-row .grow{flex:1}
+.ty-ctrl .fb-seg{display:flex;width:100%}
+.ty-ctrl .fb-seg button{padding:7px 0;font-size:14px}
+
+/* ---------- 白话 ---------- */
+.ty-bh{margin-bottom:18px}
+.ty-bh .bh-h .fb-tag{background:rgba(141,191,151,.16);color:var(--lv)}
+.ty-bh .r > i{flex-basis:3em}
+.ty-bh .side{font-family:var(--font-title);font-weight:600;letter-spacing:.08em}
+.ty-bh .side.s-主{color:var(--zhu-c)} .ty-bh .side.s-客{color:var(--ke-c)} .ty-bh .side.s-俱不利{color:var(--zhu)} .ty-bh .side.s-相持{color:var(--fg)}
+.ty-chips{display:inline-flex;flex-wrap:wrap;gap:4px 6px;vertical-align:1px}
+.ty-chips span{font-family:var(--font-title);font-size:12px;letter-spacing:.06em;padding:0 8px;line-height:20px;border-radius:999px;border:1px solid var(--rule-2);color:var(--fg-2);white-space:nowrap}
+.ty-chips span.x{border-color:rgba(224,122,98,.55);color:var(--zhu)}
+.ty-chips span.g{border-color:rgba(141,191,151,.55);color:var(--lv)}
+
+/* ---------- 布局：左盘右表 ---------- */
+.ty-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+.ty-pan-card{padding:14px}
+.ty-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.ty-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;margin-bottom:10px}
+.ty-h h2{font-family:var(--font-title);font-weight:600;font-size:16px;letter-spacing:.2em}
+.ty-h small{font-size:12px;color:var(--faint);letter-spacing:.06em}
+
+/* ---------- 式盘：外圈十六神、内九宫，南在上 ---------- */
+.ty-pan{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;max-width:560px;margin:0 auto}
+.ty-c{position:relative;min-width:0;min-height:86px;padding:5px 6px;border-radius:8px;font-family:var(--font-title);
+  display:flex;flex-direction:column;gap:3px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.ty-c:focus-visible{outline:2px solid var(--zi-2);outline-offset:1px}
+/* 外圈十六神 */
+.ty-c.ring{background:var(--bg-2);border:1px solid var(--rule)}
+.ty-c.ring.gong{background:color-mix(in oklab,var(--bg-3) 55%,var(--bg-2))}
+.ty-c.ring .nm{display:flex;justify-content:space-between;align-items:baseline;gap:2px;font-size:13px;letter-spacing:.06em;color:var(--fg-2);white-space:nowrap}
+.ty-c.ring .nm small{font-size:11px;color:var(--faint);letter-spacing:0}
+/* 内九宫 */
+.ty-c.pal{background:var(--bg-3);border:1px solid var(--rule-2);min-height:96px}
+.ty-c.pal .hd{display:flex;justify-content:space-between;align-items:baseline;gap:2px;font-size:13px;letter-spacing:.06em;color:var(--fg-2);white-space:nowrap}
+.ty-c.pal .hd .door{font-size:12px;color:var(--faint);letter-spacing:0}
+.ty-c.pal .hd .door.ji{color:var(--lv)}
+.ty-c.pal .num{position:absolute;right:6px;bottom:2px;font-size:30px;font-weight:900;line-height:1;color:rgba(169,148,224,.12);pointer-events:none}
+.ty-c.pal.ty{border-color:var(--zi-2);box-shadow:0 0 0 1px var(--zi-2),0 0 18px -6px rgba(169,148,224,.6)}
+.ty-c.pal.mid{background:none;border-style:dashed;align-items:center;justify-content:center;text-align:center;cursor:default}
+.ty-c.pal.mid .ju{font-size:18px;font-weight:600;letter-spacing:.1em;color:var(--fg);line-height:1.25}
+.ty-c.pal.mid .ju small{display:block;font-size:11px;font-weight:400;color:var(--muted);letter-spacing:.15em}
+.ty-c.sel{box-shadow:0 0 0 2px var(--fg-2)}
+.ty-c.pal.ty.sel{box-shadow:0 0 0 2px var(--fg-2),0 0 18px -6px rgba(169,148,224,.6)}
+/* 标签 */
+.ty-tags{display:flex;flex-wrap:wrap;gap:2px 3px;margin-top:auto;position:relative;z-index:1}
+.ty-c.pal.mid .ty-tags{margin-top:2px;justify-content:center}
+.ty-t{display:inline-flex;align-items:baseline;font-style:normal;font-size:11px;line-height:17px;padding:0 4px;border-radius:3px;white-space:nowrap;letter-spacing:.02em;
+  color:var(--muted);border:1px solid var(--rule-2)}
+.ty-t.taiyi{background:var(--zi);border-color:var(--zi);color:#fff}
+.ty-t.zhu{color:var(--zhu-c);border-color:color-mix(in oklab,var(--zhu-c) 55%,transparent);background:color-mix(in oklab,var(--zhu-c) 12%,transparent)}
+.ty-t.ke{color:var(--ke-c);border-color:color-mix(in oklab,var(--ke-c) 55%,transparent);background:color-mix(in oklab,var(--ke-c) 12%,transparent)}
+.ty-t.mu{font-weight:600}
+.ty-t sup{font-size:9px;color:var(--zhu);margin-left:1px;vertical-align:baseline;position:relative;top:-3px}
+.ty-key{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:10px;font-size:11.5px;color:var(--faint);letter-spacing:.04em}
+.ty-key .ty-t{margin-right:4px}
+.ty-detail{margin-top:10px;padding:10px 12px;border-radius:var(--r);background:var(--bg-3);font-size:13px;line-height:1.8;color:var(--fg-2)}
+.ty-detail b{font-family:var(--font-title);font-weight:600;color:var(--fg);letter-spacing:.08em;margin-right:6px}
+.ty-detail .hint{color:var(--faint)}
+.ty-detail .x{color:var(--zhu)}
+
+/* ---------- 右栏表 ---------- */
+.ty-card{padding:14px 16px}
+.ty-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:5px 14px;font-size:14px;line-height:1.6}
+.ty-dl dt{font-family:var(--font-title);font-size:12px;color:var(--faint);letter-spacing:.12em;padding-top:2px;white-space:nowrap}
+.ty-dl dd{color:var(--fg-2);min-width:0}
+.ty-dl dd b{font-family:var(--font-title);font-weight:600;color:var(--fg);letter-spacing:.06em}
+.ty-dl dd small{color:var(--faint);font-size:12px}
+.ty-dl dd .x{color:var(--zhu);font-size:12.5px}
+.ty-suan{display:flex;flex-direction:column;gap:8px}
+.ty-suan .row{display:grid;grid-template-columns:3.4em 2.4em minmax(0,1fr);align-items:center;gap:6px 10px;padding:8px 10px;border-radius:var(--r);background:var(--bg-3);border:1px solid var(--rule)}
+.ty-suan .row.zhu{border-left:3px solid var(--zhu-c)} .ty-suan .row.ke{border-left:3px solid var(--ke-c)} .ty-suan .row.ding{border-left:3px solid var(--rule-2)}
+.ty-suan .lab{font-family:var(--font-title);font-size:12px;color:var(--muted);letter-spacing:.15em}
+.ty-suan .n{font-family:var(--font-title);font-size:26px;font-weight:600;line-height:1;color:var(--fg);text-align:center}
+.ty-suan .info{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ty-suan .tg{display:flex;flex-wrap:wrap;gap:3px 5px}
+.ty-suan .tg span{font-size:11.5px;line-height:18px;padding:0 7px;border-radius:999px;border:1px solid var(--rule-2);color:var(--fg-2);font-family:var(--font-title);white-space:nowrap}
+.ty-suan .tg span.he{border-color:rgba(141,191,151,.55);color:var(--lv)}
+.ty-suan .tg span.bu{border-color:var(--rule-2);color:var(--muted)}
+.ty-suan .tg span.du{border-color:rgba(224,122,98,.55);color:var(--zhu)}
+.ty-suan .gen{display:flex;flex-wrap:wrap;gap:0 14px;font-size:13px;color:var(--fg-2);line-height:1.6}
+.ty-suan .gen > span{white-space:nowrap}
+.ty-suan .gen b{font-family:var(--font-title);font-weight:600;color:var(--fg)}
+.ty-suan .gen .x{color:var(--zhu)} .ty-suan .gen .ok{color:var(--lv)}
+.ty-ge{display:flex;flex-direction:column}
+.ty-ge .it{display:grid;grid-template-columns:3.6em minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid var(--rule);font-size:13.5px;line-height:1.65;color:var(--fg-2)}
+.ty-ge .it:first-child{border-top:none;padding-top:0}
+.ty-ge .k{font-family:var(--font-title);font-weight:600;font-size:13px;letter-spacing:.1em;color:var(--zhu);text-align:center;border:1px solid rgba(224,122,98,.45);border-radius:var(--r-sm);line-height:24px;height:26px;white-space:nowrap}
+.ty-ge .k.n{color:var(--muted);border-color:var(--rule-2)}
+.ty-ge small{display:block;font-size:12px;color:var(--faint);line-height:1.6}
+.ty-ge .none{font-size:13px;color:var(--faint);padding:2px 0}
+.ty-mj{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--rule-2);font-size:13.5px;color:var(--fg-2);line-height:1.6}
+.ty-mj b{font-family:var(--font-title);font-weight:600;letter-spacing:.1em}
+.ty-mj b.ok{color:var(--lv)} .ty-mj b.no{color:var(--zhu)}
+.ty-mj span{min-width:0}
+.ty-doors{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;margin-top:8px}
+.ty-doors span{display:flex;flex-direction:column;align-items:center;padding:4px 0;border-radius:var(--r-sm);background:var(--bg-3);font-family:var(--font-title);font-size:11px;color:var(--faint);line-height:1.4}
+.ty-doors span b{font-size:15px;font-weight:600;color:var(--fg-2)}
+.ty-doors span.ji b{color:var(--lv)}
+.ty-doors span.ty{box-shadow:inset 0 0 0 1px var(--zi-2)}
+
+/* ---------- 口径 ---------- */
+.ty-help{margin-top:18px;padding:16px 20px}
+.ty-help h3{font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:.2em;margin-bottom:8px}
+.ty-help ul{padding:0}
+.ty-help li{list-style:none;padding-left:14px;position:relative;font-size:13px;line-height:1.9;color:var(--fg-2)}
+.ty-help li::before{content:"";position:absolute;left:0;top:.9em;width:5px;height:5px;border-radius:50%;background:var(--zi-2)}
+.ty-help li b{font-family:var(--font-title);color:var(--fg);font-weight:600;margin-right:4px}
+
+@media (max-width:860px){
+  .ty-ctrl{min-width:0}
+  .ty-bh{margin-bottom:14px}
+  .ty-layout{grid-template-columns:1fr;gap:14px}
+  .ty-pan-card{padding:8px}
+  .ty-pan{gap:3px}
+  .ty-c{min-height:70px;padding:4px 3px 3px;border-radius:6px;gap:2px}
+  .ty-c.pal{min-height:78px}
+  .ty-c.ring .nm,.ty-c.pal .hd{font-size:11.5px;letter-spacing:0}
+  .ty-c.ring .nm small,.ty-c.pal .hd .door{font-size:10px}
+  .ty-c.pal .num{font-size:24px;right:3px}
+  .ty-c.pal.mid .ju{font-size:15px;letter-spacing:.04em}
+  .ty-c.pal.mid .ju small{font-size:10px;letter-spacing:.06em}
+  .ty-t{font-size:10px;line-height:15px;padding:0 2px;letter-spacing:0}
+  .ty-t sup{font-size:8px;top:-2px}
+  .ty-card{padding:12px}
+  .ty-suan .row{grid-template-columns:3em 2.1em minmax(0,1fr);gap:6px 8px;padding:8px}
+  .ty-suan .n{font-size:22px}
+  .ty-help{padding:16px;margin-top:14px}
+  .ty-ge .it{grid-template-columns:3.2em minmax(0,1fr)}
+}
+@media (max-width:400px){
+  .ty-c.ring .nm small{font-size:9.5px}
+  .ty-doors span{font-size:10px}
+  .ty-doors span b{font-size:13px}
+}
+</style>
+</head>
+<body data-tool="taiyi">
+
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">乙</div>
+    <div>
+      <h1 class="fb-title">太乙神数<span class="en">TAI YI SHEN SHU</span></h1>
+      <p class="fb-sub">年计 · 月计 · 日计 · 时计 · 主客算 · 格局白话</p>
+    </div>
+  </header>
+
+  <!-- 此刻：起局 -->
+  <section class="fb-now" aria-label="起局">
+    <div class="fb-now-info">
+      <div class="fb-when"><span class="fb-tag" id="nowTag">此刻</span><span id="whenTxt"></span></div>
+      <div class="fb-pillars" id="pillars"></div>
+      <div class="fb-key" id="keyLine" aria-live="polite"></div>
+      <div class="fb-note ty-sub" id="subLine"></div>
+      <div class="ty-qi" id="qiLine"></div>
+      <div class="fb-note bad" id="edgeWarn" hidden></div>
+    </div>
+    <div class="fb-now-ctrl ty-ctrl">
+      <div class="fb-seg" id="jiSeg" role="group" aria-label="计法">
+        <button type="button" data-k="year">年计</button>
+        <button type="button" data-k="month">月计</button>
+        <button type="button" data-k="day">日计</button>
+        <button type="button" data-k="hour">时计</button>
+      </div>
+      <div class="fb-row">
+        <input type="datetime-local" id="dtIn" class="grow" min="1900-02-05T00:00" max="2100-12-31T23:59" aria-label="起局时间">
+        <button type="button" class="fb-btn" id="nowBtn">此刻</button>
+      </div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn grow" id="prevBtn" title="快捷键 ←">‹ 前一时</button>
+        <button type="button" class="fb-btn grow" id="nextBtn" title="快捷键 →">后一时 ›</button>
+      </div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn primary grow" id="copyBtn">复制</button>
+        <button type="button" class="fb-btn grow" id="aiBtn" title="把盘面、白话和口径打包复制，贴给任意 AI">问 AI</button>
+        <button type="button" class="fb-btn grow" id="linkBtn">此盘链接</button>
+      </div>
+      <div class="fb-fine">积年依《太乙金镜式经》· 可排 1900–2100 年</div>
+    </div>
+  </section>
+
+  <!-- 白话 -->
+  <section class="fb-card bh ty-bh" id="bhBox" aria-label="白话"></section>
+
+  <div class="ty-layout">
+    <section class="fb-card ty-pan-card" aria-label="式盘">
+      <div class="ty-h"><h2>式盘</h2><small>外圈十六神 · 内九宫（太乙宫数）· 上南下北、左东右西</small></div>
+      <div class="ty-pan" id="pan" role="group" aria-label="太乙式盘，南在上"></div>
+      <div class="ty-key">
+        <span><i class="ty-t taiyi">太乙</i>所在宫</span>
+        <span><i class="ty-t zhu mu">文昌</i><i class="ty-t zhu">主大</i>主方（青）</span>
+        <span><i class="ty-t ke mu">始击</i><i class="ty-t ke">客大</i>客方（赭）</span>
+        <span><i class="ty-t">囚<sup>迫</sup></i>右上小字为格局</span>
+      </div>
+      <div class="ty-detail" id="detail" aria-live="polite"></div>
+    </section>
+
+    <div class="ty-side">
+      <section class="fb-card ty-card" aria-label="盘要">
+        <div class="ty-h"><h2>盘要</h2><small id="yaoSub"></small></div>
+        <dl class="ty-dl" id="yaoBox"></dl>
+      </section>
+      <section class="fb-card ty-card" aria-label="主客定算">
+        <div class="ty-h"><h2>主客定算</h2><small>大将取算之个位（满十取十位），参将为大将乘三之个位</small></div>
+        <div class="ty-suan" id="suanBox"></div>
+      </section>
+      <section class="fb-card ty-card" aria-label="三门五将与格局">
+        <div class="ty-h"><h2>三门五将 · 格局</h2><small>依《金镜》卷三、卷四</small></div>
+        <div class="ty-mj" id="mjBox"></div>
+        <div class="ty-ge" id="geBox"></div>
+        <div class="ty-doors" id="doorBox" aria-label="八门"></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="fb-card ty-help" aria-label="口径">
+    <h3>口径</h3>
+    <ul id="rulesList"></ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/taiyi/taiyi.js?v=1"></script>
+<script src="/fabao/fabao.js?v=13"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, TY = window.TY;
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const WEEK = '日一二三四五六';
+const LS = 'taiyi.view.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const KINDS = ['year', 'month', 'day', 'hour'];
+const view = Object.assign({ kind: 'hour' }, store.get(LS, {}));
+if (KINDS.indexOf(view.kind) < 0) view.kind = 'hour';
+const saveView = () => store.set(LS, { kind: view.kind });
+let date = null, cur = null, isNow = true, sel = null;
+
+const RULES = [
+  ['流派与积年', '依《太乙金镜式经》（唐王希明，四库全书文渊阁本）卷一：上元甲子至唐开元十二年甲子积 1,937,281 算，往后每年加一，故积年 = 公元年 + 1,936,557。《太乙统宗宝鉴》作公元年 + 10,153,917，两者相差 360 的整倍数，纪、元、局全同；《太乙淘金歌》积年少 276 年（局差十二），本页不取。'],
+  ['四计', '年计以立春换年（kintaiyi 用农历正月初一）。月计依经载李淳风法：积月 = (积年 − 1) × 12 + 2 + 节月（寅月为一），「若有闰月只以逐月节气时刻为正」，按节交月。日计依经「梁天监三年六月八日积七亿七百五十万一千六十一日」推得积日 = 儒略日数 + 705,595,730（积日除六十即日干支），夜 23 点换日。时计积时 = (积日 − 1) × 12 + 时辰序。年、月、日计皆阳遁；时计冬至后阳遁、夏至后阴遁，以交气时刻为准。'],
+  ['局与太乙', '积数除 360（周纪）余数再除 72 为局；六十为一纪，七十二为一元（甲子、丙子、戊子、庚子、壬子）。太乙三局一移，阳遁一、二、三、四、六、七、八、九宫顺行，阴遁自九宫逆行，不入中五；宫数用太乙九宫：一乾、二离、三艮、四震、六兑、七坤、八坎、九巽。入宫第一年治天、第二年治地、第三年治人。'],
+  ['文昌 · 始击 · 定目', '文昌（天目、主目）阳遁起武德、阴遁起吕申，顺行十六神，阳遁遇阴德、大武，阴遁遇大炅、和德重留一局。计神阳遁起寅、阴遁起申，按太岁逆行。以计神加和德，文昌所临为始击（客目）；以合神加太岁，文昌所临为定目。太岁在年计为年支、月计为月建、日计为日辰、时计为时支；合神阳遁取六合，阴遁依经时计例取其冲（寅时以巳为合神）。'],
+  ['算与将', '从目所在起顺行，累加所经各宫之数，至太乙宫止；目在间神（丑寅辰巳未申戌亥）先得一算，目与太乙同宫即得本宫之数。主算看文昌、客算看始击、定算看定目。大将取算之个位，满十取十位（经「若得十置一」）；参将为大将乘三之个位；入中五则大将参将不出中宫，为杜。'],
+  ['算的名目', '满十为长、不满十为短。十位与个位一奇一偶为阴阳和：上和十四、十八，次和二十三、二十九、三十二，下和十二、十六、二十七、三十四、三十八；单数与同奇同偶者不和（纯阳、杂阳、纯阴、杂阴、重阳、重阴，名目依经卷二）。三才：不满十无天，个位不满五无地，个位为零无人，十以上而个位过五为三才足数。'],
+  ['格局', '依经卷三：始击临太乙宫为掩；始击在太乙前后一辰、一宫为击；文昌及主客大小将在太乙前后为迫（十六神顺行在前为外、在后为内，相邻一辰为辰迫、一宫为宫迫）；文昌或诸将与太乙同宫为囚；主客将同宫为关；始击或诸将在太乙对宫为格；文昌冲太乙为对；目或将两旁被对方之将（或将与太乙）夹住为提挟；文昌囚太乙又有关或始击临之为四郭固；主参将与文昌并、主客大将相并为四郭杜；开生二门合、冲太乙为执提、提格。'],
+  ['三门五将', '直使门加太乙宫，八门依开休生伤杜景死惊顺布。年、月、日计直使三十一移（积数除 240），时计依经卷一阳遁开生惊休、阴遁杜死伤景，三十时一移。太乙或文昌（在正宫时）临开、休、生为三门不具；始击无掩击、文昌无囚迫、主客将无关，且大将不囚、不入中五，为五将发。'],
+  ['主客倾向', '只作参考。仿《太乙秘书》各局断法：大将囚、迫、被挟或入中五的一方不可用（大将格而参将发者仍可用）；两方都可用，再比太乙助主（一、八、三、四宫，地内）还是助客（九、二、七、六宫，天外）、算的和与长、算多算少。拿《秘书》阴阳一百三十四局明断对照，约九成相合。主为守方、后应者，客为攻方、先动者。'],
+  ['出处与范围', '规则逐条对照 kentang2017/kintaiyi（MIT）的实现与主客算表，有出入处以《金镜》立成为准（见 scripts/taiyi/check.js）。时间按本机时区与钟点，不改真太阳时；可排 1900 年 2 月 5 日至 2100 年底。']
+];
+const RULES_TEXT = RULES.map(r => `· ${r[0]}：${r[1]}`).join('\n');
+
+/* ================ 小件 ================ */
+const KN = TY.KIND, UNIT = TY.KIND_UNIT;
+const cn = n => TY.cnNum(n);
+const gname = g => g === 5 ? '中五' : cn(g) + '宫' + TY.GONG[g].gua;
+const posN = p => `${TY.SHEN[p]}（${TY.RING[p]}）`;
+const md = t => { const d = new Date(t); return `${d.getMonth() + 1}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const ymd = t => { const d = new Date(t); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const hm = t => { const d = new Date(t); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const isBad = x => /囚|迫|击|掩|格|挟|对|关|杜/.test(x);
+const stHTML = a => a.map(x => isBad(x) ? `<span class="x">${x}</span>` : x === '发' ? `<span class="ok">发</span>` : x).join('、');
+const SHORT = { '内辰迫': '迫', '外辰迫': '迫', '内宫迫': '迫', '外宫迫': '迫', '内迫': '迫', '外迫': '迫', '内辰击': '击', '外辰击': '击', '内宫击': '击', '外宫击': '击', '主挟': '挟', '客挟': '挟', '被掩': '掩' };
+const sup = a => { const s = [...new Set(a.filter(isBad).map(x => SHORT[x] || x))]; return s.length ? `<sup>${s.join('')}</sup>` : ''; };
+const ZHI_HOUR = '子丑寅卯辰巳午未申酉戌亥';
+const SIDE_KEY = { 主: '利主', 客: '利客', 相持: '主客相持', 俱不利: '主客俱不利' };
+const YI = { 主: '宜后动、守势，先起者不利', 客: '宜先动、主动出击', 相持: '两边都还能用，看事而定，宜审时', 俱不利: '宜守不宜先起，各自固守' };
+
+/* ================ 白话 ================ */
+function bhHTML(c) {
+  const v = c.v, rows = [];
+  const pos = w => v.why[w].filter(x => !/不和|囚|迫|挟|杜|格|关|掩|击/.test(x) || /发$/.test(x));
+  const neg = w => v.why[w].filter(x => /不和|囚|迫|挟|杜|格|关|掩|击/.test(x) && !/参将发$/.test(x));
+  let lead;
+  if (v.side === '主' || v.side === '客') {
+    const w = v.side, o = w === '主' ? '客' : '主';
+    lead = `${pos(w).slice(0, 3).join('，') || w + '方尚可'}${neg(o).length ? `；${o}方${neg(o).slice(0, 2).join('，')}` : ''}`;
+  } else if (v.side === '俱不利') lead = `主方${neg('主').slice(0, 2).join('，') || '不利'}；客方${neg('客').slice(0, 2).join('，') || '不利'}`;
+  else lead = `两边大将都还能用；主：${v.why.主.slice(0, 2).join('，')}；客：${v.why.客.slice(0, 2).join('，')}`;
+  rows.push(['倾向', `<span class="side s-${v.side}">${SIDE_KEY[v.side]}</span>：${esc(lead)}。${YI[v.side]}。`]);
+  rows.push(['太乙', `在${gname(c.T)}（${TY.GONG[c.T].dir}），入宫第${cn(c.ruGong)}${UNIT[c.kind]}（${c.li}）；${c.help === '主' ? '在地内（一、八、三、四宫），助主' : '在天外（九、二、七、六宫），助客'}${c.jue ? '；是' + c.jue + '，遇掩、囚尤凶' : ''}。`]);
+  const sl = (I, nm) => `${nm}算 <b>${I.n}</b> ${I.chang ? '长' : '短'}${I.du ? '、杜' : I.he ? '、' + I.name : '、不和'}${I.sancai.length ? '（' + I.sancai.join('、') + '）' : ''}`;
+  rows.push(['算', `${sl(c.zsI, '主')}；${sl(c.ksI, '客')}；${sl(c.dsI, '定')}。`]);
+  const ge = c.geju.filter(g => g.k !== '执提');
+  const chips = ge.length ? ge.map(g => `<span class="x">${esc(geShort(g))}</span>`).join('') : '<span class="g">无掩迫关囚击格对</span>';
+  rows.push(['格局', `<span class="ty-chips">${chips}</span>${geLine(c)}`]);
+  rows.push(['门将', `三门${c.sanmen.ju ? '具' : '不具（' + esc(c.sanmen.why.join('；')) + '）'}；五将${c.wujiang.fa ? '发' : '不发（' + esc(c.wujiang.why.join('；')) + '）'}。${c.sanmen.ju && c.wujiang.fa ? '门具将发，可以举事。' : !c.sanmen.ju && !c.wujiang.fa ? '门不具、将不发，不宜出兵临战之事。' : ''}`]);
+  return `<div class="bh-h"><span class="fb-tag">白话 · 参考</span><small>${KN[c.kind]}看${{ year: '这一年', month: '这个月', day: '这一天', hour: '这个时辰' }[c.kind]}的主客之势；主为守方后应，客为攻方先动</small></div>` +
+    rows.map(r => `<div class="r"><i>${r[0]}</i><span>${r[1]}</span></div>`).join('');
+}
+function geShort(g) {
+  if (g.k === '提挟') return g.who === '二目' ? '二目挟太乙' : g.who.replace(/大将|参将/, m => m === '大将' ? '大' : '参');
+  if (g.k === '关') return g.who.replace(/大将|参将/g, m => m === '大将' ? '大' : '参').replace('、', '') + '关';
+  if (g.k === '杜') return g.who + '杜';
+  if (g.k === '四郭固' || g.k === '四郭杜') return g.k;
+  if (g.k === '掩' && g.txt.indexOf('掩太乙') >= 0) return '始击掩太乙';
+  if (g.k === '掩') return '掩' + (g.txt.indexOf('主大将') >= 0 ? '主大' : '主参');
+  const w = g.who.replace('大将', '大').replace('参将', '参');
+  const m = /(外|内)(辰|宫)?(迫|击)/.exec(g.txt);
+  return w + (m ? m[0] : g.k);
+}
+function geLine(c) {
+  const ks = new Set(c.geju.map(g => g.k)), out = [];
+  if (ks.has('掩')) out.push(c.geju.some(g => g.k === '掩' && g.txt.indexOf('掩太乙') >= 0) ? '始击掩太乙，臣强君弱之象' : '始击掩主将，主人算和尚可、不和则凶');
+  if (ks.has('囚')) out.push('有将与太乙同宫为囚，篡戮之象，算和者利');
+  if (ks.has('迫')) out.push('迫近太乙，辰迫灾急、宫迫灾缓');
+  if (ks.has('击')) out.push('始击犯太乙，下凌上之象');
+  if (ks.has('格')) out.push('对宫相格，上下不通');
+  if (ks.has('对')) out.push('文昌冲太乙，大臣怀二');
+  if (ks.has('关')) out.push('主客将同宫相关，相持不下');
+  if (ks.has('四郭固')) out.push('四郭固：坚守者胜，不利先起');
+  if (ks.has('四郭杜')) out.push('四郭杜：出兵闭杜不通');
+  return out.length ? '　' + out.slice(0, 3).join('；') + '。' : '　太乙清明，主客将无相犯。';
+}
+
+/* ================ 式盘 ================ */
+// 5×5：外圈十六神（顺行：子在下中，丑艮寅卯辰巽巳午未坤申酉戌乾亥），内九宫；南在上
+const RING_CELL = { 6: [0, 0], 7: [0, 1], 8: [0, 2], 9: [0, 3], 10: [0, 4], 11: [1, 4], 12: [2, 4], 13: [3, 4], 14: [4, 4], 15: [4, 3], 0: [4, 2], 1: [4, 1], 2: [4, 0], 3: [3, 0], 4: [2, 0], 5: [1, 0] };
+const PAL_CELL = { 9: [1, 1], 2: [1, 2], 7: [1, 3], 4: [2, 1], 5: [2, 2], 6: [2, 3], 3: [3, 1], 8: [3, 2], 1: [3, 3] };
+function ringTags(c, p) {
+  const t = [];
+  if (c.wc === p) t.push(`<i class="ty-t zhu mu">文昌${sup(c.st.wc)}</i>`);
+  if (c.sj === p) t.push(`<i class="ty-t ke mu">始击${sup(c.st.sj)}</i>`);
+  if (c.dm === p) t.push('<i class="ty-t">定目</i>');
+  if (c.js === p) t.push('<i class="ty-t">计神</i>');
+  if (c.hs === p) t.push('<i class="ty-t">合神</i>');
+  if (c.ts === p) t.push(`<i class="ty-t">${TY.KIND_SUI[c.kind]}</i>`);
+  return t.join('');
+}
+function palTags(c, g) {
+  const t = [];
+  if (c.T === g) t.push('<i class="ty-t taiyi">太乙</i>');
+  [['zd', '主大', 'zhu'], ['zc', '主参', 'zhu'], ['kd', '客大', 'ke'], ['kc', '客参', 'ke']].forEach(([k, n, s]) => {
+    if (c[k] === g && !(k === 'zc' && c.zd === g && g === 5) && !(k === 'kc' && c.kd === g && g === 5)) t.push(`<i class="ty-t ${s}">${n}${sup(c.st[k])}</i>`);
+  });
+  if (g === 5) {
+    if (c.zd === 5) t.push('<i class="ty-t zhu">主将<sup>杜</sup></i>');
+    if (c.kd === 5) t.push('<i class="ty-t ke">客将<sup>杜</sup></i>');
+  }
+  return t.join('');
+}
+function panHTML(c) {
+  const cells = [];
+  for (let p = 0; p < 16; p++) {
+    const [r, col] = RING_CELL[p], isG = TY.POS_GONG[p] > 0;
+    cells.push(`<div class="ty-c ring${isG ? ' gong' : ''}${sel === 'r' + p ? ' sel' : ''}" style="grid-row:${r + 1};grid-column:${col + 1}" data-sel="r${p}" role="button" tabindex="0" aria-pressed="${sel === 'r' + p}" aria-label="${TY.SHEN[p]}（${TY.RING[p]}）">
+      <span class="nm">${TY.SHEN[p]}<small>${TY.RING[p]}</small></span><span class="ty-tags">${ringTags(c, p)}</span></div>`);
+  }
+  for (const g of [9, 2, 7, 4, 5, 6, 3, 8, 1]) {
+    const [r, col] = PAL_CELL[g];
+    if (g === 5) {
+      cells.push(`<div class="ty-c pal mid" style="grid-row:${r + 1};grid-column:${col + 1}"><div class="ju">${c.yin ? '阴遁' : '阳遁'}<small>${cn(c.k)}局 · ${KN[c.kind]}</small></div><span class="ty-tags">${palTags(c, 5)}</span></div>`);
+      continue;
+    }
+    const d = c.doors[g], ji = d === '开' || d === '休' || d === '生';
+    cells.push(`<div class="ty-c pal${c.T === g ? ' ty' : ''}${sel === 'g' + g ? ' sel' : ''}" style="grid-row:${r + 1};grid-column:${col + 1}" data-sel="g${g}" role="button" tabindex="0" aria-pressed="${sel === 'g' + g}" aria-label="${gname(g)}${c.T === g ? '，太乙所在' : ''}，${d}门">
+      <span class="hd">${TY.GONG[g].gua}<span class="door${ji ? ' ji' : ''}">${d}门</span></span><span class="num" aria-hidden="true">${cn(g)}</span><span class="ty-tags">${palTags(c, g)}</span></div>`);
+  }
+  return cells.join('');
+}
+function relTxt(c, pos) {
+  const d = TY.mod(pos - TY.GONG[c.T].pos, 16);
+  return { 0: '与太乙同宫', 1: '在太乙前一辰（外）', 15: '在太乙后一辰（内）', 2: '在太乙前一宫（外）', 14: '在太乙后一宫（内）', 8: '与太乙对冲' }[d] || '';
+}
+function detailHTML(c) {
+  if (!sel) return '<span class="hint">点盘上任一格，看那里有谁、与太乙什么关系。十六神顺行（子→丑→艮→寅…，盘上为顺时针）在太乙之前为外、之后为内。</span>';
+  const out = [];
+  if (sel[0] === 'r') {
+    const p = +sel.slice(1), g = TY.POS_GONG[p];
+    out.push(`<b>${TY.SHEN[p]} · ${TY.RING[p]}</b>${g ? `正宫（${gname(g)}之位）` : '间神（目在此先得一算）'}`);
+    const who = [];
+    if (c.wc === p) who.push(`文昌（主目）${c.st.wc.length ? '：<span class="x">' + c.st.wc.join('、') + '</span>' : ''}`);
+    if (c.sj === p) who.push(`始击（客目）${c.st.sj.length ? '：<span class="x">' + c.st.sj.join('、') + '</span>' : ''}`);
+    if (c.dm === p) who.push('定目');
+    if (c.js === p) who.push('计神');
+    if (c.hs === p) who.push('合神');
+    if (c.ts === p) who.push(TY.KIND_SUI[c.kind]);
+    out.push(who.length ? '此处：' + who.join('；') : '此处无目、无神。');
+    const r = relTxt(c, p); if (r) out.push(r + '。');
+  } else {
+    const g = +sel.slice(1);
+    out.push(`<b>${gname(g)}</b>${TY.GONG[g].dir} · ${c.doors[g]}门${c.T === g ? ' · <span style="color:var(--zi-2)">太乙所在</span>' : ''}`);
+    const who = [];
+    [['zd', '主大将'], ['zc', '主参将'], ['kd', '客大将'], ['kc', '客参将']].forEach(([k, n]) => { if (c[k] === g) who.push(`${n}：${stHTML(c.st[k])}`); });
+    if (c.dd === g) who.push('定大将'); if (c.dc === g) who.push('定参将');
+    out.push(who.length ? '此宫：' + who.join('；') : '此宫无将。');
+    const r = c.T === g ? '' : relTxt(c, TY.GONG[g].pos); if (r) out.push(r + '。');
+  }
+  return out.join('<br>');
+}
+
+/* ================ 右栏 ================ */
+function yaoHTML(c) {
+  const M = c.M, I = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
+  const st = a => a.length ? ` <span class="x">${a.join('、')}</span>` : '';
+  return I(TY.KIND_JI[c.kind], `<b>${TY.fmtN(c.ji)}</b>${c.kind === 'year' ? ` <small>统宗 ${TY.fmtN(c.ji - TY.EPOCH.nian + 10153917)}</small>` : ''}`) +
+    I('纪 · 元', `第${cn(c.jiNo)}纪 · ${c.yuan}元 <small>入纪第${cn(c.ruJi)}${UNIT[c.kind]}</small>`) +
+    I('局', `<b>${c.yin ? '阴遁' : '阳遁'}${cn(c.k)}局</b> <small>${c.gz}${UNIT[c.kind]}</small>`) +
+    I('太乙', `<b>${gname(c.T)}</b> ${TY.GONG[c.T].dir} <small>入宫第${cn(c.ruGong)}${UNIT[c.kind]} · ${c.li} · ${c.help === '主' ? '地内助主' : '天外助客'}${c.jue ? ' · ' + c.jue : ''}</small>`) +
+    I('文昌', `<b>${posN(c.wc)}</b> <small>主目</small>${st(c.st.wc)}`) +
+    I('始击', `<b>${posN(c.sj)}</b> <small>客目</small>${st(c.st.sj)}`) +
+    I('定目', `<b>${posN(c.dm)}</b>`) +
+    I(TY.KIND_SUI[c.kind], `<b>${TY.RING[c.ts]}</b> <small>计神 ${posN(c.js)} · 合神 ${posN(c.hs)}</small>`);
+}
+function suanHTML(c) {
+  const tg = I => [`<span>${I.chang ? '长' : '短'}</span>`, I.du ? '<span class="du">杜</span>' : `<span class="${I.he ? 'he' : 'bu'}">${I.he ? I.name : '不和' + (I.name !== '不和' ? '·' + I.name : '')}</span>`]
+    .concat(I.sancai.map(s => `<span class="${s === '三才足' ? 'he' : 'bu'}">${s}</span>`)).join('');
+  const gen = (k, n) => `<span>${n} <b>${c[k] === 5 ? '中五' : cn(c[k]) + '宫'}</b>（${stHTML(c.st[k])}）</span>`;
+  return `<div class="row zhu"><span class="lab">主算</span><span class="n">${c.zs}</span><div class="info"><div class="tg">${tg(c.zsI)}</div><div class="gen">${gen('zd', '主大将')}${gen('zc', '主参将')}</div></div></div>
+    <div class="row ke"><span class="lab">客算</span><span class="n">${c.ks}</span><div class="info"><div class="tg">${tg(c.ksI)}</div><div class="gen">${gen('kd', '客大将')}${gen('kc', '客参将')}</div></div></div>
+    <div class="row ding"><span class="lab">定算</span><span class="n">${c.ds}</span><div class="info"><div class="tg">${tg(c.dsI)}</div><div class="gen"><span>定大将 <b>${c.dd === 5 ? '中五' : cn(c.dd) + '宫'}</b></span><span>定参将 <b>${c.dc === 5 ? '中五' : cn(c.dc) + '宫'}</b></span></div></div></div>`;
+}
+function mjHTML(c) {
+  return `<span><b class="${c.sanmen.ju ? 'ok' : 'no'}">三门${c.sanmen.ju ? '具' : '不具'}</b> ${c.sanmen.ju ? '开休生三门不临太乙、文昌' : esc(c.sanmen.why.join('；'))}</span>
+    <span><b class="${c.wujiang.fa ? 'ok' : 'no'}">五将${c.wujiang.fa ? '发' : '不发'}</b> ${c.wujiang.fa ? '目无掩击囚迫，将无关囚' : esc(c.wujiang.why.join('；'))}</span>`;
+}
+function geHTML(c) {
+  if (!c.geju.length) return '<p class="none">无掩、迫、囚、击、关、格、对诸格。</p>';
+  const seen = new Set();
+  return c.geju.map(g => {
+    const nk = g.k === '掩' && g.txt.indexOf('掩太乙') < 0 ? '掩将' : g.k, note = seen.has(nk) ? '' : TY.GEJU_NOTE[nk] || '';
+    seen.add(nk);
+    return `<div class="it"><span class="k${g.k === '执提' ? ' n' : ''}">${g.k}</span><span>${esc(g.txt)}${note ? `<small>${esc(note)}</small>` : ''}</span></div>`;
+  }).join('');
+}
+function doorHTML(c) {
+  return TY.CLOCK8.map(g => { const d = c.doors[g], ji = d === '开' || d === '休' || d === '生'; return `<span class="${ji ? 'ji' : ''}${c.T === g ? ' ty' : ''}" title="${gname(g)}"><b>${d}</b>${TY.GONG[g].gua}</span>`; }).join('');
+}
+
+/* ================ 起局 ================ */
+function stepLabel() {
+  const u = { year: '年', month: '月', day: '日', hour: '时' }[view.kind];
+  $('prevBtn').textContent = `‹ 前一${u}`; $('nextBtn').textContent = `后一${u} ›`;
+  $('prevBtn').title = `上一${u}（快捷键 ←）`; $('nextBtn').title = `下一${u}（快捷键 →）`;
+}
+function render() {
+  const c = TY.cast(date, view.kind);
+  if (!c) { F.toast('只能排 1900-02-05 至 2100 年底'); return; }
+  cur = c;
+  const M = c.M, d = date;
+  document.querySelectorAll('#jiSeg button').forEach(b => { const on = b.dataset.k === view.kind; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  stepLabel();
+  $('nowTag').textContent = isNow ? '此刻' : '所选时刻';
+  $('whenTxt').textContent = `${F.fmt(d)} 周${WEEK[d.getDay()]} · ${ZHI_HOUR[M.zi]}时`;
+  $('pillars').innerHTML = [['年', M.pillars[0]], ['月', M.pillars[1]], ['日', M.pillars[2]], ['时', M.pillars[3]]]
+    .map(([l, v]) => `<span class="fb-pillar"><small>${l}</small><b>${v}</b></span>`).join('');
+  $('keyLine').innerHTML = `<strong>${c.yin ? '阴遁' : '阳遁'}${cn(c.k)}局</strong><span class="sep">·</span>太乙在${gname(c.T)}<span class="sep">·</span>${KN[c.kind]}`;
+  $('subLine').innerHTML = `<span>${TY.KIND_JI[c.kind]} <b>${TY.fmtN(c.ji)}</b></span><span class="sep">·</span><span>第${cn(c.jiNo)}纪 <b>${c.yuan}元</b></span><span class="sep">·</span>
+    <span>文昌 <b>${TY.SHEN[c.wc]}</b> · 始击 <b>${TY.SHEN[c.sj]}</b></span><span class="sep">·</span><span>主 <b>${c.zs}</b> 客 <b>${c.ks}</b> 定 <b>${c.ds}</b></span>`;
+  // 边界：本计这一格从哪到哪
+  let qi = '', near = '';
+  const H = 3600e3;
+  if (c.kind === 'year') {
+    qi = `<span><b>立春</b> ${ymd(M.lichun.t)} ${hm(M.lichun.t)} 起</span>${M.lichunNext ? `<span>下一立春 <b>${ymd(M.lichunNext.t)}</b> ${hm(M.lichunNext.t)}</span>` : ''}`;
+    if (M.lichunNext && M.lichunNext.t - +d < 24 * H) near = '距下一立春不到一天，年计将换局';
+    if (+d - M.lichun.t < 24 * H) near = '刚交立春不到一天，前一刻仍是上一年计';
+  } else if (c.kind === 'month') {
+    qi = `<span><b>${M.jie.n}</b> ${md(M.jie.t)} 交</span>${M.jieNext ? `<span>下一节 <b>${M.jieNext.n}</b> ${md(M.jieNext.t)}</span>` : ''}`;
+    if (M.jieNext && M.jieNext.t - +d < 12 * H) near = `距交${M.jieNext.n}不到半天，月计将换局`;
+    if (+d - M.jie.t < 12 * H) near = `刚交${M.jie.n}不到半天，月计已换`;
+  } else if (c.kind === 'day') {
+    qi = `<span><b>${M.pillars[2]}</b>日 · 夜 23 点换日</span><span>${M.zhi ? (M.yin ? '夏至后' : '冬至后') : ''}</span>`;
+    if (d.getHours() === 23) near = '23 点后已算次日（子初换日）';
+  } else {
+    const s = (M.zi * 2 + 23) % 24;
+    qi = `<span><b>${ZHI_HOUR[M.zi]}时</b> ${pad(s)}:00–${pad((s + 2) % 24)}:00</span><span><b>${M.zhi.n}</b> ${ymd(M.zhi.t)} 起${M.yin ? '阴' : '阳'}遁</span>${M.zhiNext ? `<span>${M.zhiNext.n} ${ymd(M.zhiNext.t)} ${hm(M.zhiNext.t)} 换${M.yin ? '阳' : '阴'}遁</span>` : ''}`;
+    if (M.zhiNext && M.zhiNext.t - +d < 2 * H) near = `两小时内交${M.zhiNext.n}，阴阳遁将换`;
+    if (+d - M.zhi.t < 2 * H) near = `刚交${M.zhi.n}，已换${M.yin ? '阴' : '阳'}遁`;
+  }
+  $('qiLine').innerHTML = qi + '<span>（本机时区）</span>';
+  $('edgeWarn').hidden = !near; $('edgeWarn').textContent = near;
+  $('bhBox').innerHTML = bhHTML(c);
+  renderPan();
+  $('yaoSub').textContent = `${KN[c.kind]} · ${c.yin ? '阴遁' : '阳遁'}`;
+  $('yaoBox').innerHTML = yaoHTML(c);
+  $('suanBox').innerHTML = suanHTML(c);
+  $('mjBox').innerHTML = mjHTML(c);
+  $('geBox').innerHTML = geHTML(c);
+  $('doorBox').innerHTML = doorHTML(c);
+  document.title = `太乙神数 · ${KN[c.kind]}${c.yin ? '阴遁' : '阳遁'}${cn(c.k)}局 · 潜蛟阁法宝库`;
+}
+function renderPan() {
+  $('pan').innerHTML = panHTML(cur);
+  $('detail').innerHTML = detailHTML(cur);
+}
+(function () {
+  const el = $('pan');
+  const hit = (cell, refocus) => {
+    const k = cell.dataset.sel; if (!k) return;
+    sel = sel === k ? null : k; renderPan();
+    if (refocus) { const a = el.querySelector(`[data-sel="${k}"]`); if (a) a.focus(); }
+  };
+  el.addEventListener('click', e => { const c = e.target.closest('[data-sel]'); if (c) hit(c, false); });
+  el.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const c = e.target.closest('[data-sel]'); if (!c) return;
+    e.preventDefault(); hit(c, true);
+  });
+})();
+
+function setDate(d, now) {
+  if (!TY.inRange(d)) { F.toast('只能排 1900-02-05 至 2100 年底'); $('dtIn').value = F.toLocalInput(date); return; }
+  date = d; isNow = !!now; render();
+}
+function setKind(k) {
+  if (KINDS.indexOf(k) < 0 || k === view.kind) return;
+  view.kind = k; saveView(); render();
+}
+// 前后一格：时、日按 2 小时、1 天；年、月按立春与节跳到前后一格，钟点不变（先挪这一格的天数，再按天微调落进目标格）
+function step(dir) {
+  const M = cur.M, k = view.kind;
+  const at = (x, n) => new Date(x.getFullYear(), x.getMonth(), x.getDate() + n, x.getHours(), x.getMinutes());
+  let d;
+  if (k === 'hour') d = new Date(+date + dir * 2 * 3600e3);
+  else if (k === 'day') d = at(date, dir);
+  else {
+    const key = k === 'year' ? 'lichun' : 'jie', a = M[key], b = M[key + 'Next'];
+    const pm = a && TY.inRange(new Date(a.t - 60000)) ? TY.moment(new Date(a.t - 60000)) : null;
+    const want = dir > 0 ? b && b.t : pm && pm[key] && pm[key].t;
+    if (!a || !want) { F.toast('超出可排范围'); return; }
+    d = at(date, dir * Math.round((b ? b.t - a.t : 30 * 864e5) / 864e5));
+    for (let i = 0; i < 40 && TY.inRange(d); i++) {
+      const s = TY.moment(d)[key].t;
+      if (s === want) break;
+      d = at(d, s < want ? 1 : -1);
+    }
+  }
+  if (!TY.inRange(d)) { F.toast('只能排 1900-02-05 至 2100 年底'); return; }
+  $('dtIn').value = F.toLocalInput(d); setDate(d, false);
+}
+$('prevBtn').onclick = () => step(-1);
+$('nextBtn').onclick = () => step(1);
+$('jiSeg').addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if (b) setKind(b.dataset.k); });
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,textarea,select,[contenteditable]') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+});
+
+/* ================ 复制 · 问 AI · 链接 ================ */
+function plain() {
+  const c = cur;
+  return TY.text(c) + `\n白话（参考）：${SIDE_KEY[c.v.side]}，${YI[c.v.side]}。`;
+}
+$('copyBtn').onclick = () => F.copy(plain(), '盘面已复制');
+$('aiBtn').onclick = () => F.askAI('太乙神数', plain(), RULES_TEXT);
+$('linkBtn').onclick = () => {
+  const u = new URL(location.href);
+  u.search = ''; u.searchParams.set('t', F.toLocalInput(date)); u.searchParams.set('ji', view.kind);
+  F.copy(u.toString(), '此盘链接已复制');
+};
+$('rulesList').innerHTML = RULES.map(r => `<li><b>${r[0]}</b>${r[1]}</li>`).join('');
+
+// 网址可带 ?t=2026-11-04T15:30（时刻）&ji=year|month|day|hour（或 年/月/日/时）
+const Q = new URLSearchParams(location.search);
+const qj = { 年: 'year', 月: 'month', 日: 'day', 时: 'hour', 時: 'hour' }[Q.get('ji')] || Q.get('ji');
+if (KINDS.indexOf(qj) >= 0) view.kind = qj;
+date = F.bindWhen($('dtIn'), $('nowBtn'), (d, now) => setDate(d, now));
+isNow = !F.linkedTime();
+if (!TY.inRange(date)) { F.toast('网址里的时刻超出可排范围，改排此刻'); date = new Date(); date.setSeconds(0, 0); $('dtIn').value = F.toLocalInput(date); isNow = true; }
+render();
+})();
+</script>
+</body>
+</html>

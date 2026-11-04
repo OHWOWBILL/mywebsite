@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#17131F" />
   <title>流年 · 潜蛟阁法宝库</title>
-  <meta name="description" content="流年一页看全：干支纳音、九宫飞星年盘、太岁岁破三煞五黄方位、犯太岁生肖、五运六气、你的这一年、二十四节气与节日。" />
+  <meta name="description" content="流年一页看全：干支纳音、九宫飞星年盘、太岁岁破三煞五黄方位、犯太岁生肖、五运六气、你的这一年、二十四节气、七十二候与节日，节气节日可存进手机日历。" />
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,7 +118,7 @@
     <div class="fb-seal">年</div>
     <div>
       <h1 class="fb-title"><span id="ttl">流年</span> <span class="en">THE YEAR</span></h1>
-      <div class="fb-sub">太岁方位 · 九宫飞星 · 犯太岁生肖 · 运气 · 你的这一年 · 节气节日</div>
+      <div class="fb-sub">太岁方位 · 九宫飞星 · 犯太岁生肖 · 运气 · 你的这一年 · 节气、七十二候与节日</div>
     </div>
   </div>
 
@@ -164,7 +164,7 @@
     </section>
   </div>
 
-  <p class="fb-fine" style="margin-top:26px">口径：年以立春换（立春前出生的人属上一年）；九宫飞星年盘取三元九运紫白，2026 丙午一白入中，顺飞；太岁在年支之方，岁破在其对冲，三煞：申子辰年在南、寅午戌年在北、巳酉丑年在东、亥卯未年在西；犯太岁取值、冲、刑（三刑与自刑）、害、破，三合六合为合。九星年运按本命星落年盘之宫论（坎停滞、坤准备、震萌发、巽顺遂、中宫顶点、乾充实、兑收获、艮变化、离显露），只作参照。五运六气按大寒交气（与「五运六气」法宝同一口径）。节气精确到分，时刻按本机时区。</p>
+  <p class="fb-fine" style="margin-top:26px">口径：年以立春换（立春前出生的人属上一年）；九宫飞星年盘取三元九运紫白，2026 丙午一白入中，顺飞；太岁在年支之方，岁破在其对冲，三煞：申子辰年在南、寅午戌年在北、巳酉丑年在东、亥卯未年在西；犯太岁取值、冲、刑（三刑与自刑）、害、破，三合六合为合。九星年运按本命星落年盘之宫论（坎停滞、坤准备、震萌发、巽顺遂、中宫顶点、乾充实、兑收获、艮变化、离显露），只作参照。五运六气按大寒交气（与「五运六气」法宝同一口径）。节气精确到分，时刻按本机时区。七十二候按太阳黄经每 5° 一候、入候那天整天算新候，中国候名取《逸周书·时训解》与宣明暦本，开日本历注时并列略本暦的本朝七十二候（国立天文台暦Wiki、kotobank 核过）。「节气与节日加入日历」存成 .ics（整天事项，节日随日本历注开关），手机上点开即可加入日历。</p>
 </main>
 
 <script src="/fabao/fabao.js?v=13"></script>
@@ -346,14 +346,9 @@
       const d = new Date(x.t), key = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
       const h = TS.hou(d.getFullYear(), d.getMonth() + 1, d.getDate());
       return { uid: TS.uid(key, 'jq', x.n), date: [d.getFullYear(), d.getMonth() + 1, d.getDate()], title: `${x.n} · ${hm} 交节`, url: `https://ohwowbill.com/huangli/?d=${key}`,
-        desc: `${x.n}：${key} ${hm}（本机时区）交节${h && h.cn ? `
-七十二候：${h.cnName} ${h.cn} · 本朝 ${h.jp}` : ''}
-潜蛟阁 · 流年` };
+        desc: `${x.n}：${key} ${hm}（本机时区）交节${h && h.cn ? `\n七十二候：${h.cnName} ${h.cn} · 本朝 ${h.jp}` : ''}\n潜蛟阁 · 流年` };
     }).concat(festList().map(x => ({ uid: TS.uid(x.r.key, 'fe', x.n), date: [x.r.y, x.r.m, x.r.d], title: x.n, url: `https://ohwowbill.com/huangli/?d=${x.r.key}`,
-      desc: `${x.r.y}年${x.r.m}月${x.r.d}日 ${x.r.week} · 农历${x.r.lunarText}${x.cls === 'jp' ? '
-日本雑節' : x.cls === 'k' ? '
-日本历注吉日' : ''}
-潜蛟阁 · 流年` })));
+      desc: `${x.r.y}年${x.r.m}月${x.r.d}日 ${x.r.week} · 农历${x.r.lunarText}${x.cls === 'jp' ? '\n日本雑節' : x.cls === 'k' ? '\n日本历注吉日' : ''}\n潜蛟阁 · 流年` })));
     TS.saveICS(`liunian-${Y}.ics`, TS.ics(evs, `潜蛟阁流年 ${Y} · 节气与节日`));
     Fabao.toast(`已生成 ${evs.length} 条日历事项，打开即可加入日历`, 2600);
   }
@@ -369,14 +364,6 @@
     $('jpTg').classList.toggle('on', jp); $('jpTg').textContent = '日本历注 · ' + (jp ? '开' : '关');
     renderHou();
     $('fest').innerHTML = festList().map(x => `<a class="${x.cls}" href="/huangli/?d=${x.r.key}"><span>${x.r.m}/${x.r.d}</span>${x.n}</a>`).join('');
-  }
-  function renderFestOld() {
-    const out = [];
-    for (let m = 1; m <= 12; m++) TS.month(Y, m).forEach(r => {
-      r.fest.forEach(f => { if (f.kind === 'cn' || jp) out.push({ r, n: f.n, cls: f.kind === 'jp' ? 'jp' : '' }); });
-      if (jp && r.sen.some(s => s.n === '天赦日')) out.push({ r, n: r.sen.some(s => s.n === '一粒万倍日') ? '天赦日＋一粒万倍日' : '天赦日', cls: 'k' });
-    });
-    $('fest').innerHTML = out.map(x => `<a class="${x.cls}" href="/huangli/?d=${x.r.key}"><span>${x.r.m}/${x.r.d}</span>${x.n}</a>`).join('');
   }
   function personSx() {
     if (who && who.b) { const y = Fabao.birth.yearOf(who.b); return y ? y.sx : null; }
