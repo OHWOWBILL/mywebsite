@@ -95,7 +95,7 @@
       position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border-radius: 50%;
       display: grid; place-items: center; color: var(--faint); z-index: 3;
     }
-    .zw-dot::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1.3px solid currentColor; transition: all .2s; }
+    .zw-dot::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1.3px solid currentColor; transition: background-color .16s, border-color .16s, transform .16s; }
     .zw-dot:hover { color: var(--jin); }
     .zw-dot.on { color: var(--jin); }
     .zw-dot.on::before { background: var(--jin); box-shadow: 0 0 0 3px rgba(217, 174, 78, .22); }
@@ -221,7 +221,7 @@
   <header class="fb-head">
     <div class="fb-seal" aria-hidden="true">紫</div>
     <div>
-      <h1 class="fb-title">紫微斗数<span class="en">ZIWEI DOUSHU</span></h1>
+      <h1 class="fb-title">紫微斗数</h1>
       <p class="fb-sub">十二宫安星 · 三方四正 · 宫干飞化 · 转宫 · 大限流年</p>
     </div>
   </header>

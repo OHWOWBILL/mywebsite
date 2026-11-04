@@ -45,11 +45,14 @@
   --font-body:  "LXGW WenKai TC", "Kaiti SC", "STKaiti", var(--font-title);
   --font-mark:  "Archivo", "Helvetica Neue", Arial, sans-serif;
 
-  --r-sm: 6px;
+  /* 圆角按大小：胶囊（999px）只留给分段开关（.fb-seg、家族条），别的用下面几档（unslop 细节轮） */
+  --r-xs: 4px;    /* 小标签 */
+  --r-sm: 6px;    /* 按钮、小牌、可点的签 */
   --r:    10px;
   --r-lg: 14px;
   --top-h: 56px;
   --nav-h: 62px;
+  --ease: cubic-bezier(.22, 1, .36, 1);
   color-scheme: dark;
 }
 
@@ -63,14 +66,8 @@ body {
   line-height: 1.7;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;   /* 时刻、度数、分数上下对齐 */
   overflow-x: hidden;
-}
-/* 夜空：两团极淡的紫光，不用纸纹 */
-body::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background:
-    radial-gradient(60vw 40vh at 85% -10%, rgba(122, 91, 192, .14), transparent 70%),
-    radial-gradient(50vw 40vh at -10% 110%, rgba(122, 91, 192, .08), transparent 70%);
 }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; border: none; background: none; }
@@ -108,7 +105,7 @@ a { color: var(--zi-2); }
 .fb-tabs::-webkit-scrollbar { display: none; }
 .fb-tab {
   display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; white-space: nowrap;
-  padding: 7px 14px; border-radius: 999px;
+  padding: 8px 14px; border-radius: var(--r-sm);
   text-decoration: none; color: var(--muted);
   font-family: var(--font-title); font-size: 14px; letter-spacing: .15em;
   transition: color .2s, background .2s;
@@ -121,57 +118,56 @@ a { color: var(--zi-2); }
 /* 二½ 命部 · 星命同参（八字、紫微、占星、读盘四件共用的切换条） */
 .fb-mingbu {
   position: relative; z-index: 2;
-  max-width: 1180px; margin: 0 auto; padding: 14px 32px 0;
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  max-width: 1180px; margin: 0 auto; padding: 16px 32px 0;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
 }
 .fb-mingbu .lab { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; color: var(--fg); display: inline-flex; align-items: baseline; gap: 8px; }
 .fb-mingbu .lab small { font-weight: 400; font-size: 12px; letter-spacing: .25em; color: var(--jin); }
-.fb-mingbu .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg-3); border: 1px solid var(--rule); border-radius: 999px; }
+.fb-mingbu .seg { display: inline-flex; padding: 4px; gap: 2px; background: var(--bg-3); border: 1px solid var(--rule); border-radius: 999px; }
 .fb-mingbu .seg a {
   display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px;
-  color: var(--muted); text-decoration: none; font-family: var(--font-title); font-size: 13.5px; letter-spacing: .15em; white-space: nowrap;
+  color: var(--muted); text-decoration: none; font-family: var(--font-title); font-size: 14px; letter-spacing: .15em; white-space: nowrap;
   transition: color .2s, background .2s;
 }
 .fb-mingbu .seg a svg { width: 15px; height: 15px; }
 .fb-mingbu .seg a:hover { color: var(--fg); }
 .fb-mingbu .seg a.on { background: var(--zi); color: #fff; }
-.fb-mingbu .seg a i { font-style: normal; font-size: 10px; line-height: 15px; padding: 0 4px; border-radius: 3px; background: rgba(224, 122, 98, .2); color: var(--zhu); letter-spacing: 0; }
+.fb-mingbu .seg a i { font-style: normal; font-size: 11px; line-height: 16px; padding: 0 4px; border-radius: var(--r-xs); background: rgba(224, 122, 98, .2); color: var(--zhu); letter-spacing: 0; }
 .fb-mingbu .seg a.on i { background: rgba(255, 255, 255, .22); color: #fff; }
 .fb-mingbu .hint { font-size: 12px; color: var(--faint); letter-spacing: .1em; }
 /* 命部「人」：存过的几个人，一点就换 */
-.fb-mingbu .ppl { display: inline-flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; max-width: 100%; padding: 2px 0; }
+.fb-mingbu .ppl { display: inline-flex; gap: 8px; align-items: center; overflow-x: auto; scrollbar-width: none; max-width: 100%; padding: 2px 0; }
 .fb-mingbu .ppl::-webkit-scrollbar { display: none; }
-.fb-mingbu .ppl .pc { display: inline-flex; align-items: center; flex-shrink: 0; border: 1px solid var(--rule-2); border-radius: 999px; background: var(--bg-3); }
+.fb-mingbu .ppl .pc { display: inline-flex; align-items: center; flex-shrink: 0; border: 1px solid var(--rule-2); border-radius: var(--r-sm); background: var(--bg-3); }
 .fb-mingbu .ppl .pc button { padding: 4px 12px; font-family: var(--font-title); font-size: 13px; letter-spacing: .1em; color: var(--muted); white-space: nowrap; }
 .fb-mingbu .ppl .pc button:hover { color: var(--fg); }
 .fb-mingbu .ppl .pc.on { border-color: var(--jin); background: rgba(217, 174, 78, .1); }
 .fb-mingbu .ppl .pc.on button { color: var(--fg); }
 .fb-mingbu .ppl .pc .x { padding: 4px 10px 4px 0; color: var(--faint); font-size: 15px; letter-spacing: 0; }
 .fb-mingbu .ppl .pc .x:hover { color: var(--zhu); }
-.fb-mingbu .ppl .add { flex-shrink: 0; padding: 4px 12px; border: 1px dashed var(--rule-2); border-radius: 999px; font-family: var(--font-title); font-size: 13px; letter-spacing: .1em; color: var(--zi-2); white-space: nowrap; }
+.fb-mingbu .ppl .add { flex-shrink: 0; padding: 4px 12px; border: 1px dashed var(--rule-2); border-radius: var(--r-sm); font-family: var(--font-title); font-size: 13px; letter-spacing: .1em; color: var(--zi-2); white-space: nowrap; }
 .fb-mingbu .ppl .add:hover { border-color: var(--zi-2); }
 .fb-mingbu .ppl .ask { display: inline-flex; gap: 4px; flex-shrink: 0; }
-.fb-mingbu .ppl .ask input { width: 7em; padding: 3px 8px; font-size: 13px; background: var(--bg-3); color: var(--fg); border: 1px solid var(--zi-2); border-radius: var(--r-sm); }
-.fb-mingbu .ppl .ask button { padding: 3px 12px; border-radius: var(--r-sm); background: var(--zi); color: #fff; font-family: var(--font-title); font-size: 13px; }
+.fb-mingbu .ppl .ask input { width: 7em; padding: 4px 8px; font-size: 13px; background: var(--bg-3); color: var(--fg); border: 1px solid var(--zi-2); border-radius: var(--r-sm); }
+.fb-mingbu .ppl .ask button { padding: 4px 12px; border-radius: var(--r-sm); background: var(--zi); color: #fff; font-family: var(--font-title); font-size: 13px; }
 .fb-mingbu .ppl .none { font-size: 12px; color: var(--faint); letter-spacing: .1em; white-space: nowrap; }
 
 /* 三 页首 -------------------------------------------------- */
-.fb-head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+.fb-head { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
 .fb-seal {
-  width: 46px; height: 46px; flex-shrink: 0;
+  width: 48px; height: 48px; flex-shrink: 0;
   display: grid; place-items: center;
   background: var(--zi); color: #fff; border-radius: 6px;
-  font-family: var(--font-title); font-weight: 900; font-size: 26px;
+  font-family: var(--font-title); font-weight: 900; font-size: 28px;
   position: relative; transform: rotate(-3deg);
-  box-shadow: 0 6px 20px -6px rgba(122, 91, 192, .7);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .6);
 }
-.fb-seal::after { content: ""; position: absolute; inset: 3px; border: 1px solid rgba(255,255,255,.28); border-radius: 3px; }
+.fb-seal::after { content: ""; position: absolute; inset: 4px; border: 1px solid rgba(255,255,255,.28); border-radius: 2px; }
 .fb-title {
   font-family: var(--font-title); font-weight: 600;
   font-size: 30px; letter-spacing: .25em; line-height: 1.2;
-  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
 }
-.fb-title .en { font-family: var(--font-mark); font-weight: 500; font-stretch: 125%; font-size: 10px; letter-spacing: .3em; color: var(--faint); }
 .fb-sub { color: var(--muted); font-size: 14px; letter-spacing: .12em; margin-top: 4px; }
 
 /* 四 「此刻」面板 ------------------------------------------- */
@@ -181,20 +177,20 @@ a { color: var(--zi-2); }
   padding: 20px 24px;
   background: var(--bg-2);
   border: 1px solid var(--rule); border-radius: var(--r-lg);
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 .fb-now::before {
-  content: ""; position: absolute; left: -1px; top: 18px; bottom: 18px; width: 3px;
+  content: ""; position: absolute; left: -1px; top: 16px; bottom: 16px; width: 3px;
   background: var(--zi); border-radius: 0 3px 3px 0;
 }
-.fb-now-info { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.fb-now-ctrl { display: flex; flex-direction: column; gap: 10px; align-items: stretch; min-width: 260px; }
+.fb-now-info { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.fb-now-ctrl { display: flex; flex-direction: column; gap: 8px; align-items: stretch; min-width: 260px; }
 .fb-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .fb-row > .grow { flex: 1; min-width: 0; }
 
-.fb-when { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; color: var(--muted); font-size: 14px; letter-spacing: .08em; }
+.fb-when { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 14px; letter-spacing: .08em; }
 .fb-tag {
-  display: inline-block; padding: 1px 10px; border-radius: 999px;
+  display: inline-block; padding: 2px 8px; border-radius: var(--r-xs);
   font-family: var(--font-title); font-size: 12px; letter-spacing: .15em;
   background: rgba(122, 91, 192, .22); color: var(--zi-2); white-space: nowrap;
 }
@@ -207,23 +203,23 @@ a { color: var(--zi-2); }
 .good { color: var(--lv); } .warn { color: var(--jin); } .bad { color: var(--zhu); }
 
 /* 四柱：横排四格 */
-.fb-pillars { display: flex; gap: 6px; flex-wrap: wrap; }
+.fb-pillars { display: flex; gap: 8px; flex-wrap: wrap; }
 .fb-pillar {
   display: inline-flex; flex-direction: column; align-items: center;
-  min-width: 46px; padding: 4px 8px 5px;
+  min-width: 48px; padding: 4px 8px;
   background: var(--bg-3); border-radius: var(--r-sm);
   line-height: 1.25;
 }
-.fb-pillar small { font-size: 10px; color: var(--faint); letter-spacing: .2em; }
+.fb-pillar small { font-size: 11px; color: var(--faint); letter-spacing: .2em; }
 .fb-pillar b { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .1em; color: var(--fg-2); }
 
 /* 五 通用构件 ---------------------------------------------- */
 .fb-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 9px 16px; border-radius: var(--r-sm);
+  padding: 8px 16px; border-radius: var(--r-sm);
   border: 1px solid var(--rule-2); background: var(--bg-3); color: var(--fg-2);
   font-family: var(--font-title); font-size: 14px; letter-spacing: .15em; white-space: nowrap;
-  transition: border-color .2s, color .2s, background .2s, opacity .2s;
+  transition: border-color .16s var(--ease), color .16s var(--ease), background-color .16s var(--ease), opacity .16s var(--ease);
 }
 .fb-btn:hover { border-color: var(--zi-2); color: var(--fg); }
 .fb-btn.primary { background: var(--zi); border-color: var(--zi); color: #fff; }
@@ -232,15 +228,15 @@ a { color: var(--zi-2); }
 .fb-btn.ghost:hover { color: var(--fg); }
 .fb-btn.block { width: 100%; padding: 12px; font-size: 15px; letter-spacing: .3em; }
 
-.fb-seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg-3); border: 1px solid var(--rule); border-radius: 999px; }
+.fb-seg { display: inline-flex; padding: 4px; gap: 2px; background: var(--bg-3); border: 1px solid var(--rule); border-radius: 999px; }
 .fb-seg button {
   flex: 1; padding: 6px 14px; border-radius: 999px; position: relative;
   color: var(--muted); font-family: var(--font-title); font-size: 13px; letter-spacing: .15em; white-space: nowrap;
 }
 .fb-seg button.on { background: var(--zi); color: #fff; }
 .fb-seg .badge {
-  display: inline-block; margin-left: 4px; min-width: 18px; padding: 0 5px;
-  border-radius: 9px; background: var(--zhu); color: #fff; font-size: 11px; letter-spacing: 0; line-height: 18px;
+  display: inline-block; margin-left: 4px; min-width: 18px; padding: 0 4px;
+  border-radius: var(--r-xs); background: var(--zhu); color: #fff; font-size: 11px; letter-spacing: 0; line-height: 18px;
 }
 
 .fb-input, .fb-main input:not([type=checkbox]):not([type=radio]), .fb-main textarea, .fb-main select {
@@ -252,29 +248,29 @@ a { color: var(--zi-2); }
 .fb-main input[type=datetime-local] { font-family: var(--font-title); letter-spacing: .05em; }
 
 .fb-card { background: var(--bg-2); border: 1px solid var(--rule); border-radius: var(--r-lg); }
-.fb-empty { text-align: center; color: var(--faint); padding: 40px 10px; font-family: var(--font-title); font-size: 13px; letter-spacing: .25em; line-height: 2.2; }
-.fb-label { display: block; font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .2em; margin-bottom: 6px; }
+.fb-empty { text-align: center; color: var(--faint); padding: 40px 12px; font-family: var(--font-title); font-size: 13px; letter-spacing: .25em; line-height: 2.2; }
+.fb-label { display: block; font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .2em; margin-bottom: 8px; }
 
 /* 白话卡：命部各盘顶上的几行大白话（.bh 套在 .fb-card 上；每行 .r，标签 i，正文 span） */
-.bh { padding: 13px 18px 12px; }
-.bh-h { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 6px; }
-.bh-h small { font-size: 11.5px; color: var(--faint); letter-spacing: .12em; }
-.bh .r { display: flex; gap: 8px; padding: 3px 0; font-size: 14px; line-height: 1.75; color: var(--fg-2); letter-spacing: .02em; }
+.bh { padding: 12px 16px; }
+.bh-h { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 8px; }
+.bh-h small { font-size: 12px; color: var(--faint); letter-spacing: .12em; }
+.bh .r { display: flex; gap: 8px; padding: 4px 0; font-size: 14px; line-height: 1.75; color: var(--fg-2); letter-spacing: .02em; }
 .bh .r > i { flex: 0 0 3.6em; font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 23px; color: var(--faint); letter-spacing: .12em; white-space: nowrap; }
 .bh .r > span { min-width: 0; }
 .bh .r b { font-family: var(--font-title); font-weight: 600; color: var(--fg); }
-.bh .fb-fine { margin-top: 6px; }
+.bh .fb-fine { margin-top: 8px; }
 
 .fb-toast {
   position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 8px);
-  background: var(--fg); color: var(--bg); padding: 9px 20px; border-radius: 18px;
+  background: var(--fg); color: var(--bg); padding: 8px 20px; border-radius: var(--r);
   max-width: min(92vw, 560px); width: max-content; text-align: center; line-height: 1.6;
   font-size: 14px; letter-spacing: .08em; opacity: 0; pointer-events: none; z-index: 90;
   transition: opacity .25s, transform .25s;
 }
 .fb-toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-.fb-foot { margin-top: 36px; text-align: center; color: var(--faint); font-size: 12px; letter-spacing: .2em; }
+.fb-foot { margin-top: 40px; text-align: center; color: var(--faint); font-size: 12px; letter-spacing: .2em; }
 
 @keyframes fbIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
@@ -283,7 +279,7 @@ a { color: var(--zi-2); }
 
 /* 手机：法宝切换沉到底部，面板改为上下排 --------------------- */
 @media (max-width: 860px) {
-  .fb-main { padding: 18px 16px calc(var(--nav-h) + 36px + env(safe-area-inset-bottom)); }
+  .fb-main { padding: 16px 16px calc(var(--nav-h) + 40px + env(safe-area-inset-bottom)); }
   .fb-top { padding: 0 16px; height: 48px; background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
   .fb-tabs { display: none; }
   .fb-dock {
@@ -295,7 +291,7 @@ a { color: var(--zi-2); }
   }
   .fb-dock .fb-tab {
     flex: 1 1 0; min-width: 0; position: relative;
-    flex-direction: column; justify-content: center; gap: 3px; border-radius: 0; padding: 6px 0;
+    flex-direction: column; justify-content: center; gap: 4px; border-radius: 0; padding: 8px 0;
     font-size: 12px; letter-spacing: .1em;
   }
   .fb-dock .fb-tab svg { width: 20px; height: 20px; }
@@ -304,23 +300,23 @@ a { color: var(--zi-2); }
   .fb-dock .fb-tab.on svg { color: var(--zi-2); }
   .fb-dock .fb-tab.on::before { content: ""; position: absolute; top: 0; left: 50%; width: 28px; margin-left: -14px; height: 2px; background: var(--zi-2); border-radius: 0 0 2px 2px; }
   .fb-dock .fb-tab.all:not(.on) { color: var(--muted); }
-  .fb-mingbu { padding: 12px 16px 0; gap: 8px 10px; }
+  .fb-mingbu { padding: 12px 16px 0; gap: 8px 12px; }
   .fb-mingbu .seg { flex: 1 1 100%; }
-  .fb-mingbu .seg a { flex: 1; justify-content: center; padding: 7px 4px; letter-spacing: .08em; gap: 4px; }
+  .fb-mingbu .seg a { flex: 1; justify-content: center; padding: 8px 4px; letter-spacing: .08em; gap: 4px; }
   .fb-mingbu .seg a svg { display: none; }
   .fb-mingbu .hint { display: none; }
   .fb-mingbu .ppl { flex: 1 1 100%; }
   .fb-head { gap: 12px; margin-bottom: 16px; }
-  .fb-seal { width: 38px; height: 38px; font-size: 21px; }
-  .fb-title { font-size: 22px; gap: 10px; }
+  .fb-seal { width: 40px; height: 40px; font-size: 22px; }
+  .fb-title { font-size: 22px; gap: 12px; }
   .fb-sub { font-size: 12px; }
-  .fb-now { grid-template-columns: 1fr; padding: 16px; gap: 14px; }
+  .fb-now { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
   .fb-now-ctrl { min-width: 0; }
-  .fb-key { font-size: 17px; }
+  .fb-key { font-size: 18px; }
   .fb-toast { bottom: calc(var(--nav-h) + 20px + env(safe-area-inset-bottom)); }
-  .bh { padding: 12px 14px 11px; }
-  .bh .r { font-size: 13.5px; gap: 6px; }
-  .bh .r > i { font-size: 11.5px; }
+  .bh { padding: 12px 16px; }
+  .bh .r { font-size: 14px; gap: 8px; }
+  .bh .r > i { font-size: 12px; }
 }
 
 /* 六 共用小件 --------------------------------------------- */
@@ -335,14 +331,14 @@ fb-t:focus { outline: none; }
 fb-t:focus-visible { outline: 2px solid var(--zi-2); outline-offset: 1px; border-radius: 2px; }
 .fb-gloss {
   position: fixed; left: 0; top: 0; z-index: 95;
-  padding: 10px 14px 11px; border-radius: var(--r);
+  padding: 12px 16px; border-radius: var(--r);
   background: #2A2238; color: var(--fg-2); border: 1px solid var(--rule-2);
   box-shadow: 0 14px 36px -12px rgba(0, 0, 0, .85);
-  font-size: 13.5px; line-height: 1.75; letter-spacing: .03em;
+  font-size: 14px; line-height: 1.75; letter-spacing: .03em;
   opacity: 0; transform: translateY(4px); visibility: hidden; pointer-events: none;
-  transition: opacity .16s, transform .16s, visibility 0s .16s;
+  transition: opacity .16s var(--ease), transform .16s var(--ease), visibility 0s .16s;
 }
-.fb-gloss.on { opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition: opacity .16s, transform .16s; }
+.fb-gloss.on { opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition: opacity .16s var(--ease), transform .16s var(--ease); }
 .fb-gloss b { display: block; margin-bottom: 2px; font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .15em; color: var(--zi-2); }
 
 /* 印章落笔：本标签页头一回打开时，印里的字一笔一笔写出来，写完淡回原字 */
@@ -389,8 +385,8 @@ html.fb-noscroll { overflow: hidden; }
   .fb-fam .seg a.on { view-transition-name: fb-fam-on; }
   .fb-head .fb-seal { view-transition-name: fb-seal; }
   ::view-transition-old(root) { animation: fbVtOut .16s ease-in both; }
-  ::view-transition-new(root) { animation: fbVtIn .36s cubic-bezier(.2, .7, .2, 1) both; }
-  ::view-transition-group(fb-fam-on), ::view-transition-group(fb-seal) { animation-duration: .34s; animation-timing-function: cubic-bezier(.3, .8, .3, 1); }
+  ::view-transition-new(root) { animation: fbVtIn .32s var(--ease) both; }
+  ::view-transition-group(fb-fam-on), ::view-transition-group(fb-seal) { animation-duration: .32s; animation-timing-function: var(--ease); }
 }
 @keyframes fbVtOut { to { opacity: 0; } }
 @keyframes fbVtIn { from { opacity: 0; transform: translateY(8px); } }

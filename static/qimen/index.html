@@ -40,7 +40,7 @@
 .qm-key .bx-h{outline:1.5px solid var(--zhu);color:var(--fg-2)}
 .qm-key .bx-d{outline:1.5px dashed var(--jin);color:var(--fg-2)}
 .qm-tgs{display:flex;justify-content:center;gap:6px;margin-top:8px;flex-wrap:wrap}
-.qm-tg{font-size:12px;color:var(--faint);border:1px solid var(--rule-2);border-radius:999px;padding:2px 10px;font-family:var(--font-title);letter-spacing:.08em}
+.qm-tg{font-size:12px;color:var(--faint);border:1px solid var(--rule-2);border-radius: var(--r-sm);padding:2px 10px;font-family:var(--font-title);letter-spacing:.08em}
 .qm-tg.on{color:var(--fg-2);border-color:var(--zi-2)}
 .qm-set{margin-top:10px;border-top:1px solid var(--rule);padding-top:8px;font-size:13px;color:var(--muted)}
 .qm-set summary{cursor:pointer;text-align:center;font-family:var(--font-title);font-size:12px;letter-spacing:.15em;color:var(--faint);list-style:none}
@@ -118,7 +118,7 @@
 .palace .pnum{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:2.4rem;color:rgba(169,148,224,.07);font-weight:900;line-height:1;pointer-events:none;z-index:0}
 .palace.kong{background:repeating-linear-gradient(135deg,transparent 0 12px,rgba(224,122,98,.07) 12px 13px),var(--bg-3)}
 .palace.dkong:not(.kong){background:repeating-linear-gradient(135deg,transparent 0 12px,rgba(163,157,176,.06) 12px 13px),var(--bg-3)}
-.palace.zhifu{border-color:var(--zhu);box-shadow:0 0 16px -6px rgba(224,122,98,.6)}
+.palace.zhifu{border-color:var(--zhu)}
 .palace.zhishi{border-color:var(--qing);box-shadow:0 0 16px -6px rgba(143,176,216,.55)}
 .palace.yongshen{outline:1.5px dashed var(--zi-2);outline-offset:-5px}
 .palace .ys{position:absolute;left:50%;transform:translateX(-50%);bottom:5px;font-size:.58rem;line-height:1.5;color:var(--zi-2);border:1px solid var(--zi-2);padding:0 4px;border-radius:2px;background:var(--bg-3);z-index:2;white-space:nowrap;letter-spacing:.05em}
@@ -136,7 +136,7 @@
 .qm-mh{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;max-width:520px;margin:10px auto 0;padding:9px 12px;
   background:var(--bg-3);border:1px solid var(--rule);border-radius:var(--r);font-family:var(--font-title);font-size:13px;color:var(--fg-2)}
 .qm-mh .t{font-size:11px;color:var(--faint);letter-spacing:.2em;width:100%;display:flex;justify-content:space-between;align-items:center}
-.qm-mh .t a{font-size:12px;letter-spacing:.08em;color:var(--zi-2);text-decoration:none;border:1px solid var(--rule-2);border-radius:999px;padding:1px 10px}
+.qm-mh .t a{font-size:12px;letter-spacing:.08em;color:var(--zi-2);text-decoration:none;border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:1px 10px}
 .qm-mh .t a:hover{border-color:var(--zi-2);color:var(--fg)}
 .qm-mh .g{display:inline-flex;align-items:center;gap:5px}
 .qm-mh .g small{font-size:11px;color:var(--faint)}
@@ -155,7 +155,7 @@
 
 /* ---------- 格局 ---------- */
 .pal-detail h3{font-family:var(--font-title);font-size:16px;font-weight:600;letter-spacing:.12em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pal-detail .tag{font-size:11px;font-weight:400;color:var(--zi-2);border:1px solid var(--rule-2);border-radius:999px;padding:0 8px;letter-spacing:.05em}
+.pal-detail .tag{font-size:11px;font-weight:400;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 8px;letter-spacing:.05em}
 .pal-detail dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin-top:10px;font-size:14px;line-height:1.65}
 .pal-detail dt{color:var(--faint);font-family:var(--font-title);font-size:12px;letter-spacing:.15em;padding-top:2px}
 .pal-detail dd{color:var(--fg-2)}
@@ -165,7 +165,7 @@
 .ge-item b{font-family:var(--font-title);font-weight:600;letter-spacing:.08em;margin-right:8px}
 .ge-item.吉 b{color:var(--lv)}
 .ge-item.凶 b{color:var(--zhu)}
-.ge-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius:999px;padding:0 7px;margin-right:6px;font-family:var(--font-title)}
+.ge-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 7px;margin-right:6px;font-family:var(--font-title)}
 .ge-item .tx{font-size:13px;color:var(--fg-2)}
 .ge-none{font-size:13px;color:var(--faint);padding:8px 2px}
 .ys-box .ge-h:first-child{margin-top:4px}
@@ -173,7 +173,7 @@
 .ys-item:hover{background:rgba(122,91,192,.08)}
 .ys-item .lb{display:inline-block;min-width:1.6em;text-align:center;font-family:var(--font-title);font-size:12px;color:var(--bg);background:var(--zi-2);border-radius:3px;padding:0 4px;margin-right:6px}
 .ys-item b{font-family:var(--font-title);font-weight:600;letter-spacing:.06em;margin-right:6px}
-.ys-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius:999px;padding:0 7px;margin-right:6px;font-family:var(--font-title)}
+.ys-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 7px;margin-right:6px;font-family:var(--font-title)}
 .ys-item .rel{font-size:12px;color:var(--qing);margin-left:4px}
 .ys-item .br{display:block;font-size:13px;color:var(--fg-2)}
 .ys-item .fl{color:var(--zhu);margin-left:6px;font-size:12px}
@@ -187,7 +187,7 @@
 .ze-item:hover{background:rgba(122,91,192,.08)}
 .ze-item .when{font-family:var(--font-title);font-size:13px;color:var(--fg);letter-spacing:.05em;margin-right:8px}
 .ze-item .when small{color:var(--faint);font-size:11px;margin-left:4px}
-.ze-item .g{display:inline-block;font-size:12px;color:var(--lv);border:1px solid rgba(141,191,151,.45);border-radius:999px;padding:0 8px;margin:2px 4px 2px 0;font-family:var(--font-title)}
+.ze-item .g{display:inline-block;font-size:12px;color:var(--lv);border:1px solid rgba(141,191,151,.45);border-radius: var(--r-xs);padding:0 8px;margin:2px 4px 2px 0;font-family:var(--font-title)}
 .ze-item .g.w{color:var(--faint);border-color:var(--rule-2)}
 .ze-item .g sup{color:var(--zhu);font-size:9px;margin-left:2px}
 .ze-item .bad{display:inline-block;font-size:12px;color:var(--zhu);margin-right:6px;font-family:var(--font-title)}
@@ -205,7 +205,7 @@
 .field input,.field textarea{width:100%}
 textarea{min-height:68px;resize:vertical;line-height:1.7}
 .chips,.wx{display:flex;gap:6px;flex-wrap:wrap}
-.chip,.wx button{border:1px solid var(--rule-2);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--muted);background:var(--bg-3);font-family:var(--font-title);letter-spacing:.08em}
+.chip,.wx button{border:1px solid var(--rule-2);border-radius: var(--r-sm);padding:6px 14px;font-size:14px;color:var(--muted);background:var(--bg-3);font-family:var(--font-title);letter-spacing:.08em}
 .chip:hover,.wx button:hover{color:var(--fg)}
 .chip.on,.wx button.on{border-color:var(--zi-2);color:var(--fg);background:rgba(122,91,192,.25)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -278,7 +278,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
   <div class="fb-head">
     <div class="fb-seal">奇</div>
     <div>
-      <h1 class="fb-title">奇门手记 <span class="en">QI MEN NOTES</span></h1>
+      <h1 class="fb-title">奇门手记</h1>
       <div class="fb-sub">起局 · 看格局 · 记反馈 · 复盘归档</div>
     </div>
   </div>

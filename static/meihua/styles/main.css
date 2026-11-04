@@ -42,7 +42,6 @@
   font-family: var(--font-title); font-weight: 600; font-size: 18px; letter-spacing: .25em;
   color: var(--c); display: flex; align-items: baseline; gap: 10px;
 }
-.card-label .en { font-family: var(--font-mark); font-weight: 500; font-stretch: 125%; font-size: 9px; letter-spacing: .25em; color: var(--faint); }
 .matched-name {
   font-family: var(--font-title); font-size: 14px; letter-spacing: .12em; color: var(--muted);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;

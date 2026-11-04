@@ -7,7 +7,7 @@
 <script src="{{ $bundle.RelPermalink }}" integrity="{{ $bundle.Data.Integrity }}"></script>
 <script>
 (function () {
-  // ===== 星空 + 鼠标拖尾粒子系统 =====
+  // ===== 星空（时令粒子画在同一张画布上） =====
   var canvas = document.createElement('canvas');
   canvas.id = 'qianjiao-stars';
   canvas.style.cssText = [
@@ -22,7 +22,7 @@
   document.body.appendChild(canvas);
 
   var ctx = canvas.getContext('2d');
-  var W, H, stars = [], trail = [];
+  var W, H, stars = [];
   var still = window.matchMedia('(prefers-reduced-motion: reduce)');
   var running = false;
 
@@ -48,34 +48,11 @@
     for (var i = 0; i < n; i++) stars.push(mkStar());
   }
 
-  // 鼠标跟随
-  document.addEventListener('mousemove', function (e) {
-    if (still.matches) return;
-    for (var i = 0; i < 3; i++) {
-      trail.push({
-        x:  e.clientX + (Math.random() - 0.5) * 14,
-        y:  e.clientY + (Math.random() - 0.5) * 14,
-        vx: (Math.random() - 0.5) * 1.3,
-        vy: (Math.random() - 0.5) * 1.3 - 0.5,
-        life: 1.0,
-        r:   Math.random() * 2.2 + 0.6,
-        gold: Math.random() > 0.92
-      });
-    }
-  });
-
-  // 点按落星：一圈金紫碎屑向外散开（点在链接、按钮上不放，免得抢戏）
+  // 点按页面空白处：音律开着时敲一声（点在链接、按钮上不响）。
+  // 原先还有鼠标拖尾与点按落星的碎屑，按 unslop 拿掉——装饰性的动效不留，星空与时令照旧。
   document.addEventListener('pointerdown', function (e) {
     if (still.matches || e.button > 0) return;
     if (e.target.closest && e.target.closest('a,button,input,textarea,select,label')) return;
-    for (var k = 0; k < 22; k++) {
-      var ang = (k / 22) * 6.283 + Math.random() * .3, sp = Math.random() * 2.4 + 1.2;
-      trail.push({
-        x: e.clientX, y: e.clientY,
-        vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
-        life: 1.0, r: Math.random() * 2.2 + 1.2, gold: Math.random() > 0.55, k: 0.9
-      });
-    }
     if (window.qjYin) window.qjYin.tap();
   });
 
@@ -98,18 +75,6 @@
     // 时令粒子（assets/js/qj/season.js）
     if (window.qjSeason) window.qjSeason.draw(ctx, W, H);
 
-    // 拖尾
-    for (var j = trail.length - 1; j >= 0; j--) {
-      var p = trail[j];
-      p.x += p.vx; p.y += p.vy; p.life -= 0.026;
-      if (p.life <= 0) { trail.splice(j, 1); continue; }
-      // 拖尾以紫为主，偶有一粒金（视觉基调：金比紫少）
-      var col = p.gold ? '217,174,78' : '169,148,224';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r * p.life, 0, 6.283);
-      ctx.fillStyle = 'rgba(' + col + ',' + (p.life * (p.k || 0.19)) + ')';
-      ctx.fill();
-    }
 
     if (running) requestAnimationFrame(draw);
   }
@@ -126,7 +91,7 @@
   start();
   document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
   if (still.addEventListener) still.addEventListener('change', function () {
-    if (still.matches) { stop(); trail = []; draw(); } else start();
+    if (still.matches) { stop(); draw(); } else start();
   });
   window.addEventListener('resize', function () { resize(); initStars(); if (!running) draw(); });
 })();

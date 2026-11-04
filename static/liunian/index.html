@@ -61,7 +61,7 @@
     @media (max-width: 560px) { .sx { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
     /* 你 */
     .ppl { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-    .ppl button { border: 1px solid var(--rule-2); border-radius: 999px; padding: 3px 12px; font-family: var(--font-title); font-size: 13px; color: var(--muted); background: var(--bg-3); }
+    .ppl button { border: 1px solid var(--rule-2); border-radius: var(--r-sm); padding: 3px 12px; font-family: var(--font-title); font-size: 13px; color: var(--muted); background: var(--bg-3); }
     .ppl button.on { border-color: var(--jin); color: var(--fg); }
     .me-line { font-size: 15px; line-height: 1.85; color: var(--fg-2); }
     .me-line b { font-family: var(--font-title); color: var(--fg); }
@@ -78,7 +78,7 @@
     .terms .next b { color: var(--jin); }
     .terms .past { opacity: .55; }
     .fest { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
-    .fest a { display: inline-flex; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--bg-3); color: var(--fg-2); text-decoration: none; border: 1px solid transparent; }
+    .fest a { display: inline-flex; gap: 6px; padding: 3px 10px; border-radius: var(--r-sm); background: var(--bg-3); color: var(--fg-2); text-decoration: none; border: 1px solid transparent; }
     .fest a:hover { border-color: var(--zi-2); }
     .fest a span { color: var(--faint); font-family: var(--font-mark); font-size: 12px; }
     .fest a.jp { color: var(--qing); } .fest a.k { color: var(--jin); }
@@ -106,7 +106,7 @@
     .hou-t .now .c { color: var(--jin); }
     .hou-t .past { opacity: .55; }
     @media (max-width: 560px) { .hou-t { grid-template-columns: 2.6em repeat(3, minmax(0, 1fr)); gap: 0 6px; font-size: 12.5px; } }
-    .tg { border: 1px solid var(--rule-2); border-radius: 999px; padding: 2px 11px; font-size: 12.5px; color: var(--faint); font-family: var(--font-title); }
+    .tg { border: 1px solid var(--rule-2); border-radius: var(--r-sm); padding: 2px 11px; font-size: 12.5px; color: var(--faint); font-family: var(--font-title); }
     .tg.on { color: var(--fg-2); border-color: var(--zi-2); }
     .yq { font-size: 14px; line-height: 1.85; color: var(--fg-2); }
     .yq b { font-family: var(--font-title); color: var(--fg); letter-spacing: .08em; }
@@ -117,7 +117,7 @@
   <div class="fb-head">
     <div class="fb-seal">年</div>
     <div>
-      <h1 class="fb-title"><span id="ttl">流年</span> <span class="en">THE YEAR</span></h1>
+      <h1 class="fb-title"><span id="ttl">流年</span></h1>
       <div class="fb-sub">太岁方位 · 九宫飞星 · 犯太岁生肖 · 运气 · 你的这一年 · 节气、七十二候与节日</div>
     </div>
   </div>

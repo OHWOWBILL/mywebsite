@@ -112,7 +112,9 @@ h1, h2, h3, h4,
   --tw-prose-invert-hr: var(--ge-rule);
 }
 
-.prose h2, .prose h3 { font-weight: 600; }
+.prose h1, .prose h2, .prose h3, #single_header h1 { font-weight: 600; }
+/* 文章页首：面包屑别贴着标题（unslop 间距轮） */
+#single_header > ol { margin-bottom: 8px; }
 
 /* 分隔线 · 八卦，压到雾色里，只作呼吸 */
 .prose hr {
@@ -970,7 +972,7 @@ main > header h1 {
 }
 
 @keyframes qj-mist {
-  from { opacity: 0; filter: blur(16px) brightness(.4); transform: scale(1.08); }
+  from { opacity: 0; filter: brightness(.4); transform: scale(1.04); }
   to   { opacity: 1; filter: none; transform: none; }
 }
 /* 字是行内元素（竖排里换成 inline-block 会叠字），
@@ -1024,20 +1026,20 @@ main > header h1 {
   }
 }
 @keyframes qj-rise {
-  from { opacity: 0; transform: translateY(18px); filter: blur(4px); }
-  to   { opacity: 1; transform: none; filter: none; }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
 }
 
-/* --- 换页：同站跳转时整页如墨洇开（View Transitions API，
-       Chrome 126+ / Safari 18.2+；其余浏览器照常硬切） --- */
+/* --- 换页：同站跳转时旧页淡出、新页淡入微微上浮（View Transitions API，
+       Chrome 126+ / Safari 18.2+；其余浏览器照常硬切）。不用模糊，弱机也顺 --- */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
   #qianjiao-stars { view-transition-name: qj-stars; }
-  ::view-transition-old(root) { animation: qj-vt-out .32s ease-in both; }
-  ::view-transition-new(root) { animation: qj-vt-in .55s cubic-bezier(.2, .7, .2, 1) both; }
+  ::view-transition-old(root) { animation: qj-vt-out .2s ease-in both; }
+  ::view-transition-new(root) { animation: qj-vt-in .36s cubic-bezier(.22, 1, .36, 1) both; }
 }
-@keyframes qj-vt-out { to { opacity: 0; filter: blur(8px); transform: scale(.985); } }
-@keyframes qj-vt-in  { from { opacity: 0; filter: blur(8px); transform: scale(1.015); } }
+@keyframes qj-vt-out { to { opacity: 0; } }
+@keyframes qj-vt-in  { from { opacity: 0; transform: translateY(8px); } }
 
 /* --- 音律开关 --- */
 .qj-yin-toggle { display: inline-flex; align-items: center; font-size: 1.15em; opacity: .6; }
@@ -1578,7 +1580,7 @@ html.qj-vert-on .toc { display: none; }
   background: var(--zi);
   color: #fff;
   border-radius: 2px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), 0 6px 18px -8px rgba(122, 91, 192, .9);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), 0 6px 16px -8px rgba(0, 0, 0, .7);
   font-family: var(--font-title);
   font-size: clamp(1rem, 2.6vw, 1.45rem);
   line-height: 1.25;
@@ -1668,7 +1670,7 @@ html.qj-vert-on .toc { display: none; }
 .ws-door:focus-visible .ws-leaf-r,
 .ws-door.is-open .ws-leaf-r { transform: rotateY(-78deg); filter: brightness(.7); }
 .ws-door:hover .ws-plaque,
-.ws-door:focus-visible .ws-plaque { transform: rotate(0); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3), 0 0 22px rgba(169, 148, 224, .75); }
+.ws-door:focus-visible .ws-plaque { transform: rotate(0); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3), 0 8px 20px -8px rgba(0, 0, 0, .8); }
 
 /* 门未开：合着，贴封条 */
 .ws-door.is-shut { cursor: default; }
@@ -2233,3 +2235,11 @@ html.qj-ge-on body { overflow-x: clip; }
 @keyframes ge-lei { 0% { opacity: 0; } 5% { opacity: .75; } 11% { opacity: .1; } 17% { opacity: .55; } 45% { opacity: 0; } 100% { opacity: 0; } }
 @keyframes ge-star { from { opacity: 1; } to { opacity: .45; } }
 @keyframes ge-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+
+/* ===========================================================
+   手机上顶栏下的留白：Blowfish 固定顶栏留了 148px 占位（顶栏本身约 53px），
+   手机上空出近百像素一条；收到 112px，正文离顶栏约 60px
+   =========================================================== */
+@media (max-width: 640px) {
+  .min-h-\[148px\] { min-height: 112px; }
+}

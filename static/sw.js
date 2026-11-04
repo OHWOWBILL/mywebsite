@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-5666e6aeea33';
+const V = 'fb-83bb5e906306';
 const PRE = [
   '/bazi/',
   '/changsheng/',
