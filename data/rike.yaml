@@ -1,5 +1,7 @@
-# 日课卡（首页）与日签用的建除十二神宜忌。
-# 取通书里最常见的简本；与法宝库通书底座（static/fabao/tongshu.js 的 YIJI）是同一份，
+# 首页日课卡的退路：建除十二神宜忌（通书常见简本）。
+# 平时日课用法宝库通书底座现算的《协纪辨方书》全套宜忌（static/fabao/tongshu-shensha.js，取自 lunar-javascript）；
+# 只有底座没载入时，assets/js/qj/rike.js 才按当天建除查这张表。
+# 与底座里的简本（static/fabao/tongshu.js 的 YIJI，协纪全表不在时它也顶用）是同一份，
 # 改一处另一处也要改，scripts/tongshu/check.js 会核对两边是否一致。
 jianchu:
   建: { yi: "出行、上任、谒贵、求谋", ji: "动土、开仓、嫁娶、安葬" }

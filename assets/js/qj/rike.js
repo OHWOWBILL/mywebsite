@@ -1,6 +1,6 @@
 // =========================================================
 // 日课 · 首页小卡（partials/qj-rike.html）
-// 农历、日柱、建除宜忌、节气进度、月相、此时一卦。
+// 农历、日柱、协纪宜忌摘要（底座不在时退回建除简本）、节气进度、七十二候、月相、此时一卦。
 // 每分钟看一眼：换了时辰就换卦，过了子夜就换日课。
 // =========================================================
 
@@ -21,11 +21,16 @@
   function rikeOf(now, list) {
     var L = Q.lunar(now), gz = Q.dayGZ(now), jc = Q.jianchu(now), jq = Q.jieqi(now), mo = Q.moon(now);
     var yj = (data.jianchu || {})[jc] || {};
-    // 通书底座在就用它（交节精确到分，另有值神冲煞、方位、时辰、日本历注）
-    var T = window.TS && window.TS.day(now), H = null;
+    // 通书底座在就用它（交节精确到分，另有协纪宜忌、值神冲煞、方位、时辰、七十二候、日本历注）。
+    // 宜忌摘要：日签那一行按 14 字取（qian.js 画在 1080 宽的图上），卡上多给一些
+    var T = window.TS && window.TS.day(now), H = null, yjCard = null;
     if (T) {
       jc = T.jianchu;
-      yj = { yi: T.yi.slice(0, 5).join('、'), ji: T.ji.slice(0, 5).join('、') };
+      var brief = window.TS.brief || function (list) { return { items: list.slice(0, 5), more: list.length > 5 }; };
+      var bf = function (list, n) { return brief(list, n).items.join('、') || '无'; };
+      yj = { yi: bf(T.yi, 14), ji: bf(T.ji, 14) };
+      var by = brief(T.yi, 22), bj = brief(T.ji, 22);
+      yjCard = { yi: by.items.join('、') || '无', ji: bj.items.join('、') || '无', yiMore: by.more, jiMore: bj.more };
       var hs = window.TS.hours(T), hz = Q.hourZhi(now);
       H = { now: hs[hz], next: null };
       for (var k = 1; k < 12 && !H.next; k++) { var h = hs[(hz + k) % 12]; if (h.huang && (hz + k) < 12) H.next = h; }
@@ -41,7 +46,7 @@
       qiNext: jq.left > 0 ? '距' + jq.next + Q.hanNum(jq.left) + '日' : '今日交' + jq.next,
       moon: mo, cast: c, ben: ben, bian: bian,
       shi: Q.ZHI[Q.hourZhi(now)] + '时',
-      ts: T, hour: H, jp: T && jpOn()
+      ts: T, hour: H, jp: T && jpOn(), yjCard: yjCard, hou: T && T.hou && T.hou.cn ? T.hou : null
     };
   }
   Q.rikeOf = rikeOf;
@@ -58,11 +63,17 @@
     set('date', r.solar + '<span>' + r.lunar + '</span>');
     set('day', '<b>' + r.day + '</b> · 值「' + r.jc + '」');
     set('qi', '<b>' + r.qi + '</b> · ' + r.qiNext);
-    set('yi', r.yi);
-    set('ji', r.ji);
+    var hl = box.querySelector('.qj-rike-link[href*="huangli"]');
+    var more = '<a class="more" href="' + (hl ? hl.getAttribute('href') : '/huangli/') + '" title="全套宜忌在黄历里">…</a>';
+    set('yi', r.yjCard ? r.yjCard.yi + (r.yjCard.yiMore ? more : '') : r.yi);
+    set('ji', r.yjCard ? r.yjCard.ji + (r.yjCard.jiMore ? more : '') : r.ji);
     var row = function (k, on) { var el = box.querySelector('[data-row="' + k + '"]'); if (el) el.hidden = !on; };
     var T = r.ts;
-    row('shen', !!T); row('shi', !!(T && r.hour)); row('fang', !!T); row('jp', !!(T && r.jp));
+    row('shen', !!T); row('shi', !!(T && r.hour)); row('fang', !!T); row('jp', !!(T && r.jp)); row('hou', !!r.hou);
+    // 七十二候：中国候名；开日本历注时并列本朝候名；前面一枚节气色
+    var se = r.hou && (window.QJ_JIEQI_SE || {})[r.hou.jie];
+    if (r.hou) set('hou', (se ? '<i class="se" style="background:' + se[1] + '" title="' + r.hou.jie + '色 · ' + se[0] + '：' + se[2] + '"></i>' : '') +
+      '<b>' + r.hou.cnName + '</b> · ' + r.hou.cn + (r.jp ? ' <span class="jph" title="' + r.hou.jpName + '（' + r.hou.yomi + '）">' + r.hou.jp + '</span>' : ''));
     if (T) {
       set('shen', '<b class="' + (T.huang ? 'hd' : 'hk') + '">' + T.shen + (T.huang ? '黄道' : '黑道') + '</b> · 冲' + T.chong.sx + '（' + T.chong.gz + '）煞' + T.chong.sha +
         (T.notes.length ? ' · <span class="hk">' + T.notes.map(function (n) { return n.n; }).join('、') + '</span>' : ''));

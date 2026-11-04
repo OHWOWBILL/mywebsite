@@ -7,6 +7,8 @@
    精度约一至二角分，足供本命盘之用（黄道为当日分点，即回归黄道）。
    上升、中天由格林尼治平恒星时（IAU）推；宫制有 Placidus、整宫、等宫、波菲利。
    法达按昼夜分序，主运之下七分子运（迦勒底序）；小限每年一宫。
+   推运（文件后半）：行运相位与精确成相之日、太阳回归、留与逆行（含影子期）、月亮空亡、次限，
+   都用同一套星历求根，不另带星历表。
 
    浏览器里挂 window.XP；node 里 require 即得同一对象。
    ========================================================= */
@@ -243,6 +245,10 @@
   function chart(inp) {
     var wall = Date.UTC(inp.y, inp.mo - 1, inp.d, inp.h, inp.mi || 0);
     var utc = wall - (inp.dst ? 3600e3 : 0) - (+inp.tz) * 3600e3;
+    return chartAt(utc, inp);
+  }
+  // 按 UTC 时刻排盘（回归盘、推运盘用）：inp 只用 lat、lon、house、bonatti，其余原样放进 input 供显示
+  function chartAt(utc, inp) {
     var P = bodies(utc), P2 = bodies(utc + 3600e3), P0 = bodies(utc - 3600e3);
     Object.keys(P).forEach(function (k) {
       P[k].speed = mod(P2[k].lon - P0[k].lon + 180, 360) - 180;      // 每两小时 → 下面换成每日
@@ -279,10 +285,244 @@
     return { sign: s, d: dd, m: mm, text: SIGNS[s] + ' ' + dd + '°' + (mm < 10 ? '0' : '') + mm + '′' };
   }
 
+  /* =========================================================
+     推运：行运、太阳回归、留与逆行、月亮空亡、次限
+     ---------------------------------------------------------
+     全用上面同一套星历，只是换个问法：某量何时过零。先按步长扫出变号，再夹逼求根；
+     夹逼照 astronomy-engine 的 Search（Don Cross，MIT 许可，github.com/cosinekitty/astronomy）
+     改写为毫秒计时：三点抛物线插值猜根，猜得准就收窄，不准就二分。
+     ========================================================= */
+  var DAY = 864e5, HOUR = 3600e3;
+  var PLANETS = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+  function wrap180(x) { return mod(x + 180, 360) - 180; }
+
+  // 单个天体的地心黄经：与 bodies() 同一算法、同一结果，只算要的那一颗（求根时省力）
+  function lonOf(id, utcMs) {
+    var d = dayNum(utcMs), S = sunPos(d);
+    if (id === 'sun') return S.lon;
+    if (id === 'moon') return moonPos(d, S).lon;
+    if (id === 'node') return n360(elements('moon', d).N);
+    var h = id === 'pluto' ? plutoHelio(d) : planetHelio(id, d), p = rect(h.lon, h.lat, h.r);
+    return sph({ x: p.x + S.x, y: p.y + S.y, z: p.z }).lon;
+  }
+  // 日行（度/日）：前后各一小时之差，与 chart() 同法
+  function speedOf(id, utcMs) { return wrap180(lonOf(id, utcMs + HOUR) - lonOf(id, utcMs - HOUR)) * 12; }
+
+  function quadInterp(tm, dt, fa, fm, fb) {
+    var Q = (fb + fa) / 2 - fm, R = (fb - fa) / 2, S = fm, x;
+    if (Q === 0) {
+      if (R === 0) return null;
+      x = -S / R;
+      if (x < -1 || x > 1) return null;
+    } else {
+      var u = R * R - 4 * Q * S;
+      if (u <= 0) return null;
+      var ru = Math.sqrt(u), x1 = (-R + ru) / (2 * Q), x2 = (-R - ru) / (2 * Q);
+      if (x1 >= -1 && x1 <= 1) { if (x2 >= -1 && x2 <= 1) return null; x = x1; }
+      else if (x2 >= -1 && x2 <= 1) x = x2;
+      else return null;
+    }
+    return { t: tm + x * dt, df: (2 * Q * x + R) / dt };
+  }
+  // f 在 t1、t2 之间由负转正（只许一次）的那一刻，夹到 tol 毫秒（默认一秒）以内；找不到给 null
+  function search(f, t1, t2, tol) {
+    tol = tol || 1000;
+    var f1 = f(t1), f2 = f(t2), fm = NaN, calc = true;
+    for (var it = 0; it < 60; it++) {
+      var tm = (t1 + t2) / 2, dt = tm - t1;
+      if (Math.abs(dt) < tol) return tm;
+      if (calc) fm = f(tm); else calc = true;
+      var q = quadInterp(tm, t2 - tm, f1, fm, f2);
+      if (q) {
+        var fq = f(q.t);
+        if (q.df !== 0) {
+          if (Math.abs(fq / q.df) < tol) return q.t;
+          var g = 1.2 * Math.abs(fq / q.df);
+          if (g < Math.abs(dt) / 10) {
+            var tl = q.t - g, tr = q.t + g;
+            if ((tl - t1) * (tl - t2) < 0 && (tr - t1) * (tr - t2) < 0) {
+              var fl = f(tl), fr = f(tr);
+              if (fl < 0 && fr >= 0) { f1 = fl; f2 = fr; t1 = tl; t2 = tr; fm = fq; calc = false; continue; }
+            }
+          }
+        }
+      }
+      if (f1 < 0 && fm >= 0) { t2 = tm; f2 = fm; continue; }
+      if (fm < 0 && f2 >= 0) { t1 = tm; f1 = fm; continue; }
+      return null;
+    }
+    return (t1 + t2) / 2;
+  }
+  // [t0, t1] 内 f 的全部过零点 { t, up }（up：由负转正）。角度差先折到 ±180，跨 ±180 的跳变不算
+  function crossings(f, t0, t1, step, tol) {
+    var out = [], a = t0, fa = f(a);
+    function push(t, up) { if (t != null) out.push({ t: t, up: up }); }
+    while (a < t1) {
+      var b = Math.min(a + step, t1), fb = f(b);
+      if (Math.abs(fb - fa) < 180) {
+        if (fa < 0 && fb >= 0) push(search(f, a, b, tol), true);
+        else if (fa >= 0 && fb < 0) push(search(function (x) { return -f(x); }, a, b, tol), false);
+      }
+      a = b; fa = fb;
+    }
+    return out;
+  }
+
+  // —— 留与逆行 ——
+  // 留：视速度过零。kind 'R' 留逆（由顺转逆），'D' 留顺；lon 为留时黄经
+  function stations(id, t0, t1) {
+    return crossings(function (t) { return speedOf(id, t); }, t0, t1, DAY, 1000).map(function (c) {
+      return { id: id, t: c.t, kind: c.up ? 'D' : 'R', lon: lonOf(id, c.t) };
+    });
+  }
+  // 与 [t0, t1] 相交的逆行段：R 留逆、D 留顺；影子期以度数定——
+  // pre 前影之始：留逆前行星（顺行）最后一次到达留顺度数之时；post 后影之终：留顺后行星回到留逆度数之时
+  function retrogrades(id, t0, t1) {
+    var st = stations(id, t0 - 200 * DAY, t1 + 200 * DAY), out = [];
+    var lastUp = function (cs) { var r = null; cs.forEach(function (c) { if (c.up) r = c.t; }); return r; };
+    var firstUp = function (cs) { for (var i = 0; i < cs.length; i++) if (cs[i].up) return cs[i].t; return null; };
+    for (var i = 0; i + 1 < st.length; i++) {
+      var R = st[i], D = st[i + 1];
+      if (R.kind !== 'R' || D.kind !== 'D' || D.t < t0 || R.t > t1) continue;
+      var span = D.t - R.t, w = 2 * span + 60 * DAY;
+      var pre = lastUp(crossings(function (t) { return wrap180(lonOf(id, t) - D.lon); }, R.t - w, R.t - HOUR, DAY, 60e3));
+      var post = firstUp(crossings(function (t) { return wrap180(lonOf(id, t) - R.lon); }, D.t + HOUR, D.t + w, DAY, 60e3));
+      out.push({ id: id, R: R, D: D, pre: pre, post: post });
+    }
+    return out;
+  }
+
+  // —— 太阳回归：太阳回到本命黄经那一刻；approx 取当年生日，前后三日内求根到一秒 ——
+  function solarReturn(sunLon, approx) {
+    return search(function (t) { return wrap180(lonOf('sun', t) - sunLon); }, approx - 3 * DAY, approx + 3 * DAY, 1000);
+  }
+
+  // —— 月亮：换座、与行星成相、空亡 ——
+  var ASP_OF = { 0: 0, 60: 1, 300: 1, 90: 2, 270: 2, 120: 3, 240: 3, 180: 4 };   // 相差角 → ASPECTS 下标
+  var PTOLEMY = [0, 60, 90, 120, 180, 240, 270, 300];
+  var VOC_IDS = ['sun', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+  // 月亮换座（t0 到 t1 之间）：sign 为新入之座
+  function moonIngresses(t0, t1) {
+    var out = [], step = 2 * HOUR, a = t0, sa = Math.floor(lonOf('moon', a) / 30);
+    while (a < t1) {
+      var b = a + step, sb = Math.floor(lonOf('moon', b) / 30);
+      if (sb !== sa) {
+        var B = sb * 30, t = search(function (x) { return wrap180(lonOf('moon', x) - B); }, a, b, 1000);
+        if (t != null && t >= t0 && t < t1) out.push({ t: t, sign: sb });
+      }
+      a = b; sa = sb;
+    }
+    return out;
+  }
+  // 月亮与各星精确成托勒密相位（合、六合、刑、拱、冲）的时刻。月亮总比行星快，月 − 星之差只增不减
+  function moonAspects(t0, t1, ids) {
+    var out = [];
+    (ids || VOC_IDS).forEach(function (id) {
+      var rel = function (t) { return n360(lonOf('moon', t) - lonOf(id, t)); };
+      var a = t0, ra = rel(a);
+      while (a < t1) {
+        var b = Math.min(a + 3 * HOUR, t1), rb = rel(b), dr = n360(rb - ra);
+        PTOLEMY.forEach(function (A) {
+          var k = n360(A - ra);
+          if (k > 0 && k <= dr) {
+            var t = search(function (x) { return wrap180(rel(x) - A); }, a, b, 1000);
+            if (t != null) out.push({ id: id, t: t, A: A, type: ASPECTS[ASP_OF[A]] });
+          }
+        });
+        a = b; ra = rb;
+      }
+    });
+    return out.sort(function (x, y) { return x.t - y.t; });
+  }
+  // 月亮空亡（Void of Course）：月亮在本座内与日水金火木土天海冥的最后一个托勒密相位精确成相之后，
+  // 到入下一座为止；整座不成相位则自入座起即空。返回与 [t0, t1] 相交的各段 { start, end, sign（将入）, last }
+  function voidMoon(t0, t1, ids) {
+    var ing = moonIngresses(t0 - 4 * DAY, t1 + 4 * DAY), out = [];
+    for (var i = 0; i + 1 < ing.length; i++) {
+      var a = ing[i].t, b = ing[i + 1].t;
+      if (b <= t0 || a >= t1) continue;
+      var asp = moonAspects(a, b, ids), last = asp.length ? asp[asp.length - 1] : null;
+      var start = last ? last.t : a;
+      if (start >= t1) continue;
+      out.push({ start: start, end: b, from: ing[i].sign, sign: ing[i + 1].sign, last: last });
+    }
+    return out;
+  }
+
+  // —— 行运：某一刻的天体对本命各点的相位 ——
+  // 容许度按行运天体定（月亮走得快只取 1°，三王星取 1.5°），日月不再加宽
+  var TRANSIT_ORB = { sun: 2, moon: 1, mercury: 2, venus: 2, mars: 2, jupiter: 2, saturn: 2, uranus: 1.5, neptune: 1.5, pluto: 1.5 };
+  function natalPoints(C) {
+    var pts = PLANETS.map(function (id) { return { id: id, lon: C.bodies[id].lon }; });
+    pts.push({ id: 'asc', lon: C.angles.asc }, { id: 'mc', lon: C.angles.mc });
+    return pts;
+  }
+  // 返回按容许度由紧到松排好的 { tr 行运星, na 本命点, type, orb, applying 入相, lon, speed }
+  function transits(C, utcMs, orbs) {
+    orbs = orbs || TRANSIT_ORB;
+    var T = bodies(utcMs), T2 = bodies(utcMs + 60e3), pts = natalPoints(C), out = [];
+    PLANETS.forEach(function (id) {
+      var sp = speedOf(id, utcMs);
+      pts.forEach(function (p) {
+        var sep = Math.abs(wrap180(T[id].lon - p.lon)), sep2 = Math.abs(wrap180(T2[id].lon - p.lon));
+        ASPECTS.forEach(function (as) {
+          var orb = Math.abs(sep - as.a);
+          if (orb <= orbs[id]) out.push({ tr: id, na: p.id, type: as, orb: orb, applying: Math.abs(sep2 - as.a) < orb, lon: T[id].lon, speed: sp });
+        });
+      });
+    });
+    return out.sort(function (x, y) { return x.orb - y.orb; });
+  }
+  // 某星到达某一黄经的全部时刻（顺行、逆行经过都算）；step 为扫描步长
+  function exactTimes(id, target, t0, t1, step) {
+    return crossings(function (t) { return wrap180(lonOf(id, t) - target); }, t0, t1, step || DAY, 60e3)
+      .map(function (c) { return { t: c.t, retro: !c.up }; });
+  }
+  // 行运精确成相：ids 中各星在 [t0, t1] 内与本命各点精确成相的时刻（逆行往返则有数次），按时间排
+  function transitHits(C, t0, t1, ids) {
+    var pts = natalPoints(C), out = [];
+    (ids || ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto']).forEach(function (id) {
+      var ts = [], ls = [];
+      for (var t = t0; ; t += DAY) { var u = Math.min(t, t1); ts.push(u); ls.push(lonOf(id, u)); if (u >= t1) break; }
+      pts.forEach(function (p) {
+        PTOLEMY.forEach(function (A) {
+          var target = n360(p.lon + A), f = function (x) { return wrap180(lonOf(id, x) - target); };
+          for (var k = 0; k + 1 < ts.length; k++) {
+            var fa = wrap180(ls[k] - target), fb = wrap180(ls[k + 1] - target), t = null;
+            if (Math.abs(fb - fa) > 90) continue;
+            if (fa < 0 && fb >= 0) t = search(f, ts[k], ts[k + 1], 60e3);
+            else if (fa >= 0 && fb < 0) t = search(function (x) { return -f(x); }, ts[k], ts[k + 1], 60e3);
+            if (t != null) out.push({ tr: id, na: p.id, A: A, type: ASPECTS[ASP_OF[A]], t: t, retro: fb < fa });
+          }
+        });
+      });
+    });
+    return out.sort(function (x, y) { return x.t - y.t; });
+  }
+
+  // —— 次限（一日一年）：出生后第 n 日的天象对应第 n 岁；年按回归年 365.2422 日 ——
+  // 推运中天用太阳弧（中天加上推运太阳走过的度数），推运上升由推运中天按出生地纬度反推
+  var TROP_YEAR = 365.2422;
+  function progressed(C, utcMs) {
+    var age = (utcMs - C.utc) / (TROP_YEAR * DAY), t = C.utc + age * DAY, P = {};
+    PLANETS.forEach(function (id) { P[id] = { lon: lonOf(id, t), speed: speedOf(id, t) }; P[id].sign = Math.floor(P[id].lon / 30); P[id].house = houseOf(P[id].lon, C.cusps); });
+    var arc = wrap180(P.sun.lon - C.bodies.sun.lon), mc = n360(C.angles.mc + arc), eps = C.angles.eps;
+    // 由中天黄经反求中天赤经，再按出生地纬度求上升
+    var ramc = n360(atan2(sin(mc) * cos(eps), cos(mc)));
+    var asc = n360(atan2(cos(ramc), -(sin(ramc) * cos(eps) + Math.tan(C.input.lat * RAD) * sin(eps))));
+    return { t: t, age: age, bodies: P, arc: arc, mc: mc, asc: asc };
+  }
+
   var api = {
     SIGNS: SIGNS, SIGN_GLYPH: SIGN_GLYPH, ELEM: ELEM, BODIES: BODIES, RULER: RULER, ASPECTS: ASPECTS, CHALDEAN: CHALDEAN,
     dayNum: dayNum, bodies: bodies, sunPos: sunPos, gmst: gmst, angles: angles, houses: houses, houseOf: houseOf,
-    dignity: dignity, aspects: aspects, firdaria: firdaria, profection: profection, chart: chart, fmtDeg: fmtDeg, mod: mod
+    dignity: dignity, aspects: aspects, firdaria: firdaria, profection: profection, chart: chart, fmtDeg: fmtDeg, mod: mod,
+    // 推运
+    PLANETS: PLANETS, TRANSIT_ORB: TRANSIT_ORB, VOC_IDS: VOC_IDS, TROP_YEAR: TROP_YEAR,
+    chartAt: chartAt, lonOf: lonOf, speedOf: speedOf, search: search, crossings: crossings,
+    stations: stations, retrogrades: retrogrades, solarReturn: solarReturn,
+    moonIngresses: moonIngresses, moonAspects: moonAspects, voidMoon: voidMoon,
+    natalPoints: natalPoints, transits: transits, exactTimes: exactTimes, transitHits: transitHits, progressed: progressed
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.XP = api;

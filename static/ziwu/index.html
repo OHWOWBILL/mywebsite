@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=7">
   <style>
     [data-wx="木"] { --wc: var(--wx-mu); }
     [data-wx="火"] { --wc: var(--wx-huo); }
@@ -189,7 +189,7 @@
   </div>
 
   <section class="fb-now">
-    <div class="fb-now-info" id="nowInfo"></div>
+    <div class="fb-now-info" id="nowInfo" data-gloss></div>
     <div class="fb-now-ctrl">
       <div class="fb-row">
         <input type="datetime-local" id="dtInput" class="grow" aria-label="查看时间">
@@ -199,6 +199,7 @@
         <button type="button" class="fb-btn" id="prevBtn">‹ 前一时辰</button>
         <button type="button" class="fb-btn" id="nextBtn">后一时辰 ›</button>
       </div>
+      <button type="button" class="fb-btn ghost" id="shareBtn" title="把这一页的结论画成一张图，可存可分享" onclick="Fabao.share()">分享图</button>
       <div class="fb-fine">点流注钟或下方时辰表，可改看当日别的时辰</div>
     </div>
   </section>
@@ -221,7 +222,7 @@
     <section class="fb-card lz-card">
       <h2>纳甲法 <small>徐凤 · 逐日按时定穴</small></h2>
       <div class="lz-res" id="njRes"></div>
-      <p class="lz-why" id="njWhy"></p>
+      <p class="lz-why" id="njWhy" data-gloss></p>
       <ol class="lz-seq" id="njSeq"></ol>
       <div class="lz-ge" id="njGe"></div>
       <p class="fb-fine" id="njNext" style="margin-top:10px"></p>
@@ -274,7 +275,7 @@
   </section>
 </main>
 
-<script src="/fabao/fabao.js?v=13"></script>
+<script src="/fabao/fabao.js?v=14"></script>
 <script src="/ziwu/liuzhu.js?v=1"></script>
 <script>
 (function () {

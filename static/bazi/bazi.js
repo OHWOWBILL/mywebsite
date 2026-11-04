@@ -15,6 +15,8 @@
      三日一年、一日四月、一时辰十日（一分钟折两小时）。
 
    浏览器里挂 window.BZ；node 里 require 即得同一对象。
+   调候用神查《穷通宝鉴》，表在 /bazi/qiongtong.js（页面须另行载入；
+   没载入时 analyze() 的 tiaohou 为 null，合盘、六爻等页照旧）。
    ========================================================= */
 (function (root) {
   'use strict';
@@ -419,7 +421,35 @@
       taiyuan: { name: gzName(taiyuan), nayin: nayin(taiyuan) },
       minggong: { name: gzName(minggong), nayin: nayin(minggong) },
       taixi: { name: gzName(taixi), nayin: nayin(taixi) },
-      relations: relations(cols)
+      relations: relations(cols),
+      tiaohou: tiaohou(C)
+    };
+  }
+
+  /* =========================================================
+     调候：《穷通宝鉴》以日干、月令取用神（表在 /bazi/qiongtong.js）
+     逐个看在原局里透干（年、月、时三干；日干本身不算）、藏支（四支藏干）与否。
+     页面没载入那张表（合盘、六爻等借用本文件的页）就返回 null。仅供参考。
+     ========================================================= */
+  var QTONG = isNode ? require('./qiongtong.js') : null;
+  function tiaohou(C) {
+    var Q = QTONG || root.BZ_QIONGTONG;
+    if (!Q) return null;
+    var P = C.pillars, dg = P[2].gan, e = Q.get(dg, P[1].zhi);
+    if (!e) return null;
+    var stems = e.y.split('').map(function (ch, k) {
+      var g = GAN.indexOf(ch), tou = [], cang = [];
+      [0, 1, 3].forEach(function (i) { if (P[i].gan === g) tou.push(PILLAR_NAME[i]); });
+      P.forEach(function (p, i) {
+        CANG[p.zhi].forEach(function (h, j) { if (h === g) cang.push({ pillar: PILLAR_NAME[i], zhi: ZHI[p.zhi], qi: QI_NAME[j] }); });
+      });
+      return { gan: ch, ss: shishen(dg, g), tou: tou, cang: cang, state: tou.length ? '透' : cang.length ? '藏' : '无', main: k === 0 };
+    });
+    return {
+      key: e.key, gan: e.gan, wx: e.wx, zhi: e.zhi, month: e.month, season: e.season, chapter: e.chapter,
+      y: e.y, q: e.q, ji: e.ji, n: e.n, v: e.v, cite: Q.BOOK.cite, stems: stems,
+      tou: stems.filter(function (s) { return s.state === '透'; }).length,
+      cang: stems.filter(function (s) { return s.state === '藏'; }).length
     };
   }
 
@@ -522,7 +552,7 @@
   var api = {
     GAN: GAN, ZHI: ZHI, SX: SX, WX: WX, GAN_WX: GAN_WX, ZHI_WX: ZHI_WX, CANG: CANG, SS: SS, SS_SHORT: SS_SHORT, STAGES: STAGES,
     JIE: JIE, PILLAR_NAME: PILLAR_NAME, RANGE: RANGE, TERMS: TERMS, LUNAR: LUNAR,
-    chart: chart, analyze: analyze, extraCol: extraCol, shensha: shensha, relations: relations,
+    chart: chart, analyze: analyze, extraCol: extraCol, shensha: shensha, relations: relations, tiaohou: tiaohou,
     shishen: shishen, stage: stage, nayin: nayin, kongOf: kongOf, wangshuai: wangshuai,
     yearGZ: yearGZ, liuyue: liuyue, fromPillars: fromPillars, gzName: gzName, parseGZ: parseGZ, gzIdx: gzIdx,
     isChinaDST: isChinaDST, eqTime: eqTime, fmtF: fmtF, fields: fields, mod: mod

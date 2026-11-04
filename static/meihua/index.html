@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=7">
   <link rel="stylesheet" href="styles/main.css?v=4">
 </head>
 <body data-tool="meihua">
@@ -25,7 +25,7 @@
   </div>
 
   <!-- 此刻：起卦 -->
-  <section class="fb-now">
+  <section class="fb-now" data-gloss>
     <div class="fb-now-info" id="qiguaInfo">
       <div class="fb-note">正在按此刻起卦…</div>
     </div>
@@ -48,6 +48,7 @@
         <button type="button" class="fb-btn primary grow" id="castBtn">起 卦</button>
         <button type="button" class="fb-btn" id="copyBtn" title="复制为 Markdown 卦例">复制</button>
         <button type="button" class="fb-btn" id="aiBtn" title="把卦连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button type="button" class="fb-btn" id="shareBtn" title="把这一卦画成一张图，可存可分享">分享图</button>
         <button type="button" class="fb-btn ghost" id="clearBtn">清空</button>
       </div>
     </div>
@@ -94,7 +95,7 @@
   <p class="fb-foot">动爻所在为用，另一经卦为体 · 点爻线看爻辞 · 上下卦可手动改</p>
 </main>
 
-<script src="/fabao/fabao.js?v=13"></script>
+<script src="/fabao/fabao.js?v=14"></script>
 <script src="data/hexagrams.js?v=3"></script>
 <script src="data/yao.js?v=3"></script>
 <script src="/fabao/lunar.js?v=1"></script>
@@ -134,6 +135,21 @@
     if (y) L.push(`- **动爻爻辞**：${y[0]} ${y[1]}`);
     L.push('- **所问**：（未写；贴给 AI 时在这里补上所问之事）');
     Fabao.askAI('梅花易数', L.join('\n'), RULES);
+  });
+  // 分享图：本之变为题，体用一句作金句，卦辞、动爻爻辞、互卦随后
+  $('shareBtn').addEventListener('click', () => {
+    const ben = nameOf('ben');
+    if (!ben) { Fabao.toast('先起一卦，或选齐上下卦'); return; }
+    const bian = nameOf('bian'), hu = nameOf('hu');
+    const T = window.YAO_TEXT && window.YAO_TEXT[ben], dong = document.querySelector('[data-card="ben"] .yao-row.dong');
+    const y = T && dong && T.yao[+dong.dataset.idx];
+    const note = document.querySelector('#qiguaInfo .fb-note'), when = document.querySelector('#qiguaInfo .fb-when');
+    Fabao.share({
+      title: bian && bian !== ben ? `${ben} 之 ${bian}` : ben,
+      key: note ? note.innerText.trim() : '',
+      lines: [T && T.gua ? ['卦辞', T.gua] : null, y ? ['动爻', `${y[0]}　${y[1]}`] : null, hu ? ['互卦', hu] : null].filter(Boolean),
+      meta: when ? when.innerText.replace(/\s+/g, ' ').trim() : ''
+    });
   });
 })();
 </script>

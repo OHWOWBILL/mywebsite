@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=7">
   <style>
     .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
     .ly-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -44,6 +44,10 @@
     @keyframes lySpin { 0% { transform: translateY(0) rotateY(0); } 40% { transform: translateY(-26px) rotateY(540deg); } 100% { transform: translateY(0) rotateY(var(--end, 720deg)); } }
     .ly-toss-ctrl { display: flex; flex-direction: column; gap: 6px; }
     .ly-toss-ctrl .fb-btn { min-width: 9em; }
+    /* 摇一摇：开着时按钮亮起，前面一颗点慢慢呼吸 */
+    #shakeBtn.on { border-color: var(--zi-2); color: var(--fg); background: rgba(122, 91, 192, .22); }
+    #shakeBtn.on::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--zi-2); animation: lyBreath 1.4s ease-in-out infinite; }
+    @keyframes lyBreath { 50% { opacity: .25; transform: scale(.7); } }
     .ly-stack { display: flex; flex-direction: column-reverse; gap: 4px; min-width: 120px; }
     .ly-stack div { display: grid; grid-template-columns: 2.6em 64px 1.4em; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); font-family: var(--font-title); }
     .ly-stack svg { width: 64px; height: 8px; }
@@ -173,6 +177,7 @@
         <div class="ly-coins" id="coins" aria-hidden="true"></div>
         <div class="ly-toss-ctrl">
           <button class="fb-btn primary" id="tossBtn" type="button">摇第一爻</button>
+          <button class="fb-btn" id="shakeBtn" type="button" aria-pressed="false" title="手机上点开后，晃一下手机就摇一爻" hidden>摇一摇</button>
           <div class="fb-row"><button class="fb-btn ghost" id="tossAll" type="button">一气摇完</button><button class="fb-btn ghost" id="tossReset" type="button">重来</button></div>
         </div>
         <div class="ly-stack" id="stack" aria-live="polite"></div>
@@ -195,6 +200,7 @@
         <button class="fb-btn primary" id="saveBtn" type="button">存卦</button>
         <button class="fb-btn" id="copyBtn" type="button">复制</button>
         <button class="fb-btn" id="aiBtn" type="button" title="把卦连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button class="fb-btn" id="shareBtn" type="button" title="把这一卦画成一张图，可存可分享">分享图</button>
       </div>
       <select id="libSel" aria-label="卦例"><option value="">卦例（存过的卦）</option></select>
       <p class="fb-fine">摇卦用浏览器的密码学随机数，每爻三钱：背三、字二，合六为交（老阴）、七为单、八为拆、九为重（老阳）。</p>
@@ -207,8 +213,8 @@
       <section class="fb-card ly-card ly-text" id="textCard" hidden></section>
     </div>
     <aside class="ly-side">
-      <section class="fb-card ly-card" id="infoCard" hidden></section>
-      <section class="fb-card ly-card" id="yongCard" hidden></section>
+      <section class="fb-card ly-card" id="infoCard" hidden data-gloss></section>
+      <section class="fb-card ly-card" id="yongCard" hidden data-gloss></section>
       <section class="fb-card ly-card" id="xlrCard" hidden></section>
       <section class="fb-card ly-card ly-note">
         <h3>断语<small>随卦一并存入卦例</small></h3>
@@ -233,10 +239,10 @@
 
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
-<script src="/bazi/bazi.js?v=1"></script>
+<script src="/bazi/bazi.js?v=2"></script>
 <script src="/liuyao/liuyao.js?v=1"></script>
 <script src="/meihua/data/yao.js"></script>
-<script src="/fabao/fabao.js?v=13"></script>
+<script src="/fabao/fabao.js?v=14"></script>
 <script>
 (function () {
 'use strict';
@@ -318,6 +324,30 @@ let busy = false;
 $('tossBtn').onclick = () => { if (busy) return; busy = true; tossOne(false); setTimeout(() => { busy = false; }, 720); };
 $('tossAll').onclick = () => { if (nums.length >= 6) nums = []; while (nums.length < 6) tossOne(true); };
 $('tossReset').onclick = () => { nums = []; renderStack(); $('tossBtn').textContent = '摇第一爻'; G = null; show(); };
+// 摇一摇：手机上点开，晃一下手机摇一爻，六爻摇齐自动停（iOS 要先允许「动作与方向」）；电脑上不出这个按钮
+if (Fabao.shake && window.matchMedia && matchMedia('(pointer: coarse)').matches) {
+  const sb = $('shakeBtn');
+  let sh = null;
+  const stop = msg => {
+    if (sh) sh.stop();
+    sh = null; sb.classList.remove('on'); sb.textContent = '摇一摇'; sb.setAttribute('aria-pressed', 'false');
+    if (msg) toast(msg, 2600);
+  };
+  sb.hidden = false;
+  sb.onclick = () => {
+    if (sh) { stop(); return; }
+    Fabao.shake(() => {
+      if (busy) return;
+      busy = true; tossOne(false); setTimeout(() => { busy = false; }, 720);
+      if (nums.length >= 6) stop('六爻摇齐，卦成');
+    }).then(r => {
+      if (!r.ok) { toast(r.why, 3200); return; }
+      sh = r; sb.classList.add('on'); sb.textContent = '摇着 · 点停'; sb.setAttribute('aria-pressed', 'true');
+      toast(nums.length >= 6 ? '再摇一卦：心里默念所问，晃一下摇一爻' : '心里默念所问，晃一下摇一爻', 2600);
+      setTimeout(() => { if (sh && !sh.heard()) stop('这台设备没有动作感应，改点「' + $('tossBtn').textContent + '」'); }, 2500);
+    });
+  };
+}
 
 // —— 手动 ——
 function renderManual() {
@@ -549,6 +579,27 @@ const LY_RULES = [
   '三钱摇卦：背三字二，合六为交（老阴）、七为单、八为拆、九为重（老阳）；○ 为老阳动、✕ 为老阴动；→ 后为变卦同位之爻（静爻也列出）。'
 ].join('\n');
 $('aiBtn').onclick = () => { if (!G) { toast('先起一卦'); return; } Fabao.askAI('六爻纳甲', guaText(true), LY_RULES); };
+// 分享图：本之变为题，卦辞作金句，所问、日月、世应、动爻、用神随后；二维码回到这一卦
+$('shareBtn').onclick = () => {
+  if (!G) { toast('先起一卦'); return; }
+  const B = G.ben, V = G.bian, d = G.day, yi = i => B.yao[i - 1], T = TXT[B.name];
+  const yz = y => `${y.qin}${ZHI[y.zhi]}${WX[y.wx]}`;
+  const mv = [0, 1, 2, 3, 4, 5].filter(i => G.moving[i]).map(i => `${POS[i]}爻${yz(B.yao[i])}${V ? ' 化 ' + yz(V.yao[i]) : ''}`);
+  const pick = $('yongIn').value, r = pick ? LY.yongShen(G, pick) : null;
+  Fabao.share({
+    title: V ? `${B.name} 之 ${V.name}` : `${B.name} · 静卦`,
+    key: T && T.gua ? `「${T.gua}」` : `${B.palace}宫 · ${B.genName}`,
+    lines: [
+      ['所问', $('qIn').value.trim() || '心中默念，未记'],
+      d ? ['日月', `月建${ZHI[d.monthZhi]} · 日辰${GAN[d.dayGan]}${ZHI[d.dayZhi]} · 旬空${d.kong.map(z => ZHI[z]).join('')}`] : null,
+      ['世应', `世在${POS[B.shi - 1]}爻${yz(yi(B.shi))}，应在${POS[B.ying - 1]}爻${yz(yi(B.ying))}`],
+      ['动爻', mv.length ? mv.join('；') : '六爻安静'],
+      r ? ['用神', `${pick === '世爻' ? '世爻（自占）' : r.yong}属${WX[r.yongWx]} · 原神${r.yuan} · 忌神${r.ji}`] : null,
+      ['互卦', `${G.hu.name}`]
+    ].filter(Boolean),
+    meta: d ? `${d.w.y}.${pad(d.w.mo)}.${pad(d.w.d)} ${pad(d.w.h)}:${pad(d.w.mi)} · ${d.w.c.pillars.map(p => p.name).join(' ')}` : ''
+  });
+};
 function writeURL() {
   const q = new URLSearchParams();
   q.set('g', nums.join('')); q.set('t', $('whenIn').value);

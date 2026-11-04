@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#17131F" />
   <title>择日 · 潜蛟阁法宝库</title>
-  <meta name="description" content="择日择时：选好事项，贴上几个候选时间或给一段日子，合看黄历宜忌、时辰黄道与奇门用神，排出先后并说明理由。" />
+  <meta name="description" content="择日择时：选好事项，贴上几个候选时间或给一段日子，合看协纪宜忌、时辰黄道与奇门用神，排出先后并说明理由；挑中的时辰可一键存进手机日历。" />
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=6">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=7">
   <style>
     .zr-wrap { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr); gap: 22px; align-items: start; }
     .zr-in { display: flex; flex-direction: column; gap: 14px; position: sticky; top: calc(var(--top-h) + 14px); }
@@ -127,21 +127,23 @@
 
     <section>
       <div class="res-h"><b id="resT">排名</b><span class="fb-fine" id="resSub"></span><span class="sp"></span>
-        <button type="button" class="fb-btn" id="copyBtn">复制</button><button type="button" class="fb-btn" id="aiBtn">问 AI</button></div>
+        <button type="button" class="fb-btn" id="icsAll" title="把下面列出的时辰都存进日历（.ics，手机上点开即可加入）">全部加入</button><button type="button" class="fb-btn" id="copyBtn">复制</button><button type="button" class="fb-btn" id="aiBtn">问 AI</button><button type="button" class="fb-btn" id="shareBtn" title="把排名画成一张图，可存可分享">分享图</button></div>
       <div id="res"></div>
     </section>
   </div>
 
-  <p class="fb-fine" style="margin-top:26px">口径：一个时刻的分数＝这一天对此事的黄历分（建除宜忌、黄道黑道、冲本命、岁破四离四绝杨公忌、彭祖百忌；开日本历注再加六曜選日）＋这个时辰的值神黄道黑道与冲本命（日本历注另看先勝、先負、赤口的上午下午）＋奇门白话断语分（按事项取题型：面试→求职、考试面谈→考试、签约→签约、开业→开业、搬家→搬家、出行→出行、嫁娶→婚姻、求医→疾病，动土与祭祀只看日干时干、权重减半；先挪到以常见时辰为零再计）。23 点后算次日子时；奇门按钟点起局，不开真太阳时。分数只排先后、给理由，不是定论；吉时之外，准备与状态更要紧。</p>
+  <p class="fb-fine" style="margin-top:26px">口径：一个时刻的分数＝这一天对此事的黄历分（《协纪辨方书》的每日宜忌——取自 lunar-javascript——以及黄道黑道、大吉神、二十八宿、冲本命、岁破四离四绝杨公忌、彭祖百忌；开日本历注再加六曜選日）＋这个时辰的值神黄道黑道与冲本命（日本历注另看先勝、先負、赤口的上午下午）＋奇门白话断语分（按事项取题型：面试→求职、考试面谈→考试、签约→签约、开业→开业、搬家→搬家、出行→出行、嫁娶→婚姻、求医→疾病，动土与祭祀只看日干时干、权重减半；先挪到以常见时辰为零再计）。事项对协纪宜忌的条目：面试→赴任、会亲友（见贵）；考试面谈→入学、习艺；签约→立券、交易、纳财；开业→开市、挂匾、纳财；搬家→移徙、入宅、安香；出行→出行；嫁娶→嫁娶、纳采、订盟；求医→求医、治病、针灸；动土→动土、修造、破土、起基、修饰垣墙；祭祀→祭祀、祈福。23 点后算次日子时；奇门按钟点起局，不开真太阳时。分数只排先后、给理由，不是定论；吉时之外，准备与状态更要紧。「加入日历」把时辰存成 .ics（起止写 UTC，日历按所在时区显示），手机上点开即可加入。</p>
 </main>
 
-<script src="/fabao/fabao.js?v=13"></script>
+<script src="/fabao/fabao.js?v=14"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/fabao/kyureki.js?v=1"></script>
-<script src="/fabao/tongshu.js?v=1"></script>
-<script src="/qimen/core.js?v=4"></script>
-<script src="/zeri/zeri.js?v=1"></script>
+<script src="/fabao/tongshu-shensha.js?v=1"></script>
+<script src="/fabao/tongshu-hou.js?v=1"></script>
+<script src="/fabao/tongshu.js?v=2"></script>
+<script src="/qimen/core.js?v=5"></script>
+<script src="/zeri/zeri.js?v=2"></script>
 <script>
 (function () {
   'use strict';
@@ -234,6 +236,7 @@
       <div class="acts">
         <a href="/qimen/?t=${iso(d)}${E.qm !== '自由' ? '&type=' + encodeURIComponent(E.qm) : ''}">看奇门盘</a>
         <a href="/huangli/?d=${ymd(d)}&do=${encodeURIComponent(E.k)}">看这天黄历</a>
+        <button type="button" data-ics="${i}" title="存成 .ics，手机上点开即可加入日历">加入日历</button>
         ${mode === 'cand' ? `<button type="button" data-rm="${d.getTime()}">移除</button>` : ''}
       </div>
     </article>`;
@@ -264,8 +267,19 @@
     $('res').innerHTML = shown.length ? shown.map(card).join('') + (mode === 'find' && list.length > showN ? `<button type="button" class="fb-btn more" id="moreBtn">再看 ${Math.min(10, list.length - showN)} 个</button>` : '')
       : `<div class="fb-card fb-empty">${mode === 'cand' ? '先在左边贴上候选时间' : '这段日子里没有合适的时辰（或都已过去）'}</div>`;
     $('res').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { cands = cands.filter(x => x.getTime() !== +b.dataset.rm); saveC(); render(); });
+    $('res').querySelectorAll('[data-ics]').forEach(b => b.onclick = () => saveICS([shown[+b.dataset.ics]]));
+    $('icsAll').hidden = !shown.length;
     const mb = $('moreBtn'); if (mb) mb.onclick = () => { showN += 10; render(); };
   }
+  // 存进日历：每个时辰一条定时事项（UTC 起止）
+  function saveICS(list) {
+    if (!list.length) { Fabao.toast('还没有结果'); return; }
+    const E = TS.EV_BY[ev], d0 = list[0].date;
+    const name = list.length === 1 ? `zeri-${E.py}-${ymd(d0)}-${pad(d0.getHours())}${pad(d0.getMinutes())}.ics` : `zeri-${E.py}-${list.length}.ics`;
+    const res = TS.saveICS(name, TS.ics(list.map(ZR.toEvent), `潜蛟阁择日 · ${E.name}`));
+    Fabao.toast(res === 'inapp' ? '这是应用内浏览器，若没存下，请用 Safari 或 Chrome 打开本页再点' : list.length === 1 ? '已生成日历文件，打开即可加入日历' : `已生成 ${list.length} 个时辰的日历文件`, 3200);
+  }
+  $('icsAll').onclick = () => saveICS(last.slice(0, mode === 'find' ? showN : 99));
   function resultText() {
     const E = TS.EV_BY[ev];
     return [`择日 ·「${E.name}」${byear ? '（' + byear + '年生，属' + TS.SX[sxOf(byear)] + '）' : ''}`]
@@ -276,8 +290,21 @@
       })).concat(['—— 潜蛟阁 · 择日 ohwowbill.com/zeri/']).join('\n');
   }
   $('copyBtn').onclick = () => last.length ? Fabao.copy(resultText(), '排名已复制') : Fabao.toast('还没有结果');
+  // 分享图：事项为题，头一名作金句，前几名随后
+  $('shareBtn').onclick = () => {
+    if (!last.length) { Fabao.toast('还没有结果'); return; }
+    const E = TS.EV_BY[ev], when = e => `${e.date.getMonth() + 1}月${e.date.getDate()}日 周${WEEK[e.date.getDay()]} ${pad(e.date.getHours())}:${pad(e.date.getMinutes())}`;
+    const top = last.slice(0, 6), a = top[0];
+    Fabao.share({
+      title: `择日 · ${E.name}`,
+      key: `首选 ${when(a)}（${a.hour.name}）· ${a.grade}`,
+      lines: top.slice(1).map((e, i) => [`第${'二三四五六'[i]}`, `${when(e)} ${e.grade}：${e.pros.slice(0, 2).map(x => short(x.t)).join('、') || '—'}`]),
+      meta: `黄历宜忌 · 时辰黄黑道 · 奇门用神合看`,
+      url: location.origin + '/zeri/', qrLabel: '扫码也挑一个日子'
+    });
+  };
   $('aiBtn').onclick = () => last.length ? Fabao.askAI('择日（通书与奇门）', resultText(),
-    '日：建除十二神宜忌（通书简本）、值神黄道黑道、冲本命、岁破四离四绝杨公忌、彭祖百忌；时：时辰值神与冲；奇门：时家转盘拆补，按事项取用神（面试看开门值符日干时干，考试面谈看景门丁奇天辅日干），用神与日干宫生克、空墓刑迫、神将格局，伏吟反吟五不遇时扣分。' + (jp ? '另计日本六曜選日。' : '')) : Fabao.toast('还没有结果');
+    '日：《协纪辨方书》每日宜忌（事项对应：面试→赴任、会亲友；签约→立券、交易；开业→开市、挂匾、纳财；搬家→移徙、入宅、安香；动土→动土、修造、破土等）、值神黄道黑道、天德月德等大吉神、二十八宿、冲本命、岁破四离四绝杨公忌、彭祖百忌；时：时辰值神与冲；奇门：时家转盘拆补，按事项取用神（面试看开门值符日干时干，考试面谈看景门丁奇天辅日干），用神与日干宫生克、空墓刑迫、神将格局，伏吟反吟五不遇时扣分。' + (jp ? '另计日本六曜選日。' : '')) : Fabao.toast('还没有结果');
   render();
 })();
 </script>

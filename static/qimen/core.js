@@ -21,6 +21,16 @@
      九星用奇门星法（我生令旺、同令相、令生我休、令克我囚、我克令废）。
    · 真太阳时只改日柱、时柱（钟点）；节气、年柱、月柱按真实时刻。
    · 年命：出生年的年干（甲遁旬首六仪），看天盘落宫。
+   · 定局流派 opts.school（只管「用哪个节气的哪一元」，排盘其余一概相同）：
+     拆补（默认，不传即是）：节气按交节时刻，元按日柱符头（甲己日）之支，子午卯酉上元、寅申巳亥中元、辰戌丑未下元。
+     置闰 'zhirun'：上元符头（甲子、己卯、甲午、己酉日）起每十五日统领一个节气，元仍按符头。
+       二至由交节日前 0–7 日的上元符头统领（超神 / 正授）；差到 8 日以上——古书含头计作「超九日」，
+       《奇门遁甲统宗》康熙五十七年例：五月十六甲子、廿四夏至，「乃超过九日矣」——则不作二至上元，
+       而在其前的芒种或大雪重用一遍本气三元（闰奇），二至改由下一个符头统领（接气）。
+       符头链的交节日按北京时间（东经 120°）计，与通行历书一致，不随本机时区变。
+       同 arc119226/qimen_dunjia（MIT）的符头链、atopx/qimen（MIT）的 ZhiRunTerm，见 scripts/qimen/check.js。
+     茅山 'maoshan'：不论符头。交节即用本节气上元，从交节所在时辰数起，上元用满六十时辰（五日）接中元，
+       再六十时辰接下元；下元用满而新节气未到，仍用下元。同 deminzhang/qimen-go（MIT）的茅山法。
    浏览器里挂 window.QM；node 里 require 即得同一对象。
    ========================================================= */
 (function (root) {
@@ -87,6 +97,30 @@
   var RANGE = { min: TERMS[0].t + 31 * DAY, max: TERMS[TERMS.length - 1].t - 31 * DAY };
   function inRange(dt) { var ms = dt.getTime(); return ms >= RANGE.min && ms <= RANGE.max; }
 
+  // —— 定局流派 ——
+  var SCHOOLS = { chaibu: '拆补', zhirun: '置闰', maoshan: '茅山' };
+  var ZHIRUN_LEAD = 7;                    // 上元符头早于二至交节日至多 7 个历日仍统领之；8 日起置闰
+  function dayNoCN(t) { return Math.floor((t + 8 * 3600e3) / DAY) + 2440588; }   // 北京时间的历日（儒略日数）
+  function dayIdxOf(Jd) { return mod(Jd - 2415021 + 10, 60); }
+  function isSolstice(k) { return TERMS[k].n === '冬至' || TERMS[k].n === '夏至'; }
+  // 置闰：f 为所问之日的上元符头（儒略日数），返回 { i: 用局节气在 TERMS 的下标, leap: 是否闰奇, chao: 节气日减符头日 }
+  function zhirunAt(f, termIdx) {
+    var sol = [], k;                      // 由近及远：将到的二至、本半年起头的二至、再前一个
+    for (k = termIdx + 1; k < TERMS.length && !sol.length; k++) if (isSolstice(k)) sol.push(k);
+    for (k = termIdx; k >= 0 && sol.length < 3; k--) if (isSolstice(k)) sol.push(k);
+    for (var j = 0; j < sol.length; j++) {
+      var zi = sol[j], zd = dayNoCN(TERMS[zi].t), lead = dayIdxOf(zd) % 15, g = zd - lead;
+      if (lead > ZHIRUN_LEAD) g += 15;    // 超神太远：此二至改由下一个符头统领，前一个芒种 / 大雪闰
+      if (g > f) continue;
+      var step = (f - g) / 15, leap = step > 11, i = zi + Math.min(step, 11);
+      if (i >= TERMS.length) return null;
+      return { i: i, leap: leap, chao: leap ? null : dayNoCN(TERMS[i].t) - f };
+    }
+    return null;
+  }
+  // 茅山：本机（或真太阳时）钟点上的时辰序数，子时起于 23 点
+  function shichenNo(t) { var w = t - new Date(t).getTimezoneOffset() * 60000; return Math.floor((w + 3600e3) / 7200e3); }
+
   // —— 真太阳时 ——
   // 均时差（分钟），NOAA 分数年公式，误差一分钟内
   function eqTime(dt) {
@@ -120,7 +154,7 @@
     return '废';
   }
 
-  // opts: { solarLon: 经度（开真太阳时）, mingYear: 出生年（年命） }
+  // opts: { solarLon: 经度（开真太阳时）, mingYear: 出生年（年命）, school: 'zhirun' | 'maoshan'（不传为拆补） }
   function computeChart(dt, juOverride, opts) {
     opts = opts || {};
     var ms = dt.getTime();
@@ -153,8 +187,23 @@
     var dstem = dayIdx % 10;
     var futou = mod(dayIdx - dstem % 5, 60), fb = futou % 12;
     var yuan = [0, 6, 3, 9].indexOf(fb) >= 0 ? 0 : [2, 8, 5, 11].indexOf(fb) >= 0 ? 1 : 2;
-    var isYang = juOverride ? juOverride.yang : YANG_TERMS.indexOf(term.n) >= 0;
-    var ju = juOverride ? juOverride.ju : JU[term.n][yuan];
+    // 流派：置闰换「用局节气」，茅山换「元」；拆补（默认）两者都照上面
+    var school = opts.school && opts.school !== 'chaibu' && SCHOOLS[opts.school] ? opts.school : null;
+    var juTerm = term, sx = null;
+    if (school === 'zhirun') {
+      var zr = zhirunAt(Jd - dayIdx % 15, termIdx);
+      if (zr) {
+        juTerm = TERMS[zr.i];
+        sx = { leap: zr.leap, chao: zr.chao, chaoName: zr.leap ? '闰' : zr.chao > 0 ? '超神' : zr.chao < 0 ? '接气' : '正授' };
+      }
+    } else if (school === 'maoshan') {
+      var shiftAt = function (t) { return solar ? solarClock(new Date(t), opts.solarLon).shift * 60000 : 0; };
+      var nShi = Math.max(0, shichenNo(ms + shiftAt(ms)) - shichenNo(term.t + shiftAt(term.t)));
+      yuan = Math.min(2, Math.floor(nShi / 60));
+      sx = { shichen: nShi };
+    }
+    var isYang = juOverride ? juOverride.yang : YANG_TERMS.indexOf(juTerm.n) >= 0;
+    var ju = juOverride ? juOverride.ju : JU[juTerm.n][yuan];
 
     // 地盘
     var earth = {};
@@ -244,7 +293,7 @@
       ming = { year: my, gz: gzName(mIdx), stem: mStem, skyP: skyP, earthP: palaceOfStem(mStem) };
     }
 
-    return {
+    var chart = {
       date: new Date(ms), clock: clock, solar: solar, ming: ming, ws: ws,
       pillars: { year: gzName(yearIdx), month: gzName(monthIdx), day: gzName(dayIdx), hour: gzName(hIdx) },
       idx: { year: yearIdx, month: monthIdx, day: dayIdx, hour: hIdx },
@@ -259,6 +308,15 @@
       earth: earth, sky: sky, doors: doors, gods: gods, diGods: diGods, hidden: hidden, marks: marks,
       palaceName: PALACE_NAME
     };
+    // 非默认流派才多带这几项，拆补盘与从前一字不差
+    // juTerm：用局节气（置闰时可先于或后于天文节气 term）；置闰另有 leap / chao（节气日减上元符头日，正为超神、负为接气）
+    // / chaoName；茅山另有 shichen（交节时辰起已过几个时辰，0 起）
+    if (school) {
+      chart.school = school; chart.schoolName = SCHOOLS[school];
+      chart.juTerm = juTerm.n; chart.juTermStart = juTerm;
+      for (var key in sx) chart[key] = sx[key];
+    }
+    return chart;
   }
 
   /* ================= 格局 ================= */
@@ -620,6 +678,7 @@
   var api = {
     computeChart: computeChart, analyze: analyze, palaceDetail: palaceDetail, inRange: inRange, RANGE: RANGE,
     solarClock: solarClock, findHours: findHours, yongshen: yongshen, verdict: verdict, yingqi: yingqi, TOPICS: TOPICS, dayIndexOf: dayIndexOf,
+    SCHOOLS: SCHOOLS,
     TERMS: TERMS, STEMS: STEMS, BRANCHES: BRANCHES, GRID: GRID, PNUM: PNUM, PALACE_NAME: PALACE_NAME, GOD_SHORT: GOD_SHORT,
     STEM_WX: STEM_WX, STAR_WX: STAR_WX, DOOR_WX: DOOR_WX, GOD_WX: GOD_WX
   };

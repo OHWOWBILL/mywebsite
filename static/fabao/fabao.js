@@ -2,7 +2,9 @@
 // 法宝库 · 共用外框
 // 顶栏与法宝切换只在这里写一次；各件法宝都在 <body data-tool="…">
 // 里引入本文件，就会得到同一套导航、提示条与干支小工具。
-// 几件同类的法宝合成「一家」（命部、堪舆、通书）：顶栏只留一个标签，进来后在家族条里切换。
+// 几件同类的法宝合成「一家」（通书、三式、命部、堪舆、医部）：顶栏只留一个标签，进来后在家族条里切换。
+// 另有几样各件共用的：手机底栏（常用几件＋全部）、术语小词典、印章落笔、摇一摇、
+// 分享图（/fabao/share.js）、本机存档备份与扫码带走（/fabao/backup.js）、离线（/sw.js）。
 // =========================================================
 
 (function () {
@@ -26,25 +28,52 @@
     zeri: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 9.5h16M8.5 3.5v3M15.5 3.5v3M9 14.6l2.1 2 3.9-4"/></svg>',
     liunian: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.5 1.5M16.5 16.5L18 18M6 18l1.5-1.5M16.5 7.5L18 6"/></svg>',
     jiuxing: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.5"/><circle cx="12" cy="6" r="1.5"/><circle cx="18" cy="6" r="1.5"/><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="2.6"/><circle cx="18" cy="12" r="1.5"/><circle cx="6" cy="18" r="1.5"/><circle cx="12" cy="18" r="1.5"/><circle cx="18" cy="18" r="1.5"/></svg>',
-    hepan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="5.6"/><circle cx="15" cy="12" r="5.6"/></svg>'
+    hepan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="5.6"/><circle cx="15" cy="12" r="5.6"/></svg>',
+    // 三式：天圆地方的式盘；六壬天盘在地盘上转；太乙一星行九宫
+    sanshi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><circle cx="12" cy="12" r="5.6"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>',
+    liuren: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 6.2l5.8 5.8-5.8 5.8-5.8-5.8z"/></svg>',
+    taiyi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M3.5 12h17" stroke-opacity=".45"/><circle cx="16.2" cy="7.8" r="1.9" fill="currentColor" stroke="none"/></svg>',
+    lingqian: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 10.5h11l-1.3 9.5H7.8z"/><path d="M9.5 10.5V4M12 10.5V2.8M14.5 10.5V5"/></svg>',
+    yibu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8v2"/><path d="M10 5.2h4c0 1.6-.7 2.4-1 3 3.4.9 5.2 3.4 5.2 6.4 0 3.5-2.8 5.9-6.2 5.9s-6.2-2.4-6.2-5.9c0-3 1.8-5.5 5.2-6.4-.3-.6-1-1.4-1-3z"/></svg>',
+    tizhi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.6" r="2.4"/><path d="M6.8 20.5v-6a5.2 5.2 0 0 1 10.4 0v6"/><path d="M12 11.5v4"/></svg>',
+    xingming: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="3.5" width="13" height="17" rx="1.5"/><path d="M9 8h6M9 12h6M9 16h3.5"/></svg>',
+    all: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.3"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.3"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.3"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.3"/></svg>'
   };
   // men = 归哪一门（五术门庭 data/wushu.toml）；desc = 法宝库大堂（/tools/）上那一行，短到一眼看完即可
   const TOOLS = [
     { id: 'tongshu', name: '通书', href: '/huangli/', men: '卜', desc: '黄历、择日、流年' },  // 黄历、择日、流年三件在通书里切换
     { id: 'meihua', name: '梅花', href: '/meihua/', men: '卜', desc: '此刻起卦，本互变并排' },
     { id: 'liuyao', name: '六爻纳甲', short: '六爻', href: '/liuyao/', men: '卜', desc: '摇卦装卦，旺衰逐爻标' },
-    { id: 'qimen', name: '奇门手记', short: '奇门', href: '/qimen/', men: '卜', desc: '起局看断语，回头复盘' },
-    { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字 · 紫微 · 占星 · 合盘' },     // 星命同参：八字、紫微、占星、合盘、读盘都在命部里切换
-    { id: 'kanyu', name: '堪舆', href: '/kanyu/', men: '山', desc: '玄空飞星、八宅、九星气学' },     // 玄空八宅、九星气学
+    { id: 'sanshi', name: '三式', href: '/qimen/', men: '卜', desc: '奇门、六壬、太乙' },         // 奇门、六壬、太乙三件在三式里切换
+    { id: 'lingqian', name: '灵签', href: '/lingqian/', men: '卜', desc: '掷筊求签，签诗白话' },
+    { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字、紫微、占星、合盘、姓名' },  // 星命同参：八字、紫微、占星、合盘、姓名、读盘
     { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/', men: '命', desc: '干支旺衰速查' },
-    { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/', men: '医', desc: '按时开穴，四法并排' },
-    { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/', men: '医', desc: '岁运、司天在泉、六步' },
+    { id: 'kanyu', name: '堪舆', href: '/kanyu/', men: '山', desc: '玄空飞星、八宅、九星气学' },     // 玄空八宅、九星气学
+    { id: 'yibu', name: '医部', href: '/ziwu/', men: '医', desc: '子午流注、五运六气、体质辨识' },   // 流注、运气、体质
     { id: 'xiangbu', name: '相部', href: '/xiangbu/', men: '相', lock: true, desc: '相法读书卡与字相九宫' }  // 口令加密页，未解禁时为锁屏
   ];
+  // 旧版记下的顶栏标签（奇门、流注、运气原先各占一格）
+  const OLD_TAB = { qimen: 'sanshi', ziwu: 'yibu', yunqi: 'yibu' };
 
   // —— 一家：顶栏一个标签，进来后在家族条里切换 ——
-  // 命部：八字、紫微、占星、合盘公开；读盘是口令加密页（/mingbu/），未解禁时为锁屏。
+  // 命部：八字、紫微、占星、合盘、姓名公开；读盘是口令加密页（/mingbu/），未解禁时为锁屏。
   const FAMILIES = {
+    tongshu: {
+      name: '通书', sub: '选择', hint: '黄历看日子，择日排时辰，流年看一年', lsLast: 'tongshu.last',
+      items: [
+        { id: 'huangli', name: '黄历', href: '/huangli/' },
+        { id: 'zeri', name: '择日', href: '/zeri/' },
+        { id: 'liunian', name: '流年', href: '/liunian/' }
+      ]
+    },
+    sanshi: {
+      name: '三式', sub: '式占', hint: '奇门看事看时，六壬看人看情，太乙看大势', lsLast: 'sanshi.last',
+      items: [
+        { id: 'qimen', name: '奇门', href: '/qimen/' },
+        { id: 'liuren', name: '六壬', href: '/liuren/' },
+        { id: 'taiyi', name: '太乙', href: '/taiyi/' }
+      ]
+    },
     mingbu: {
       name: '命部', sub: '星命同参', hint: '同一生辰，几种看法；换一件，人跟着走', people: true, lsLast: 'mingbu.last',
       items: [
@@ -52,6 +81,7 @@
         { id: 'ziwei', name: '紫微', href: '/ziwei/' },
         { id: 'xingpan', name: '占星', href: '/xingpan/' },
         { id: 'hepan', name: '合盘', href: '/hepan/' },
+        { id: 'xingming', name: '姓名', href: '/xingming/' },
         { id: 'mingbu', name: '读盘', href: '/mingbu/', lock: true }
       ]
     },
@@ -62,20 +92,34 @@
         { id: 'jiuxing', name: '九星气学', short: '九星', href: '/jiuxing/' }
       ]
     },
-    tongshu: {
-      name: '通书', sub: '选择', hint: '黄历看日子，择日排时辰，流年看一年', lsLast: 'tongshu.last',
+    yibu: {
+      name: '医部', sub: '岐黄', hint: '按时开穴，按年看气，按人看体质', lsLast: 'yibu.last',
       items: [
-        { id: 'huangli', name: '黄历', href: '/huangli/' },
-        { id: 'zeri', name: '择日', href: '/zeri/' },
-        { id: 'liunian', name: '流年', href: '/liunian/' }
+        { id: 'ziwu', name: '子午流注', short: '流注', href: '/ziwu/' },
+        { id: 'yunqi', name: '五运六气', short: '运气', href: '/yunqi/' },
+        { id: 'tizhi', name: '体质辨识', short: '体质', href: '/tizhi/' }
       ]
     }
   };
-  const MINGBU = FAMILIES.mingbu.items;
-  const LS_BIRTH = 'mingbu.birth.v1', LS_PEOPLE = 'mingbu.people.v1', LS_KU_LAST = 'fabao.last';
+  const LS_BIRTH = 'mingbu.birth.v1', LS_PEOPLE = 'mingbu.people.v1', LS_KU_LAST = 'fabao.last', LS_USE = 'fabao.use';
   const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* 无痕模式 */ } };
   const famOf = id => { for (const k in FAMILIES) { const it = FAMILIES[k].items.find(t => t.id === id); if (it) return { key: k, fam: FAMILIES[k], item: it }; } return null; };
+  const escH = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 用到才取的脚本（分享图、存档、二维码、词典）；同一个只取一回
+  const loaded = {};
+  function loadScript(src) {
+    if (!loaded[src]) loaded[src] = new Promise((ok, bad) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = () => ok();
+      s.onerror = () => { delete loaded[src]; bad(new Error('没取到 ' + src)); };
+      document.head.appendChild(s);
+    });
+    return loaded[src];
+  }
 
   // —— 共享生辰：命部几件谁起了盘就记下来，换一件时带过去，同一个人几种看法 ——
   // { when: 出生地钟表时间 'YYYY-MM-DDTHH:MM', male, name, tz, lon, lat, sun（真太阳时）, dst（夏令时）, city }
@@ -111,7 +155,7 @@
   }
   // 把共享生辰写成某件法宝认得的网址参数
   function birthQuery(id, b) {
-    if (!b || !b.when || id === 'mingbu' || id === 'hepan') return '';
+    if (!b || !b.when || id === 'mingbu' || id === 'hepan' || id === 'xingming') return '';
     const q = new URLSearchParams();
     if (id === 'bazi') {
       q.set('d', b.when); q.set('g', b.male === false ? '0' : '1');
@@ -140,8 +184,8 @@
   function refreshMingbuLinks() {
     document.querySelectorAll('[data-fam-item]').forEach(a => { a.href = famHref(a.dataset.fam, a.dataset.famItem); });
     Object.keys(FAMILIES).forEach(k => {
-      const tab = document.querySelector('.fb-tab[data-tab="' + k + '"]');
-      if (tab) tab.href = famHref(k, lsGet(FAMILIES[k].lsLast) || FAMILIES[k].items[0].id);
+      const href = famHref(k, lsGet(FAMILIES[k].lsLast) || FAMILIES[k].items[0].id);
+      document.querySelectorAll('.fb-tab[data-tab="' + k + '"]').forEach(tab => { tab.href = href; });
     });
   }
 
@@ -183,13 +227,12 @@
     const box = famBar.querySelector('.ppl');
     if (!box) return;
     const list = loadPeople(), cur = currentPerson(), b = loadBirth();
-    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    box.innerHTML = list.map(p => `<span class="pc${cur && cur.id === p.id ? ' on' : ''}"><button type="button" data-pid="${p.id}" title="换成${esc(p.name)}的命盘">${esc(p.name)}</button>${cur && cur.id === p.id ? `<button type="button" class="x" data-del="${p.id}" title="删掉这个人" aria-label="删掉${esc(p.name)}">×</button>` : ''}</span>`).join('') +
+    box.innerHTML = list.map(p => `<span class="pc${cur && cur.id === p.id ? ' on' : ''}"><button type="button" data-pid="${p.id}" title="换成${escH(p.name)}的命盘">${escH(p.name)}</button>${cur && cur.id === p.id ? `<button type="button" class="x" data-del="${p.id}" title="删掉这个人" aria-label="删掉${escH(p.name)}">×</button>` : ''}</span>`).join('') +
       (b && b.when && !cur ? `<button type="button" class="add" title="把当前这一盘存成一个人，下次一点就换">＋ 存为…</button>` : list.length ? '' : `<span class="none">起一盘后可存，下次一点就换人</span>`);
     box.querySelectorAll('[data-pid]').forEach(btn => btn.onclick = () => {
       const nb = usePerson(btn.dataset.pid);
       const t = famOf(curTool);
-      if (nb && t && t.key === 'mingbu' && !t.item.lock) location.href = t.item.href + birthQuery(t.item.id, nb);
+      if (nb && t && t.key === 'mingbu' && !t.item.lock && birthQuery(t.item.id, nb)) location.href = t.item.href + birthQuery(t.item.id, nb);
       else { refreshMingbuLinks(); renderPeople(); document.dispatchEvent(new CustomEvent('fabao:person')); }
     });
     box.querySelectorAll('[data-del]').forEach(btn => btn.onclick = () => {
@@ -198,7 +241,7 @@
     });
     const add = box.querySelector('.add');
     if (add) add.onclick = () => {
-      add.outerHTML = `<span class="ask"><input type="text" maxlength="12" placeholder="叫什么" value="${esc((b && b.name) || (list.length ? '' : '本人'))}" aria-label="名字"><button type="button">存</button></span>`;
+      add.outerHTML = `<span class="ask"><input type="text" maxlength="12" placeholder="叫什么" value="${escH((b && b.name) || (list.length ? '' : '本人'))}" aria-label="名字"><button type="button">存</button></span>`;
       const inp = box.querySelector('.ask input'), go = () => { if (addPerson(inp.value.trim() || '未名')) { toast('已存，下次在这里一点就换'); renderPeople(); } };
       inp.focus(); inp.select();
       inp.onkeydown = e => { if (e.key === 'Enter') go(); if (e.key === 'Escape') renderPeople(); };
@@ -206,15 +249,41 @@
     };
   }
 
+  // —— 手机底栏：顶栏的法宝一多，手机上只放常用的四件，末一格「全部」回大堂 ——
+  // 常用按本机用过的次数排（fabao.use），没用过的先放通书、梅花、三式、命部；正在用的那件总在栏上。
+  // 四件按顶栏次序摆，位置不跟着次数乱跳。
+  const DOCK_DEF = ['tongshu', 'meihua', 'sanshi', 'mingbu'];
+  function useCounts() { try { return JSON.parse(lsGet(LS_USE)) || {}; } catch (e) { return {}; } }
+  function bumpUse(tab) { const u = useCounts(); u[tab] = (u[tab] || 0) + 1; lsSet(LS_USE, JSON.stringify(u)); }
+  function dockIds(cur) {
+    const u = useCounts();
+    // 默认四件先垫 2.5 次，用过三回以上的才挤得掉它们
+    const n = t => (u[t.id] || 0) + (DOCK_DEF.indexOf(t.id) >= 0 ? 2.5 - DOCK_DEF.indexOf(t.id) * 0.1 : 0);
+    const top = TOOLS.filter(t => !t.lock).sort((a, b) => n(b) - n(a) || TOOLS.indexOf(a) - TOOLS.indexOf(b)).slice(0, 4).map(t => t.id);
+    if (cur && TOOLS.some(t => t.id === cur) && top.indexOf(cur) < 0) top[3] = cur;
+    return TOOLS.filter(t => top.indexOf(t.id) >= 0).map(t => t.id);
+  }
+  function mountDock(curTab, isKu) {
+    const nav = document.createElement('nav');
+    nav.className = 'fb-dock';
+    nav.setAttribute('aria-label', '常用法宝');
+    nav.innerHTML = dockIds(isKu ? null : curTab).map(id => {
+      const t = TOOLS.find(x => x.id === id), on = id === curTab;
+      return `<a class="fb-tab${on ? ' on' : ''}" href="${t.href}" data-tab="${id}"${on ? ' aria-current="page"' : ''}>${ICONS[id]}<span>${t.short || t.name}</span></a>`;
+    }).join('') + `<a class="fb-tab all${isKu ? ' on' : ''}" href="/tools/"${isKu ? ' aria-current="page"' : ''} title="法宝库大堂：全部法宝">${ICONS.all}<span>全部</span></a>`;
+    document.body.appendChild(nav);
+  }
+
   function mountShell() {
     const cur = curTool = document.body.dataset.tool;
     const F = famOf(cur);
     const curTab = F ? F.key : cur;
     const isKu = cur === 'ku';   // 法宝库大堂 /tools/：顶栏照旧，正文由 mountKu 现排
+    const locked = !!document.querySelector('.lock-wrap');
     // 记下上回用的是哪一件（一家记家名），大堂上给「接着用」；锁屏页不算
-    if (!isKu && TOOLS.some(t => t.id === curTab) && !document.querySelector('.lock-wrap')) lsSet(LS_KU_LAST, curTab);
+    if (!isKu && TOOLS.some(t => t.id === curTab) && !locked) { lsSet(LS_KU_LAST, curTab); bumpUse(curTab); }
     // 记下这一家上次用的是哪件；锁屏页（.lock-wrap）不记，免得访客每次点进来都落到锁屏
-    if (F && !(F.item.lock && document.querySelector('.lock-wrap'))) lsSet(F.fam.lsLast, F.item.id);
+    if (F && !(F.item.lock && locked)) lsSet(F.fam.lsLast, F.item.id);
     const top = document.createElement('header');
     top.className = 'fb-top';
     top.innerHTML = `
@@ -243,8 +312,9 @@
       top.after(bar);
       renderPeople();
     }
+    mountDock(curTab, isKu);
     refreshMingbuLinks();
-    // 法宝一多，顶栏（与手机底栏）都用两字简称；当前这件滚进视野
+    // 法宝一多，顶栏都用两字简称；当前这件滚进视野
     if (window.matchMedia('(max-width: 1500px)').matches) {
       top.querySelectorAll('.fb-tab .full').forEach((el, i) => { if (TOOLS[i].short) el.textContent = TOOLS[i].short; });
     }
@@ -347,21 +417,265 @@ ${body}${rules ? '\n\n【口径】\n' + rules : ''}`;
     (window.Fabao && window.Fabao.copy || copy)(text, '已复制，贴给任意 AI 即可');   // 走 Fabao.copy，测试时可替换
   }
 
+  // —— 分享图：把这一盘画成 3:4 竖图，可存可分享，图上二维码扫了回到这一盘 ——
+  // Fabao.share({ title, key, lines: ['…' | ['标签', '…']], meta, url }) ；不给的从页面上取（印、标题、白话卡）
+  function share(opt) {
+    return loadScript('/fabao/share.js?v=1').then(() => window.FabaoShare.open(opt || {}), () => toast('分享图没载入，联网后再试'));
+  }
+  // 二维码（Kazuhiko Arase 的 qrcode-generator，MIT，/fabao/vendor/）：{ n, dark(r, c) }
+  function qr(text, ecc) {
+    return loadScript('/fabao/vendor/qrcode.js?v=1.4.4').then(() => {
+      const Q = window.qrcode;
+      if (Q.stringToBytesFuncs && Q.stringToBytesFuncs['UTF-8']) Q.stringToBytes = Q.stringToBytesFuncs['UTF-8'];
+      const q = Q(0, ecc || 'M');
+      q.addData(text, 'Byte');
+      q.make();
+      return { n: q.getModuleCount(), dark: (r, c) => q.isDark(r, c) };
+    });
+  }
+
+  // —— 摇一摇：手机晃一下回调一次。iOS 13+ 要在点按里先讨权限，所以只在按钮的点击里调用 ——
+  // 返回 Promise<{ ok, stop(), heard() }>；ok 为 false 时带 why（一句话说为什么）
+  function shake(onShake, opt) {
+    opt = opt || {};
+    const DM = window.DeviceMotionEvent;
+    if (!DM) return Promise.resolve({ ok: false, why: '这台设备没有动作感应' });
+    const ask = typeof DM.requestPermission === 'function' ? DM.requestPermission().catch(() => 'denied') : Promise.resolve('granted');
+    return ask.then(st => {
+      if (st !== 'granted') return { ok: false, why: '没拿到动作感应的权限，可在浏览器设置里打开' };
+      let last = 0, prev = null, prevT = 0, heard = false;
+      const th = opt.threshold || 18, gap = opt.gap || 800;
+      const on = e => {
+        const a = e.accelerationIncludingGravity || e.acceleration;
+        if (!a || a.x == null) return;
+        heard = true;
+        const now = Date.now();
+        if (now - prevT < 80) return;      // 每 80 毫秒比一次，晃得猛才算
+        if (prev) {
+          const d = Math.abs(a.x - prev.x) + Math.abs(a.y - prev.y) + Math.abs(a.z - prev.z);
+          if (d > th && now - last > gap) {
+            last = now;
+            try { if (navigator.vibrate) navigator.vibrate(30); } catch (err) { /* iOS 不震 */ }
+            onShake();
+          }
+        }
+        prev = { x: a.x, y: a.y, z: a.z }; prevT = now;
+      };
+      window.addEventListener('devicemotion', on);
+      return { ok: true, stop: () => window.removeEventListener('devicemotion', on), heard: () => heard };
+    });
+  }
+
+  // —— 术语小词典 ——
+  // 白话卡（.bh）与标了 data-gloss 的地方：每处头一回出现的术语描一道虚线，点一下看一句解释。
+  // 词条在 /fabao/cidian.js（window.QJ_CIDIAN = [[词, 解释, '别名|别名'], …]），页面上有这类地方才去取。
+  // 不想标的地方写 data-gloss="off"。
+  const GLOSS = '.bh, [data-gloss]';
+  const NO_GLOSS = 'fb-t, a, button, input, textarea, select, option, label, script, style, svg, code, [contenteditable], [data-gloss="off"], .fb-key';
+  let gloss = null, glossP = null, gloMO = null, gloTimer = 0, gloPop = null, gloCur = null;
+  const gloDirty = new Set();
+  function glossLoad() {
+    return glossP || (glossP = loadScript('/fabao/cidian.js?v=1').then(() => {
+      const map = new Map();
+      (window.QJ_CIDIAN || []).forEach(e => {
+        if (!e || !e[0] || !e[1]) return;
+        map.set(e[0], e);
+        String(e[2] || '').split('|').forEach(a => { if (a && !map.has(a)) map.set(a, e); });
+      });
+      const keys = [...map.keys()].sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      gloss = keys.length ? { map, re: new RegExp(keys.join('|'), 'g') } : null;
+    }, () => { gloss = null; }));
+  }
+  function glossOne(root) {
+    const MAX = 12, seen = new Set();
+    root.querySelectorAll('fb-t').forEach(t => { const e = gloss.map.get(t.dataset.t); if (e) seen.add(e[0]); });
+    if (seen.size >= MAX) return;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: x => { const p = x.parentElement; return !p || p.closest(NO_GLOSS) || !x.nodeValue.trim() ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }
+    });
+    const nodes = [];
+    while (w.nextNode()) nodes.push(w.currentNode);
+    for (const node of nodes) {
+      if (seen.size >= MAX) break;
+      const s = node.nodeValue;
+      let m, last = 0, frag = null;
+      gloss.re.lastIndex = 0;
+      while ((m = gloss.re.exec(s)) && seen.size < MAX) {
+        const e = gloss.map.get(m[0]);
+        if (!e || seen.has(e[0])) continue;
+        seen.add(e[0]);
+        frag = frag || document.createDocumentFragment();
+        frag.append(s.slice(last, m.index));
+        const t = document.createElement('fb-t');
+        t.dataset.t = m[0]; t.tabIndex = 0; t.setAttribute('role', 'button');
+        t.textContent = m[0];
+        frag.append(t);
+        last = m.index + m[0].length;
+      }
+      if (frag) { frag.append(s.slice(last)); node.replaceWith(frag); }
+    }
+  }
+  function glossFlush() {
+    const roots = new Set();
+    gloDirty.forEach(x => {
+      const el = x.nodeType === 1 ? x : x.parentElement;
+      if (!el || !el.isConnected) return;
+      const up = el.closest(GLOSS);
+      if (up) roots.add(up);
+      el.querySelectorAll(GLOSS).forEach(r => roots.add(r));
+    });
+    gloDirty.clear();
+    const list = [...roots].filter(r => r.getAttribute('data-gloss') !== 'off' && !(r.parentElement && r.parentElement.closest(GLOSS)));
+    if (!list.length) return;
+    glossLoad().then(() => {
+      if (!gloss) return;
+      gloMO.disconnect();
+      list.forEach(r => { if (r.isConnected && !r.closest('[data-gloss="off"]')) glossOne(r); });
+      gloMO.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  function glossShow(t) {
+    const e = gloss && gloss.map.get(t.dataset.t);
+    if (!e) return;
+    if (!gloPop) {
+      gloPop = document.createElement('div');
+      gloPop.className = 'fb-gloss'; gloPop.id = 'fbGloss'; gloPop.setAttribute('role', 'tooltip');
+      document.body.appendChild(gloPop);
+    }
+    gloPop.innerHTML = `<b>${escH(e[0])}</b>${escH(e[1])}`;
+    gloPop.classList.add('on');
+    const r = t.getBoundingClientRect(), W = document.documentElement.clientWidth, H = window.innerHeight;
+    const w = Math.min(300, W - 24);
+    gloPop.style.width = w + 'px';
+    gloPop.style.left = Math.round(Math.min(Math.max(12, r.left + r.width / 2 - w / 2), W - w - 12)) + 'px';
+    const h = gloPop.offsetHeight, room = H - (W <= 860 ? 84 : 16);
+    gloPop.style.top = Math.round(r.bottom + 8 + h > room ? Math.max(8, r.top - h - 8) : r.bottom + 8) + 'px';
+    if (gloCur && gloCur !== t) gloCur.removeAttribute('aria-describedby');
+    gloCur = t;
+    t.setAttribute('aria-describedby', 'fbGloss');
+  }
+  function glossHide() {
+    if (gloPop) gloPop.classList.remove('on');
+    if (gloCur) { gloCur.removeAttribute('aria-describedby'); gloCur = null; }
+  }
+  function glossStart() {
+    // 点术语只开词条，不再往下传（免得点到整行的跳转）
+    document.addEventListener('click', e => {
+      const t = e.target.closest && e.target.closest('fb-t');
+      if (t) { e.stopPropagation(); e.preventDefault(); if (gloCur === t) glossHide(); else glossShow(t); return; }
+      if (gloCur && !(e.target.closest && e.target.closest('.fb-gloss'))) glossHide();
+    }, true);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { if (gloCur) { const t = gloCur; glossHide(); t.focus(); } return; }
+      const t = e.target && e.target.closest && e.target.closest('fb-t');
+      if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.stopPropagation(); if (gloCur === t) glossHide(); else glossShow(t); }
+    }, true);
+    window.addEventListener('scroll', () => { if (gloCur) glossHide(); }, { passive: true });
+    window.addEventListener('resize', () => { if (gloCur) glossHide(); });
+    gloMO = new MutationObserver(ms => {
+      ms.forEach(m => gloDirty.add(m.target));
+      clearTimeout(gloTimer);
+      gloTimer = setTimeout(glossFlush, 150);
+    });
+    gloMO.observe(document.body, { childList: true, subtree: true, characterData: true });
+    gloDirty.add(document.body);
+    gloTimer = setTimeout(glossFlush, 60);
+  }
+
+  // —— 印章落笔：每件法宝的印，本标签页头一回打开时一笔一笔写出来 ——
+  // 笔画取自 Make Me a Hanzi（经 hanzi-writer-data，Arphic Public License，见 /fabao/strokes/）
+  function writeSeal() {
+    const seal = document.querySelector('.fb-head .fb-seal');
+    if (!seal || reduced() || !window.fetch) return;
+    const ch = (seal.textContent || '').trim();
+    if ([...ch].length !== 1) return;
+    try { const k = 'fb.seal.' + ch; if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, '1'); } catch (e) { return; }
+    fetch('/fabao/strokes/' + ch.codePointAt(0).toString(16) + '.json').then(r => r.ok ? r.json() : null).then(d => {
+      if (!d || !Array.isArray(d.s) || !Array.isArray(d.m) || d.s.length !== d.m.length || !d.s.length) return;
+      const id = 'fbs' + Math.random().toString(36).slice(2, 8);
+      const segs = d.m.map(pts => {
+        // 起笔往回多拉一截，免得笔头留白
+        const a = pts[0], b = pts[1] || pts[0], dx = a[0] - b[0], dy = a[1] - b[1], L = Math.hypot(dx, dy) || 1;
+        const p = [[a[0] + dx / L * 60, a[1] + dy / L * 60]].concat(pts);
+        let len = 0;
+        for (let i = 1; i < p.length; i++) len += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+        return { d: 'M' + p.map(q => Math.round(q[0]) + ' ' + Math.round(q[1])).join('L'), len };
+      });
+      const total = segs.reduce((s, x) => s + x.len, 0) || 1, gap = 45, T = Math.min(1500, 420 + segs.length * 85);
+      let t = 150, body = '';
+      segs.forEach((s, i) => {
+        const dur = Math.max(110, (T - gap * segs.length) * s.len / total);
+        body += `<path class="st" clip-path="url(#${id}-${i})" d="${s.d}" style="--l:${Math.ceil(s.len) + 8};animation-duration:${Math.round(dur)}ms;animation-delay:${Math.round(t)}ms"/>`;
+        t += dur + gap;
+      });
+      seal.insertAdjacentHTML('beforeend', `<svg class="fb-seal-w" viewBox="0 0 1024 1024" aria-hidden="true"><defs>${d.s.map((p, i) => `<clipPath id="${id}-${i}"><path d="${p}"/></clipPath>`).join('')}</defs><g transform="translate(0 900) scale(1 -1)">${body}</g></svg>`);
+      seal.classList.add('writing');
+      // 写完墨色收进印里：笔画淡去，原字浮回
+      setTimeout(() => seal.classList.add('written'), t + 120);
+      setTimeout(() => { seal.classList.remove('writing', 'written'); const w = seal.querySelector('.fb-seal-w'); if (w) w.remove(); }, t + 900);
+    }).catch(() => {});
+  }
+
+  // —— 离线与装到桌面：法宝库各页先存一份（/sw.js），断网也能起盘 ——
+  let installEvt = null;
+  function pwa() {
+    const head = document.head, add = (tag, attrs) => { const el = document.createElement(tag); Object.keys(attrs).forEach(k => el.setAttribute(k, attrs[k])); head.appendChild(el); };
+    if (!head.querySelector('link[rel="manifest"]')) add('link', { rel: 'manifest', href: '/fabao/app.webmanifest' });
+    if (!head.querySelector('link[rel="apple-touch-icon"]')) add('link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' });
+    if (!head.querySelector('meta[name="apple-mobile-web-app-title"]')) add('meta', { name: 'apple-mobile-web-app-title', content: '法宝库' });
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; document.dispatchEvent(new CustomEvent('fabao:installable')); });
+    if ('serviceWorker' in navigator && window.isSecureContext) {
+      const go = () => navigator.serviceWorker.register('/sw.js').catch(() => { /* 不支持或被禁用：照常在线用 */ });
+      if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
+    }
+  }
+  const standalone = () => (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
   // —— 法宝库大堂（/tools/，body data-tool="ku"）——
-  // 不逐件写说明：按五门排成一屏小牌，一件一行字，点了就进；上回用过的放最前「接着用」；
-  // 另有一排「我想问」（名单在 data/wenti.yaml，构建时出成 /fabao/wenti.js 的 window.QJ_WENTI）。
+  // 不逐件写说明：按五门排成一屏小牌，一件一行字，点了就进；一家的牌子上各件都能直接点；
+  // 上回用过的放最前「接着用」；另有一排「我想问」（名单在 data/wenti.yaml，构建时出成 /fabao/wenti.js 的 window.QJ_WENTI）；
+  // 末尾「本机存档」：导出、导入、扫码带到另一台设备（/fabao/backup.js，用到才取）。
   const MEN = [['山', '堪舆'], ['医', '方脉针灸'], ['命', '推命'], ['卜', '占断'], ['相', '观形']];
+  function storeSummary() {
+    let people = 0, recs = 0;
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k || /^lock_key_/.test(k)) continue;
+        let v = null;
+        try { v = JSON.parse(localStorage.getItem(k)); } catch (e) { continue; }
+        if (!Array.isArray(v)) continue;
+        if (k === LS_PEOPLE) people = v.length; else recs += v.length;
+      }
+    } catch (e) { /* 无痕模式 */ }
+    return people || recs ? `存着${people ? ` ${people} 个人` : ''}${people && recs ? '、' : ''}${recs ? ` ${recs} 条盘例与记录` : ''}` : '这台设备上还没存过盘';
+  }
+  function withBackup(fn) {
+    return loadScript('/fabao/backup.js?v=1').then(() => fn(window.FabaoBackup), () => toast('存档工具没载入，联网后再试'));
+  }
   function mountKu() {
     const box = document.getElementById('fbKu');
     if (!box) return;
     const href = t => FAMILIES[t.id] ? famHref(t.id, lsGet(FAMILIES[t.id].lsLast) || FAMILIES[t.id].items[0].id) : t.href;
-    const tile = t => `
+    const tile = t => {
+      const F = FAMILIES[t.id];
+      if (!F) return `
       <a class="ku-tile${t.lock ? ' is-lock' : ''}" href="${href(t)}">
         <span class="ku-ico">${ICONS[t.id]}</span>
         <span class="ku-t">${t.name}${t.lock ? '<i title="此宝被阁主下了禁制，持诀者可开">禁</i>' : ''}</span>
         <span class="ku-s">${t.desc || ''}</span>
       </a>`;
-    const last = TOOLS.find(t => t.id === lsGet(LS_KU_LAST));
+      // 一家：整块点了进上回用的那件，下面一排各件也能直接点
+      return `
+      <div class="ku-tile is-fam">
+        <span class="ku-ico">${ICONS[t.id]}</span>
+        <span class="ku-t">${t.name}</span>
+        <span class="ku-s ku-sub">${F.items.filter(i => !i.lock).map(i => `<a href="${famHref(t.id, i.id)}" data-fam="${t.id}" data-fam-item="${i.id}">${i.short || i.name}</a>`).join('')}</span>
+        <a class="ku-hit" href="${href(t)}" aria-label="${t.name}：${t.desc || ''}"></a>
+      </div>`;
+    };
+    const lastId = lsGet(LS_KU_LAST), last = TOOLS.find(t => t.id === (OLD_TAB[lastId] || lastId));
     const dh = dayHour(new Date());
     const ask = Array.isArray(window.QJ_WENTI) ? window.QJ_WENTI : [];
     box.innerHTML = `
@@ -375,16 +689,58 @@ ${body}${rules ? '\n\n【口径】\n' + rules : ''}`;
           <a class="ku-seal" href="/wushu/#men-${encodeURIComponent(seal)}" title="${seal}门 · ${name}：此门文章">${seal}</a>
           <div class="ku-tiles">${ts.map(tile).join('')}</div>
         </section>` : '';
-      }).join('')}</div>`;
+      }).join('')}</div>
+      <section class="ku-bk" aria-label="本机存档">
+        <span class="ku-bk-h">本机存档</span><span class="ku-bk-s">${storeSummary()}</span>
+        <span class="ku-bk-a">
+          <button type="button" class="fb-btn" data-bk="qr" title="在另一台设备上扫这个码，就把这里存的人和盘带过去">扫码带走</button>
+          <button type="button" class="fb-btn ghost" data-bk="out" title="存成一个文件，换机、备份都行">导出</button>
+          <button type="button" class="fb-btn ghost" data-bk="in" title="把导出的文件并回来">导入</button>
+          <button type="button" class="fb-btn ghost ku-inst" hidden>装到桌面</button>
+        </span>
+        <small class="fb-fine">盘与人只存在这台设备的浏览器里，不经任何服务器；换设备、清浏览器之前，先在这里带走或导出。</small>
+      </section>`;
     const more = box.querySelector('.ku-ask-more');
     if (more) more.onclick = () => { box.querySelectorAll('.ku-ask a.more').forEach(a => { a.hidden = false; }); more.remove(); };
+    const bk = box.querySelector('.ku-bk');
+    bk.addEventListener('click', e => {
+      const b = e.target.closest('[data-bk]');
+      if (!b) return;
+      if (b.dataset.bk === 'in') {
+        // 选文件得在点按当下开（Safari 不认隔了一拍的 click）
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = 'application/json,.json';
+        inp.onchange = () => { if (inp.files && inp.files[0]) withBackup(B => B.importFile(inp.files[0])); };
+        inp.click();
+        return;
+      }
+      withBackup(B => B[b.dataset.bk === 'qr' ? 'qr' : 'exportFile']());
+    });
+    document.addEventListener('fabao:store', () => { const s = bk.querySelector('.ku-bk-s'); if (s) s.textContent = storeSummary(); });
+    // 装到桌面：安卓、电脑 Chrome 给原生提示；iPhone 只能自己点「分享 → 添加到主屏幕」
+    const inst = bk.querySelector('.ku-inst');
+    const showInst = () => { if (!standalone()) inst.hidden = false; };
+    if (installEvt) showInst();
+    document.addEventListener('fabao:installable', showInst);
+    if (isIOS() && !standalone()) showInst();
+    inst.onclick = () => {
+      if (installEvt) { installEvt.prompt(); installEvt.userChoice.then(c => { if (c && c.outcome === 'accepted') inst.hidden = true; }).catch(() => {}); installEvt = null; }
+      else if (isIOS()) toast('点 Safari 下方的「分享」，再点「添加到主屏幕」', 4200);
+      else toast('浏览器菜单里选「安装」或「添加到主屏幕」', 3600);
+    };
+    // 另一台设备扫码打开的：#bk=…，问一声再并进来
+    if (/^#bk=/.test(location.hash)) withBackup(B => B.fromHash());
   }
 
   window.Fabao = {
-    GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy, askAI, FAMILIES,
+    GAN, ZHI, dayHour, toLocalInput, fmt, bindWhen, linkedTime, toast, copy, askAI, FAMILIES, TOOLS,
+    loadScript, share, qr, shake, gloss: () => { gloDirty.add(document.body); glossFlush(); },
     birth: { save: saveBirth, replace: replaceBirth, load: loadBirth, query: birthQuery, minusHour, yearOf: birthYearOf },
     people: { list: loadPeople, add: addPerson, remove: removePerson, use: usePerson, current: currentPerson, key: personKey, refresh: () => { refreshMingbuLinks(); renderPeople(); } }
   };
   mountShell();
+  pwa();
   if (document.body.dataset.tool === 'ku') mountKu();
+  glossStart();
+  writeSeal();
 })();

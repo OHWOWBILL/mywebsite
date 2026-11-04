@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>体质辨识 · 潜蛟阁法宝库</title>
+  <meta name="description" content="中医体质辨识：按中华中医药学会《中医体质分类与判定》（ZYYXH/T157-2009）60 条问卷自测九种体质，一题一点自动跳题，算转化分，判主体质与兼夹、倾向；附各型特征、饮食起居运动情志调养、保健穴与节气提醒，历次结果存在本机看变化。" />
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=7">
+  <style>
+    /* 判定程度：否 → 倾向是 / 基本是 → 是，一种紫由暗到亮（深底上已核过：单色相、亮度单调、最暗一级对卡片底 2.4:1） */
+    :root { --lv0: #5E527A; --lv1: #8467C9; --lv2: #B7A3EE; }
+    .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .tz-link { color: var(--zi-2); font-size: inherit; padding: 0 2px; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+    .tz-link:hover { color: var(--fg); }
+    .fb-btn:disabled { opacity: .35; cursor: default; border-color: var(--rule-2); color: var(--fg-2); }
+    /* 手机上一题一点：不要系统的蓝色点按高亮，悬停样式只给有鼠标的设备（触屏上会粘住） */
+    .fb-main button { -webkit-tap-highlight-color: transparent; }
+
+    /* —— 起始 —— */
+    .tz-intro { max-width: 760px; margin: 0 auto; padding: 24px 26px 20px; display: grid; gap: 16px; }
+    .tz-intro h2 { font-family: var(--font-title); font-weight: 600; font-size: 20px; letter-spacing: .18em; }
+    .tz-intro p { font-size: 14.5px; line-height: 1.9; color: var(--fg-2); }
+    .tz-intro p b { font-family: var(--font-title); font-weight: 600; color: var(--fg); }
+    .tz-intro .fb-fine { font-size: 12.5px; color: var(--muted); }
+    .tz-sex { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .tz-sex button {
+      display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 16px 8px 13px;
+      border-radius: var(--r); border: 1px solid var(--rule-2); background: var(--bg-3);
+      font-family: var(--font-title); font-weight: 600; font-size: 22px; letter-spacing: .3em; color: var(--fg);
+      transition: border-color .2s, background .2s;
+    }
+    .tz-sex button small { font-weight: 400; font-size: 12px; letter-spacing: .12em; color: var(--muted); }
+    .tz-sex button:active { background: rgba(122, 91, 192, .22); }
+    .tz-sex button.was { border-color: var(--zi-2); }
+    .tz-modeq { gap: 10px; }
+    .tz-modeq .fb-label { display: inline; margin: 0; }
+
+    /* —— 逐题 —— */
+    .tz-quiz { max-width: 760px; margin: 0 auto; }
+    .tz-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .tz-count { font-family: var(--font-mark); font-size: 12.5px; color: var(--muted); white-space: nowrap; letter-spacing: .02em; }
+    .tz-count b { font-size: 19px; font-weight: 800; color: var(--fg); margin-right: 2px; }
+    .tz-prog { flex: 1; min-width: 40px; height: 4px; border-radius: 2px; background: var(--bg-3); overflow: hidden; }
+    .tz-prog i { display: block; height: 100%; border-radius: 2px; background: var(--zi-2); transition: width .3s; }
+    .tz-sw { padding: 6px 10px; font-size: 13px; letter-spacing: .1em; }
+    /* 换题时只让题干淡入；选项按钮不动、不淡，手指一直点在同一处 */
+    .tz-q { padding: 24px 26px 18px; }
+    .tz-qt { animation: tzQ .2s ease; }
+    @keyframes tzQ { from { opacity: .2; } to { opacity: 1; } }
+    .tz-hint { font-family: var(--font-title); font-size: 12px; color: var(--faint); letter-spacing: .15em; margin-bottom: 8px; }
+    .tz-qt { font-family: var(--font-title); font-weight: 600; font-size: 23px; line-height: 1.6; letter-spacing: .05em; color: var(--fg); min-height: 3.2em; }
+    .tz-qt .p, .tz-li .p { font-weight: 400; font-size: .74em; color: var(--muted); letter-spacing: .02em; }
+    .tz-qt:focus { outline: none; }
+    .tz-opts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 18px; }
+    .tz-opt {
+      position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 14px 4px 12px; min-width: 0;
+      border-radius: var(--r); border: 1px solid var(--rule-2); background: var(--bg-3); color: var(--fg);
+      transition: border-color .15s, background .15s, color .15s;
+    }
+    .tz-opt b { font-family: var(--font-title); font-weight: 600; font-size: 17px; letter-spacing: .14em; }
+    .tz-opt small { font-size: 11.5px; color: var(--muted); letter-spacing: .06em; }
+    .tz-opt .lv { width: 34px; height: 3px; border-radius: 2px; background: var(--rule-2); margin-top: 4px; overflow: hidden; }
+    .tz-opt .lv::after { content: ""; display: block; height: 100%; width: calc(var(--n) * 20%); background: var(--zi-2); border-radius: 2px; }
+    .tz-opt kbd { position: absolute; top: 5px; right: 7px; font-family: var(--font-mark); font-size: 9.5px; color: var(--faint); }
+    .tz-opt:active { background: color-mix(in oklab, var(--zi) 35%, var(--bg-3)); }
+    .tz-opt.on { background: var(--zi); border-color: var(--zi); color: #fff; }
+    .tz-opt.on small, .tz-opt.on kbd { color: rgba(255, 255, 255, .78); }
+    .tz-opt.on .lv { background: rgba(255, 255, 255, .3); }
+    .tz-opt.on .lv::after { background: #fff; }
+    .tz-nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .tz-nav .fb-btn { padding: 8px 14px; }
+    .tz-meta { margin-left: auto; font-size: 12.5px; color: var(--muted); letter-spacing: .06em; white-space: nowrap; }
+    @media (hover: none) { .tz-opt kbd { display: none; } }
+
+    /* —— 一页答完 —— */
+    .tz-all { max-width: 860px; margin: 0 auto; }
+    .tz-sticky {
+      position: sticky; top: calc(var(--top-h) + 8px); z-index: 5;
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; margin-bottom: 10px;
+      background: rgba(30, 24, 40, .95); border: 1px solid var(--rule); border-radius: var(--r);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    }
+    .tz-sticky .fb-btn { padding: 6px 12px; font-size: 13px; letter-spacing: .1em; }
+    .tz-allhint { margin: 0 2px 10px; }
+    .tz-list { list-style: none; display: grid; gap: 8px; }
+    .tz-li { padding: 11px 14px 12px; border-radius: var(--r); background: var(--bg-2); border: 1px solid var(--rule); scroll-margin: 130px 0 96px; transition: border-color .3s; }
+    .tz-li > p { display: flex; gap: 10px; font-size: 15px; line-height: 1.7; color: var(--fg); }
+    .tz-li > p .no { flex: 0 0 auto; min-width: 1.6em; font-family: var(--font-mark); font-size: 12px; line-height: 25px; color: var(--faint); }
+    .tz-li.done > p { color: var(--fg-2); }
+    .tz-li.miss { border-color: var(--zhu); }
+    .tz-li .seg { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin-top: 8px; }
+    .tz-li .seg button { padding: 7px 0; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid var(--rule); font-family: var(--font-title); font-size: 13.5px; letter-spacing: .08em; color: var(--muted); }
+    .tz-li .seg button:active { background: color-mix(in oklab, var(--zi) 35%, var(--bg-3)); }
+    .tz-li .seg button.on { background: var(--zi); border-color: var(--zi); color: #fff; }
+    @media (hover: hover) {
+      .tz-sex button:hover { border-color: var(--zi-2); background: rgba(122, 91, 192, .14); }
+      .tz-opt:hover { border-color: var(--zi-2); }
+      .tz-li .seg button:hover { color: var(--fg); border-color: var(--zi-2); }
+      .tz-li .seg button.on:hover { color: #fff; }
+      .tz-row:hover { background: var(--bg-3); }
+      .tz-row:hover .trk::before { background: var(--bg); }
+    }
+    .tz-allgo { margin-top: 14px; }
+
+    /* —— 结果：顶上一句 —— */
+    .tz-head .fb-key { font-size: 23px; }
+    .tz-head .fb-note { font-size: 13.5px; line-height: 1.8; color: var(--fg-2); }
+    .tz-gist { font-size: 14.5px; line-height: 1.85; color: var(--fg-2); }
+    .tz-ctrl { min-width: 250px; }
+    .tz-ctrl .fb-row .grow { flex: 1; }
+
+    .tz-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .tz-card { padding: 18px 20px; min-width: 0; }
+    .tz-card h2, .tz-h { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .25em; margin-bottom: 12px; display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; }
+    .tz-card h2 small, .tz-h small { font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: .08em; }
+    .tz-h { margin: 26px 2px 12px; }
+
+    /* —— 九型条形图 —— */
+    .tz-axis, .tz-row { display: grid; grid-template-columns: 3em minmax(0, 1fr) 7.6em; align-items: center; column-gap: 10px; }
+    .tz-axis { height: 16px; margin-bottom: 2px; }
+    .tz-axis .trk { position: relative; height: 100%; }
+    .tz-axis .trk > span { position: absolute; top: 0; transform: translateX(-50%); font-family: var(--font-mark); font-size: 10px; color: var(--faint); font-variant-numeric: tabular-nums; }
+    .tz-axis .trk > span:first-child { transform: none; }
+    .tz-axis .trk > span:last-child { transform: translateX(-100%); }
+    .tz-row { width: 100%; padding: 4px 0; border-radius: var(--r-sm); text-align: left; transition: background .15s; }
+    .tz-row:focus-visible { background: var(--bg-3); }
+    .tz-row .nm { font-family: var(--font-title); font-size: 14px; letter-spacing: .12em; color: var(--fg-2); white-space: nowrap; padding-left: 4px; }
+    .tz-row.me .nm { color: var(--fg); font-weight: 600; }
+    .tz-row .trk { position: relative; height: 22px; }
+    .tz-row .trk::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; height: 14px; border-radius: 0 4px 4px 0; background: var(--bg-3); }
+    .tz-row:focus-visible .trk::before { background: var(--bg); }
+    .tz-row .bar { position: absolute; left: 0; top: 4px; height: 14px; border-radius: 0 4px 4px 0; background: var(--lv0); }
+    .tz-row[data-lv="1"] .bar { background: var(--lv1); }
+    .tz-row[data-lv="2"] .bar { background: var(--lv2); }
+    .tz-row .th { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--muted); opacity: .75; }
+    .tz-row .prev { position: absolute; top: 1px; height: 20px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--fg); box-shadow: 0 0 0 2px var(--bg-2); }
+    .tz-row .val { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+    .tz-row .val b { font-family: var(--font-mark); font-weight: 800; font-size: 14px; color: var(--fg); min-width: 1.6em; text-align: right; font-variant-numeric: tabular-nums; }
+    .tz-row .val small { font-family: var(--font-title); font-size: 12px; color: var(--fg-2); letter-spacing: .04em; }
+    .tz-row[data-lv="0"] .val small { color: var(--faint); }
+    .tz-row .val em { font-style: normal; font-family: var(--font-mark); font-size: 10.5px; color: var(--muted); }
+    .tz-split { margin: 6px 0 4px; padding: 6px 4px 0; border-top: 1px solid var(--rule); font-family: var(--font-title); font-size: 11px; color: var(--faint); letter-spacing: .25em; }
+    .tz-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+    .tz-legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .tz-legend i { display: inline-block; width: 14px; height: 8px; border-radius: 0 2px 2px 0; }
+    .tz-legend i.dash { width: 0; height: 12px; border-left: 1px dashed var(--muted); border-radius: 0; }
+    .tz-legend i.tick { width: 2px; height: 12px; background: var(--fg); border-radius: 1px; }
+
+    /* —— 历次 —— */
+    .tz-trend { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 3px; margin: -3px -3px 6px; width: calc(100% + 6px); }
+    .tz-trend th { font-weight: 400; }
+    .tz-trend thead th button { width: 100%; padding: 2px 0; border-radius: 4px; font-family: var(--font-mark); font-size: 10.5px; color: var(--muted); letter-spacing: 0; }
+    .tz-trend thead th button:hover { color: var(--fg); background: var(--bg-3); }
+    .tz-trend thead th.cur button { color: var(--fg); font-weight: 800; }
+    .tz-trend thead th button small { display: block; font-size: 9.5px; font-weight: 500; color: var(--faint); line-height: 1.3; }
+    .tz-trend th[scope=row] { width: 2.8em; text-align: left; font-family: var(--font-title); font-size: 12.5px; color: var(--fg-2); letter-spacing: .06em; white-space: nowrap; }
+    .tz-trend thead th:first-child { width: 2.8em; }
+    .tz-trend td { padding: 3px 0; border-radius: 4px; text-align: center; font-family: var(--font-mark); font-size: 12px; color: var(--muted); background: var(--bg-3); font-variant-numeric: tabular-nums; }
+    .tz-trend td.l1 { background: color-mix(in oklab, var(--lv1) 42%, var(--bg-3)); color: var(--fg); }
+    .tz-trend td.l2 { background: color-mix(in oklab, var(--lv2) 46%, var(--bg-3)); color: var(--fg); }
+    .tz-trend td.cur { box-shadow: inset 0 0 0 1px rgba(237, 235, 242, .3); }
+    .tz-hlist { list-style: none; display: grid; gap: 4px; margin-top: 8px; }
+    .tz-hlist li { display: flex; align-items: stretch; border-radius: var(--r-sm); background: var(--bg-3); }
+    .tz-hlist li.on { box-shadow: inset 0 0 0 1px var(--zi-2); }
+    .tz-hlist .go { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 10px; padding: 7px 4px 7px 10px; text-align: left; }
+    .tz-hlist .d { font-family: var(--font-mark); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+    .tz-hlist .h { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-title); font-size: 13.5px; color: var(--fg-2); }
+    .tz-hlist .go:hover .h { color: var(--fg); }
+    .tz-hlist .x { padding: 0 12px; color: var(--faint); font-size: 16px; }
+    .tz-hlist .x:hover { color: var(--zhu); }
+    .tz-hfoot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .tz-hfoot .fb-btn { padding: 4px 8px; font-size: 12.5px; letter-spacing: .1em; }
+
+    /* —— 各型卡片 —— */
+    .tz-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); gap: 18px; align-items: start; }
+    .tz-type { padding: 18px 20px; min-width: 0; scroll-margin-top: 72px; }
+    .tz-type h3 { font-family: var(--font-title); font-weight: 600; font-size: 19px; letter-spacing: .15em; color: var(--fg); display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; }
+    .tz-type h3 small { font-weight: 400; font-size: 12.5px; color: var(--muted); letter-spacing: .05em; }
+    .tz-type .gist { display: block; margin-top: 6px; font-size: 14.5px; line-height: 1.85; color: var(--fg); }
+    .tz-type h4 { font-family: var(--font-title); font-weight: 600; font-size: 13px; letter-spacing: .3em; color: var(--muted); margin: 14px 0 6px; padding-top: 10px; border-top: 1px dashed var(--rule-2); }
+    .tz-rows .r { display: flex; gap: 8px; padding: 3px 0; font-size: 14px; line-height: 1.8; color: var(--fg-2); }
+    .tz-rows .r > i { flex: 0 0 2.6em; font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 25px; color: var(--faint); letter-spacing: .12em; white-space: nowrap; }
+    .tz-rows .r > span { min-width: 0; }
+    .tz-rows .r b { font-family: var(--font-title); font-weight: 600; color: var(--fg); margin-right: 4px; }
+    .tz-rows .r small { font-size: 12px; color: var(--faint); }
+    .tz-xue { display: grid; gap: 6px; }
+    .tz-xue > div { padding: 8px 12px; border-radius: var(--r-sm); background: var(--bg-3); font-size: 13.5px; line-height: 1.75; color: var(--fg-2); }
+    .tz-xue b { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .1em; color: var(--fg); margin-right: 8px; }
+    .tz-xue em { display: block; font-style: normal; font-size: 12.5px; color: var(--muted); }
+    .tz-xnote { margin-top: 6px; font-size: 12px; line-height: 1.7; color: var(--faint); }
+    .tz-jie { font-size: 14px; line-height: 1.8; color: var(--fg-2); }
+    .tz-now { margin-top: 6px; padding: 7px 12px; border-left: 2px solid var(--zi-2); border-radius: 0 var(--r-sm) var(--r-sm) 0; background: rgba(122, 91, 192, .1); font-size: 13.5px; line-height: 1.8; color: var(--fg-2); }
+    .tz-now b { font-family: var(--font-title); font-weight: 600; color: var(--fg); margin-right: 4px; }
+    .tz-type.wide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 30px; }
+    .tz-type.wide > header { grid-column: 1 / -1; }
+    .tz-type.wide > section:nth-of-type(-n+2) > h4 { margin-top: 14px; }
+    details.tz-type { padding: 0; }
+    details.tz-type > summary { position: relative; list-style: none; cursor: pointer; padding: 15px 64px 14px 20px; }
+    details.tz-type > summary::-webkit-details-marker { display: none; }
+    details.tz-type > summary::after { content: "展开"; position: absolute; right: 18px; top: 18px; font-family: var(--font-title); font-size: 12px; color: var(--zi-2); letter-spacing: .15em; }
+    details.tz-type[open] > summary::after { content: "收起"; }
+    details.tz-type > summary h3 { font-size: 17px; }
+    details.tz-type > summary .gist { font-size: 13.5px; color: var(--fg-2); margin-top: 4px; }
+    details.tz-type > .body { padding: 0 20px 18px; }
+    .tz-role { font-family: var(--font-title); font-weight: 400; font-size: 11.5px; letter-spacing: .15em; padding: 1px 9px; border-radius: 999px; background: rgba(122, 91, 192, .22); color: var(--zi-2); white-space: nowrap; }
+    .tz-warn { padding: 10px 14px; border-radius: var(--r-sm); background: color-mix(in oklab, var(--zhu) 10%, var(--bg-3)); color: var(--fg-2); font-size: 13px; line-height: 1.8; }
+    .tz-cards > .tz-warn { grid-column: 1 / -1; }
+
+    /* —— 口径 —— */
+    .tz-help { margin-top: 26px; padding: 16px 20px; }
+    .tz-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
+    .tz-help ul { padding: 0; }
+    .tz-help li { list-style: none; padding-left: 14px; position: relative; font-size: 13px; line-height: 1.9; color: var(--fg-2); }
+    .tz-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
+    .tz-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 4px; }
+    .tz-help .tz-warn { margin-top: 10px; }
+    .tz-help .rel { margin-top: 10px; font-size: 13px; color: var(--muted); line-height: 1.9; }
+
+    @media (max-width: 860px) {
+      .tz-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+      .tz-card, .tz-type { padding: 16px; }
+      .tz-cards { gap: 14px; }
+      .tz-type.wide { display: block; }
+      details.tz-type { padding: 0; }
+      details.tz-type > summary { padding: 14px 60px 13px 16px; }
+      details.tz-type > summary::after { right: 16px; top: 16px; }
+      details.tz-type > .body { padding: 0 16px 16px; }
+      .tz-head .fb-key { font-size: 20px; }
+      .tz-sticky { top: 56px; }
+      .tz-help { padding: 16px; margin-top: 20px; }
+      .tz-h { margin-top: 22px; }
+    }
+    @media (max-width: 600px) {
+      .tz-intro { padding: 18px 16px 16px; gap: 14px; }
+      .tz-q { padding: 18px 16px 14px; }
+      .tz-qt { font-size: 20px; min-height: 3.2em; }   /* 375 宽下最长的题干两行 */
+      .tz-opts { grid-template-columns: minmax(0, 1fr); gap: 7px; margin-top: 14px; }
+      .tz-opt { flex-direction: row; justify-content: flex-start; align-items: center; gap: 12px; padding: 12px 16px; }
+      .tz-opt b { font-size: 17px; min-width: 3.2em; }
+      .tz-opt .lv { order: 3; margin: 0 0 0 auto; }
+      .tz-meta { margin-left: 0; width: 100%; }
+      .tz-sticky { flex-wrap: wrap; row-gap: 8px; }
+      .tz-sticky .tz-prog { flex-basis: 30%; }
+      .tz-li { padding: 10px 12px 11px; }
+      .tz-li > p { font-size: 14.5px; gap: 8px; }
+      .tz-li .seg button { font-size: 13px; letter-spacing: .02em; padding: 8px 0; }
+      .tz-axis, .tz-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nm val" "trk trk"; row-gap: 2px; }
+      .tz-axis { grid-template-areas: "trk trk"; height: 14px; }
+      .tz-axis .nm { display: none; }
+      .tz-axis .trk, .tz-row .trk { grid-area: trk; }
+      .tz-row .nm { grid-area: nm; }
+      .tz-row .val { grid-area: val; padding-right: 4px; }
+      .tz-row .trk { height: 18px; }
+      .tz-row .trk::before, .tz-row .bar { top: 3px; height: 12px; }
+      .tz-row .prev { height: 16px; }
+      .tz-row { padding: 3px 0 4px; }
+    }
+  </style>
+</head>
+<body data-tool="tizhi">
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">质</div>
+    <div>
+      <h1 class="fb-title">体质辨识<span class="en">NINE CONSTITUTIONS</span></h1>
+      <p class="fb-sub">六十问 · 九种体质 · 转化分判定 · 调养与保健穴</p>
+    </div>
+  </header>
+
+  <noscript><p class="fb-empty">体质辨识要开脚本才能用。</p></noscript>
+
+  <section class="fb-card tz-intro" id="introBox" aria-label="开始" hidden></section>
+  <section class="tz-quiz" id="oneBox" aria-label="逐题作答" hidden></section>
+  <section class="tz-all" id="allBox" aria-label="一页答完" hidden></section>
+
+  <div id="resultBox" hidden>
+    <section class="fb-now tz-head" id="resHead" aria-label="结果" aria-live="polite" data-gloss></section>
+    <div class="tz-grid">
+      <section class="fb-card tz-card" aria-labelledby="chartTitle">
+        <h2 id="chartTitle">九型转化分 <small>点一行，看那一型</small></h2>
+        <div id="chartBox"></div>
+      </section>
+      <section class="fb-card tz-card" id="histCard" aria-labelledby="histTitle">
+        <h2 id="histTitle">历次 <small>每次测完自动记下</small></h2>
+        <div id="histBox"></div>
+      </section>
+    </div>
+    <h2 class="tz-h" id="mineTitle">你的体质 <small>特征照录标准；调养是一般养生常识</small></h2>
+    <div class="tz-cards" id="cardsBox"></div>
+    <section id="restWrap" aria-labelledby="restTitle">
+      <h2 class="tz-h" id="restTitle">其余几种 <small>点开看特征与调养</small></h2>
+      <div class="tz-cards" id="restBox"></div>
+    </section>
+  </div>
+
+  <section class="fb-card tz-help" aria-label="口径">
+    <h3>口径</h3>
+    <ul id="rulesList"></ul>
+    <div class="tz-warn">仅供自我了解与学习参考，不是医疗诊断，不替代医嘱。身体不适、症状持续或加重，请及时就医。</div>
+    <p class="rel">相关：<a href="/ziwu/">子午流注 · 按时开穴</a> · <a href="/yunqi/">五运六气 · 一年气候</a> · <a href="/wushu/#men-%E5%8C%BB">五术门庭 · 医门</a></p>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/yunqi/yunqi.js?v=1"></script>
+<script src="/tizhi/tizhi.js?v=1"></script>
+<script src="/fabao/fabao.js?v=14"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, Z = window.Tizhi, Y = window.Yunqi;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const stamp = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const R = Math.round;
+const LS_P = 'tizhi.progress.v1', LS_H = 'tizhi.history.v1', LS_M = 'tizhi.mode.v1', LS_X = 'tizhi.sex.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) { /* 无痕模式 */ } }
+};
+const reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const behavior = reduce ? 'auto' : 'smooth';
+const SEX = { f: '女', m: '男' };
+const MAX_H = 30;
+
+let cur = null;                                   // 作答中：{ x 性别, ans { 条目: 1..5 }, i 逐题停在第几题 }
+let mode = store.get(LS_M, 'one') === 'all' ? 'all' : 'one';
+let H = loadH();                                  // 历次：[{ t 时间, x 性别, s 九型转化分（一位小数）, a 答案串 }]
+let at = -1;                                      // 结果页正在看第几次
+let lock = false;                                 // 点了选项、等跳题的那一下
+
+function loadH() {
+  const h = store.get(LS_H, []);
+  return Array.isArray(h) ? h.filter(e => e && typeof e.t === 'string' && Array.isArray(e.s) && e.s.length === 9 && e.s.every(x => typeof x === 'number' && isFinite(x))) : [];
+}
+const saveH = () => store.set(LS_H, H);
+const saveP = () => { if (cur) store.set(LS_P, { x: cur.x, a: Z.pack(cur.ans), i: cur.i, t: Date.now() }); };
+const qsOf = () => Z.questions(cur.x);
+const nDone = () => qsOf().filter(q => cur.ans[q.id]).length;
+const firstTodo = () => qsOf().findIndex(q => !cur.ans[q.id]);
+const scOf = e => { const o = {}; Z.ORDER.forEach((k, i) => { o[k] = e.s[i]; }); return o; };
+const vOf = e => Z.verdict(scOf(e));
+const lvNum = lv => lv === '是' ? 2 : (lv === '倾向是' || lv === '基本是') ? 1 : 0;
+// 题干里较长的括注（说明文字）淡一点；「（喝）」「（深）」这类一两字的照常
+const qHTML = t => esc(t).replace(/（[^）]{2,}）/g, m => `<span class="p">${m}</span>`);
+
+function show(which) {
+  ['introBox', 'oneBox', 'allBox', 'resultBox'].forEach(id => { $(id).hidden = id !== which; });
+}
+// 没有结果可看时：有没答完的就回去接着答，否则回起始页
+function home() {
+  at = -1;
+  if (cur) renderQuiz(true);
+  else { renderIntro(); show('introBox'); window.scrollTo(0, 0); }
+}
+
+/* ================ 起始 ================ */
+function renderIntro() {
+  const last = H[H.length - 1], was = store.get(LS_X, '');
+  $('introBox').innerHTML = `
+    <h2>六十问，看九种体质</h2>
+    <p>按<b>最近一年</b>的体验和感觉作答。每题从「没有」到「总是」点一下，自动跳到下一题；中途离开，进度留在这台设备上，回来接着答。</p>
+    <div>
+      <span class="fb-label">先选性别（只决定湿热质的一题问哪一句）</span>
+      <div class="tz-sex">${['f', 'm'].map(x => `<button type="button" data-x="${x}" class="${was === x ? 'was' : ''}">${SEX[x]}<small>点了就开始</small></button>`).join('')}</div>
+    </div>
+    <div class="fb-row tz-modeq"><span class="fb-label">作答方式</span>
+      <div class="fb-seg" role="group" aria-label="作答方式">
+        <button type="button" data-m="one" class="${mode === 'one' ? 'on' : ''}" aria-pressed="${mode === 'one'}">逐题</button>
+        <button type="button" data-m="all" class="${mode === 'all' ? 'on' : ''}" aria-pressed="${mode === 'all'}">一页答完</button>
+      </div>
+    </div>
+    <p class="fb-fine">共 60 题，约 5～8 分钟；结果只存在本机浏览器里。${last ? `上次 ${esc(last.t.slice(0, 10))}：${esc(Z.lines(vOf(last)).key)} · <button type="button" class="tz-link" data-go="last">看结果</button>` : ''}</p>`;
+}
+$('introBox').addEventListener('click', e => {
+  const x = e.target.closest('[data-x]'), m = e.target.closest('[data-m]'), g = e.target.closest('[data-go]');
+  if (x) start(x.dataset.x);
+  else if (m) { mode = m.dataset.m; store.set(LS_M, mode); renderIntro(); }
+  else if (g && g.dataset.go === 'last') showResult(H.length - 1, true);
+});
+function start(x) {
+  cur = { x, ans: {}, i: 0 };
+  store.set(LS_X, x);
+  saveP();
+  renderQuiz(true);
+}
+
+/* ================ 作答 ================ */
+function renderQuiz(top) {
+  if (mode === 'all') { renderAll(); show('allBox'); }
+  else { renderOne(); show('oneBox'); }
+  if (top) window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+// 作答时的小字：性别（可改）、重来、有存档时可先看上次结果（进度不丢）
+const metaHTML = () => `${SEX[cur.x]} · <button type="button" class="tz-link" data-go="sex">改性别</button> · <button type="button" class="tz-link" data-go="restart">重来</button>` +
+  (H.length ? ` · <button type="button" class="tz-link" data-go="peek">上次结果</button>` : '');
+
+// —— 逐题 ——
+function renderOne(focus) {
+  const L = qsOf(), i = cur.i = Math.max(0, Math.min(cur.i, L.length - 1)), q = L[i], a = cur.ans[q.id], n = nDone();
+  const next = n === L.length ? '<button type="button" class="fb-btn primary" data-go="finish">看结果</button>'
+    : a && i < L.length - 1 ? '<button type="button" class="fb-btn" data-go="next">下一题 ›</button>' : '';
+  $('oneBox').innerHTML = `
+    <div class="tz-top">
+      <span class="tz-count"><b>${i + 1}</b>/ ${L.length}</span>
+      <div class="tz-prog" role="progressbar" aria-label="已答题数" aria-valuemin="0" aria-valuemax="${L.length}" aria-valuenow="${n}"><i style="width:${(n / L.length * 100).toFixed(1)}%"></i></div>
+      <button type="button" class="fb-btn ghost tz-sw" data-go="all">一页答完</button>
+    </div>
+    <section class="fb-card tz-q">
+      <p class="tz-hint">按最近一年的感受 · 已答 ${n} 题</p>
+      <h2 class="tz-qt" id="qText" tabindex="-1">${qHTML(q.t)}</h2>
+      <div class="tz-opts" role="group" aria-labelledby="qText">${Z.OPTS.map(o => `
+        <button type="button" class="tz-opt${a === o.v ? ' on' : ''}" data-v="${o.v}" aria-pressed="${a === o.v}" style="--n:${o.v}"><b>${o.n}</b><small>${o.h}</small><span class="lv" aria-hidden="true"></span><kbd aria-hidden="true">${o.v}</kbd></button>`).join('')}
+      </div>
+      <div class="tz-nav">
+        <button type="button" class="fb-btn" data-go="prev"${i === 0 ? ' disabled' : ''}>‹ 上一题</button>${next}
+        <span class="tz-meta">${metaHTML()}</span>
+      </div>
+    </section>`;
+  if (focus) { const h = $('qText'); if (h) h.focus({ preventScroll: true }); }
+}
+function answer(v) {
+  if (lock || !cur) return;
+  const L = qsOf(), q = L[cur.i];
+  cur.ans[q.id] = v;
+  saveP();
+  $('oneBox').querySelectorAll('.tz-opt').forEach(b => { const on = +b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  const refocus = $('oneBox').contains(document.activeElement);
+  lock = true;
+  setTimeout(() => {
+    lock = false;
+    if (!cur) return;
+    if (cur.i < L.length - 1) cur.i++;
+    else { const t = firstTodo(); if (t < 0) { finish(); return; } cur.i = t; }
+    saveP();
+    renderOne(refocus);
+  }, reduce ? 60 : 170);
+}
+$('oneBox').addEventListener('click', e => {
+  const o = e.target.closest('[data-v]'), g = e.target.closest('[data-go]');
+  if (o) answer(+o.dataset.v);
+  else if (g) act(g.dataset.go, g);
+});
+document.addEventListener('keydown', e => {
+  if ($('oneBox').hidden || !cur || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if (e.key >= '1' && e.key <= '5') { e.preventDefault(); answer(+e.key); }
+  else if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); act('prev'); }
+  else if (e.key === 'ArrowRight' && cur.ans[qsOf()[cur.i].id]) { e.preventDefault(); act('next'); }
+});
+
+// —— 一页答完 ——
+function liHTML(q, i) {
+  const a = cur.ans[q.id];
+  return `<li class="tz-li${a ? ' done' : ''}" id="li-${q.id}" data-id="${q.id}"><p><span class="no">${i + 1}</span><span class="t">${qHTML(q.t)}</span></p>
+    <div class="seg" role="group" aria-label="第 ${i + 1} 题">${Z.OPTS.map(o => `<button type="button" data-v="${o.v}" class="${a === o.v ? 'on' : ''}" aria-pressed="${a === o.v}" title="${o.n}（${o.h}）">${o.n}</button>`).join('')}</div></li>`;
+}
+function renderAll() {
+  const L = qsOf();
+  $('allBox').innerHTML = `
+    <div class="tz-sticky">
+      <span class="tz-count" id="allCount"></span>
+      <div class="tz-prog" role="progressbar" aria-label="已答题数" aria-valuemin="0" aria-valuemax="${L.length}" id="allProg"><i></i></div>
+      <button type="button" class="fb-btn ghost tz-sw" data-go="one">逐题</button>
+      <button type="button" class="fb-btn primary" data-go="finish">看结果</button>
+    </div>
+    <p class="tz-hint tz-allhint">按最近一年的感受作答 · ${metaHTML()}</p>
+    <ol class="tz-list">${L.map(liHTML).join('')}</ol>
+    <button type="button" class="fb-btn primary block tz-allgo" data-go="finish">看结果</button>`;
+  syncAll();
+}
+function syncAll() {
+  const L = qsOf(), n = nDone();
+  $('allCount').innerHTML = `<b>${n}</b>/ ${L.length}`;
+  $('allProg').setAttribute('aria-valuenow', n);
+  $('allProg').firstElementChild.style.width = (n / L.length * 100).toFixed(1) + '%';
+}
+$('allBox').addEventListener('click', e => {
+  const o = e.target.closest('.seg [data-v]'), g = e.target.closest('[data-go]');
+  if (g) { act(g.dataset.go, g); return; }
+  if (!o || !cur) return;
+  const li = o.closest('.tz-li'), id = li.dataset.id, v = +o.dataset.v, L = qsOf();
+  cur.ans[id] = v;
+  cur.i = L.findIndex(q => q.id === id);
+  saveP();
+  li.classList.add('done'); li.classList.remove('miss');
+  li.querySelectorAll('[data-v]').forEach(b => { const on = +b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  syncAll();
+  // 下一道没答的题若在屏幕下方，轻轻带上来
+  const nx = L.slice(cur.i + 1).find(q => !cur.ans[q.id]);
+  const el = nx && $('li-' + nx.id);
+  if (el) {
+    const r = el.getBoundingClientRect();
+    if (r.bottom > window.innerHeight - 80) el.scrollIntoView({ block: 'nearest', behavior });
+  } else if (nDone() === L.length) F.toast('都答完了，点「看结果」', 1400);
+});
+
+// —— 共用动作 ——
+function act(k) {
+  if (!cur) return;
+  const L = qsOf();
+  if (k === 'prev') { if (cur.i > 0) { cur.i--; saveP(); renderOne(true); } }
+  else if (k === 'next') { if (cur.i < L.length - 1) { cur.i++; saveP(); renderOne(true); } }
+  else if (k === 'finish') finish();
+  else if (k === 'all') {
+    mode = 'all'; store.set(LS_M, mode); renderAll(); show('allBox');
+    const el = $('li-' + L[cur.i].id);
+    if (el && cur.i > 0) el.scrollIntoView({ block: 'center' }); else window.scrollTo(0, 0);
+  } else if (k === 'one') {
+    mode = 'one'; store.set(LS_M, mode);
+    const t = firstTodo(); if (t >= 0) cur.i = t;
+    saveP(); renderOne(); show('oneBox'); window.scrollTo(0, 0);
+  } else if (k === 'sex') {
+    cur.x = cur.x === 'f' ? 'm' : 'f';
+    store.set(LS_X, cur.x); saveP(); renderQuiz();
+    F.toast(`已改为${SEX[cur.x]}：湿热质那一题换成「${cur.x === 'f' ? '带下色黄' : '阴囊潮湿'}」`);
+  } else if (k === 'restart') {
+    if (!confirm('清掉这次已答的题，从头开始？')) return;
+    cur = null; store.del(LS_P); renderIntro(); show('introBox'); window.scrollTo(0, 0);
+  } else if (k === 'peek') showResult(H.length - 1, true);
+}
+function finish() {
+  if (!cur) return;
+  const sc = Z.scores(cur.ans, cur.x), v = Z.verdict(sc);
+  if (!v) {
+    const L = qsOf(), t = firstTodo(), left = L.length - nDone();
+    if (t < 0) return;
+    cur.i = t; saveP();
+    if (mode === 'all') {
+      const el = $('li-' + L[t].id);
+      if (el) { el.classList.add('miss'); el.scrollIntoView({ block: 'center', behavior }); }
+    } else renderOne(true);
+    F.toast(`还有 ${left} 题没答`);
+    return;
+  }
+  H.push({ t: stamp(new Date()), x: cur.x, s: Z.ORDER.map(k => R(sc[k] * 10) / 10), a: Z.pack(cur.ans) });
+  if (H.length > MAX_H) H = H.slice(-MAX_H);
+  saveH();
+  store.del(LS_P);
+  cur = null;
+  showResult(H.length - 1, true);
+}
+
+/* ================ 结果 ================ */
+function showResult(idx, toTop) {
+  const e = H[idx];
+  if (!e) { home(); return; }
+  at = idx;
+  const v = vOf(e), prev = idx > 0 ? H[idx - 1] : null, pv = prev ? vOf(prev) : null;
+  renderHead(e, v, prev, pv);
+  renderChart(v, pv);
+  renderCards(v);
+  renderHist();
+  show('resultBox');
+  if (toTop) window.scrollTo({ top: 0, behavior: 'auto' });
+}
+// 与上一次比：主体质变没变、分数动得最多的几型
+function changeText(v, pv) {
+  const L = Z.lines(v).key, PL = Z.lines(pv).key, out = [];
+  if (L !== PL) out.push(`上次「${PL}」`);
+  const mv = Z.ORDER.map(k => ({ k, d: R(v.scores[k]) - R(pv.scores[k]) })).filter(x => Math.abs(x.d) >= 5).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 3);
+  out.push(mv.length ? mv.map(x => `${Z.TYPE[x.k].short} ${R(pv.scores[x.k])}→${R(v.scores[x.k])}`).join('，') : '各型变化都在 5 分以内');
+  return out.join('；');
+}
+function renderHead(e, v, prev, pv) {
+  const L = Z.lines(v, { wrap: s => `<strong>${s}</strong>` }), latest = at === H.length - 1;
+  const main = v.main.length ? Z.TYPE[v.main[0]] : null;
+  $('resHead').innerHTML = `
+    <div class="fb-now-info">
+      <div class="fb-when"><span class="fb-tag">${latest ? '结果' : '旧结果'}</span><span>${esc(e.t)}${SEX[e.x] ? ' · ' + SEX[e.x] : ''}</span>${latest ? '' : '<button type="button" class="tz-link" data-go="latest">回到最新</button>'}</div>
+      <div class="fb-key">${L.key}</div>
+      <div class="fb-note">${esc(L.sub)}</div>
+      ${main ? `<p class="tz-gist">${esc(main.gist)}</p>` : ''}
+      ${pv ? `<p class="fb-fine">与上一次（${esc(prev.t)}）比：${esc(changeText(v, pv))}</p>` : ''}
+    </div>
+    <div class="fb-now-ctrl tz-ctrl">
+      <div class="fb-row">
+        <button type="button" class="fb-btn primary grow" data-go="copy">复制结果</button>
+        <button type="button" class="fb-btn grow" data-go="ai">问 AI</button>
+        <button type="button" class="fb-btn grow" data-go="share" title="把结果画成一张图，可存可分享">分享图</button>
+      </div>
+      <button type="button" class="fb-btn" data-go="again">${cur ? `接着答（已答 ${nDone()} 题）` : '再测一次'}</button>
+      <p class="fb-fine">自评问卷，只说体质倾向，不是诊断；调养建议不替代医嘱。</p>
+    </div>`;
+}
+function renderChart(v, pv) {
+  const row = k => {
+    const t = Z.TYPE[k], s = v.scores[k], lv = v.levels[k], p = pv ? pv.scores[k] : null, d = p == null ? 0 : R(s) - R(p);
+    const role = Z.roleOf(v, k), th = k === 'pinghe' ? [60] : [30, 40];
+    const say = `${t.name} ${R(s)} 分，${lv}${role ? '，' + role : ''}${p != null ? `；上一次 ${R(p)} 分` : ''}`;
+    return `<button type="button" class="tz-row${v.main.indexOf(k) >= 0 ? ' me' : ''}" data-k="${k}" data-lv="${lvNum(lv)}" aria-label="${say}" title="${say}">
+      <span class="nm">${t.short}</span>
+      <span class="trk">${th.map(x => `<i class="th" style="left:${x}%"></i>`).join('')}<i class="bar" style="width:${Math.max(0, Math.min(100, s))}%"></i>${d ? `<i class="prev" style="left:${Math.max(0, Math.min(100, p))}%"></i>` : ''}</span>
+      <span class="val"><b>${R(s)}</b><small>${lv}</small>${d ? `<em>${d > 0 ? '↑' : '↓'}${Math.abs(d)}</em>` : ''}</span>
+    </button>`;
+  };
+  $('chartBox').innerHTML = `
+    <div class="tz-axis" aria-hidden="true"><span class="nm"></span><span class="trk">${[0, 30, 40, 60, 100].map(x => `<span style="left:${x}%">${x}</span>`).join('')}</span></div>
+    ${row('pinghe')}
+    <div class="tz-split">偏颇体质</div>
+    ${Z.PIAN.map(row).join('')}
+    <div class="tz-legend">
+      <span><i style="background:var(--lv2)"></i>是</span><span><i style="background:var(--lv1)"></i>倾向是 · 基本是</span><span><i style="background:var(--lv0)"></i>否</span>
+      <span><i class="dash"></i>判定线（偏颇 30、40；平和 60）</span>${pv && Z.ORDER.some(k => R(v.scores[k]) !== R(pv.scores[k])) ? '<span><i class="tick"></i>上一次（有变化的才标）</span>' : ''}
+    </div>`;
+}
+$('chartBox').addEventListener('click', e => {
+  const b = e.target.closest('.tz-row');
+  const el = b && $('t-' + b.dataset.k);
+  if (!el) return;
+  if (el.tagName === 'DETAILS') el.open = true;
+  el.scrollIntoView({ block: 'start', behavior });
+});
+
+// —— 各型卡片 ——
+function nowLine(k) {
+  if (!Y || !Y.sunLon) return '';
+  const lon = Y.sunLon(new Date()), season = Z.seasonOf(lon), tip = Z.seasonTip(k, season);
+  return `<p class="tz-now"><b>眼下${Z.termName(lon)}</b>（${season}）：${esc(tip.text)}</p>`;
+}
+function cardBody(k) {
+  const t = Z.TYPE[k], s = t.std, c = t.care;
+  return `
+    <section><h4>特征</h4><div class="tz-rows">
+      <div class="r"><i>常见</i><span>${s.biaoxian}</span></div>
+      <div class="r"><i>形体</i><span>${s.xingti}</span></div>
+      <div class="r"><i>心理</i><span>${s.xinli}</span></div>
+      <div class="r"><i>易患</i><span>${s.fabing}${k === 'pinghe' ? '' : '<small>（标准所列的倾向，不是必然）</small>'}</span></div>
+      <div class="r"><i>适应</i><span>${s.shiying}</span></div>
+    </div></section>
+    <section><h4>调养</h4><div class="tz-rows">
+      <div class="r"><i>饮食</i><span><b>宜</b>${c.yi}<br>${c.shao.indexOf('少吃') === 0 ? `<b>少吃</b>${c.shao.slice(2)}` : c.shao}</span></div>
+      <div class="r"><i>起居</i><span>${c.qiju}</span></div>
+      <div class="r"><i>运动</i><span>${c.yundong}</span></div>
+      <div class="r"><i>情志</i><span>${c.qingzhi}</span></div>
+    </div></section>
+    <section><h4>保健穴</h4><div class="tz-xue">${t.xue.map(x => `<div><b>${x.n}</b>${Z.XUE[x.n]}<em>${Z.HOW[x.how]}</em></div>`).join('')}</div>
+      <p class="tz-xnote">${Z.XUE_NOTE}</p></section>
+    <section><h4>节气</h4><p class="tz-jie">${t.jie.all}</p>${nowLine(k)}</section>`;
+}
+// 展开的卡片用 header 包住；收起的放进 summary（只放标题与一行字）
+function cardHead(k, v, role) {
+  const t = Z.TYPE[k];
+  return `<h3>${t.name}<small>${t.code} 型 · ${R(v.scores[k])} 分 · ${v.levels[k]}</small>${role ? `<span class="tz-role">${role}</span>` : ''}</h3><span class="gist">${t.gist}</span>`;
+}
+function card(k, v, role, open, wide) {
+  return open
+    ? `<article class="fb-card tz-type${wide ? ' wide' : ''}" id="t-${k}"><header>${cardHead(k, v, role)}</header>${cardBody(k)}</article>`
+    : `<details class="fb-card tz-type" id="t-${k}"><summary>${cardHead(k, v, role)}</summary><div class="body">${cardBody(k)}</div></details>`;
+}
+function renderCards(v) {
+  const mine = v.kind === 'none' ? ['pinghe'] : v.main.concat(v.jian);
+  const tend = v.qing.slice(), seen = new Set(mine.concat(tend));
+  const rest = Z.ORDER.filter(k => !seen.has(k));
+  const role = k => v.kind === 'none' ? '参考' : v.kind === 'qing' ? '倾向' : Z.roleOf(v, k);
+  const notes = [];
+  if (v.kind === 'none') notes.push('九种都没到判定线：平时照平和质的法子起居饮食即可；过段时间可以再测一次。');
+  if (mine.length > 1) notes.push(v.main.length > 1 ? '几型同分并列：调养各取所需，相互矛盾的地方以平和为度。' : '兼夹体质：调养以主体质为先，兼顾其余几型。');
+  const found = mine.concat(tend);
+  if (found.indexOf('yangxu') >= 0 && (found.indexOf('yinxu') >= 0 || found.indexOf('shire') >= 0))
+    notes.push(`阳虚与${found.indexOf('yinxu') >= 0 ? '阴虚' : '湿热'}同时出现：一个宜温、一个宜清，饮食别只顾一头，进补、艾灸之前最好请中医面诊。`);
+  const wide = mine.length === 1 && !tend.length;
+  $('cardsBox').innerHTML = (notes.length ? `<p class="tz-warn">${notes.join('<br>')}</p>` : '') +
+    mine.map(k => card(k, v, role(k), true, wide)).join('') + tend.map(k => card(k, v, '倾向', false)).join('');
+  $('restBox').innerHTML = rest.map(k => card(k, v, '', false)).join('');
+  $('restWrap').hidden = !rest.length;
+}
+
+// —— 历次 ——
+function renderHist() {
+  const cols = H.slice(-6), off = H.length - cols.length, md = t => t.slice(5, 10).replace('-', '/');
+  // 同一天测了几次：日期下面再写时刻
+  const twice = d => cols.filter(e => e.t.slice(0, 10) === d).length > 1;
+  let grid;
+  if (H.length >= 2) {
+    const vs = cols.map(vOf);
+    grid = `<table class="tz-trend"><caption class="vh">近 ${cols.length} 次九型转化分</caption>
+      <thead><tr><th scope="col"><span class="vh">体质</span></th>${cols.map((e, j) => `<th scope="col" class="${off + j === at ? 'cur' : ''}"><button type="button" data-at="${off + j}" title="看 ${esc(e.t)} 的结果">${md(e.t)}${twice(e.t.slice(0, 10)) ? `<small>${esc(e.t.slice(11, 16))}</small>` : ''}</button></th>`).join('')}</tr></thead>
+      <tbody>${Z.ORDER.map((k, i) => `<tr><th scope="row">${Z.TYPE[k].short}</th>${cols.map((e, j) => {
+        const lv = vs[j].levels[k];
+        return `<td class="l${lvNum(lv)}${off + j === at ? ' cur' : ''}" title="${esc(e.t)} ${Z.TYPE[k].name} ${R(e.s[i])} 分 ${lv}">${R(e.s[i])}</td>`;
+      }).join('')}</tr>`).join('')}</tbody></table>`;
+  } else grid = '<p class="fb-fine">这是第一次。以后再测，这里会排出九型分数的变化。</p>';
+  const list = H.map((e, i) => [e, i]).reverse().map(([e, i]) => `
+    <li class="${i === at ? 'on' : ''}"><button type="button" class="go" data-at="${i}"${i === at ? ' aria-current="true"' : ''}><span class="d">${esc(e.t)}</span><span class="h">${esc(Z.lines(vOf(e)).key)}</span></button><button type="button" class="x" data-del="${i}" title="删掉这一次" aria-label="删掉 ${esc(e.t)} 这一次">×</button></li>`).join('');
+  $('histBox').innerHTML = grid + `<ul class="tz-hlist">${list}</ul>
+    <div class="tz-hfoot"><span class="fb-fine">只存在本机浏览器，最多留 ${MAX_H} 次</span><button type="button" class="fb-btn ghost" data-go="clear">全部清空</button></div>`;
+}
+$('histBox').addEventListener('click', e => {
+  const a = e.target.closest('[data-at]'), d = e.target.closest('[data-del]'), g = e.target.closest('[data-go]');
+  if (a) { showResult(+a.dataset.at); $('resHead').scrollIntoView({ block: 'start', behavior }); }
+  else if (d) {
+    const i = +d.dataset.del, e0 = H[i];
+    if (!e0 || !confirm(`删掉 ${e0.t} 这一次的结果？`)) return;
+    H.splice(i, 1); saveH();
+    if (!H.length) { home(); return; }
+    showResult(i === at ? H.length - 1 : at > i ? at - 1 : at);
+  } else if (g && g.dataset.go === 'clear') {
+    if (!confirm(`清空本机的 ${H.length} 次结果？清空后找不回来。`)) return;
+    H = []; saveH(); home();
+  }
+});
+
+// —— 复制 · 问 AI · 再测 ——
+function resultText() {
+  const e = H[at], prev = at > 0 ? H[at - 1] : null;
+  return Z.summary({ v: vOf(e), ans: Z.unpack(e.a), sex: e.x, date: e.t, prev: prev && { date: prev.t, v: vOf(prev) } });
+}
+$('resHead').addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (!g || !H[at]) return;
+  if (g.dataset.go === 'copy') F.copy(resultText(), '结果已复制');
+  else if (g.dataset.go === 'ai') F.askAI('中医体质辨识', resultText(), Z.RULES_TEXT);
+  else if (g.dataset.go === 'share') {
+    // 分享图：结论作金句（页上那一句），九种体质按分数排下来；不写性别与日期
+    const v = vOf(H[at]), ks = Object.keys(v.scores).sort((a, b) => v.scores[b] - v.scores[a]);
+    F.share({ title: '我的体质', meta: '中华中医药学会《中医体质分类与判定》六十问 · 自评，不替代医嘱',
+      lines: ks.slice(0, 7).map(k => [Z.TYPE[k].short, `${R(v.scores[k])} 分 · ${v.levels[k]}`]),
+      url: location.origin + '/tizhi/', qrLabel: '扫码也测一测' });
+  }
+  else if (g.dataset.go === 'again') { if (cur) renderQuiz(true); else start(H[at].x || store.get(LS_X, 'f')); }
+  else if (g.dataset.go === 'latest') showResult(H.length - 1, true);
+});
+
+/* ================ 开页 ================ */
+$('rulesList').innerHTML = Z.RULES.map(r => `<li><b>${r[0]}</b>${r[1]}</li>`).join('') +
+  `<li><b>条目核对</b>题干按标准附录 A 录入，与两份公开整理逐条比对过：<a href="https://github.com/chihyungchang/TCM-Body-Constitution-Test" rel="noopener">chihyungchang/TCM-Body-Constitution-Test</a>（MIT）、<a href="https://github.com/zzqsld/TCM-Constitution-Assessment" rel="noopener">zzqsld/TCM-Constitution-Assessment</a>（Apache-2.0）；三方条目、归型、逆向计分一致，个别用字（如「晦黯／晦暗」）取多数。只取标准文字，没有拷贝它们的代码。</li>
+  <li><b>新国标</b>2025 年另发布国家标准 GB/T 46939—2025《中医体质分类与判定》（2026 年 4 月 1 日起实施），条目精简到二十余条；本页仍用 2009 版 60 条全表，两者结果可能略有出入。</li>`;
+
+const saved = store.get(LS_P, null);
+if (saved && SEX[saved.x] && typeof saved.a === 'string') {
+  cur = { x: saved.x, ans: Z.unpack(saved.a), i: +saved.i || 0 };
+  const n = nDone();
+  if (n >= qsOf().length) finish();
+  else { renderQuiz(); if (n) F.toast(`接着上次：已答 ${n} 题`); }
+} else if (H.length) showResult(H.length - 1);
+else { renderIntro(); show('introBox'); }
+})();
+</script>
+</body>
+</html>

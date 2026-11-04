@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=LXGW+WenKai+TC&family=Archivo:wdth,wght@125,500;125,800&display=swap">
-<link rel="stylesheet" href="/fabao/fabao.css?v=6">
+<link rel="stylesheet" href="/fabao/fabao.css?v=7">
 <style>
 /* 奇门手记 · 盘面与表单（外框见 /fabao/fabao.css） */
 :root{ --qi:#E7C77E; }  /* 三奇：淡金，比局数那一处金轻一档 */
@@ -23,6 +23,9 @@
 .qm-sub b{color:var(--fg);font-weight:400;font-family:var(--font-title)}
 .qm-jie{display:flex;gap:4px 10px;flex-wrap:wrap;font-size:12px;color:var(--faint);letter-spacing:.05em}
 .qm-jie b{color:var(--muted);font-weight:400;font-family:var(--font-title)}
+.qm-jie .qm-sch{color:var(--zi-2)}
+#schoolKou b{font-weight:400;color:var(--fg-2)}
+.qm-set select#schoolSel{flex:1;max-width:16em}
 .override{display:none;gap:8px;align-items:center}
 .override.on{display:flex}
 .override select{flex:1}
@@ -304,13 +307,14 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
         <button type="button" class="fb-btn grow" id="copyPan">复制盘面</button>
         <button type="button" class="fb-btn grow" id="copyLink">此盘链接</button>
         <button type="button" class="fb-btn grow" id="askAI" title="把盘面、题型断语和口径打包复制，贴给任意 AI">问 AI</button>
+        <button type="button" class="fb-btn grow" id="shareImg" title="把这一局画成一张图，可存可分享">分享图</button>
       </div>
       <div class="override" id="overrideRow">
         <select id="ovDun" aria-label="阴阳遁"><option value="yang">阳遁</option><option value="yin">阴遁</option></select>
         <select id="ovJu" aria-label="局数"></select>
         <button type="button" class="fb-btn ghost" id="ovClear">恢复自动</button>
       </div>
-      <div class="fb-fine">按节气与符头自动定局（拆补法）· 可排 1900–2100 年</div>
+      <div class="fb-fine" id="juFine">按节气与符头自动定局（拆补法）· 可排 1900–2100 年</div>
     </div>
   </section>
 
@@ -340,6 +344,15 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
       <details class="qm-set" id="setBox">
         <summary>盘面设置 · <b id="setSum"></b></summary>
         <div class="set-row">
+          <label for="schoolSel">流派</label>
+          <select id="schoolSel" aria-label="定局流派">
+            <option value="chaibu">拆补（默认）</option>
+            <option value="zhirun">置闰 · 超神接气</option>
+            <option value="maoshan">茅山 · 交节起元</option>
+          </select>
+        </div>
+        <p class="hint" id="schoolHint"></p>
+        <div class="set-row">
           <label>所在地</label>
           <select id="lonCity" aria-label="城市"></select>
           <button type="button" class="fb-btn ghost" id="geoBtn">定位</button>
@@ -363,7 +376,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
     </div>
 
     <div class="qm-side">
-      <div class="qm-verdict" id="verdict" hidden></div>
+      <div class="qm-verdict" id="verdict" hidden data-gloss></div>
       <div class="fb-seg" id="secSeg">
         <button type="button" data-s="new" class="on">起局</button>
         <button type="button" data-s="ge">格局</button>
@@ -435,6 +448,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
         <div id="zeList"></div>
         <p class="hint">大吉格指青龙返首、飞鸟跌穴、九遁、三奇升殿、玉女守门。「无瑕」＝本时辰不逢五不遇时、伏吟、反吟，且至少有一个吉格所在宫不空、不迫、不刑、不墓。点一行跳到那一时辰。</p>
         <p class="hint">口径：十干克应、九遁、三奇升殿等取《烟波钓叟歌》《奇门遁甲统宗》常见说法；入墓按十二长生阳顺阴逆（乙丙戊墓乾，丁己庚墓艮，辛壬墓巽，癸墓坤）；隐干按地盘干随八门同转；刑墓只标天盘干。格局只是提示，断事仍以用神为主。</p>
+        <p class="hint" id="schoolKou"></p>
       </section>
 
       <!-- 复盘：全部判例，随时补反馈、改复盘 -->
@@ -456,25 +470,46 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
   </div>
 </main>
 
-<script src="/fabao/fabao.js?v=13"></script>
+<script src="/fabao/fabao.js?v=14"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
-<script src="/qimen/core.js?v=4"></script>
+<script src="/qimen/core.js?v=5"></script>
 <script>
 /* ================= state ================= */
 const LS='qmsj.v1', LSV='qmsj.view';
 const load=()=>{try{return JSON.parse(localStorage.getItem(LS))||[]}catch(e){return[]}};
 const save=es=>{try{localStorage.setItem(LS,JSON.stringify(es))}catch(e){Fabao.toast('本机存储不可用，未能保存')}};
 let entries=load();
-let view={wx:true,hid:true,dgod:true,solar:false,lon:139.69,lat:35.68,ming:''};
+let view={wx:true,hid:true,dgod:true,solar:false,lon:139.69,lat:35.68,ming:'',school:'chaibu'};
 try{Object.assign(view,JSON.parse(localStorage.getItem(LSV))||{})}catch(e){}
+// 定局流派（拆补 / 置闰 / 茅山）。离线时若拿到的是旧版 core.js（没有流派），只剩拆补
+const SCHOOLS=QM.SCHOOLS||{chaibu:'拆补'};
+if(!SCHOOLS[view.school]) view.school='chaibu';
+// 网址带 ?school=zhirun 时按链接的流派排（「此盘链接」会带上），不改存着的偏好
+(()=>{try{const s=new URLSearchParams(location.search).get('school');if(s&&SCHOOLS[s])view.school=s}catch(e){}})();
 let curDate=new Date(); curDate.setSeconds(0,0);
 let override=null;
 let curType='天气';
 let selP=null;
 let cur=null;     // 当前盘
-// 起盘选项：真太阳时经度、年命
-const chartOpts=()=>({solarLon:view.solar&&isFinite(+view.lon)?+view.lon:undefined, mingYear:+view.ming>=1900&&+view.ming<=2100?+view.ming:undefined});
+// 起盘选项：真太阳时经度、年命、定局流派（判例里也存这一份）
+const chartOpts=()=>({solarLon:view.solar&&isFinite(+view.lon)?+view.lon:undefined, mingYear:+view.ming>=1900&&+view.ming<=2100?+view.ming:undefined, school:view.school});
+// 流派：盘头、复制盘面、问 AI、判例共用
+const SCHOOL_FINE={chaibu:'按节气与符头自动定局（拆补法）',zhirun:'按符头统领节气自动定局（置闰法 · 超神接气）',maoshan:'交节起上元、六十时辰一元（茅山法）'};
+const SCHOOL_RULE={chaibu:'拆补定局（节气按交节时刻，元按日柱符头）',
+  zhirun:'置闰定局（上元符头每十五日统领一气，超神接气；二至前超神满九日——含头计，即符头早于交节日 8 日以上——则于芒种或大雪重排本气三元；交节日按北京时间）',
+  maoshan:'茅山定局（不论符头，交节所在时辰起上元，六十时辰一元，下元用到下一节气）'};
+const SCHOOL_HINT={
+  chaibu:'拆补：节气照交节时刻换，元看日柱的符头（甲、己日）：子午卯酉上元，寅申巳亥中元，辰戌丑未下元。交节落在一元当中就把这一元「拆」开，前用旧气、后用新气，不置闰。多数排盘软件默认此法。',
+  zhirun:'置闰：上元符头（甲子、己卯、甲午、己酉日）起，每十五日统领一个节气，元仍看符头。符头先到叫超神，节气未交就用下一气上元；节气先到叫接气，交了节仍续用上一气下元。冬至、夏至前超神满九日（古书含头计，即符头早于交节日 8 日以上），就在芒种或大雪之后把本气三元再排一遍，叫闰奇。交节日按北京时间计。',
+  maoshan:'茅山：不论符头。一交节就用本节气上元，从交节所在的时辰数起，上元用满六十时辰（五日）接中元，再六十时辰接下元；下元用满而下一节气未到，仍用下元。不置闰。'};
+// 「上元」；置闰用的不是天文节气、或闰奇时写全：「闰大雪下元」「夏至上元」
+const juLabel=c=>c.school==='zhirun'&&(c.leap||c.juTerm!==c.term)?(c.leap?'闰':'')+c.juTerm+c.yuan:c.yuan;
+function schoolNote(c){
+  if(c.school==='zhirun') return c.leap?`置闰 · 闰奇（重排${c.juTerm}三元）`:c.chaoName?`置闰 · ${c.chaoName}${c.chao?' '+Math.abs(c.chao)+' 日':''}`:'置闰';
+  if(c.school==='maoshan') return `茅山 · 交节后第 ${c.shichen+1} 个时辰`;
+  return '拆补';
+}
 const saveView=()=>{try{localStorage.setItem(LSV,JSON.stringify(view))}catch(e){}};
 const $=id=>document.getElementById(id);
 const toast=Fabao.toast;
@@ -645,20 +680,22 @@ function renderHeader(){
   renderMeihua(c);
   $('pillars').innerHTML=[['年',c.pillars.year],['月',c.pillars.month],['日',c.pillars.day],['时',c.pillars.hour]]
     .map(([l,v])=>`<span class="fb-pillar"><small>${l}</small><b>${v}</b></span>`).join('');
-  $('juMain').innerHTML=`<strong>${c.dun} ${c.ju} 局</strong><span class="sep">·</span>${c.yuan}`;
+  $('juMain').innerHTML=`<strong>${c.dun} ${c.ju} 局</strong><span class="sep">·</span>${juLabel(c)}`;
   const lu=lunar(curDate);
   const so=c.solar, sg=x=>(x>=0?'+':'−')+Math.abs(x).toFixed(0);
   $('juTerm').textContent=`${fmt(curDate)} 周${WEEK[curDate.getDay()]}${lu?' · 农历'+lu:''} ${ZHI[c.idx.hour%12]}时`+
     (so?` · 真太阳时 ${pad(c.clock.getHours())}:${pad(c.clock.getMinutes())}（经度${sg(so.lonFix)} 均时差${sg(so.eot)} 分）`:'');
-  $('juTag').textContent=c.overridden?'手动局':'时家转盘';
+  $('juTag').textContent=c.overridden?'手动局':'时家转盘 · '+(c.schoolName||'拆补');
   $('juSub').innerHTML=`<span>值符 <b>${c.zhifuStar}</b>⇢${PN[c.zfPalace]}</span><span class="sep">·</span>
     <span>值使 <b>${c.zhishiDoor}</b>⇢${PN[c.zhishiPalace]}</span><span class="sep">·</span>
     <span>旬首 <b>${c.xunShou}</b></span><span class="sep">·</span>
     <span>日空 <b>${c.dayKong.join('')}</b> 时空 <b>${c.kong.join('')}</b></span><span class="sep">·</span>
     <span>马 <b>${c.horseBranch}</b></span>`;
-  $('juJie').innerHTML=`<span><b>${c.term}</b> ${mdhm(c.termStart.t)} 交</span><span>下一气 <b>${c.termNext.n}</b> ${mdhm(c.termNext.t)}</span><span>（本机时区）</span>`;
+  $('juJie').innerHTML=`<span><b>${c.term}</b> ${mdhm(c.termStart.t)} 交</span><span>下一气 <b>${c.termNext.n}</b> ${mdhm(c.termNext.t)}</span><span>（本机时区）</span>`+
+    (c.school?`<span class="qm-sch">${schoolNote(c)}${c.school==='zhirun'&&c.juTerm!==c.term?` · 用<b>${c.juTerm}</b>局`:''}</span>`:'');
+  $('juFine').textContent=SCHOOL_FINE[view.school]+' · 可排 1900–2100 年 · 流派在「盘面设置」里换';
   $('ovToggle').textContent=c.overridden?'手动局 ✎':'改局';
-  $('boundaryWarn').hidden=!c.nearBoundary;
+  $('boundaryWarn').hidden=!c.nearBoundary||c.school==='zhirun';   // 置闰按日换局，交节那一刻不换
   renderGe();
   paintSettings();
   return c;
@@ -692,6 +729,7 @@ function renderGe(){
       ${selP!==5?`<div class="ge-h">应期候选</div>${yqHTML(QM.yingqi(c,selP,c.sky[selP].stems[0]))}`:''}
       ${d.ge.length?`<div class="ge-h">本宫格局</div>${d.ge.map(geItem).join('')}`:''}`;
   }
+  $('schoolKou').innerHTML=`定局流派（盘面设置里换）：${['chaibu','zhirun','maoshan'].map(k=>k===view.school?`<b>${SCHOOL_HINT[k]}</b>`:SCHOOL_HINT[k]).join(' ')} 三家只差「用哪一气、哪一元」，局定之后星门神干的排法、格局、用神与白话断语都同一套口径。`;
   const ji=all.filter(g=>g.tone==='吉'), xiong=all.filter(g=>g.tone!=='吉');
   $('geList').innerHTML=`<div class="ge-h">全盘吉格 · ${ji.length}</div>${ji.length?ji.map(geItem).join(''):'<div class="ge-none">无</div>'}
     <div class="ge-h">全盘凶格 · ${xiong.length}</div>${xiong.length?xiong.map(geItem).join(''):'<div class="ge-none">无</div>'}`;
@@ -787,9 +825,15 @@ function paintSettings(){
   $('mingIn').value=view.ming||'';
   const c=cur;
   $('mingOut').textContent=c&&c.ming?`${c.ming.gz}年 · 命干${c.ming.stem} · 天盘落${c.ming.skyP.map(p=>PN[p]).join('、')||'—'}`:'';
-  const sum=[hit?hit[0]:`${(+view.lon).toFixed(2)}°E ${(+view.lat).toFixed(2)}°N`, view.solar?'真太阳时':'钟点时', c&&c.ming?'年命'+c.ming.gz:''].filter(Boolean).join(' · ');
+  $('schoolSel').value=view.school; $('schoolHint').textContent=SCHOOL_HINT[view.school];
+  const sum=[SCHOOLS[view.school], hit?hit[0]:`${(+view.lon).toFixed(2)}°E ${(+view.lat).toFixed(2)}°N`, view.solar?'真太阳时':'钟点时', c&&c.ming?'年命'+c.ming.gz:''].filter(Boolean).join(' · ');
   $('setSum').textContent=sum;
 }
+[...$('schoolSel').options].forEach(o=>{if(!SCHOOLS[o.value])o.remove()});
+$('schoolSel').onchange=()=>{
+  const v=$('schoolSel').value; if(!SCHOOLS[v]) return;
+  view.school=v; saveView(); renderHeader(); toast('定局流派：'+SCHOOLS[v]);
+};
 $('solarTg').onclick=()=>{view.solar=!view.solar;saveView();renderHeader()};
 $('lonCity').onchange=()=>{const v=$('lonCity').value;if(v!==''){const [,l,a]=CITIES[+v];view.lon=l;view.lat=a;saveView();renderHeader()}else $('lonIn').focus()};
 $('latIn').onchange=()=>{const v=parseFloat($('latIn').value);if(isFinite(v)&&v>=-90&&v<=90){view.lat=Math.round(v*100)/100;saveView();renderHeader()}else toast('纬度应在 −90 到 90 之间')};
@@ -834,7 +878,7 @@ document.addEventListener('keydown',e=>{
 function panText(c){
   const L=[];
   L.push(`奇门 · ${fmt(c.date)} 周${WEEK[c.date.getDay()]}${lunar(c.date)?' 农历'+lunar(c.date):''}`);
-  L.push(`${c.pillars.year} ${c.pillars.month} ${c.pillars.day} ${c.pillars.hour}　${c.term} ${c.dun}${c.ju}局（${c.yuan}）${c.overridden?' 手动局':''}`);
+  L.push(`${c.pillars.year} ${c.pillars.month} ${c.pillars.day} ${c.pillars.hour}　${c.term} ${c.dun}${c.ju}局（${juLabel(c)}）${c.overridden?' 手动局':''}　定局：${schoolNote(c)}`);
   if(c.solar) L.push(`真太阳时 ${pad(c.clock.getHours())}:${pad(c.clock.getMinutes())}（东经${(+view.lon).toFixed(2)}°）`);
   if(c.ming) L.push(`年命 ${c.ming.gz}（${c.ming.stem}），天盘落${c.ming.skyP.map(p=>PN[p]).join('、')||'—'}`);
   L.push(`值符 ${c.zhifuStar}落${PN[c.zfPalace]}　值使 ${c.zhishiDoor}落${PN[c.zhishiPalace]}　日空 ${c.dayKong.join('')}　时空 ${c.kong.join('')}　马 ${c.horseBranch}`);
@@ -862,11 +906,29 @@ $('askAI').onclick=()=>{
   }
   const q=($('fQ')&&$('fQ').value.trim())||'';
   if(q) body='所问：'+q+'\n\n'+body;
-  Fabao.askAI('时家奇门遁甲', body, '时家转盘，拆补定局；隐干按地盘干随八门同转；入墓按十二长生阳顺阴逆（乙丙戊墓乾，丁己庚墓艮，辛壬墓巽，癸墓坤）；击刑：戊震、己坤、庚艮、辛离、壬巽、癸巽；门迫为门克宫。用神按题型取，看与日干宫的生克、空亡、入墓、击刑、门迫与格局。');
+  Fabao.askAI('时家奇门遁甲', body, '时家转盘，'+SCHOOL_RULE[cur.school||'chaibu']+'；隐干按地盘干随八门同转；入墓按十二长生阳顺阴逆（乙丙戊墓乾，丁己庚墓艮，辛壬墓巽，癸墓坤）；击刑：戊震、己坤、庚艮、辛离、壬巽、癸巽；门迫为门克宫。用神按题型取，看与日干宫的生克、空亡、入墓、击刑、门迫与格局。');
+};
+$('shareImg').onclick=()=>{
+  if(!cur) return;
+  const c=cur, typ=curType==='考试'?'考试·面谈':curType, u=new URL(location.href);
+  u.search=''; u.hash=''; u.searchParams.set('t',Fabao.toLocalInput(curDate));
+  if(view.school!=='chaibu') u.searchParams.set('school',view.school);
+  if(curType) u.searchParams.set('type',curType);
+  let key=`${c.dun} ${c.ju} 局 · ${juLabel(c)}`, lines=[];
+  if(curType!=='天气'){
+    const v=QM.verdict(c,curType), tx=a=>a.slice(0,2).map(x=>x.t).join('；');
+    key=`${v.grade}：${v.pros.length?tx(v.pros):''}${v.cons.length?(v.pros.length?'；但':'')+tx(v.cons):''}`;
+    lines=v.lines.slice(0,5).map(l=>l.text.replace(/<[^>]+>/g,''));
+  }
+  const q=($('fQ')&&$('fQ').value.trim())||'';
+  if(q) lines.unshift(['所问',q]);
+  Fabao.share({ title:`${typ||'奇门'} · ${c.dun} ${c.ju} 局`, key, lines,
+    meta:$('juTerm').textContent.replace(/\s+/g,' ').trim(), url:u.toString() });
 };
 $('copyLink').onclick=()=>{
   const u=new URL(location.href); u.search=''; u.hash='';
   u.searchParams.set('t',Fabao.toLocalInput(curDate));
+  if(view.school!=='chaibu') u.searchParams.set('school',view.school);
   Fabao.copy(u.toString(),'此盘链接已复制');
 };
 
@@ -951,7 +1013,7 @@ $('saveBtn').onclick=()=>{
   }
   const now=Date.now();
   entries.unshift({id:now, t:curDate.getTime(), type:curType, pred, ...extra,
-    ov:override, opts:chartOpts(), pan:{dun:c.dun,ju:c.ju,yuan:c.yuan,term:c.term,zf:c.zhifuStar+'落'+c.zfPalace,zs:c.zhishiDoor+'落'+c.zhishiPalace,
+    ov:override, opts:chartOpts(), pan:{dun:c.dun,ju:c.ju,yuan:juLabel(c),term:c.term,school:schoolNote(c),zf:c.zhifuStar+'落'+c.zfPalace,zs:c.zhishiDoor+'落'+c.zhishiPalace,
       pillars:c.pillars, kong:c.kong.join(''), dayKong:c.dayKong.join(''),
       ge:QM.analyze(c).map(g=>g.name+(g.p?'('+PN[g.p]+')':'')), ys:ysSummary(c,curType)},
     attr:fb.attr, actual:fb.actual, note:fb.note, ...(reviewed(fb)?{rt:now}:{})});
@@ -1027,7 +1089,7 @@ function mdOf(e){
   return `## 奇门判例 · ${e.type} · ${fmt(new Date(e.t))}
 
 - **四柱**：${e.pan.pillars.year}年 ${e.pan.pillars.month}月 ${e.pan.pillars.day}日 ${e.pan.pillars.hour}时
-- **局**：${e.pan.term} · ${e.pan.dun}${e.pan.ju}局（${e.pan.yuan}）${e.ov?' · 手动改局':''}${e.opts&&typeof e.opts.solarLon==='number'?' · 真太阳时（东经'+e.opts.solarLon+'°）':''}${e.opts&&e.opts.mingYear?' · 年命'+e.opts.mingYear:''}
+- **局**：${e.pan.term} · ${e.pan.dun}${e.pan.ju}局（${e.pan.yuan}）${e.pan.school?' · '+e.pan.school:''}${e.ov?' · 手动改局':''}${e.opts&&typeof e.opts.solarLon==='number'?' · 真太阳时（东经'+e.opts.solarLon+'°）':''}${e.opts&&e.opts.mingYear?' · 年命'+e.opts.mingYear:''}
 ${e.pan.ys?'- **用神**：'+e.pan.ys+'\n':''}- **值符**：${e.pan.zf}宫｜**值使**：${e.pan.zs}宫｜**空亡**：${e.pan.dayKong?'日'+e.pan.dayKong+' 时'+e.pan.kong:e.pan.kong}${e.pan.ge&&e.pan.ge.length?'\n- **格局**：'+e.pan.ge.join('、'):''}
 
 ### 断语
@@ -1044,9 +1106,10 @@ function caseCard(e){
   const done=reviewed(e);
   const st=e.attr?`<span style="color:${e.attr==='验中'?'var(--lv)':'var(--zhu)'}">${e.attr}</span>`:`<span class="todo">${done?'已复盘':'未复盘'}</span>`;
   const sum=[e.actual&&`<p><b>反馈</b>${esc(e.actual)}</p>`,e.note&&`<p><b>复盘</b>${esc(e.note)}</p>`].filter(Boolean).join('');
+  const sch=e.opts&&e.opts.school&&e.opts.school!=='chaibu'?SCHOOLS[e.opts.school]:'';   // 非拆补的判例标出流派
   card.innerHTML=`
     <div class="meta"><span>${fmt(new Date(e.t))} · ${e.type}</span>${st}</div>
-    <div class="pansum">${e.pan.dun}${e.pan.ju}局 ${e.pan.term} · 值符${e.pan.zf}宫 · 值使${e.pan.zs}宫${e.ov?' · 手动局':''}</div>
+    <div class="pansum">${e.pan.dun}${e.pan.ju}局 ${e.pan.term}${sch&&String(e.pan.yuan).length>2?'（'+esc(e.pan.yuan)+'）':''} · 值符${e.pan.zf}宫 · 值使${e.pan.zs}宫${sch?' · '+sch:''}${e.ov?' · 手动局':''}</div>
     <div class="view"><div class="pred">${esc(e.pred)}</div>${sum?`<div class="fbsum">${sum}</div>`:''}</div>
     <div class="rowbtns">
       <button type="button" class="fb-btn${done?'':' primary'}" data-role="edit">${done?'修改':'复盘'}</button>
@@ -1086,8 +1149,9 @@ function caseCard(e){
   card.querySelector('[data-role="open"]').onclick=()=>{
     const d=new Date(e.t); $('dtInput').value=Fabao.toLocalInput(d); curDate=d; override=e.ov||null;
     if(e.opts){view.solar=typeof e.opts.solarLon==='number'; if(view.solar) view.lon=e.opts.solarLon; view.ming=e.opts.mingYear?String(e.opts.mingYear):view.ming;}
+    view.school=e.opts&&SCHOOLS[e.opts.school]?e.opts.school:'chaibu';   // 没存流派的旧判例都是拆补起的
     renderHeader();
-    window.scrollTo({top:0,behavior:'smooth'}); toast('已回到 '+fmt(d)+' 这一盘');
+    window.scrollTo({top:0,behavior:'smooth'}); toast('已回到 '+fmt(d)+' 这一盘'+(view.school!=='chaibu'?'（'+SCHOOLS[view.school]+'）':''));
   };
   return card;
 }
