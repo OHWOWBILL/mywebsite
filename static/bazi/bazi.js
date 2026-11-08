@@ -11,6 +11,7 @@
      日柱、时柱按出生地钟点（开真太阳时则按真太阳时）；
      子时两派可选：「次日」23 点起换日（默认，与紫微、奇门同）、
      「当日」晚子时日柱仍算本日，时柱照五鼠遁接次日子时。
+     流日按当地日期，自交节当日起；流时按五鼠遁，子时口径同上。
      大运阳男阴女顺、阴男阳女逆；起运以出生到前后节的分钟数折算：
      三日一年、一日四月、一时辰十日（一分钟折两小时）。
 
@@ -482,6 +483,41 @@
     return out;
   }
 
+  // 公历某日的日柱（与 chart() 同一算法，不论子时）
+  function dayGZ(y, mo, d) { return mod(jdn(y, mo, d) - 2415021 + 10, 60); }
+  // 流日：干支年 Y 第 k 个流月所辖各日。按 tz 当地日期，自交节当日排到下一节前一日；
+  // 交节那天记上节名与交节时刻（那天交节前仍属上一月，页面上注出）。
+  function liuri(Y, k, tz) {
+    tz = isFinite(+tz) ? +tz : 8;
+    var L = liuyue(Y), m = L[k];
+    if (!m) return [];
+    var nx = L[k + 1] || liuyue(Y + 1)[0];
+    var endT = nx ? nx.t : TERMS[TERMS.length - 1].t;
+    var d0 = Math.floor((m.t + tz * 3600e3) / DAY) * DAY, d1 = Math.floor((endT + tz * 3600e3) / DAY) * DAY;
+    var out = [];
+    for (var d = d0; d < d1; d += DAY) {
+      var f = fields(d), idx = dayGZ(f.y, f.mo, f.d);
+      out.push({ y: f.y, mo: f.mo, d: f.d, idx: idx, name: gzName(idx), jie: d === d0 ? m.jie : null, jieT: d === d0 ? m.t : null });
+    }
+    return out;
+  }
+  // 流时：某干支日 dayIdx 的十二时辰，时干按五鼠遁。
+  // zi 'next'（默认）：子时为前一日 23 点至本日 1 点，十二个；
+  // zi 'same'：早子 0–1 点接本日，另有晚子 23–24 点，时干接次日，共十三个。
+  var HOUR_SPAN = ['23–1', '1–3', '3–5', '5–7', '7–9', '9–11', '11–13', '13–15', '15–17', '17–19', '19–21', '21–23'];
+  function liushi(dayIdx, zi) {
+    var dg = dayIdx % 10, out = [];
+    for (var z = 0; z < 12; z++) {
+      var idx = gzIdx((dg % 5 * 2 + z) % 10, z);
+      out.push({ zhi: z, idx: idx, name: gzName(idx), span: z === 0 && zi === 'same' ? '0–1' : HOUR_SPAN[z], late: false });
+    }
+    if (zi === 'same') {
+      var li = gzIdx(((dg + 1) % 10) % 5 * 2 % 10, 0);
+      out.push({ zhi: 0, idx: li, name: gzName(li), span: '23–24', late: true });
+    }
+    return out;
+  }
+
   /* =========================================================
      四柱反推：给四柱干支，列出 1900–2100 年间合得上的时段
      names[3]（时柱）可空：时辰不详时列出合年月日三柱的整日
@@ -554,7 +590,7 @@
     JIE: JIE, PILLAR_NAME: PILLAR_NAME, RANGE: RANGE, TERMS: TERMS, LUNAR: LUNAR,
     chart: chart, analyze: analyze, extraCol: extraCol, shensha: shensha, relations: relations, tiaohou: tiaohou,
     shishen: shishen, stage: stage, nayin: nayin, kongOf: kongOf, wangshuai: wangshuai,
-    yearGZ: yearGZ, liuyue: liuyue, fromPillars: fromPillars, gzName: gzName, parseGZ: parseGZ, gzIdx: gzIdx,
+    yearGZ: yearGZ, liuyue: liuyue, liuri: liuri, liushi: liushi, dayGZ: dayGZ, fromPillars: fromPillars, gzName: gzName, parseGZ: parseGZ, gzIdx: gzIdx,
     isChinaDST: isChinaDST, eqTime: eqTime, fmtF: fmtF, fields: fields, mod: mod
   };
   if (isNode) module.exports = api; else root.BZ = api;

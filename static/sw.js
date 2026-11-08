@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-474370c8d99f';
+const V = 'fb-1d9568fe53bf';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -36,7 +36,7 @@ const PRE = [
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
   '/apple-touch-icon.png',
-  '/bazi/bazi.js?v=2',
+  '/bazi/bazi.js?v=3',
   '/bazi/qiongtong.js?v=1',
   '/fabao/app.webmanifest',
   '/fabao/backup.js?v=1',
