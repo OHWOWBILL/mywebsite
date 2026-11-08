@@ -3,7 +3,8 @@
 // 二、与 iztro（另一套独立实现，年柱按立春）对照三百个随机日；
 // 三、已知命例、神煞、干支关系、命宫胎元胎息逐项手算核对；
 // 四、子时两派、真太阳时、起运、农历、四柱反推；
-// 五、《穷通宝鉴》调候表：一百二十格齐全、逐格抽对原文、透干藏支的判法。
+// 五、《穷通宝鉴》调候表：一百二十格齐全、逐格抽对原文、透干藏支的判法；
+// 六、流日流时：逐日对照日柱、月份首尾相接，时柱两种子时口径。
 process.env.TZ = 'Etc/GMT-8';   // 让 core.js 按东八区解读本机时间（不含 1986–1991 夏令时）
 global.self = global;
 const B = require('../../static/bazi/bazi.js');
@@ -16,6 +17,7 @@ const eq = (a, b, what) => {
   if (JSON.stringify(a) !== JSON.stringify(b)) { bad++; console.log('✗', what, '得', JSON.stringify(a), '应', JSON.stringify(b)); }
   else ok++;
 };
+const ZHI_OF = z => '子丑寅卯辰巳午未申酉戌亥'[z];
 const names = c => c.pillars.map(p => p.name).join(' ');
 const at = (y, mo, d, h, mi, extra) => B.chart(Object.assign({ y, mo, d, h, mi, tz: 8, male: true }, extra || {}));
 let seed = 20261101;
@@ -267,6 +269,49 @@ for (let k = 0; k < 400; k++) {
   run('bazi/qiongtong.js');
   eq(JSON.stringify(box.BZ.analyze(box.BZ.chart(inp)).tiaohou), JSON.stringify(t90), '浏览器：载入调候表后与 node 结果一致');
 }
+
+// —— 六、流日 · 流时 ——
+// 流日：随机抽年月，逐日与 chart() 当日正午的日柱、月柱对照；十二个月首尾相接、天数合计等于一年
+for (let n = 0; n < 40; n++) {
+  const Y = 1901 + Math.floor(rnd() * 198), tz = [8, 9, -5][n % 3];
+  let total = 0, prevEnd = null;
+  for (let k = 0; k < 12; k++) {
+    const R = B.liuri(Y, k, tz), m = B.liuyue(Y)[k];
+    total += R.length;
+    eq(R.length >= 29 && R.length <= 32, true, `${Y} 第${k + 1}月流日天数 ${R.length}`);
+    eq(R[0].jie, m.jie, `${Y} 第${k + 1}月首日标节`);
+    const first = Date.UTC(R[0].y, R[0].mo - 1, R[0].d);
+    if (prevEnd != null) eq(first - prevEnd, 864e5, `${Y} 第${k + 1}月与上月首尾相接`);
+    prevEnd = Date.UTC(R.at(-1).y, R.at(-1).mo - 1, R.at(-1).d);
+    R.forEach((r, i) => {
+      const c = B.chart({ y: r.y, mo: r.mo, d: r.d, h: 12, mi: 0, tz, male: true });
+      if (c.pillars[2].idx !== r.idx) eq(r.name, c.pillars[2].name, `流日 ${r.y}-${r.mo}-${r.d}`); else ok++;
+      if (i > 0 && c.pillars[1].idx !== m.idx) eq(c.pillars[1].name, m.name, `流日 ${r.y}-${r.mo}-${r.d} 所属流月`);
+    });
+  }
+  eq(total >= 365 && total <= 366, true, `${Y} 干支年流日合计 ${total}`);
+}
+// 流时：与 chart() 各时辰的时柱对照（两种子时口径）
+for (let n = 0; n < 60; n++) {
+  const t = Date.UTC(1901, 0, 1) + Math.floor(rnd() * 198 * 365) * 864e5, f = new Date(t);
+  const y = f.getUTCFullYear(), mo = f.getUTCMonth() + 1, d = f.getUTCDate();
+  ['next', 'same'].forEach(zi => {
+    const di = B.dayGZ(y, mo, d), H = B.liushi(di, zi);
+    eq(H.length, zi === 'same' ? 13 : 12, `流时个数 ${zi}`);
+    for (let z = 1; z < 12; z++) eq(H[z].name, at(y, mo, d, z * 2, 30, { zi }).pillars[3].name, `流时 ${y}-${mo}-${d} ${ZHI_OF(z)} ${zi}`);
+    // 子时：「子时换日」取前一日 23:30 那一刻；「晚子当日」早子取本日 0:30，晚子取本日 23:30
+    const pv = new Date(t - 864e5);
+    if (zi === 'next') eq(H[0].name, at(pv.getUTCFullYear(), pv.getUTCMonth() + 1, pv.getUTCDate(), 23, 30, { zi }).pillars[3].name, `子时换日 ${y}-${mo}-${d}`);
+    else {
+      eq(H[0].name, at(y, mo, d, 0, 30, { zi }).pillars[3].name, `早子 ${y}-${mo}-${d}`);
+      const lc = at(y, mo, d, 23, 30, { zi });
+      eq([H[12].name, lc.pillars[2].idx], [lc.pillars[3].name, di], `晚子 ${y}-${mo}-${d}`);
+    }
+  });
+}
+// 手算一例：2026-11-08 丙戌日；丙日戊子时起，酉时丁酉；晚子接丁日为庚子
+eq(B.liuri(2026, 9, 8).find(r => r.mo === 11 && r.d === 8).name, '丙戌', '2026-11-08 流日丙戌');
+eq(B.liushi(B.dayGZ(2026, 11, 8), 'same').map(h => h.name).join(''), '戊子己丑庚寅辛卯壬辰癸巳甲午乙未丙申丁酉戊戌己亥庚子', '丙戌日流时（晚子当日）');
 
 console.log(bad ? `\n${bad} 项不合，${ok} 项相合` : `全部相合（${ok} 项）`);
 process.exit(bad ? 1 : 0);
