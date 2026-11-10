@@ -1,10 +1,15 @@
-{{- /* 本站脚本合成一包：农历月表、历法小库、日课、日签、文章页四件、时令粒子、控制台彩蛋、五术门庭的灯、首页入阁全景。
-       各件自己判断当前页用不用得上，用不上就不动手。 */ -}}
-{{- $qj := slice "lunar" "li" "rike" "qian" "article" "season" "egg" "wushu" "ge" -}}
+{{- /* 本站脚本合成一包：农历月表、历法小库、日课、日签、文章页四件、时令粒子、控制台彩蛋、五术门庭的灯。
+       各件自己判断当前页用不用得上，用不上就不动手。
+       首页入阁全景（ge.js）占了一半多的分量，又只有首页用，单独一份只在首页挂。 */ -}}
+{{- $qj := slice "lunar" "li" "rike" "qian" "article" "season" "egg" "wushu" -}}
 {{- $parts := slice -}}
 {{- range $qj }}{{ $parts = $parts | append (resources.Get (printf "js/qj/%s.js" .)) }}{{ end -}}
 {{- $bundle := $parts | resources.Concat "js/qj.js" | minify | fingerprint "sha512" -}}
 <script src="{{ $bundle.RelPermalink }}" integrity="{{ $bundle.Data.Integrity }}"></script>
+{{- if .IsHome }}
+{{- $ge := resources.Get "js/qj/ge.js" | minify | fingerprint "sha512" }}
+<script src="{{ $ge.RelPermalink }}" integrity="{{ $ge.Data.Integrity }}"></script>
+{{- end }}
 <script>
 (function () {
   // ===== 星空（时令粒子画在同一张画布上） =====
@@ -75,18 +80,29 @@
 
     // 时令粒子（assets/js/qj/season.js）
     if (window.qjSeason) window.qjSeason.draw(ctx, W, H);
+  }
 
-
-    if (running) requestAnimationFrame(draw);
+  // 星与时令粒子都是「每帧走一步」。按 60 帧的步子走：高刷屏（90/120Hz）上不至于快一倍、也不多画一倍；
+  // 60Hz 的屏上每帧照画，和原先一样。
+  var STEP = 1000 / 60, last = 0, acc = 0, raf = 0;
+  function loop(now) {
+    if (!running) return;
+    raf = requestAnimationFrame(loop);
+    acc = Math.min(acc + (now - last), STEP * 2); last = now;
+    if (acc < STEP - 1) return;
+    acc = Math.max(0, acc - STEP);
+    draw();
   }
 
   // 减少动态效果：只画一帧静止的星空；切到后台标签时停表省电
   function start() {
     if (running || still.matches || document.hidden) return;
     running = true;
-    requestAnimationFrame(draw);
+    last = performance.now(); acc = 0;
+    raf = requestAnimationFrame(loop);
   }
-  function stop() { running = false; }
+  // 停表要把排着的那一帧也撤掉：不然切走再切回来，旧的一帧和新的一帧各起一圈，星星越跑越快
+  function stop() { running = false; cancelAnimationFrame(raf); }
 
   resize(); initStars(); draw();
   start();
