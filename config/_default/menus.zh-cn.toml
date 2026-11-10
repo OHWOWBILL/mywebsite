@@ -40,12 +40,14 @@
 
 [[main]]
   identifier = "x"
+  title = "X · @ohwowbill"
   pre = "x-twitter"
   url = "https://x.com/ohwowbill"
   weight = 90
 
 [[main]]
   identifier = "instagram"
+  title = "Instagram · @ohwowbill"
   pre = "instagram"
   url = "https://www.instagram.com/ohwowbill"
   weight = 100

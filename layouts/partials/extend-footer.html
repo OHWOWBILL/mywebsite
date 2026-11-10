@@ -10,6 +10,7 @@
   // ===== 星空（时令粒子画在同一张画布上） =====
   var canvas = document.createElement('canvas');
   canvas.id = 'qianjiao-stars';
+  canvas.setAttribute('aria-hidden', 'true');   // 纯装饰，读屏器略过
   canvas.style.cssText = [
     'position:fixed',
     'top:0', 'left:0',
