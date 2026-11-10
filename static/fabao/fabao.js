@@ -320,6 +320,10 @@
     mountDock(curTab, isKu);
     refreshMingbuLinks();
     if (!isKu && !locked) mountWen();
+    // 访问统计（不设 cookie），说明见 static/tj.js；法宝各页都经这里代引，不必逐页加标签
+    const tj = document.createElement('script');
+    tj.defer = true; tj.src = '/tj.js?v=1';
+    document.head.appendChild(tj);
     // 法宝一多，顶栏都用两字简称；当前这件滚进视野
     if (window.matchMedia('(max-width: 1500px)').matches) {
       top.querySelectorAll('.fb-tab .full').forEach((el, i) => { if (TOOLS[i].short) el.textContent = TOOLS[i].short; });
