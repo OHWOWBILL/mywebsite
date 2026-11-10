@@ -271,6 +271,12 @@ a { color: var(--zi-2); }
 .fb-toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 .fb-foot { margin-top: 40px; text-align: center; color: var(--faint); font-size: 12px; letter-spacing: .2em; }
+/* 延伸阅读：站里讲到这件法宝的文章（fabao.js mountWen） */
+.fb-wen { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; font-size: 14px; line-height: 1.7; }
+.fb-wen span { color: var(--faint); font-size: 12px; letter-spacing: .2em; }
+.fb-wen a { color: var(--fg-2); text-decoration: none; border-bottom: 1px solid var(--rule-2); transition: color .2s, border-color .2s; }
+.fb-wen a:hover { color: var(--zi-2); border-bottom-color: var(--zi-2); }
+.fb-wen + .fb-foot { margin-top: 24px; }
 
 @keyframes fbIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 

@@ -1053,6 +1053,19 @@ main > header h1 {
 .qj-pinned .qj-item { border-left-color: var(--zi); }
 .qj-head + .qj-pinned, .qj-intro + .qj-pinned { margin-top: 0; margin-bottom: 2.6rem; }
 
+/* 文末两块：本系列目录（partials/qj-series.html）、相关法宝（partials/qj-fabao-links.html）。
+   样子照首页的条目列表，放在正文之后、「相关文章」之前。 */
+.qj-series, .qj-fabao-links { max-width: 65ch; margin: 0 0 2.6rem; }
+.qj-series .qj-block-h, .qj-fabao-links .qj-block-h { display: flex; align-items: center; gap: .6rem; color: var(--ge-fg); }
+.qj-series .qj-here { border-left-color: var(--zi); }
+.qj-series .qj-here .qj-item-t { color: var(--ge-zi); }
+.qj-series .qj-here i { font-style: normal; font-family: var(--font-body); font-size: .75rem; letter-spacing: .1em; color: var(--ge-muted); margin-left: .7rem; }
+.qj-series-step { display: flex; justify-content: space-between; gap: 1.2rem; margin-top: 1rem; }
+.qj-series-step a { flex: 0 1 48%; text-decoration: none; font-family: var(--font-title); font-size: .95rem; line-height: 1.5; color: var(--ge-fg); transition: color .2s ease; }
+.qj-series-step a[rel="next"] { text-align: right; margin-left: auto; }
+.qj-series-step a:hover { color: var(--ge-zi); }
+.qj-series-step small { display: block; font-family: var(--font-body); font-size: .75rem; letter-spacing: .15em; color: var(--ge-muted); }
+
 /* --- 音律：三档（关 / 磬 / 磬与琴），琴档多一根弦 --- */
 .qj-yin-toggle .qj-yin-qin { display: none; }
 .qj-yin-toggle[data-yin="2"] .qj-yin-qin { display: inline; }

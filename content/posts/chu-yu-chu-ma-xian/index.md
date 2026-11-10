@@ -2,7 +2,9 @@
 title: "异闻录·其一｜初遇出马仙"
 date: 2026-05-14
 description: "塞北之行，初识出马仙家"
-categories: ["随笔", "异闻录"]
+categories: ["异闻录"]
+series: "异闻录"
+series_order: 1
 ---
 
 人还没见到出马仙，她家仙先上门来探我了。

@@ -2,7 +2,8 @@
 title: "命理师大赛2024题目解析（二）"
 date: 2024-09-27
 description: "星盘、八字、紫微、法达、卜卦 —— 五道情境题的交叉验证"
-categories: ["命", "知识点做题法"]
+categories: ["命"]
+fabao: ["/xingpan/", "/bazi/", "/ziwei/"]
 ---
 
 第一篇在这

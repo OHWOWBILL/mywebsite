@@ -2,10 +2,10 @@
 title: "寓意草（一）"
 date: 2024-05-10
 description: "读医案 · 喻嘉言寓意草第一案逐条拆解"
-categories: ["医", "医案"]
+categories: ["医"]
+series: "寓意草"
+series_order: 1
 ---
-
-# 读医案——寓意草（一）
 
 [寓意草原文](https://jicheng.tw/tcm/book/%e5%af%93%e6%84%8f%e8%8d%89/index.html)
 

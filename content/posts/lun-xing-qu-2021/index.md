@@ -2,7 +2,7 @@
 title: "论兴趣（2021）"
 date: 2023-04-20
 description: "依旧是怀旧文章"
-categories: ["过客文章", "随笔"]
+categories: ["过客文章"]
 ---
 
 任何一种兴趣都包含着

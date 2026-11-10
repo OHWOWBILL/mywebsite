@@ -1,7 +1,6 @@
 {{- /* ===========================================================
      置顶 · 首页与「万法归一」索引共用
      文章 front matter 写 `pinned: true` 即置顶，按 weight 小者在前。
-     标题里的「【置顶】」字样在这里去掉，改由「顶」印标示。
      传入：.title（区块标题）、.note（可选，小字说明）
      =========================================================== */ -}}
 {{- $pinned := where (where site.RegularPages "Section" "posts") "Params.pinned" true -}}
@@ -11,7 +10,7 @@
   <div class="qj-list">
     {{- range sort . "Weight" "asc" }}
     <a class="qj-item" href="{{ .RelPermalink }}">
-      <span class="qj-item-t">{{ replace .Title "【置顶】" "" | emojify }}</span>
+      <span class="qj-item-t">{{ .Title | emojify }}</span>
       {{- with (.Description | default (.Summary | plainify)) }}<span class="qj-item-s">{{ . | truncate 62 "…" }}</span>{{ end }}
     </a>
     {{- end }}

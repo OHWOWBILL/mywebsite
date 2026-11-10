@@ -2,7 +2,9 @@
 title: "医案随笔之寓意草——辨袁仲卿小男死證再生奇驗並詳誨門人（上）"
 date: 2024-05-20
 description: "医案随笔 · 寓意草第二案（上）"
-categories: ["医", "医案"]
+categories: ["医"]
+series: "寓意草"
+series_order: 2
 ---
 
 ## 前言

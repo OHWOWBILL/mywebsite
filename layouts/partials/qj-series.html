@@ -1,0 +1,40 @@
+{{- /* ===========================================================
+     系列导航 · 文末
+     文章 front matter 写：
+       series: "异闻录"      # 系列名，同名即同一系列
+       series_order: 2       # 第几篇（按它排，不按日期：其二可以写在其一之前）
+     一个系列至少两篇才出现。列出全系列，本篇标「本篇」；满三篇时下面再加一行上一篇、下一篇。
+     不走 Hugo 的分类法，不生成 /series/ 页。
+     =========================================================== */ -}}
+{{- with .Params.series }}
+{{- $name := . -}}
+{{- $all := sort (where (where site.RegularPages "Section" "posts") "Params.series" $name) "Params.series_order" "asc" -}}
+{{- if gt (len $all) 1 }}
+{{- $han := slice "〇" "一" "二" "三" "四" "五" "六" "七" "八" "九" "十" -}}
+{{- $i := 0 -}}
+{{- range $k, $p := $all }}{{ if eq $p.RelPermalink $.RelPermalink }}{{ $i = $k }}{{ end }}{{ end -}}
+{{- $n := len $all -}}
+<nav class="qj-block qj-series" aria-label="本系列：{{ $name }}">
+  <h2 class="qj-block-h"><span class="qj-seal" aria-hidden="true">系</span>{{ $name }}<span class="qj-pinned-note">共{{ if le $n 10 }}{{ index $han $n }}{{ else }} {{ $n }} {{ end }}篇</span></h2>
+  <div class="qj-list">
+    {{- range $k, $p := $all }}
+    {{- if eq $k $i }}
+    <span class="qj-item qj-here" aria-current="page"><span class="qj-item-t">{{ $p.Title | emojify }}<i>本篇</i></span></span>
+    {{- else }}
+    <a class="qj-item" href="{{ $p.RelPermalink }}"><span class="qj-item-t">{{ $p.Title | emojify }}</span></a>
+    {{- end }}
+    {{- end }}
+  </div>
+  {{- if gt $n 2 }}
+  <div class="qj-series-step">
+    {{- if gt $i 0 }}{{ $p := index $all (sub $i 1) }}
+    <a rel="prev" href="{{ $p.RelPermalink }}"><small>上一篇</small>{{ $p.Title | emojify }}</a>
+    {{- else }}<span></span>{{ end }}
+    {{- if lt $i (sub $n 1) }}{{ $p := index $all (add $i 1) }}
+    <a rel="next" href="{{ $p.RelPermalink }}"><small>下一篇</small>{{ $p.Title | emojify }}</a>
+    {{- end }}
+  </div>
+  {{- end }}
+</nav>
+{{- end }}
+{{- end }}

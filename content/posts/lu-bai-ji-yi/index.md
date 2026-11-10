@@ -2,7 +2,9 @@
 title: "鲁拜集（一）"
 date: 2024-06-15
 description: "从鲁拜集学波斯语 · 四行诗如绝句，一二四句押韵"
-categories: ["语言", "诗词", "波斯语", "词根词缀", "语法"]
+categories: ["语言", "诗词"]
+series: "鲁拜集"
+series_order: 1
 ---
 
 # 从鲁拜集学波斯语

@@ -2,7 +2,7 @@
 title: "秋。夜。雨（2021）"
 date: 2023-05-15
 description: "阁主最喜爱的一篇"
-categories: ["过客文章", "随笔"]
+categories: ["过客文章"]
 ---
 
 四季传衍，吾独爱秋
