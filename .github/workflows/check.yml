@@ -1,0 +1,62 @@
+name: 检查（PR）
+
+# 合并之前先过一遍：各件法宝的算法核对、离线清单与头信息是否最新、站点能否构建。
+# 只读，不发布；发布仍由另一份工作流在 main 上做。
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: 0.148.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 法宝算法核对
+        run: |
+          fail=0
+          for f in scripts/*/check.js; do
+            echo "::group::$f"
+            node "$f" || fail=1
+            echo "::endgroup::"
+          done
+          exit $fail
+
+      - name: 离线清单、法宝页头信息是否最新
+        run: |
+          node scripts/pwa/gen-sw.js --check
+          node scripts/seo/tool-meta.js --check
+
+      - name: Install Hugo CLI
+        run: |
+          wget -q -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
+          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+
+      - name: Cache processed images
+        uses: actions/cache@v4
+        with:
+          path: resources/_gen
+          key: hugo-img-${{ hashFiles('static/img/**', 'assets/img/**', 'layouts/_default/_markup/render-image.html') }}
+          restore-keys: hugo-img-
+
+      - name: Build with Hugo
+        env:
+          HUGO_ENVIRONMENT: production
+        run: hugo --minify --buildFuture
