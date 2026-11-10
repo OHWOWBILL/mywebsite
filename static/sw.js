@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-6234bd4b4e5d';
+const V = 'fb-c7baa3f34f7a';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -82,8 +82,8 @@ const PRE = [
   '/fabao/vendor/qrcode.js?v=1.4.4',
   '/fabao/wenti.js',
   '/favicon-32x32.png',
-  '/fonts/qj-rest.css?v=1c10c9e8',
-  '/fonts/qj.css?v=1c10c9e8',
+  '/fonts/qj-rest.css?v=652a41bd',
+  '/fonts/qj.css?v=652a41bd',
   '/hepan/hepan.js?v=1',
   '/jinkou/jinkou.js?v=1',
   '/jiuxing/jiuxing.js?v=1',
