@@ -30,8 +30,12 @@ for (const ch of [...chars].sort()) {
   const file = path.join(OUT, ch.codePointAt(0).toString(16) + '.json');
   if (fs.existsSync(file)) { had++; continue; }
   let raw;
-  try { raw = execFileSync('curl', ['-sSf', CDN + encodeURIComponent(ch) + '.json'], { encoding: 'utf8' }); }
-  catch (e) { miss.push(ch); continue; }
+  // jsdelivr 不通时退到 GitHub 原始文件（同一份数据）
+  for (const base of [CDN, 'https://raw.githubusercontent.com/chanind/hanzi-writer-data/master/']) {
+    try { raw = execFileSync('curl', ['-sSf', base + 'data/'.repeat(base === CDN ? 0 : 1) + encodeURIComponent(ch) + '.json'], { encoding: 'utf8' }); break; }
+    catch (e) { raw = null; }
+  }
+  if (!raw) { miss.push(ch); continue; }
   const d = JSON.parse(raw);
   if (!Array.isArray(d.strokes) || !Array.isArray(d.medians) || d.strokes.length !== d.medians.length) { miss.push(ch); continue; }
   fs.writeFileSync(file, JSON.stringify({ c: ch, s: d.strokes, m: d.medians }));
