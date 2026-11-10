@@ -8,12 +8,14 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-3cebc6cf5595';
+const V = 'fb-87e8fbcade41';
 const PRE = [
   '/bazi/',
   '/changsheng/',
+  '/dayan/',
   '/hepan/',
   '/huangli/',
+  '/jinkou/',
   '/jiuxing/',
   '/kanyu/',
   '/lingqian/',
@@ -38,12 +40,13 @@ const PRE = [
   '/apple-touch-icon.png',
   '/bazi/bazi.js?v=3',
   '/bazi/qiongtong.js?v=1',
+  '/dayan/dayan.js?v=1',
   '/fabao/app.webmanifest',
   '/fabao/backup.js?v=1',
   '/fabao/cidian.js?v=1',
   '/fabao/cities.js?v=1',
   '/fabao/fabao.css?v=8',
-  '/fabao/fabao.js?v=14',
+  '/fabao/fabao.js?v=15',
   '/fabao/jieqi-se.js?v=1',
   '/fabao/kyureki.js?v=1',
   '/fabao/lunar.js?v=1',
@@ -69,6 +72,8 @@ const PRE = [
   '/fabao/strokes/7981.json',
   '/fabao/strokes/7b7e.json',
   '/fabao/strokes/7d2b.json',
+  '/fabao/strokes/84cd.json',
+  '/fabao/strokes/8bc0.json',
   '/fabao/strokes/8d28.json',
   '/fabao/tongshu-hou.js?v=1',
   '/fabao/tongshu-shensha.js?v=1',
@@ -79,6 +84,7 @@ const PRE = [
   '/favicon-32x32.png',
   '/fonts/qj.css?v=1',
   '/hepan/hepan.js?v=1',
+  '/jinkou/jinkou.js?v=1',
   '/jiuxing/jiuxing.js?v=1',
   '/kanyu/kanyu.js?v=1',
   '/lingqian/data/guandi.js?v=1',
@@ -89,6 +95,7 @@ const PRE = [
   '/lingqian/lingqian.js?v=1',
   '/liuren/liuren.js?v=1',
   '/liuyao/liuyao.js?v=1',
+  '/meihua/data/hexagrams.js',
   '/meihua/data/hexagrams.js?v=3',
   '/meihua/data/yao_detail.json',
   '/meihua/data/yao.js',

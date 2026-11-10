@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#17131F">
+<title>大衍筮法 · 潜蛟阁法宝库</title>
+<meta name="description" content="大衍筮法揲蓍起卦：四十九策分二、挂一、揲四、归奇，三变成一爻，十八变成卦，每一变都看得见；按朱熹《易学启蒙》变占取辞，附卦辞爻辞白话，可复制或问 AI。">
+<link rel="icon" href="/favicon-32x32.png">
+<link rel="stylesheet" href="/fonts/qj.css?v=1">
+<link rel="stylesheet" href="/fabao/fabao.css?v=8">
+<style>
+/* 大衍筮法 · 蓍草台与卦（外框见 /fabao/fabao.css） */
+.dy-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;align-items:start}
+.dy-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;margin-bottom:10px}
+.dy-h h2{font-family:var(--font-title);font-weight:600;font-size:16px;letter-spacing:.2em}
+.dy-h small{font-size:12px;color:var(--faint);letter-spacing:.06em}
+.dy-card{padding:16px 18px}
+
+/* ---------- 蓍草台 ---------- */
+.dy-stage{position:relative;border-radius:var(--r);background:radial-gradient(120% 90% at 50% 100%,rgba(201,169,110,.08),transparent 60%),var(--bg-3);border:1px solid var(--rule);overflow:hidden}
+.dy-stage svg{display:block;width:100%;height:auto}
+.dy-stage .ce{fill:#cdb27a}
+.dy-stage .ce.yu{fill:var(--jin)}
+.dy-stage .ce.gua{fill:#e6d3a3}
+.dy-stage .ce.le{fill:#8a7550}
+.dy-stage .ce.taiji{fill:#6d5f48}
+.dy-stage .ce{transform-box:fill-box;transform-origin:center}
+.dy-stage.moving .ce{transition:transform var(--dy-t,.3s) cubic-bezier(.3,.7,.2,1),fill .25s}
+.dy-stage .lab{font-family:var(--font-title);font-size:11px;fill:var(--faint);letter-spacing:.15em}
+.dy-stage .num{font-family:var(--font-title);font-size:13px;fill:var(--fg-2);letter-spacing:.06em}
+.dy-cap{min-height:3.6em;margin-top:10px;font-size:13px;line-height:1.8;color:var(--fg-2);letter-spacing:.02em}
+.dy-cap b{font-family:var(--font-title);color:var(--fg);font-weight:600}
+.dy-cap .st{display:inline-block;padding:0 7px;margin-right:6px;border-radius:var(--r-xs);border:1px solid var(--rule-2);font-family:var(--font-title);font-size:12px;letter-spacing:.12em;color:var(--muted)}
+.dy-cap .st.on{border-color:var(--jin);color:var(--jin)}
+.dy-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dy-btns .fb-btn{flex:1 1 7em}
+
+/* ---------- 卦 ---------- */
+.dy-gua{display:flex;flex-direction:column-reverse;gap:9px;padding:6px 4px}
+.dy-yao{display:grid;grid-template-columns:2.4em minmax(0,1fr) 3.6em;align-items:center;gap:10px;opacity:.28;transition:opacity .4s}
+.dy-yao.on{opacity:1}
+.dy-yao .p{font-family:var(--font-title);font-size:12px;color:var(--faint);letter-spacing:.1em;text-align:right}
+.dy-yao .ln{height:12px;display:flex;gap:16%}
+.dy-yao .ln i{flex:1;border-radius:2px;background:var(--rule-2)}
+.dy-yao.on .ln i{background:var(--fg-2)}
+.dy-yao.on.bian .ln i{background:var(--jin)}
+.dy-yao .v{font-family:var(--font-title);font-size:12px;color:var(--muted);letter-spacing:.08em;white-space:nowrap}
+.dy-yao.bian .v{color:var(--jin)}
+.dy-names{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;font-family:var(--font-title);font-size:17px;letter-spacing:.12em;min-height:1.6em}
+.dy-names small{font-size:11px;color:var(--faint);letter-spacing:.15em;display:block;text-align:center}
+.dy-names .arr{color:var(--faint);font-size:13px}
+.dy-names a{color:var(--fg);text-decoration:none;border-bottom:1px solid var(--rule-2)}
+.dy-stat{margin-top:12px;font-size:12px;color:var(--faint);line-height:1.8;text-align:center}
+
+/* ---------- 断 ---------- */
+.dy-read{margin-top:18px;padding:16px 20px}
+.dy-read .rule{font-size:13.5px;color:var(--fg-2);line-height:1.8;margin-bottom:10px}
+.dy-read .rule b{font-family:var(--font-title);color:var(--fg)}
+.dy-ci{border-left:2px solid var(--rule-2);padding:6px 0 6px 12px;margin:10px 0}
+.dy-ci.main{border-left-color:var(--jin)}
+.dy-ci .t{font-family:var(--font-title);font-size:13px;color:var(--muted);letter-spacing:.1em}
+.dy-ci .t em{font-style:normal;color:var(--jin);margin-left:6px}
+.dy-ci .o{font-family:var(--font-title);font-size:17px;color:var(--fg);letter-spacing:.08em;line-height:1.7;margin:2px 0}
+.dy-ci .b{font-size:13.5px;color:var(--fg-2);line-height:1.8}
+.dy-help{margin-top:18px;padding:16px 20px}
+.dy-help h3{font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:.2em;margin-bottom:8px}
+.dy-help ul{padding:0}
+.dy-help li{list-style:none;padding-left:14px;position:relative;font-size:13px;line-height:1.9;color:var(--fg-2)}
+.dy-help li::before{content:"";position:absolute;left:0;top:.9em;width:5px;height:5px;border-radius:50%;background:var(--zi-2)}
+.dy-help li b{font-family:var(--font-title);color:var(--fg);font-weight:600;margin-right:4px}
+@media (max-width:860px){
+  .dy-layout{grid-template-columns:1fr;gap:14px}
+  .dy-card{padding:12px}
+  .dy-read,.dy-help{padding:16px;margin-top:14px}
+}
+</style>
+</head>
+<body data-tool="dayan">
+
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">蓍</div>
+    <div>
+      <h1 class="fb-title">大衍筮法</h1>
+      <p class="fb-sub">四十九策 · 分二挂一 · 揲四归奇 · 十八变成卦</p>
+    </div>
+  </header>
+
+  <section class="fb-now" aria-label="所问">
+    <div class="fb-now-info">
+      <div class="fb-when"><span class="fb-tag" id="nowTag">揲蓍</span><span id="whenTxt">心里默念所问，再动手分蓍</span></div>
+      <div class="fb-key" id="keyLine" aria-live="polite">尚未起卦</div>
+      <div class="fb-note">大衍之数五十，其用四十有九。三变成一爻，十八变成一卦。</div>
+    </div>
+    <div class="fb-now-ctrl">
+      <div class="fb-row">
+        <input type="text" id="askIn" class="grow" maxlength="80" placeholder="所问何事（可空，复制与问 AI 时带上）" aria-label="所问">
+      </div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn primary grow" id="copyBtn" disabled>复制</button>
+        <button type="button" class="fb-btn grow" id="aiBtn" disabled title="把卦、占法和辞打包复制，贴给任意 AI">问 AI</button>
+        <button type="button" class="fb-btn grow" id="linkBtn" disabled>此卦链接</button>
+        <button type="button" class="fb-btn grow" id="shareBtn" disabled title="把这一卦画成一张图，可存可分享">分享图</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="dy-layout">
+    <section class="fb-card dy-card" aria-label="蓍草台">
+      <div class="dy-h"><h2>蓍草台</h2><small id="stageSub">四十九策已备，置一策不用</small></div>
+      <div class="dy-stage" id="stage">
+        <svg viewBox="0 0 600 220" id="svg" role="img" aria-label="揲蓍示意">
+          <text class="lab" x="22" y="24">太极 · 不用</text>
+          <text class="lab" x="452" y="24" text-anchor="start">挂一</text>
+          <text class="num" id="leftNum" x="150" y="206" text-anchor="middle"></text>
+          <text class="num" id="rightNum" x="330" y="206" text-anchor="middle"></text>
+          <text class="num" id="leNum" x="520" y="206" text-anchor="middle"></text>
+          <g id="ce"></g>
+        </svg>
+      </div>
+      <div class="dy-cap" id="cap" aria-live="polite">按「揲蓍」，十八变一气呵成；想一步一步看，按「一变一停」。</div>
+      <div class="dy-btns">
+        <button type="button" class="fb-btn primary" id="goBtn">揲蓍</button>
+        <button type="button" class="fb-btn" id="stepBtn">一变一停</button>
+        <button type="button" class="fb-btn" id="skipBtn" disabled>略过动画</button>
+      </div>
+    </section>
+
+    <section class="fb-card dy-card" aria-label="卦">
+      <div class="dy-h"><h2>卦</h2><small>自下而上 · 金色为变爻</small></div>
+      <div class="dy-gua" id="gua"></div>
+      <div class="dy-names" id="names"></div>
+      <div class="dy-stat">揲蓍得 六 七 八 九 的机率是 1 : 5 : 7 : 3，<br>老阳多于老阴，与铜钱法（1 : 3 : 3 : 1）不同</div>
+    </section>
+  </div>
+
+  <section class="fb-card dy-read" id="readBox" aria-label="占辞" hidden></section>
+
+  <section class="fb-card dy-help" aria-label="口径">
+    <h3>口径</h3>
+    <ul id="rulesList"></ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/meihua/data/hexagrams.js"></script>
+<script src="/meihua/data/yao.js"></script>
+<script src="/dayan/dayan.js?v=1"></script>
+<script src="/fabao/fabao.js?v=15"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, DY = window.DY, H = window.HEXAGRAMS, T = window.YAO_TEXT;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CN = '〇一二三四五六七八九';
+const num = n => n < 10 ? CN[n] : n < 20 ? '十' + (n % 10 ? CN[n % 10] : '') : CN[Math.floor(n / 10)] + '十' + (n % 10 ? CN[n % 10] : '');
+const reduced = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ================ 蓍草：49 根，各自一个 rect ================ */
+const W = 3.2, HGT = 120, Y0 = 44;
+const ceG = $('ce'), stage = $('stage');
+const ce = [];
+for (let i = 0; i < 49; i++) {
+  const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  r.setAttribute('width', W); r.setAttribute('height', HGT); r.setAttribute('rx', 1.4);
+  r.setAttribute('x', 0); r.setAttribute('y', Y0); r.setAttribute('class', 'ce');
+  ceG.appendChild(r); ce.push(r);
+}
+{ // 太极：不用的那一策，横放左上
+  const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  r.setAttribute('width', 70); r.setAttribute('height', W); r.setAttribute('rx', 1.4);
+  r.setAttribute('x', 22); r.setAttribute('y', 32); r.setAttribute('class', 'ce taiji');
+  ceG.insertBefore(r, ceG.firstChild);
+}
+const put = (i, x, y, rot, cls, sc) => {
+  ce[i].style.transform = `translate(${x.toFixed(1)}px, ${(y || 0).toFixed(1)}px)${rot ? ` rotate(${rot}deg)` : ''}${sc ? ` scale(${sc})` : ''}`;
+  ce[i].setAttribute('class', 'ce' + (cls ? ' ' + cls : ''));
+};
+// 一排蓍草居中摆在 cx，间距 gap，可按 grp 根一组留空
+function row(ids, cx, gap, grp, cls) {
+  const groups = grp ? Math.ceil(ids.length / grp) - 1 : 0;
+  const width = (ids.length - 1) * gap + groups * gap * 1.6;
+  let x = cx - width / 2;
+  ids.forEach((id, k) => {
+    if (grp && k && k % grp === 0) x += gap * 1.6;
+    put(id, x, 0, 0, typeof cls === 'function' ? cls(k) : cls);
+    x += gap;
+  });
+}
+// 扐：归奇的蓍草横叠在右下
+let le = [];
+// 横放、缩成六成长，中心落在 (520, 176 − 叠高)；rect 原中心在 (1.6, Y0 + HGT / 2)
+function layLe() { le.forEach((id, k) => put(id, 518 + (k % 2) * 3, 176 - Y0 - HGT / 2 - k * 2.6, 90, 'le', .55)); $('leNum').textContent = le.length ? `归奇于扐 ${le.length} 策` : ''; }
+function gather(ids) {
+  row(ids, 230, Math.min(7, 380 / ids.length), 0, '');
+  $('leftNum').textContent = ''; $('rightNum').textContent = '';
+}
+
+/* ================ 揲蓍过程 ================ */
+let yaos = [], vals = [], running = false, stepMode = false, skip = false, waiter = null, res = null;
+function phaseT(k) { return skip || reduced() ? 0 : (k < 3 ? 1 : .55); }   // 第一爻慢放，其后加快
+async function wait(ms) {
+  if (skip || reduced()) return;
+  await sleep(ms);
+}
+function cap(stepName, html) {
+  const ST = ['分二', '挂一', '揲四', '归奇'];
+  $('cap').innerHTML = ST.map(s => `<span class="st${s === stepName ? ' on' : ''}">${s}</span>`).join('') + '<br>' + html;
+}
+async function runBian(ids, b, yi, bi) {
+  const sp = phaseT(yi * 3 + bi), tms = 340 * sp;
+  stage.style.setProperty('--dy-t', (tms / 1000).toFixed(2) + 's');
+  stage.classList.toggle('moving', tms > 0);
+  const label = `第${CN[yi + 1]}爻 · 第${CN[bi + 1]}变（${num(b.n)}策）`;
+  $('stageSub').textContent = label;
+  const L = ids.slice(0, b.left), R = ids.slice(b.left);
+  // 分二
+  row(L, 150, Math.min(5.2, 230 / L.length)); row(R, 330, Math.min(5.2, 230 / R.length));
+  $('leftNum').textContent = `左 ${b.left}`; $('rightNum').textContent = `右 ${b.right}`;
+  cap('分二', `${label}：随手分作两份，左 <b>${b.left}</b>、右 <b>${b.right}</b>`);
+  await wait(tms * 1.6);
+  // 挂一
+  const g = R[0], R2 = R.slice(1);
+  put(g, 498, 46 - Y0 - HGT / 2, 90, 'gua', .55);
+  row(R2, 330, Math.min(5.2, 230 / Math.max(1, R2.length)));
+  $('rightNum').textContent = `右 ${R2.length}`;
+  cap('挂一', `${label}：右份取一策挂于指间，右余 <b>${R2.length}</b>`);
+  await wait(tms * 1.4);
+  // 揲四
+  const yuL = L.slice(L.length - b.rl), yuR = R2.slice(R2.length - b.rr);
+  row(L, 150, Math.min(4.6, 200 / L.length), 4, k => k >= L.length - b.rl ? 'yu' : '');
+  row(R2, 330, Math.min(4.6, 200 / Math.max(1, R2.length)), 4, k => k >= R2.length - b.rr ? 'yu' : '');
+  cap('揲四', `${label}：左右各四四数之，左余 <b>${b.rl}</b>、右余 <b>${b.rr}</b>（余零算四）`);
+  await wait(tms * 2);
+  // 归奇
+  le = le.concat([g], yuL, yuR);
+  layLe();
+  const rest = L.slice(0, L.length - b.rl).concat(R2.slice(0, R2.length - b.rr));
+  gather(rest);
+  cap('归奇', `${label}：挂一与两份余策归于扐，共去 <b>${b.out}</b> 策，余 <b>${b.rest}</b>`);
+  await wait(tms * 1.6);
+  return rest;
+}
+async function runYao(yi, y) {
+  let ids = Array.from({ length: 49 }, (_, i) => i);
+  le = []; layLe(); gather(ids);
+  await wait(220 * phaseT(yi * 3));
+  for (let bi = 0; bi < 3; bi++) {
+    if (stepMode && !skip) await new Promise(r => { waiter = r; $('stepBtn').textContent = '下一变'; });
+    ids = await runBian(ids, y.bians[bi], yi, bi);
+  }
+  vals[yi] = y.v;
+  paintGua();
+  cap('', `第${CN[yi + 1]}爻：三变余 <b>${y.rest}</b> 策，四除得 <b>${CN[y.v]}</b>，为${DY.V_NAME[y.v]}${y.v === 6 || y.v === 9 ? '，是变爻' : ''}`);
+  $('cap').firstChild && $('cap').querySelectorAll('.st').forEach(s => s.classList.remove('on'));
+  await wait(500 * phaseT(yi * 3));
+}
+async function start(step) {
+  if (running) { if (stepMode && waiter) { const w = waiter; waiter = null; w(); } return; }
+  running = true; stepMode = !!step; skip = false; res = null;
+  yaos = DY.cast(); vals = [];
+  $('readBox').hidden = true; $('names').innerHTML = ''; paintGua();
+  $('goBtn').disabled = !step; $('goBtn').textContent = '揲蓍中…';
+  $('stepBtn').disabled = !step; $('skipBtn').disabled = false;
+  setBtns(false);
+  for (let yi = 0; yi < 6; yi++) await runYao(yi, yaos[yi]);
+  finish();
+}
+function finish() {
+  running = false; waiter = null;
+  $('goBtn').disabled = false; $('goBtn').textContent = '再起一卦';
+  $('stepBtn').disabled = false; $('stepBtn').textContent = '一变一停';
+  $('skipBtn').disabled = true;
+  stage.classList.remove('moving');
+  $('stageSub').textContent = '十八变已毕';
+  show(DY.read(vals, H, T));
+}
+$('goBtn').onclick = () => { if (running && stepMode && waiter) { stepMode = false; const w = waiter; waiter = null; w(); $('stepBtn').disabled = true; $('goBtn').disabled = true; return; } start(false); };
+$('stepBtn').onclick = () => start(true);
+$('skipBtn').onclick = () => { skip = true; if (waiter) { const w = waiter; waiter = null; w(); } };
+
+/* ================ 卦与占辞 ================ */
+function paintGua() {
+  $('gua').innerHTML = [0, 1, 2, 3, 4, 5].map(i => {
+    const v = vals[i], on = v != null, b = v === 6 || v === 9;
+    const yang = on ? v % 2 === 1 : true;
+    return `<div class="dy-yao${on ? ' on' : ''}${b ? ' bian' : ''}"><span class="p">${DY.POS[i]}爻</span>
+      <span class="ln">${yang ? '<i></i>' : '<i></i><i></i>'}</span>
+      <span class="v">${on ? CN[v] + ' ' + DY.V_NAME[v] + (v === 9 ? ' ○' : v === 6 ? ' ×' : '') : ''}</span></div>`;
+  }).join('');
+}
+function show(r) {
+  res = r;
+  paintGua();
+  $('names').innerHTML = `<span><small>本卦</small>${esc(r.ben.name)}</span>${r.zhi ? `<span class="arr">→</span><span><small>之卦</small>${esc(r.zhi.name)}</span>` : ''}`;
+  $('keyLine').innerHTML = `<strong>${esc(r.ben.name)}</strong>${r.zhi ? `<span class="sep">·</span>之 <strong>${esc(r.zhi.name)}</strong><span class="sep">·</span>${r.bian.map(i => DY.POS[i]).join('、')}爻变` : '<span class="sep">·</span>六爻不变'}`;
+  $('nowTag').textContent = '已成卦';
+  $('whenTxt').textContent = F.fmt(new Date());
+  $('readBox').hidden = false;
+  $('readBox').innerHTML = `<div class="dy-h"><h2>占辞</h2><small>依朱熹《易学启蒙·考变占》</small></div>
+    <p class="rule">${esc(r.rule).replace(/^([^：]+)：/, '<b>$1</b>：')}</p>
+    ${r.items.map((it, i) => `<div class="dy-ci${r.main === i ? ' main' : ''}"><div class="t">${esc(it.gua)} · ${esc(it.title)}${r.main === i ? '<em>为主</em>' : ''}</div>
+      <div class="o">${esc(it.text)}</div>${it.plain ? `<div class="b">${esc(it.plain)}</div>` : ''}</div>`).join('')}
+    <p class="fb-note">本卦含义：${esc(r.ben.meaning)}${r.zhi ? `　之卦含义：${esc(r.zhi.meaning)}` : ''}</p>`;
+  setBtns(true);
+  const u = new URL(location.href); u.search = ''; u.searchParams.set('y', vals.join('')); history.replaceState(null, '', u);
+}
+function setBtns(on) { ['copyBtn', 'aiBtn', 'linkBtn', 'shareBtn'].forEach(id => { $(id).disabled = !on; }); }
+const ask = () => $('askIn').value.trim();
+const txt = () => DY.text(res, { ask: ask(), when: F.fmt(new Date()) });
+$('copyBtn').onclick = () => { if (res) F.copy(txt(), '卦已复制'); };
+$('aiBtn').onclick = () => { if (res) F.askAI('大衍筮法', txt(), DY.RULES.map(r => `· ${r[0]}：${r[1]}`).join('\n')); };
+$('linkBtn').onclick = () => { if (res) F.copy(location.href, '此卦链接已复制'); };
+$('shareBtn').onclick = () => {
+  if (!res) return;
+  const r = res;
+  F.share({ title: `大衍 · ${r.ben.name}${r.zhi ? ' 之 ' + r.zhi.name : ''}`, meta: `揲蓍 · ${vals.map(v => CN[v]).join('')}`, url: location.href,
+    lines: (ask() ? [['所问', ask()]] : []).concat([['占法', r.rule]], r.items.map(it => [it.title, it.text + (it.plain ? '　' + it.plain : '')])) });
+};
+$('rulesList').innerHTML = DY.RULES.map(r => `<li><b>${r[0]}</b>${esc(r[1])}</li>`).join('');
+
+/* ================ 开页 ================ */
+gather(Array.from({ length: 49 }, (_, i) => i));
+paintGua();
+const q = new URLSearchParams(location.search).get('y');
+if (q && /^[6-9]{6}$/.test(q)) { vals = q.split('').map(Number); show(DY.read(vals, H, T)); $('goBtn').textContent = '再起一卦'; $('cap').textContent = '这是链接里带来的一卦；按「再起一卦」重新揲蓍。'; }
+})();
+</script>
+</body>
+</html>

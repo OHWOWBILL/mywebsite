@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#17131F">
+<title>金口诀 · 潜蛟阁法宝库</title>
+<meta name="description" content="大六壬金口诀起课：开页即排此刻，点方位定地分，月将加时取将神，地盘布贵取贵神，五子元遁取人元；四位阴阳定用爻，上下生克、旺衰旬空一眼看完，附白话提纲，可复制课式或问 AI。">
+<link rel="icon" href="/favicon-32x32.png">
+<link rel="stylesheet" href="/fonts/qj.css?v=1">
+<link rel="stylesheet" href="/fabao/fabao.css?v=8">
+<style>
+/* 金口诀 · 课式与地分（外框见 /fabao/fabao.css） */
+[data-w="0"]{--wc:var(--wx-mu)} [data-w="1"]{--wc:var(--wx-huo)} [data-w="2"]{--wc:var(--wx-tu)} [data-w="3"]{--wc:var(--wx-jin)} [data-w="4"]{--wc:var(--wx-shui)}
+
+.jk-sub{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:baseline}
+.jk-sub .sep{color:var(--faint)}
+.jk-sub b{color:var(--fg);font-weight:400;font-family:var(--font-title)}
+.jk-ctrl{min-width:300px}
+.jk-ctrl .fb-row .grow{flex:1}
+
+.jk-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start}
+.jk-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;margin-bottom:10px}
+.jk-h h2{font-family:var(--font-title);font-weight:600;font-size:16px;letter-spacing:.2em}
+.jk-h small{font-size:12px;color:var(--faint);letter-spacing:.06em}
+.jk-card{padding:16px 18px}
+
+/* ---------- 课式：四位竖排 ---------- */
+.jk-ke{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.jk-wei{display:grid;grid-template-columns:3.4em 3.6em minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--rule);border-radius:var(--r);background:var(--bg-3);position:relative}
+.jk-wei .pos{font-family:var(--font-title);font-size:12px;letter-spacing:.2em;color:var(--faint)}
+.jk-wei .big{font-family:var(--font-title);font-size:30px;font-weight:600;line-height:1;color:var(--wc,var(--fg));text-align:center}
+.jk-wei .big small{display:block;font-size:11px;font-weight:400;letter-spacing:.1em;color:var(--faint);margin-top:4px}
+.jk-wei .ex{display:flex;flex-wrap:wrap;gap:3px 8px;font-size:13px;color:var(--fg-2);align-items:baseline}
+.jk-wei .ex b{font-family:var(--font-title);font-weight:600;color:var(--fg);font-size:15px;letter-spacing:.08em}
+.jk-wei .ex .x{color:var(--zhu)}
+.jk-wei .ex small{color:var(--faint);font-size:12px}
+.jk-wei .tags{display:flex;gap:4px;flex-direction:column;align-items:flex-end}
+.jk-wei .tags i{font-style:normal;font-family:var(--font-title);font-size:11px;letter-spacing:.1em;padding:0 6px;border-radius:var(--r-xs);border:1px solid var(--rule-2);color:var(--muted);line-height:18px;white-space:nowrap}
+.jk-wei .tags i.yong{border-color:var(--jin);color:var(--jin)}
+.jk-wei .tags i.dong{border-color:var(--zhu);color:var(--zhu)}
+.jk-wei .tags i.kong{border-style:dashed}
+.jk-wei.yong{border-color:var(--jin);box-shadow:inset 3px 0 0 var(--jin)}
+.jk-rel{align-self:center;font-size:12px;letter-spacing:.12em;color:var(--faint);padding:3px 0;display:flex;align-items:center;gap:6px}
+.jk-rel::before,.jk-rel::after{content:"";width:18px;height:1px;background:var(--rule-2)}
+.jk-rel.ke,.jk-rel.zei{color:var(--zhu)}
+.jk-rel.sheng,.jk-rel.sheng2{color:var(--lv)}
+.jk-yy{margin-top:10px;font-size:12px;color:var(--faint);letter-spacing:.06em;text-align:center}
+
+/* ---------- 地分：十二支方位盘（南上） ---------- */
+.jk-fang{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,auto);gap:6px}
+.jk-fang button{appearance:none;border:1px solid var(--rule);background:var(--bg-3);color:var(--fg-2);border-radius:var(--r-sm);padding:7px 2px 6px;cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:center;gap:1px;transition:border-color .2s var(--ease),background .2s var(--ease)}
+.jk-fang button b{font-family:var(--font-title);font-size:19px;font-weight:600;color:var(--wc,var(--fg))}
+.jk-fang button small{font-size:10.5px;color:var(--faint);letter-spacing:.04em}
+.jk-fang button i{font-style:normal;font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+.jk-fang button:hover{border-color:var(--zi-2)}
+.jk-fang button.on{border-color:var(--jin);background:rgba(201,169,110,.12)}
+.jk-fang button.hour:not(.on){border-style:dashed}
+.jk-fang .mid{grid-row:2 / span 2;grid-column:2 / span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:12px;color:var(--faint);line-height:1.6;padding:6px}
+.jk-fang .mid b{font-family:var(--font-title);color:var(--fg);font-weight:600;font-size:14px;letter-spacing:.1em}
+.jk-fang .mid .fb-btn{padding:4px 10px;font-size:12px}
+
+/* 口径设置、口径列表 */
+.jk-set{margin-top:12px;border-top:1px solid var(--rule);padding-top:8px;font-size:13px;color:var(--muted)}
+.jk-set summary{cursor:pointer;text-align:center;font-family:var(--font-title);font-size:12px;letter-spacing:.15em;color:var(--faint);list-style:none}
+.jk-set summary::-webkit-details-marker{display:none}
+.jk-set summary b{font-weight:400;color:var(--zi-2)}
+.jk-set .set-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.jk-set .set-row > label{font-family:var(--font-title);font-size:12px;letter-spacing:.15em;color:var(--muted);min-width:4.5em}
+.jk-set select{flex:1;min-width:0;background:var(--bg-3);border:1px solid var(--rule-2);border-radius:var(--r-sm);padding:5px 8px;font-size:13px}
+.jk-set .fb-seg button{padding:5px 12px}
+.jk-bh{margin-bottom:18px}
+.jk-bh .bh-h .fb-tag{background:rgba(141,191,151,.16);color:var(--lv)}
+.jk-help{margin-top:18px;padding:16px 20px}
+.jk-help h3{font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:.2em;margin-bottom:8px}
+.jk-help ul{padding:0}
+.jk-help li{list-style:none;padding-left:14px;position:relative;font-size:13px;line-height:1.9;color:var(--fg-2)}
+.jk-help li::before{content:"";position:absolute;left:0;top:.9em;width:5px;height:5px;border-radius:50%;background:var(--zi-2)}
+.jk-help li b{font-family:var(--font-title);color:var(--fg);font-weight:600;margin-right:4px}
+
+@media (prefers-reduced-motion: no-preference){
+  .jk-ke.fresh .jk-wei{animation:jkIn .5s var(--ease) both}
+  .jk-ke.fresh .jk-wei:nth-of-type(2){animation-delay:.08s}
+  .jk-ke.fresh .jk-wei:nth-of-type(3){animation-delay:.16s}
+  .jk-ke.fresh .jk-wei:nth-of-type(4){animation-delay:.24s}
+  @keyframes jkIn{from{opacity:0;transform:translateY(6px)}}
+}
+@media (max-width:860px){
+  .jk-ctrl{min-width:0}
+  .jk-layout{grid-template-columns:1fr;gap:14px}
+  .jk-card{padding:12px}
+  .jk-wei{grid-template-columns:2.8em 3em minmax(0,1fr) auto;gap:8px;padding:8px 10px}
+  .jk-wei .big{font-size:26px}
+  .jk-fang{gap:4px}
+  .jk-fang button b{font-size:17px}
+  .jk-help{padding:16px;margin-top:14px}
+}
+</style>
+</head>
+<body data-tool="jinkou">
+
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">诀</div>
+    <div>
+      <h1 class="fb-title">金口诀</h1>
+      <p class="fb-sub">点方位定地分 · 四位起课 · 阴阳取用 · 生克白话</p>
+    </div>
+  </header>
+
+  <section class="fb-now" aria-label="起课">
+    <div class="fb-now-info">
+      <div class="fb-when"><span class="fb-tag" id="nowTag">此刻</span><span id="whenTxt"></span></div>
+      <div class="fb-pillars" id="pillars"></div>
+      <div class="fb-key" id="keyLine" aria-live="polite"></div>
+      <div class="fb-note jk-sub" id="subLine"></div>
+      <div class="fb-note bad" id="qiWarn" hidden>距交中气不足一小时，月将可能有出入，请核对时刻</div>
+    </div>
+    <div class="fb-now-ctrl jk-ctrl">
+      <div class="fb-row">
+        <input type="datetime-local" id="dtIn" class="grow" min="1900-01-01T00:00" max="2100-12-31T23:59" aria-label="起课时间">
+        <button type="button" class="fb-btn" id="nowBtn">此刻</button>
+      </div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn grow" id="prevH" title="快捷键 ←">‹ 前一时</button>
+        <button type="button" class="fb-btn grow" id="nextH" title="快捷键 →">后一时 ›</button>
+      </div>
+      <div class="fb-row">
+        <input type="text" id="askIn" class="grow" maxlength="80" placeholder="所问何事（金口诀一课只问一事）" aria-label="所问">
+      </div>
+      <div class="fb-row">
+        <button type="button" class="fb-btn primary grow" id="copyBtn">复制</button>
+        <button type="button" class="fb-btn grow" id="aiBtn" title="把课式、白话和口径打包复制，贴给任意 AI">问 AI</button>
+        <button type="button" class="fb-btn grow" id="linkBtn">此课链接</button>
+        <button type="button" class="fb-btn grow" id="shareBtn" title="把这一课画成一张图，可存可分享">分享图</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="fb-card bh jk-bh" id="bhBox" aria-label="白话"></section>
+
+  <div class="jk-layout">
+    <section class="fb-card jk-card" aria-label="课式">
+      <div class="jk-h"><h2>课式</h2><small>自上而下：人元 · 贵神 · 将神 · 地分</small></div>
+      <div class="jk-ke" id="keBox"></div>
+      <p class="jk-yy" id="yyLine"></p>
+    </section>
+
+    <section class="fb-card jk-card" aria-label="地分">
+      <div class="jk-h"><h2>地分</h2><small>点问事所在或来人方位；虚线是占时</small></div>
+      <div class="jk-fang" id="fang" role="group" aria-label="十二支方位，南（午）在上"></div>
+      <details class="jk-set" id="setBox">
+        <summary>口径设置 · <b id="setSum"></b></summary>
+        <div class="set-row">
+          <label for="guiSel">贵人</label>
+          <select id="guiSel">
+            <option value="niuyang">甲戊庚牛羊（默认，昼丑夜未）</option>
+            <option value="yangniu">甲羊戊庚牛（《协纪辨方书》，昼未夜丑）</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <label>昼夜</label>
+          <span class="fb-seg" id="dnSeg"><button type="button" data-v="auto">按占时</button><button type="button" data-v="day">昼贵</button><button type="button" data-v="night">夜贵</button></span>
+        </div>
+        <p class="fb-note" style="margin-top:8px">与大六壬共用一套月将与贵人表；改了就记在本机。</p>
+      </details>
+    </section>
+  </div>
+
+  <section class="fb-card jk-help" aria-label="口径">
+    <h3>口径</h3>
+    <ul id="rulesList"></ul>
+  </section>
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/bazi/bazi.js?v=3"></script>
+<script src="/liuren/liuren.js?v=1"></script>
+<script src="/jinkou/jinkou.js?v=1"></script>
+<script src="/fabao/fabao.js?v=15"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, LR = window.LR, JK = window.JK, Z = LR.ZHI, G = LR.GAN;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const WEEK = '日一二三四五六';
+const LS = 'jinkou.view.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const view = Object.assign({ gui: 'niuyang', dn: 'auto' }, store.get(LS, {}));
+const saveView = () => store.set(LS, { gui: view.gui, dn: view.dn });
+let date = null, cur = null, isNow = true, difen = null;     // difen null = 随占时
+{ const q = new URLSearchParams(location.search).get('d'); const i = q == null ? -1 : Z.indexOf(q); if (i >= 0) difen = i; }
+const opts = () => ({ gui: view.gui, dn: view.dn, difen: difen == null ? null : difen });
+
+function setDate(d, now) {
+  if (!LR.inRange(d)) { F.toast('只能排 1900–2100 年'); $('dtIn').value = F.toLocalInput(date); return; }
+  date = d; isNow = !!now; render(true);
+}
+function render(fresh) {
+  cur = JK.cast(date, opts());
+  if (!cur) { F.toast('这一刻排不出来（超出 1900–2100）'); return; }
+  renderNow(); renderBh(); renderKe(fresh); renderFang(); renderRules(); paintSet();
+}
+function weiLabel(w) {
+  return w.pos === '人元' ? w.name : w.pos === '贵神' ? w.name : w.pos === '将神' ? Z[w.zhi] + ' ' + w.name : w.name + ' ' + w.fang;
+}
+function renderNow() {
+  const c = cur, d = c.date;
+  $('nowTag').textContent = isNow ? '此刻' : '起课时刻';
+  $('whenTxt').textContent = `${F.fmt(d)} 周${WEEK[d.getDay()]}${c.lunarText ? ' · 农历' + c.lunarText : ''} · ${Z[c.hour]}时`;
+  $('pillars').innerHTML = [['年', 0], ['月', 1], ['日', 2], ['时', 3]].map(([l, i]) => `<span class="fb-pillar"><small>${l}</small><b>${c.pillars[i].name}</b></span>`).join('');
+  const y = c.yong != null ? c.wei[c.yong] : null;
+  $('keyLine').innerHTML = `<strong>${esc(c.title)}</strong><span class="sep">·</span>${y ? `用爻 <strong>${y.pos}</strong> ${esc(weiLabel(y))}` : '阴阳均停，看克处'}`;
+  $('subLine').innerHTML = `<span><b>${Z[c.jiang]}将</b>（${c.jiangName}）加<b>${Z[c.hour]}时</b></span><span class="sep">·</span>
+    <span>地分 <b>${Z[c.difen]}</b>（${JK.FANG[c.difen]}${c.difenAuto ? '，随占时' : ''}）</span><span class="sep">·</span>
+    <span>${c.gui.day ? '昼' : '夜'}贵 <b>${Z[c.gui.zhi]}</b> 地盘${c.gui.shun ? '顺' : '逆'}布</span><span class="sep">·</span>
+    <span>旬空 <b>${c.xun.kong.map(z => Z[z]).join('')}</b></span>`;
+  $('qiWarn').hidden = !c.nearQi;
+}
+function renderBh() {
+  const rows = JK.plain(cur);
+  $('bhBox').innerHTML = `<div class="bh-h"><span class="fb-tag">白话 · 参考</span><small>按用爻、贵神、将神与生克读个大概；断事仍要合所问</small></div>
+    ${rows.map(r => `<div class="r"><i>${r.lab}</i><span>${r.html}</span></div>`).join('')}`;
+}
+function renderKe(fresh) {
+  const c = cur, W = c.wei;
+  let h = '';
+  W.forEach((w, i) => {
+    let big, ex;
+    if (w.pos === '人元') { big = `${w.name}<small>${LR.WX[w.wx]}</small>`; ex = `<span>五子元遁至${Z[c.difen]}</span>`; }
+    else if (w.pos === '贵神') { big = `${Z[w.zhi]}<small>${G[w.gan]} · ${LR.WX[w.wx]}</small>`; ex = `<b class="${w.ji ? '' : 'x'}">${w.name}</b><small>${w.ji ? '吉神' : '凶神'}</small>`; }
+    else if (w.pos === '将神') { big = `${Z[w.zhi]}<small>${G[w.gan]} · ${LR.WX[w.wx]}</small>`; ex = `<b>${w.name}</b><small>${Z[c.jiang]}将加${Z[c.hour]}，${Z[c.difen]}上见${Z[w.zhi]}</small>`; }
+    else { big = `${w.name}<small>${LR.WX[w.wx]}</small>`; ex = `<b>${w.fang}</b><small>${c.difenAuto ? '随占时' : '所点方位'}</small>`; }
+    const tags = [w.yong ? '<i class="yong">用</i>' : '', w.dong ? '<i class="dong">动</i>' : '', `<i>${w.yang ? '阳' : '阴'}${w.ws ? ' · ' + w.ws : ''}</i>`, w.kong ? '<i class="kong">空</i>' : ''].join('');
+    h += `<div class="jk-wei${w.yong ? ' yong' : ''}" data-w="${w.wx}"><span class="pos">${w.pos}</span><span class="big">${big}</span><span class="ex">${ex}</span><span class="tags">${tags}</span></div>`;
+    if (i < 3) { const r = c.rels[i]; h += `<div class="jk-rel ${r.k}">${r.n}</div>`; }
+  });
+  const box = $('keBox');
+  box.classList.remove('fresh'); box.innerHTML = h;
+  if (fresh) { void box.offsetWidth; box.classList.add('fresh'); }
+  const far = c.far.map(r => `${JK.POS[r.up]}对${JK.POS[r.down]}${r.n}`);
+  $('yyLine').textContent = `四位 ${c.yinyang.yang} 阳 ${c.yinyang.yin} 阴${far.length ? ' · 隔位：' + far.join('，') : ''}`;
+}
+// 地盘位在四方格里的位置（南上）：巳午未申 / 辰□□酉 / 卯□□戌 / 寅丑子亥
+const AREA = { 5: [1, 1], 6: [1, 2], 7: [1, 3], 8: [1, 4], 9: [2, 4], 10: [3, 4], 11: [4, 4], 0: [4, 3], 1: [4, 2], 2: [4, 1], 3: [3, 1], 4: [2, 1] };
+function renderFang() {
+  const c = cur;
+  let h = '';
+  for (let p = 0; p < 12; p++) {
+    const on = p === c.difen, hr = p === c.hour;
+    const gen = LR.GEN[c.genAt[p]];
+    h += `<button type="button" class="${on ? 'on' : ''}${hr ? ' hour' : ''}" data-z="${p}" data-w="${LR.ZHI_WX[p]}" style="grid-row:${AREA[p][0]};grid-column:${AREA[p][1]}" aria-pressed="${on}" title="${Z[p]} · ${JK.FANG[p]}，地盘此位贵神${gen}">
+      <b>${Z[p]}</b><small>${JK.FANG[p]}</small><i>${gen}</i></button>`;
+  }
+  h += `<div class="mid"><b>${c.difenAuto ? '地分随占时' : '地分 ' + Z[c.difen]}</b><span>不知方位，就用占时；<br>或随手点一位</span>
+    <span><button type="button" class="fb-btn" id="hourBtn"${c.difenAuto ? ' disabled' : ''}>随占时</button> <button type="button" class="fb-btn" id="randBtn">随手</button></span></div>`;
+  $('fang').innerHTML = h;
+}
+$('fang').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.id === 'hourBtn') difen = null;
+  else if (b.id === 'randBtn') { const a = new Uint32Array(1); crypto.getRandomValues(a); difen = a[0] % 12; }
+  else if (b.dataset.z != null) difen = +b.dataset.z;
+  else return;
+  render(true);
+});
+function rulesText() { return JK.rules(opts()).map(r => `· ${r[0]}：${r[1]}`).join('\n'); }
+function renderRules() { $('rulesList').innerHTML = JK.rules(opts()).map(r => `<li><b>${r[0]}</b>${esc(r[1])}</li>`).join(''); }
+function paintSet() {
+  $('guiSel').value = view.gui;
+  document.querySelectorAll('#dnSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === view.dn));
+  $('setSum').textContent = [LR.GUI[view.gui].name, view.dn === 'auto' ? '昼夜按占时' : view.dn === 'day' ? '定昼贵' : '定夜贵'].join(' · ');
+}
+$('guiSel').onchange = () => { view.gui = $('guiSel').value; saveView(); render(); };
+document.querySelectorAll('#dnSeg button').forEach(b => b.onclick = () => { view.dn = b.dataset.v; saveView(); render(); });
+
+date = F.bindWhen($('dtIn'), $('nowBtn'), (d, now) => setDate(d, now));
+isNow = !F.linkedTime();
+function step(k) {
+  const d = new Date(date.getTime() + k * 2 * 3600e3);
+  if (!LR.inRange(d)) { F.toast('只能排 1900–2100 年'); return; }
+  $('dtIn').value = F.toLocalInput(d); setDate(d, false);
+}
+$('prevH').onclick = () => step(-1);
+$('nextH').onclick = () => step(1);
+setInterval(() => {
+  if (!isNow || !cur || document.activeElement === $('dtIn')) return;
+  const d = new Date(); d.setSeconds(0, 0);
+  if (d.getTime() === date.getTime() || !LR.inRange(d)) return;
+  const c = JK.cast(d, opts());
+  if (!c) return;
+  const same = c.day.idx === cur.day.idx && c.hour === cur.hour && c.jiang === cur.jiang;
+  date = d; $('dtIn').value = F.toLocalInput(d);
+  if (same) { cur = c; renderNow(); } else render(true);
+}, 30000);
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,textarea,select') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+});
+
+const ask = () => $('askIn').value.trim();
+const plainText = () => JK.plain(cur).map(r => `${r.lab}：${r.html.replace(/<[^>]+>/g, '')}`).join('\n');
+const linkUrl = () => {
+  const u = new URL(location.href); u.search = ''; u.hash = '';
+  u.searchParams.set('t', F.toLocalInput(date));
+  if (difen != null) u.searchParams.set('d', Z[difen]);
+  return u.toString();
+};
+$('copyBtn').onclick = () => { if (cur) F.copy(JK.text(cur, { ask: ask() }), '课式已复制'); };
+$('aiBtn').onclick = () => { if (cur) F.askAI('大六壬金口诀', JK.text(cur, { ask: ask() }) + '\n\n本站白话（参考）：\n' + plainText(), rulesText()); };
+$('linkBtn').onclick = () => F.copy(linkUrl(), '此课链接已复制');
+$('shareBtn').onclick = () => {
+  if (!cur) return;
+  const c = cur;
+  F.share({ title: `金口诀 · ${c.title}`, meta: `${F.fmt(c.date)} · ${c.pillars.map(p => p.name).join(' ')} · 地分${Z[c.difen]}`, url: linkUrl(),
+    lines: (ask() ? [['所问', ask()]] : []).concat(c.wei.map(w => [w.pos, weiLabel(w) + (w.yong ? '（用）' : '')]), JK.plain(c).map(r => [r.lab, r.html.replace(/<[^>]+>/g, '')])) });
+};
+
+render(true);
+})();
+</script>
+</body>
+</html>

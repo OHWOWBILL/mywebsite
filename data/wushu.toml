@@ -96,6 +96,11 @@
     href = "/liuyao/"
     desc = "三钱摇卦，纳甲装卦，月建日辰逐爻标注"
   [[door.tools]]
+    seal = "蓍"
+    name = "大衍筮法"
+    href = "/dayan/"
+    desc = "四十九策分二挂一、揲四归奇，十八变成卦，按朱熹变占取辞"
+  [[door.tools]]
     seal = "奇"
     name = "奇门手记"
     href = "/qimen/"
@@ -105,6 +110,11 @@
     name = "大六壬"
     href = "/liuren/"
     desc = "月将加时，四课三传，十二天将"
+  [[door.tools]]
+    seal = "诀"
+    name = "金口诀"
+    href = "/jinkou/"
+    desc = "点方位定地分，人元贵神将神四位，一课断一事"
   [[door.tools]]
     seal = "乙"
     name = "太乙神数"

@@ -33,6 +33,9 @@
     sanshi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><circle cx="12" cy="12" r="5.6"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>',
     liuren: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M12 6.2l5.8 5.8-5.8 5.8-5.8-5.8z"/></svg>',
     taiyi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M3.5 12h17" stroke-opacity=".45"/><circle cx="16.2" cy="7.8" r="1.9" fill="currentColor" stroke="none"/></svg>',
+    // 金口诀：四位一柱（人元、贵神、将神、地分）；大衍：蓍草一束
+    jinkou: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7.5" y="2.8" width="9" height="18.4" rx="1.5"/><path d="M7.5 7.4h9M7.5 12h9M7.5 16.6h9"/></svg>',
+    dayan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20.5L10.6 3.5M12 20.5V3.5M16 20.5L13.4 3.5M5 20.5h14"/></svg>',
     lingqian: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 10.5h11l-1.3 9.5H7.8z"/><path d="M9.5 10.5V4M12 10.5V2.8M14.5 10.5V5"/></svg>',
     yibu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8v2"/><path d="M10 5.2h4c0 1.6-.7 2.4-1 3 3.4.9 5.2 3.4 5.2 6.4 0 3.5-2.8 5.9-6.2 5.9s-6.2-2.4-6.2-5.9c0-3 1.8-5.5 5.2-6.4-.3-.6-1-1.4-1-3z"/></svg>',
     tizhi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.6" r="2.4"/><path d="M6.8 20.5v-6a5.2 5.2 0 0 1 10.4 0v6"/><path d="M12 11.5v4"/></svg>',
@@ -44,7 +47,8 @@
     { id: 'tongshu', name: '通书', href: '/huangli/', men: '卜', desc: '黄历、择日、流年' },  // 黄历、择日、流年三件在通书里切换
     { id: 'meihua', name: '梅花', href: '/meihua/', men: '卜', desc: '此刻起卦，本互变并排' },
     { id: 'liuyao', name: '六爻纳甲', short: '六爻', href: '/liuyao/', men: '卜', desc: '摇卦装卦，旺衰逐爻标' },
-    { id: 'sanshi', name: '三式', href: '/qimen/', men: '卜', desc: '奇门、六壬、太乙' },         // 奇门、六壬、太乙三件在三式里切换
+    { id: 'dayan', name: '大衍筮法', short: '大衍', href: '/dayan/', men: '卜', desc: '四十九策揲蓍，十八变成卦' },
+    { id: 'sanshi', name: '三式', href: '/qimen/', men: '卜', desc: '奇门、六壬、太乙、金口诀' },  // 奇门、六壬、太乙、金口诀四件在三式里切换
     { id: 'lingqian', name: '灵签', href: '/lingqian/', men: '卜', desc: '掷筊求签，签诗白话' },
     { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字、紫微、占星、合盘、姓名' },  // 星命同参：八字、紫微、占星、合盘、姓名、读盘
     { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/', men: '命', desc: '干支旺衰速查' },
@@ -67,11 +71,12 @@
       ]
     },
     sanshi: {
-      name: '三式', sub: '式占', hint: '奇门看事看时，六壬看人看情，太乙看大势', lsLast: 'sanshi.last',
+      name: '三式', sub: '式占', hint: '奇门看事看时，六壬看人看情，太乙看大势，金口诀一课断一事', lsLast: 'sanshi.last',
       items: [
         { id: 'qimen', name: '奇门', href: '/qimen/' },
         { id: 'liuren', name: '六壬', href: '/liuren/' },
-        { id: 'taiyi', name: '太乙', href: '/taiyi/' }
+        { id: 'taiyi', name: '太乙', href: '/taiyi/' },
+        { id: 'jinkou', name: '金口诀', href: '/jinkou/' }
       ]
     },
     mingbu: {
