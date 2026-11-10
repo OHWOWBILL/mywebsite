@@ -9,3 +9,6 @@ birthday_deploy/
 
 # 入阁 3D 的打包工具（tools/qj3d），装的依赖不进库
 tools/qj3d/node_modules/
+
+# 字体原件（scripts/fonts/pack.py 自取，几十兆，不进库）
+scripts/fonts/.src/
