@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-eb68d8ccdef0';
+const V = 'fb-2ad840a4554a';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -45,7 +45,7 @@ const PRE = [
   '/fabao/backup.js?v=1',
   '/fabao/cidian.js?v=1',
   '/fabao/cities.js?v=1',
-  '/fabao/fabao.css?v=8',
+  '/fabao/fabao.css?v=9',
   '/fabao/fabao.js?v=15',
   '/fabao/jieqi-se.js?v=1',
   '/fabao/kyureki.js?v=1',

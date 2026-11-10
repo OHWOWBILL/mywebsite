@@ -1,0 +1,18 @@
+{{- /* 法宝库各件（static/ 下的静态页）的名录：直接读各页自己的 <title> 与 description，不另立清单。
+       带 noindex 的（口令页）不收。返回 [{href, title, desc}]，供站点地图与站内搜索索引用。 */ -}}
+{{- $out := slice -}}
+{{- range readDir "static" -}}
+  {{- if .IsDir -}}
+    {{- $f := printf "static/%s/index.html" .Name -}}
+    {{- if fileExists $f -}}
+      {{- $html := readFile $f -}}
+      {{- if not (findRE `<meta name="robots"[^>]*noindex` $html 1) -}}
+        {{- $title := "" -}}{{- $desc := "" -}}
+        {{- with findRESubmatch `<title>([^<]*)</title>` $html 1 }}{{ $title = index (index . 0) 1 }}{{ end -}}
+        {{- with findRESubmatch `<meta name="description" content="([^"]*)"` $html 1 }}{{ $desc = index (index . 0) 1 }}{{ end -}}
+        {{- $out = $out | append (dict "href" (printf "/%s/" .Name) "title" ($title | htmlUnescape) "desc" ($desc | htmlUnescape)) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $out -}}

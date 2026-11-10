@@ -1,4 +1,6 @@
 {{ define "main" }}
+{{- /* 标签页标题：Hugo 给 404 页的固定标题是英文「404 Page not found」，这里换成与页面一致的中文 */ -}}
+<script>document.title = '此路不通 · {{ site.Title }}';</script>
 <div style="
   display: flex;
   flex-direction: column;
