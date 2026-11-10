@@ -10,6 +10,7 @@ var hideButton = document.getElementById("close-search-button");
 var wrapper = document.getElementById("search-wrapper");
 var modal = document.getElementById("search-modal");
 var input = document.getElementById("search-query");
+if (input && !input.getAttribute("aria-label")) input.setAttribute("aria-label", "站内搜索");  // 主题的搜索框只有占位字，没有标签
 var output = document.getElementById("search-results");
 var first = output.firstChild;
 var last = output.lastChild;

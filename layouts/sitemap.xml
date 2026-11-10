@@ -1,0 +1,18 @@
+{{- /* 站点地图：主题那份只列 Hugo 的页面，法宝库各件是 static/ 下的静态页，一件也不在里头，
+       搜索引擎只能顺着链接碰运气。这里把它们补上：凡 static/某目录/index.html 且没有 noindex 的都列入。 */ -}}
+{{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{{- range .Data.Pages }}
+{{- if and .Permalink (not (in site.Params.sitemap.excludedKinds .Kind)) (.Param "xml" | default true) (not .Params.externalUrl) }}
+  <url>
+    <loc>{{ .Permalink }}</loc>{{ if not .Lastmod.IsZero }}
+    <lastmod>{{ .Lastmod.Format "2006-01-02" }}</lastmod>{{ end }}
+  </url>
+{{- end }}
+{{- end }}
+{{- range partial "qj-fabao-pages.html" . }}
+  <url>
+    <loc>{{ .href | absURL }}</loc>
+  </url>
+{{- end }}
+</urlset>

@@ -1,0 +1,36 @@
+{{- /* 文章里的 ![说明](/img/x.jpg)：
+       原图动辄一两兆、三四千像素宽。这里按原图出 480／800／1280 三档 webp，浏览器按屏宽挑一档；
+       写上宽高，图没到之前先把位置占好，正文不跳；点图放大时才取原图。
+       取不到原图的（外链、svg、gif）照主题原样输出。 */ -}}
+{{- $url := urls.Parse .Destination -}}
+{{- $res := "" -}}
+{{- if not $url.Scheme -}}
+  {{- $res = or (.Page.Resources.GetMatch $url.String) (resources.Get (strings.TrimPrefix "/" $url.Path)) -}}
+{{- end -}}
+<figure>
+{{- if and $res (in (slice "jpeg" "png" "webp") $res.MediaType.SubType) -}}
+  {{- $res = $res.Filter images.AutoOrient -}}
+  {{- $q := cond (eq $res.MediaType.SubType "png") "q90" "q78" -}}
+  {{- $set := slice -}}
+  {{- $big := "" -}}
+  {{- range slice 480 800 1280 -}}
+    {{- if lt . $res.Width -}}
+      {{- $big = $res.Resize (printf "%dx webp %s" . $q) -}}
+      {{- $set = $set | append (printf "%s %dw" $big.RelPermalink .) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if lt $res.Width 1400 -}}
+    {{- $big = $res.Resize (printf "%dx webp %s" $res.Width $q) -}}
+    {{- $set = $set | append (printf "%s %dw" $big.RelPermalink $res.Width) -}}
+  {{- end }}
+  <img class="my-0 rounded-md" loading="lazy" decoding="async" alt="{{ .Text }}"
+    width="{{ $big.Width }}" height="{{ $big.Height }}"
+    srcset="{{ delimit $set ", " }}" sizes="(min-width: 768px) 680px, 100vw"
+    src="{{ $big.RelPermalink }}" data-zoom-src="{{ $url.String }}">
+{{- else }}
+  <img class="my-0 rounded-md" loading="lazy" decoding="async" alt="{{ .Text }}" src="{{ $url.String }}">
+{{- end }}
+{{- with .Title }}
+  <figcaption>{{ . | markdownify }}</figcaption>
+{{- end }}
+</figure>

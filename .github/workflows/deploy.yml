@@ -40,6 +40,14 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
+      # 文章配图的小尺寸 webp（render-image 钩子生成）存一份，图没变就不重出，构建省半分钟
+      - name: Cache processed images
+        uses: actions/cache@v4
+        with:
+          path: resources/_gen
+          key: hugo-img-${{ hashFiles('static/img/**', 'assets/img/**', 'layouts/_default/_markup/render-image.html') }}
+          restore-keys: hugo-img-
+
       - name: Build with Hugo
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache

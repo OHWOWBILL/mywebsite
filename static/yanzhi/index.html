@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>閩吳淮泰谚文 · 第四版 · 四語子集</title>
+<!-- seo:begin 由 scripts/seo/tool-meta.js 生成，勿手改 -->
+<link rel="canonical" href="https://ohwowbill.com/yanzhi/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="潜蛟阁" />
+<meta property="og:title" content="閩吳淮泰谚文 · 第四版 · 四語子集" />
+<meta property="og:url" content="https://ohwowbill.com/yanzhi/" />
+<meta property="og:image" content="https://ohwowbill.com/img/og-card.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<!-- seo:end -->
 <link href="/fonts/yz.css?v=1" rel="stylesheet">
 <style>
   :root {
@@ -564,12 +573,14 @@
   }
 
   nav.toc {
-    position: sticky;
+    /* 目錄釘在正文（.page 寬 900）右側。原先是 float + 負邊距，而 nav 直接掛在 body 下，
+       結果整塊落在視窗之外：看不到，還把頁面撐出一條橫向捲軸。 */
+    position: fixed;
     top: 24px;
-    float: right;
+    left: calc(50% + 474px);
     width: 180px;
-    margin-left: 24px;
-    margin-right: -200px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
     font-family: "Noto Serif SC", serif;
     font-size: 12px;
     padding: 16px 0 16px 20px;

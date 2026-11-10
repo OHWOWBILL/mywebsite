@@ -9,6 +9,9 @@ enableSearch = true
 enableCodeCopy = true
 
 defaultSocialImage = "img/og-card.jpg"
+# 分享卡片用大图样式（twitter:card = summary_large_image）。Hugo 内置模板只在页面或站点
+# 配了 images 时才出大图卡，否则是小方图；这里指到与 defaultSocialImage 同一张。
+images = ["img/og-card.jpg"]
 
 mainSections = ["posts"]
 

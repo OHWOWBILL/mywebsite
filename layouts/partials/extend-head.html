@@ -2,9 +2,18 @@
        本 partial 只用 site.* 全局函数，不依赖传入上下文。 */ -}}
 {{ partial "person-schema.html" . }}
 {{ partial "owner-mode.html" . }}
-{{- /* 字体全部来自 Google Fonts（视觉基调指定）：
-       Noto Serif SC 600/900 标题 · LXGW WenKai TC 正文与引文 · Archivo 宽体只写 ohwowbill 与日期 */}}
-<link rel="stylesheet" href="/fonts/qj.css?v=1"/>
+{{- /* 字体自托管（视觉基调指定）：
+       Noto Serif SC 600/900 标题 · LXGW WenKai TC 正文与引文 · Archivo 宽体只写 ohwowbill 与日期。
+       qj.css 是按本站用字打的字包（scripts/fonts/pack.py），先载；两个「通用包」顺手预载。
+       qj-rest.css 是兜底的谷歌切片（包里没有的字才用得上），不挡首屏，载完再生效。 */}}
+{{- with site.Data.fonts }}
+{{- range .preload }}
+<link rel="preload" href="{{ . }}" as="font" type="font/woff2" crossorigin/>
+{{- end }}
+<link rel="stylesheet" href="/fonts/qj.css?v={{ .v }}"/>
+<link rel="stylesheet" href="/fonts/qj-rest.css?v={{ .v }}" media="print" onload="this.media='all'"/>
+<noscript><link rel="stylesheet" href="/fonts/qj-rest.css?v={{ .v }}"/></noscript>
+{{- end }}
 {{- /* 节气换肤：在画面出来之前按太阳黄经算出当令节气与季节，
        写到 <html data-season data-jieqi>，custom.css「十一 节气」据此微调那一处金。
        网址带 ?jieqi=冬至 可预览。算法与 assets/js/qj/li.js 同。 */}}

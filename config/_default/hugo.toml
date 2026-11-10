@@ -44,3 +44,14 @@ enableEmoji = true
   [[related.indices]]
     name = "date"
     weight = 10
+
+# 文章配图放在 static/img/（网址 /img/x.jpg 不变）。把这个目录同时挂进 assets，
+# 图片渲染钩子（layouts/_default/_markup/render-image.html）才能拿到原图去出小尺寸 webp。
+# 给某个目标另加挂载后，Hugo 不再自动挂它的默认目录，所以 assets 本身也要写上。
+[module]
+  [[module.mounts]]
+    source = "assets"
+    target = "assets"
+  [[module.mounts]]
+    source = "static/img"
+    target = "assets/img"

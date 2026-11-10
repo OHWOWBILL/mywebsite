@@ -1,0 +1,30 @@
+{{- /* 站内搜索索引（主题原样 ＋ 法宝库各件）。
+       主题只收 Hugo 的页面，搜「八字」「奇门」「择日」寻不到法宝；这里把 static/ 下各件法宝也编进去，
+       标题取各页 <title>，摘要与正文取各页 description。 */ -}}
+{{- $index := slice -}}
+{{- range .Site.Pages -}}
+  {{- $section := .Site.GetPage "section" .Section -}}
+  {{- $row := dict
+    "title" (.Title | emojify | safeJS)
+    "section" ($section.Title | emojify | safeJS)
+    "summary" (.Summary | safeJS)
+    "content" (.Plain | safeJS)
+    "permalink" .RelPermalink
+    "externalUrl" .Params.externalUrl
+    "type" .Type -}}
+  {{- if .Date -}}
+    {{- $row = merge $row (dict "date" (.Date | time.Format (.Site.Language.Params.dateFormat | default ":date_long"))) -}}
+  {{- end -}}
+  {{- $index = $index | append $row -}}
+{{- end -}}
+{{- range partial "qj-fabao-pages.html" . -}}
+  {{- $index = $index | append (dict
+    "title" (replaceRE ` · 潜蛟阁.*$` "" .title)
+    "section" "法宝库"
+    "summary" .desc
+    "content" .desc
+    "permalink" .href
+    "externalUrl" nil
+    "type" "fabao") -}}
+{{- end -}}
+{{- $index | jsonify -}}
