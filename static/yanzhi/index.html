@@ -573,12 +573,14 @@
   }
 
   nav.toc {
-    position: sticky;
+    /* 目錄釘在正文（.page 寬 900）右側。原先是 float + 負邊距，而 nav 直接掛在 body 下，
+       結果整塊落在視窗之外：看不到，還把頁面撐出一條橫向捲軸。 */
+    position: fixed;
     top: 24px;
-    float: right;
+    left: calc(50% + 474px);
     width: 180px;
-    margin-left: 24px;
-    margin-right: -200px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
     font-family: "Noto Serif SC", serif;
     font-size: 12px;
     padding: 16px 0 16px 20px;
