@@ -1,0 +1,126 @@
+<nav aria-label="{{ i18n "nav.main_menu" }}" class="flex items-center gap-x-5 h-12">
+  {{ if .Site.Menus.main }}
+    {{ range .Site.Menus.main }}
+      {{ template "DesktopMenu" . }}
+    {{ end }}
+  {{ end }}
+
+  {{ partial "header/components/translations.html" . }}
+  {{ if .Site.Params.enableA11y | default false }}
+    {{ partial "header/components/a11y.html" (dict "prefix" "desktop-") }}
+  {{ end }}
+
+  {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
+    <div class="flex items-center">
+      <button
+        id="appearance-switcher"
+        aria-label="{{ i18n "footer.dark_appearance" }}"
+        type="button"
+        class="text-sm bf-icon-color-hover"
+        title="{{ i18n "footer.dark_appearance" }}">
+        <div class="flex items-center justify-center dark:hidden">
+          {{ partial "icon.html" "moon" }}
+        </div>
+        <div class="items-center justify-center hidden dark:flex">
+          {{ partial "icon.html" "sun" }}
+        </div>
+      </button>
+    </div>
+  {{ end }}
+
+  {{- /* 本站改动（覆盖主题同名 partial，Blowfish v3.9.0）：搜索钮只留图标（主题新版是带 ⌘K 字样的框），后面加音律开关；
+         只有图标的菜单项（X、Instagram）读屏器念它的 title。其余照抄主题。 */}}
+  {{ if .Site.Params.enableSearch | default false }}
+    <button
+      id="search-button"
+      aria-label="{{ i18n "search.open_button_title" }}"
+      class="text-base bf-icon-color-hover"
+      title="{{ i18n "search.open_button_title" }}">
+      {{ partial "icon.html" "search" }}
+    </button>
+  {{ end }}
+
+  {{- /* 本站改动：音律开关（关 / 磬 / 磬与琴 三档，见 partials/qj-yin.html） */}}
+  <button type="button" class="qj-yin-toggle text-base bf-icon-color-hover" aria-pressed="false" aria-label="音律" title="音律：关">
+    <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2.5M7.5 4.5h9L18 16H6Z"/><circle cx="12" cy="19" r="1.4"/><path class="qj-yin-on" d="M3 9.5c-1.2 2-1.2 4 0 6M21 9.5c1.2 2 1.2 4 0 6"/><path class="qj-yin-qin" d="M2.5 22.6h19M5 21.2v2.8M19 21.2v2.8" stroke-width="1.2"/></svg>
+  </button>
+</nav>
+
+{{ define "DesktopMenu" }}
+  {{ if .HasChildren }}
+    <div class="nested-menu">
+      <div class="cursor-pointer flex items-center">
+        <a
+          {{ if .URL }}
+            href="{{ .URL }}"
+            {{ if or (strings.HasPrefix .URL "http:" ) (strings.HasPrefix .URL "https:" ) }}
+              target="_blank"
+            {{ end }}
+          {{ else }}
+            tabindex="0"
+          {{ end }}
+          {{ with or .Name .Title .Pre }}aria-label="{{ . }}"{{ end }}
+          aria-haspopup="true"
+          aria-expanded="false"
+          class="flex items-center text-sm font-medium bf-icon-color-hover"
+          title="{{ .Title }}">
+          {{ if .Pre }}
+            <span {{ if and .Pre .Name }}class="mr-1"{{ end }}>
+              {{ partial "icon.html" .Pre }}
+            </span>
+          {{ end }}
+          <span class="text-sm font-medium break-normal" title="{{ .Title }}">
+            {{ .Name | markdownify }}
+          </span>
+          <span>
+            {{ partial "icon.html" "chevron-down" }}
+          </span>
+        </a>
+      </div>
+      <div class="menuhide">
+        <div class="p-5 mt-2 rounded-xl border border-neutral-200/80 bg-neutral/95 shadow-2xl shadow-neutral-900/20 dark:border-neutral-700/80 dark:bg-neutral-800/95">
+          <div class="flex flex-col space-y-3">
+            {{ range .Children }}
+              <a
+                href="{{ .URL }}"
+                {{ if or (strings.HasPrefix .URL "http:" ) (strings.HasPrefix .URL "https:" ) }}
+                  target="_blank"
+                {{ end }}
+                {{ with or .Name .Title .Pre }}aria-label="{{ . }}"{{ end }}
+                class="flex items-center bf-icon-color-hover">
+                {{ if .Pre }}
+                  <span {{ if and .Pre .Name }}class="mr-1"{{ end }}>
+                    {{ partial "icon.html" .Pre }}
+                  </span>
+                {{ end }}
+                <span class="text-sm font-sm" title="{{ .Title }}">
+                  {{ .Name | markdownify }}
+                </span>
+              </a>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+    </div>
+  {{ else }}
+    <a
+      href="{{ .URL }}"
+      {{ if or (strings.HasPrefix .URL "http:" ) (strings.HasPrefix .URL "https:" ) }}
+        target="_blank"
+      {{ end }}
+      class="flex items-center bf-icon-color-hover"
+      {{ with or .Name .Title .Pre }}aria-label="{{ . }}"{{ end }}
+      title="{{ .Title }}">
+      {{ if .Pre }}
+        <span {{ if and .Pre .Name }}class="mr-1"{{ end }}>
+          {{ partial "icon.html" .Pre }}
+        </span>
+      {{ end }}
+      {{ if .Name }}
+        <span class="qj-nav-t text-sm font-medium break-normal">
+          {{ .Name | markdownify }}
+        </span>
+      {{ end }}
+    </a>
+  {{ end }}
+{{ end }}

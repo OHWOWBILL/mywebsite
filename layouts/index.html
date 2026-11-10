@@ -24,7 +24,7 @@
 {{- /* 入阁：首页打开总是文字版，点「入阁」才换全景（assets/js/qj/ge.js）。
      网址 ?ge=1 直接入阁（内页的「回阁」用它）；从下一页按返回回来时，本标签页里刚才在阁中（sessionStorage qj-ge）就仍在阁中。
      旧版记在 localStorage 的 qj-ge / qj-ge3d 顺手清掉 */ -}}
-try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=new URLSearchParams(location.search).get('ge'),n=performance.getEntriesByType('navigation')[0];if(g==='1'||g==='0')sessionStorage.setItem('qj-ge',g);if(g==='1'||(g!=='0'&&n&&n.type==='back_forward'&&sessionStorage.getItem('qj-ge')==='1'))document.documentElement.classList.add('qj-ge-on')}catch(e){}</script>
+(function(){try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=new URLSearchParams(location.search).get('ge'),n=performance.getEntriesByType('navigation')[0];if(g==='1'||g==='0')sessionStorage.setItem('qj-ge',g);if(g==='1'||(g!=='0'&&n&&n.type==='back_forward'&&sessionStorage.getItem('qj-ge')==='1'))document.documentElement.classList.add('qj-ge-on')}catch(e){}})();</script>
 <section class="qj-hero" aria-label="潜蛟阁">
   {{- with $hero }}
   <img class="qj-hero-img nozoom" src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="雾中杉林，石阶通往亮着灯的社殿" fetchpriority="high"/>
@@ -51,12 +51,12 @@ try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=ne
       <span class="qj-door-z">庭</span>
       <span class="qj-door-t">五术门庭</span>
       <span class="qj-door-s">山、医、命、卜、相，一术一门，文章与法宝各归其门</span>
-      <span class="qj-door-five" aria-hidden="true">{{ range site.Data.wushu.door }}<i>{{ .seal }}</i>{{ end }}</span>
+      <span class="qj-door-five" aria-hidden="true">{{ range hugo.Data.wushu.door }}<i>{{ .seal }}</i>{{ end }}</span>
     </a>
     <a class="qj-door" href="{{ "posts/" | relURL }}">
       <span class="qj-door-z">文</span>
       <span class="qj-door-t">万法归一</span>
-      <span class="qj-door-s">全部文章 {{ len $posts }} 篇，按{{ len site.Data.sections.group }}个主题分区存放</span>
+      <span class="qj-door-s">全部文章 {{ len $posts }} 篇，按{{ len hugo.Data.sections.group }}个主题分区存放</span>
     </a>
     <a class="qj-door" href="{{ "tools/" | relURL }}">
       <span class="qj-door-z">术</span>
@@ -78,7 +78,7 @@ try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=ne
   <section class="qj-block">
     <h2 class="qj-block-h">分区</h2>
     <ul class="qj-boards">
-      {{- range site.Data.sections.group }}
+      {{- range hugo.Data.sections.group }}
       <li><a href="{{ "posts/" | relURL }}#sec-{{ .seal }}"><span class="qj-seal" aria-hidden="true">{{ .seal }}</span>{{ .name }}</a></li>
       {{- end }}
     </ul>
@@ -100,7 +100,7 @@ try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=ne
 
 {{- /* 入阁 · 全景。数量都从站点数据来：门 = data/wushu.toml，书架 = data/sections.toml（一篇归第一个命中的分区），
        宫灯 = 各门 tools。图由 assets/js/qj/ge.js 现画；没有脚本时这一块不出现。 */ -}}
-{{- $cfg := site.Data.sections -}}
+{{- $cfg := hugo.Data.sections -}}
 {{- $count := dict -}}
 {{- range $p := $posts -}}
   {{- $cats := $p.Params.categories | default slice -}}
@@ -117,7 +117,7 @@ try{localStorage.removeItem('qj-ge');localStorage.removeItem('qj-ge3d');var g=ne
 {{- $doors := slice -}}
 {{- $wtools := slice -}}
 {{- $locked := slice -}}
-{{- range site.Data.wushu.door -}}
+{{- range hugo.Data.wushu.door -}}
   {{- $t := .tools | default slice -}}
   {{- $ps := where $posts "Params.categories" "intersect" .categories -}}
   {{- $doors = $doors | append (dict "seal" .seal "name" .name "shut" (and (eq (len $ps) 0) (eq (len $t) 0))) -}}

@@ -1,5 +1,4 @@
-{{/* Logo section */}}
-{{ define "HeaderLogo" }}
+<div class="main-menu flex items-center w-full gap-2 p-1 pl-0">
   {{ if .Site.Params.Logo }}
     {{ $logo := resources.Get .Site.Params.Logo }}
     {{ if $logo }}
@@ -15,205 +14,73 @@
               src="{{ $logo.RelPermalink }}"
               width="{{ div $logo.Width 2 }}"
               height="{{ div $logo.Height 2 }}"
-              class="logo max-h-[5rem] max-w-[5rem] object-scale-down object-left nozoom"
-              alt="{{ .Site.Title }}">
+              class="logo max-h-20 max-w-20 object-scale-down object-left nozoom"
+              alt="">
           {{ end }}
         </a>
       </div>
     {{ end }}
-  {{- end }}
-{{ end }}
-
-{{/* Desktop navigation */}}
-{{ define "HeaderDesktopNavigation" }}
-  <nav class="hidden md:flex items-center gap-x-5 md:ml-12 h-12">
-    {{ if .Site.Menus.main }}
-      {{ range .Site.Menus.main }}
-        {{ partial "header/header-option.html" . }}
-      {{ end }}
-    {{ end }}
-
-    {{ partial "translations.html" . }}
-
-    {{ if .Site.Params.enableSearch | default false }}
-      <button
-        id="search-button"
-        aria-label="{{ i18n "search.open_button_title" }}"
-        class="text-base hover:text-primary-600 dark:hover:text-primary-400"
-        title="{{ i18n "search.open_button_title" }}">
-        {{ partial "icon.html" "search" }}
-      </button>
-    {{ end }}
-
-    {{- /* 本站改动：音律开关（关 / 磬 / 磬与琴 三档，见 partials/qj-yin.html） */}}
-    <button type="button" class="qj-yin-toggle text-base hover:text-primary-600 dark:hover:text-primary-400" aria-pressed="false" aria-label="音律" title="音律：关">
-      <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2.5M7.5 4.5h9L18 16H6Z"/><circle cx="12" cy="19" r="1.4"/><path class="qj-yin-on" d="M3 9.5c-1.2 2-1.2 4 0 6M21 9.5c1.2 2 1.2 4 0 6"/><path class="qj-yin-qin" d="M2.5 22.6h19M5 21.2v2.8M19 21.2v2.8" stroke-width="1.2"/></svg>
-    </button>
-
-    {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
-      <div class="{{ if .Site.Params.footer.showScrollToTop | default true -}}{{- end }} flex items-center">
-        <button
-          id="appearance-switcher"
-          aria-label="Dark mode switcher"
-          type="button"
-          class="text-base hover:text-primary-600 dark:hover:text-primary-400">
-          <div class="flex items-center justify-center dark:hidden">
-            {{ partial "icon.html" "moon" }}
-          </div>
-          <div class="items-center justify-center hidden dark:flex">
-            {{ partial "icon.html" "sun" }}
-          </div>
-        </button>
-      </div>
-    {{ end }}
-  </nav>
-{{ end }}
-
-{{/* Mobile navigation */}}
-{{ define "HeaderMobileNavigation" }}
-  <div class="flex md:hidden items-center gap-x-5 md:ml-12 h-12">
-    <span></span>
-
-    {{ partial "translations.html" . }}
-    {{ if .Site.Params.enableSearch | default false }}
-      <button
-        id="search-button-mobile"
-        aria-label="{{ i18n "search.open_button_title" }}"
-        class="text-base hover:text-primary-600 dark:hover:text-primary-400"
-        title="{{ i18n "search.open_button_title" }}">
-        {{ partial "icon.html" "search" }}
-      </button>
-    {{ end }}
-
-    {{- /* 本站改动：音律开关（关 / 磬 / 磬与琴 三档，见 partials/qj-yin.html） */}}
-    <button type="button" class="qj-yin-toggle text-base hover:text-primary-600 dark:hover:text-primary-400" aria-pressed="false" aria-label="音律" title="音律：关">
-      <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2.5M7.5 4.5h9L18 16H6Z"/><circle cx="12" cy="19" r="1.4"/><path class="qj-yin-on" d="M3 9.5c-1.2 2-1.2 4 0 6M21 9.5c1.2 2 1.2 4 0 6"/><path class="qj-yin-qin" d="M2.5 22.6h19M5 21.2v2.8M19 21.2v2.8" stroke-width="1.2"/></svg>
-    </button>
-
-    {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
-      <button
-        id="appearance-switcher-mobile"
-        aria-label="Dark mode switcher"
-        type="button"
-        class="text-base hover:text-primary-600 dark:hover:text-primary-400 ltr:mr-1 rtl:ml-1">
-        <div class="flex items-center justify-center dark:hidden">
-          {{ partial "icon.html" "moon" }}
-        </div>
-        <div class="items-center justify-center hidden dark:flex">
-          {{ partial "icon.html" "sun" }}
-        </div>
-      </button>
-    {{ end }}
-  </div>
-{{ end }}
-
-{{ define "HeaderMobileMenu" }}
-  <div class="-my-2 md:hidden">
-    <div id="menu-button" class="block">
-      {{ if .Site.Menus.main }}
-        <div class="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
-          {{ partial "icon.html" "bars" }}
-        </div>
-        <div
-          id="menu-wrapper"
-          class="fixed inset-0 z-30 invisible w-screen h-screen m-0 overflow-auto transition-opacity opacity-0 cursor-default bg-neutral-100/50 backdrop-blur-sm dark:bg-neutral-900/50 pt-[5px]">
-          <ul
-            class="flex space-y-2 mt-3 flex-col items-end w-full px-6 py-6 mx-auto overflow-visible list-none ltr:text-right rtl:text-left max-w-7xl">
-            <li id="menu-close-button">
-              <span
-                class="cursor-pointer inline-block align-text-bottom hover:text-primary-600 dark:hover:text-primary-400">
-                {{ partial "icon.html" "xmark" }}
-              </span>
-            </li>
-
-            {{ range .Site.Menus.main }}
-              {{ partial "header/header-mobile-option.html" . }}
-            {{ end }}
-
-          </ul>
-          {{ if .Site.Menus.subnavigation }}
-            <hr>
-            <ul
-              class="flex mt-4 flex-col items-end w-full px-6 py-6 mx-auto overflow-visible list-none ltr:text-right rtl:text-left max-w-7xl">
-              {{ range .Site.Menus.subnavigation }}
-                <li class="mb-1">
-                  <a
-                    href="{{ .URL }}"
-                    {{ if or (strings.HasPrefix .URL "http:" ) (strings.HasPrefix .URL "https:") }}
-                      target="_blank"
-                    {{ end }}
-                    class="flex items-center">
-                    {{ if .Pre }}
-                      <span {{ if and .Pre .Name }}class="mr-3"{{ end }}>
-                        {{ partial "icon.html" .Pre }}
-                      </span>
-                    {{ end }}
-                    <p class="text-sm font-sm text-gray-500 hover:text-gray-900" title="{{ .Title }}">
-                      {{ .Name | markdownify }}
-                    </p>
-                  </a>
-                </li>
-              {{ end }}
-            </ul>
-          {{ end }}
-        </div>
-      {{ end }}
+  {{ end }}
+  {{- /* 本站改动（覆盖主题同名 partial，Blowfish v3.9.0）：
+         站名改为「蛟标记 + 拉丁字标 ohwowbill + 潜蛟阁」，其余照抄主题。 */}}
+  <a href="{{ "" | relLangURL }}" class="qj-brand" aria-label="{{ .Site.Title }} · 首页">
+    <span class="qj-brand-mark">{{ partial "qj-mark.html" . }}</span>
+    <span class="qj-brand-lat">ohwowbill</span>
+    <span class="qj-brand-zh">{{ .Site.Title }}</span>
+  </a>
+  <div class="flex items-center ms-auto">
+    <div class="hidden md:flex">
+      {{ partial "header/components/desktop-menu.html" . }}
+    </div>
+    <div class="flex md:hidden">
+      {{ partial "header/components/mobile-menu.html" . }}
     </div>
   </div>
-{{ end }}
-
-{{/* ========== Render HTML ========== */}}
-<div
-  class="main-menu flex items-center justify-between px-4 py-6 sm:px-6 md:justify-start gap-x-3 pt-[2px] pr-0 pb-[3px] pl-0">
-  {{ template "HeaderLogo" . }}
-  <div class="flex flex-1 items-center justify-between">
-    <nav class="flex space-x-3">
-      {{- /* 本站改动（覆盖主题同名 partial）：
-             站名改为「拉丁字标 ohwowbill + 潜蛟阁」，见视觉基调「交给网站那边」。 */}}
-      <a href="{{ "" | relLangURL }}" class="qj-brand" aria-label="{{ .Site.Title }} · 首页">
-        <span class="qj-brand-mark">{{ partial "qj-mark.html" . }}</span>
-        <span class="qj-brand-lat">ohwowbill</span>
-        <span class="qj-brand-zh">{{ .Site.Title }}</span>
-      </a>
-    </nav>
-    {{ template "HeaderDesktopNavigation" . }}
-    {{ template "HeaderMobileNavigation" . }}
-  </div>
-  {{ template "HeaderMobileMenu" . }}
 </div>
 
 {{ if .Site.Menus.subnavigation }}
-  <div
-    class="main-menu flex pb-3 flex-col items-end justify-between md:justify-start space-x-3{{ if .Site.Params.Logo }} -mt-[15px]{{ end }}">
-    <div class="hidden md:flex items-center space-x-5">
-      {{ range .Site.Menus.subnavigation }}
-        <a
-          href="{{ .URL }}"
-          {{ if or (strings.HasPrefix .URL "http:" ) (strings.HasPrefix .URL "https:" ) }}
-            target="_blank"
-          {{ end }}
-          class="flex items-center">
-          {{ if .Pre }}
-            <span {{ if and .Pre .Name }}class="mr-1"{{ end }}>
-              {{ partial "icon.html" .Pre }}
+  <nav id="main-menu" aria-label="{{ i18n "nav.main_menu" }}">
+    <div
+      class="main-menu flex pb-3 flex-col items-end justify-between md:justify-start space-x-3 {{ if .Site.Params.Logo }}
+        -mt-[15px]
+      {{ end }}">
+      <div class="hidden md:flex items-center space-x-5">
+        {{ range .Site.Menus.subnavigation }}
+          <a
+            href="{{ .URL }}"
+            {{ if or (strings.HasPrefix .URL "http:" ) (strings.HasPrefix .URL "https:" ) }}
+              target="_blank"
+            {{ end }}
+            class="flex items-center bf-icon-color-hover">
+            {{ if .Pre }}
+              <span {{ if and .Pre .Name }}class="mr-1"{{ end }}>
+                {{ partial "icon.html" .Pre }}
+              </span>
+            {{ end }}
+            <span class="text-xs font-light" title="{{ .Title }}">
+              {{ .Name | markdownify }}
             </span>
-          {{ end }}
-          <p class="text-xs font-light text-gray-500 hover:text-gray-900" title="{{ .Title }}">
-            {{ .Name | markdownify }}
-          </p>
-        </a>
-      {{ end }}
+          </a>
+        {{ end }}
+      </div>
     </div>
-  </div>
+  </nav>
 {{ end }}
 
 {{ if .Site.Params.highlightCurrentMenuArea }}
   <script>
     (function () {
-      var $mainmenu = $(".main-menu");
+      var mainmenu = document.querySelector(".main-menu");
+      if (!mainmenu) return;
+
       var path = window.location.pathname;
-      $mainmenu.find('a[href="' + path + '"]').each(function (i, e) {
-        $(e).children("p").addClass("active");
+      var links = mainmenu.querySelectorAll('a[href="' + path + '"]');
+
+      links.forEach(function (link) {
+        var targets = link.querySelectorAll("span");
+        targets.forEach(function (el) {
+          el.classList.add("active");
+        });
       });
     })();
   </script>

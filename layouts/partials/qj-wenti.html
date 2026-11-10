@@ -5,12 +5,12 @@
      =========================================================== */ -}}
 {{- $home := and . (index . "home") -}}
 {{- /* 同一份名单另出一个脚本给法宝库大堂（/tools/ 是静态页，读不到 data）：window.QJ_WENTI */ -}}
-{{- $wj := printf "/* 由 layouts/partials/qj-wenti.html 依 data/wenti.yaml 生成，勿手改 */\nwindow.QJ_WENTI = %s;\n" (jsonify site.Data.wenti.ask) | resources.FromString "fabao/wenti.js" -}}
+{{- $wj := printf "/* 由 layouts/partials/qj-wenti.html 依 data/wenti.yaml 生成，勿手改 */\nwindow.QJ_WENTI = %s;\n" (jsonify hugo.Data.wenti.ask) | resources.FromString "fabao/wenti.js" -}}
 {{- $wj.Publish -}}
 <section class="qj-block qj-wenti" id="wenti" aria-label="我想问">
   <h2 class="qj-block-h"><span class="qj-seal" aria-hidden="true">问</span>我想问…<span class="qj-wenti-note">点一下就到，不用先懂是哪门术</span></h2>
   <div class="qj-wenti-grid">
-    {{- range site.Data.wenti.ask }}{{ if or (not $home) .home }}
+    {{- range hugo.Data.wenti.ask }}{{ if or (not $home) .home }}
     <a class="qj-wenti-a" href="{{ .href | relURL }}">
       <span class="qj-wenti-s" aria-hidden="true">{{ .seal }}</span>
       <span class="qj-wenti-q">{{ .q }}</span>

@@ -6,7 +6,7 @@
   <h1 class="qj-h1">{{ .Title }}</h1>
   <p class="qj-lede">{{ .Description }}。也可按分区翻：</p>
   <ul class="qj-boards">
-    {{- range site.Data.sections.group }}
+    {{- range hugo.Data.sections.group }}
     <li><a href="{{ "posts/" | relURL }}#sec-{{ .seal }}"><span class="qj-seal" aria-hidden="true">{{ .seal }}</span>{{ .name }}</a></li>
     {{- end }}
   </ul>
