@@ -19,7 +19,7 @@
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
   <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
 
@@ -38,7 +38,7 @@
     .bz-pick { display: flex; flex-direction: column; gap: 10px; }
     .bz-pick-sum { display: flex; gap: 6px; flex-wrap: wrap; align-items: stretch; }
     .bz-slot { min-width: 4.6em; padding: 4px 10px 5px; border-radius: var(--r-sm); border: 1px dashed var(--rule-2); background: none; text-align: center; font-family: var(--font-title); font-size: 17px; font-weight: 600; letter-spacing: .08em; color: var(--faint); line-height: 1.25; }
-    .bz-slot small { display: block; font-size: 10.5px; font-weight: 400; letter-spacing: .25em; color: var(--faint); }
+    .bz-slot small { display: block; font-size: 12px; font-weight: 400; letter-spacing: .25em; color: var(--faint); }
     .bz-slot.on { border-style: solid; color: var(--fg); cursor: pointer; }
     .bz-slot.on:hover { border-color: var(--zi-2); }
     .bz-slot.cur { border-color: var(--jin); color: var(--jin); }
@@ -53,7 +53,7 @@
       border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid var(--rule-2); line-height: 1.25;
       font-family: var(--font-title); font-size: 16px; font-weight: 600; color: var(--wc, var(--fg-2)); letter-spacing: .06em;
     }
-    .bz-chips button small { font-family: var(--font-mark); font-weight: 500; font-size: 10.5px; color: var(--faint); letter-spacing: .02em; margin-top: 1px; white-space: nowrap; }
+    .bz-chips button small { font-family: var(--font-mark); font-weight: 500; font-size: 12px; color: var(--faint); letter-spacing: .02em; margin-top: 1px; white-space: nowrap; }
     .bz-chips button:hover { border-color: var(--zi-2); }
     .bz-chips button.wide { flex-direction: row; gap: 6px; font-size: 13.5px; font-weight: 400; color: var(--muted); }
     .bz-side-ctrl { display: flex; flex-direction: column; gap: 8px; max-width: 340px; }
@@ -72,9 +72,9 @@
     table.bz-t { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 360px; table-layout: fixed; }
     .bz-t th, .bz-t td { text-align: center; padding: 5px 2px; vertical-align: middle; border-top: 1px dashed var(--rule); }
     .bz-t tr:first-child th, .bz-t tr:first-child td { border-top: none; }
-    .bz-t th.lab { width: 3.4em; font-family: var(--font-title); font-weight: 400; font-size: 11.5px; color: var(--faint); letter-spacing: .15em; text-align: left; padding-left: 6px; position: sticky; left: 0; background: var(--bg-2); z-index: 1; }
+    .bz-t th.lab { width: 3.4em; font-family: var(--font-title); font-weight: 400; font-size: 12px; color: var(--faint); letter-spacing: .15em; text-align: left; padding-left: 6px; position: sticky; left: 0; background: var(--bg-2); z-index: 1; }
     .bz-t thead th { font-family: var(--font-title); font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: .2em; padding-bottom: 7px; }
-    .bz-t thead th small { display: block; font-family: var(--font-mark); font-size: 10px; letter-spacing: .02em; color: var(--faint); margin-top: 1px; }
+    .bz-t thead th small { display: block; font-family: var(--font-mark); font-size: 12px; letter-spacing: .02em; color: var(--faint); margin-top: 1px; }
     .bz-t .col-day { background: rgba(122, 91, 192, .07); }
     .bz-t .col-x { background: rgba(143, 176, 216, .055); }
     .bz-t .col-x.ln { background: rgba(141, 191, 151, .05); }
@@ -89,21 +89,21 @@
     .bz-ss { font-family: var(--font-title); font-size: 12.5px; color: var(--fg-2); letter-spacing: .08em; }
     .bz-ss.zhu { color: var(--jin); font-weight: 600; }
     .bz-gz { font-family: var(--font-title); font-weight: 600; font-size: 30px; line-height: 1.15; color: var(--wc); }
-    .bz-gz small { display: block; font-size: 10px; font-weight: 400; color: var(--faint); letter-spacing: .1em; line-height: 1.3; }
+    .bz-gz small { display: block; font-size: 12px; font-weight: 400; color: var(--faint); letter-spacing: .1em; line-height: 1.3; }
     .bz-cang { display: flex; flex-direction: column; gap: 1px; align-items: center; font-size: 12px; line-height: 1.35; }
     .bz-cang span { white-space: nowrap; }
     .bz-cang b { font-family: var(--font-title); font-weight: 600; color: var(--wc); margin-right: 2px; }
-    .bz-cang i { font-style: normal; color: var(--muted); font-size: 11px; }
+    .bz-cang i { font-style: normal; color: var(--muted); font-size: 12px; }
     .bz-cang .yu { opacity: .7; }
     .bz-sm { font-size: 12px; color: var(--fg-2); font-family: var(--font-title); letter-spacing: .05em; }
     .bz-sm.dim { color: var(--muted); }
-    .bz-kong { color: var(--faint); font-size: 11.5px; font-family: var(--font-title); }
+    .bz-kong { color: var(--faint); font-size: 12px; font-family: var(--font-title); }
     .bz-kong.hit { color: var(--zhu); }
     .bz-sha { display: flex; flex-direction: column; gap: 2px; align-items: center; }
-    .bz-sha span { font-size: 11px; font-family: var(--font-title); color: var(--muted); white-space: nowrap; cursor: help; }
+    .bz-sha span { font-size: 12px; font-family: var(--font-title); color: var(--muted); white-space: nowrap; cursor: help; }
     .bz-sha span.gui { color: #CDBB86; }
     .bz-sha span.xiong { color: #C99A9A; }
-    .bz-empty-sha { color: var(--faint); font-size: 11px; }
+    .bz-empty-sha { color: var(--faint); font-size: 12px; }
 
     /* 运限条 */
     .bz-yun { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
@@ -121,14 +121,14 @@
     .bz-ybtns button:hover { border-color: var(--rule-2); }
     .bz-ybtns button.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 26%, var(--bg-3)); color: var(--fg); }
     .bz-ybtns b { font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .05em; }
-    .bz-ybtns em { font-style: normal; font-family: var(--font-title); font-size: 10.5px; color: var(--muted); }
-    .bz-ybtns span { font-family: var(--font-mark); font-size: 10px; color: var(--faint); }
+    .bz-ybtns em { font-style: normal; font-family: var(--font-title); font-size: 12px; color: var(--muted); }
+    .bz-ybtns span { font-family: var(--font-mark); font-size: 12px; color: var(--faint); }
     .bz-ybtns button.on span, .bz-ybtns button.on em { color: var(--fg-2); }
-    .bz-ybtns i { position: absolute; top: 2px; right: 3px; font-style: normal; font-size: 9.5px; color: var(--jin); font-family: var(--font-title); }
+    .bz-ybtns i { position: absolute; top: 2px; right: 3px; font-style: normal; font-size: 12px; color: var(--jin); font-family: var(--font-title); }
     .bz-ybtns .xy b { color: var(--muted); }
     .bz-ybtns.wrap { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); overflow: visible; }
     .bz-ybtns.wrap button { min-width: 0; }
-    .bz-ybtns u { position: absolute; top: 2px; left: 3px; text-decoration: none; font-style: normal; font-size: 9.5px; color: var(--qing); font-family: var(--font-title); }
+    .bz-ybtns u { position: absolute; top: 2px; left: 3px; text-decoration: none; font-style: normal; font-size: 12px; color: var(--qing); font-family: var(--font-title); }
     .bz-ybtns .late b { color: var(--fg-2); }
     .bz-yhead .bz-ynow { margin-left: auto; padding: 3px 10px; font-size: 12px; }
 
@@ -146,11 +146,11 @@
     .bz-key .jin { color: var(--jin); font-weight: 600; }
 
     .bz-wx { display: flex; flex-direction: column; gap: 7px; }
-    .bz-wx .r { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) 4.6em 1.6em; gap: 8px; align-items: center; font-size: 12.5px; }
+    .bz-wx .r { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) 5.2em 1.6em; gap: 8px; align-items: center; font-size: 12.5px; }
     .bz-wx .n { font-family: var(--font-title); font-weight: 600; color: var(--wc); font-size: 15px; }
     .bz-wx .bar { height: 8px; border-radius: 4px; background: var(--bg-3); overflow: hidden; }
     .bz-wx .bar i { display: block; height: 100%; background: var(--wc); border-radius: 4px; opacity: .8; }
-    .bz-wx .v { font-family: var(--font-mark); color: var(--muted); font-size: 11px; text-align: right; }
+    .bz-wx .v { font-family: var(--font-mark); color: var(--muted); font-size: 12px; text-align: right; white-space: nowrap; }
     .bz-wx .s { font-family: var(--font-title); color: var(--muted); text-align: center; }
     .bz-wx .s.wang { color: var(--jin); }
 
@@ -160,7 +160,7 @@
     .bz-ssc .dots { display: flex; gap: 3px; }
     .bz-ssc .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--zi-2); }
     .bz-ssc .dots i.c { background: none; box-shadow: inset 0 0 0 1px var(--zi-2); }
-    .bz-ssc .v { font-family: var(--font-mark); font-size: 10.5px; color: var(--faint); }
+    .bz-ssc .v { font-family: var(--font-mark); font-size: 12px; color: var(--faint); }
     .bz-ssc .r.zero .n { color: var(--faint); }
     .bz-rel { display: flex; flex-direction: column; gap: 5px; }
     .bz-rel .r { display: flex; gap: 8px; align-items: baseline; font-size: 13px; line-height: 1.55; }
@@ -187,7 +187,7 @@
     /* 白话：盘上几句大白话，随盘重画（紫微、占星同式） */
     /* 调候（《穷通宝鉴》）：白话卡里一行，下面一块折叠细看（原文、盘中有无、忌） */
     .bh .r b.th-g, .bh-th b.th-g { color: var(--wc); }
-    .th-tag { display: inline-block; font-style: normal; font-family: var(--font-title); font-size: 11px; line-height: 1.5; padding: 0 5px; margin: 0 1px; border-radius: 4px; letter-spacing: 0; vertical-align: 1px; white-space: nowrap; }
+    .th-tag { display: inline-block; font-style: normal; font-family: var(--font-title); font-size: 12px; line-height: 1.5; padding: 0 5px; margin: 0 1px; border-radius: 4px; letter-spacing: 0; vertical-align: 1px; white-space: nowrap; }
     .th-tag.tou { color: var(--lv); box-shadow: inset 0 0 0 1px rgba(141, 191, 151, .55); }
     .th-tag.cang { color: var(--qing); box-shadow: inset 0 0 0 1px rgba(143, 176, 216, .5); }
     .th-tag.wu { color: var(--muted); box-shadow: inset 0 0 0 1px var(--rule-2); }
@@ -197,7 +197,7 @@
     .bh-th > summary::-webkit-details-marker { display: none; }
     .bh-th > summary::before { content: "＋"; color: var(--zi-2); font-size: 12px; letter-spacing: 0; }
     .bh-th[open] > summary::before { content: "－"; }
-    .bh-th > summary small { font-size: 11px; color: var(--faint); letter-spacing: .04em; }
+    .bh-th > summary small { font-size: 12px; color: var(--faint); letter-spacing: .04em; }
     .bh-th blockquote { margin: 2px 0 10px; padding: 6px 12px; border-left: 2px solid var(--zi-2); background: rgba(122, 91, 192, .07); border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: 14px; line-height: 1.85; color: var(--fg); }
     .bh-th ul { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
     .bh-th li { display: grid; grid-template-columns: 1.2em auto minmax(0, 1fr); gap: 8px; align-items: baseline; font-size: 13px; line-height: 1.6; color: var(--fg-2); }
@@ -215,11 +215,11 @@
       .bz-side { grid-template-columns: 1fr; }
       .bz-board { margin: 0 -10px; border-radius: var(--r); padding: 12px 4px 8px; }
       .bz-gz { font-size: 25px; }
-      .bz-t th.lab { width: 2.9em; font-size: 10.5px; letter-spacing: .05em; padding-left: 4px; }
+      .bz-t th.lab { width: 2.9em; font-size: 11px; letter-spacing: .05em; padding-left: 4px; }
       .bz-ss { font-size: 11.5px; letter-spacing: 0; }
       .bz-cang { font-size: 11px; }
-      .bz-cang i { font-size: 10px; }
-      .bz-sha span { font-size: 10px; }
+      .bz-cang i { font-size: 11px; }
+      .bz-sha span { font-size: 11px; }
       .bz-yrow { grid-template-columns: 1fr; gap: 4px; }
       .bz-form input[type=text] { width: 100%; }
       .bz-pick-sum .bz-slot { flex: 1 1 0; min-width: 0; padding: 4px 2px 5px; font-size: 16px; }
@@ -341,7 +341,7 @@
 <script src="/bazi/qiongtong.js?v=1"></script>
 <script src="/bazi/bazi.js?v=3"></script>
 <script src="/fabao/cities.js?v=1"></script>
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=16"></script>
 <script>
 (function () {
 'use strict';

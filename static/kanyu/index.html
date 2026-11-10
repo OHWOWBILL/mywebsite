@@ -19,7 +19,7 @@
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
   <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     .q-旺 { --qc: var(--jin); } .q-生 { --qc: var(--lv); } .q-退 { --qc: var(--muted); } .q-死 { --qc: #9B8FA6; } .q-煞 { --qc: var(--zhu); }
     .ky-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -48,22 +48,22 @@
     .ky-cell { position: relative; background: var(--bg-2); aspect-ratio: 1 / .86; padding: 8px 10px; cursor: pointer; display: grid; grid-template-rows: auto 1fr auto; transition: background .2s; min-width: 0; }
     .ky-cell:hover { background: #211a2c; }
     .ky-cell.sel { background: color-mix(in oklab, var(--zi) 18%, var(--bg-2)); box-shadow: inset 0 0 0 1px var(--zi-2); }
-    .ky-cell.zuo::after, .ky-cell.xiang::after { position: absolute; top: 6px; right: 8px; font-family: var(--font-title); font-size: 11px; font-weight: 600; padding: 0 6px; border-radius: 3px; line-height: 18px; }
+    .ky-cell.zuo::after, .ky-cell.xiang::after { position: absolute; top: 6px; right: 8px; font-family: var(--font-title); font-size: 12px; font-weight: 600; padding: 0 6px; border-radius: 3px; line-height: 18px; }
     .ky-cell.zuo::after { content: "坐"; background: rgba(169, 148, 224, .2); color: var(--zi-2); }
     .ky-cell.xiang::after { content: "向"; background: rgba(217, 174, 78, .18); color: var(--jin); }
     .ky-cell .pn { font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .1em; }
     .ky-cell .pn b { color: var(--fg-2); font-weight: 600; margin-right: 4px; }
     .ky-stars { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; }
     .ky-stars .s { font-family: var(--font-title); font-weight: 600; font-size: clamp(26px, 5.4vw, 40px); line-height: 1; color: var(--qc); }
-    .ky-stars .s small { display: block; text-align: center; font-size: 10px; font-weight: 400; color: var(--faint); letter-spacing: .1em; margin-top: 3px; }
+    .ky-stars .s small { display: block; text-align: center; font-size: 12px; font-weight: 400; color: var(--faint); letter-spacing: .1em; margin-top: 3px; }
     .ky-yun { text-align: center; font-family: var(--font-title); font-size: 16px; color: var(--fg-2); }
-    .ky-yun small { font-size: 10px; color: var(--faint); margin-left: 2px; }
+    .ky-yun small { font-size: 12px; color: var(--faint); margin-left: 2px; }
     .ky-flow { position: absolute; left: 8px; bottom: 6px; display: flex; gap: 4px; }
-    .ky-flow span { font-family: var(--font-title); font-size: 11px; padding: 0 5px; border-radius: 3px; line-height: 17px; }
+    .ky-flow span { font-family: var(--font-title); font-size: 12px; padding: 0 5px; border-radius: 3px; line-height: 17px; }
     .ky-flow .fy { background: rgba(141, 191, 151, .14); color: var(--lv); }
     .ky-flow .fm { background: rgba(201, 165, 120, .14); color: var(--wx-tu); }
     .ky-cell.center { background: var(--bg); }
-    .ky-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 10px; font-size: 11.5px; color: var(--faint); }
+    .ky-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 10px; font-size: 12px; color: var(--faint); }
     .ky-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--qc); margin-right: 4px; vertical-align: 0; }
 
     .ky-card { padding: 16px 18px; }
@@ -126,7 +126,7 @@
       .ky-side { grid-template-columns: 1fr; }
       .ky-board { padding: 12px 8px; margin: 0 -10px; border-radius: var(--r); }
       .ky-cell { padding: 5px 6px; aspect-ratio: 1 / .95; }
-      .ky-cell .pn { font-size: 10.5px; letter-spacing: .02em; }
+      .ky-cell .pn { font-size: 11px; letter-spacing: .02em; }
       .ky-yun { font-size: 13px; }
       .ky-luopan { grid-template-columns: 1fr; }
       .ky-dial { max-width: 320px; margin: 0 auto; }
@@ -226,7 +226,7 @@
 
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/kanyu/kanyu.js?v=1"></script>
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=16"></script>
 <script>
 (function () {
 'use strict';

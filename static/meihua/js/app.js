@@ -130,7 +130,7 @@
       btn.classList.remove('filled');
     } else {
       btn.innerHTML = `
-        <span class="tri-name">${trigram.name}<span style="font-size:11px;color:var(--ink-4);margin-left:6px;letter-spacing:1px">${trigram.element}</span></span>
+        <span class="tri-name">${trigram.name}<span style="font-size:12px;color:var(--ink-4);margin-left:6px;letter-spacing:1px">${trigram.element}</span></span>
         <span style="font-size:20px;color:var(--c);line-height:1;font-family:var(--font-serif)">${trigram.symbol}</span>
       `;
       btn.classList.add('filled');

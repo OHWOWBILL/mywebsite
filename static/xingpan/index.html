@@ -19,7 +19,7 @@
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
   <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     :root { --el-fire: #E07A62; --el-earth: #C9A578; --el-air: #8FB0D8; --el-water: #7FA3D6; --glyph: "Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", "Symbola", serif; }
     .el-0 { --ec: var(--el-fire); } .el-1 { --ec: var(--el-earth); } .el-2 { --ec: var(--el-air); } .el-3 { --ec: var(--el-water); }
@@ -79,14 +79,14 @@
     .xp-card h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
     .xp-card h3 small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
     table.xp-t { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .xp-t th { font-family: var(--font-title); font-weight: 400; font-size: 11.5px; color: var(--faint); letter-spacing: .12em; text-align: left; padding: 0 6px 6px; }
+    .xp-t th { font-family: var(--font-title); font-weight: 400; font-size: 12px; color: var(--faint); letter-spacing: .12em; text-align: left; padding: 0 6px 6px; }
     .xp-t td { padding: 5px 6px; border-top: 1px dashed var(--rule); color: var(--fg-2); white-space: nowrap; }
     .xp-t tr.hl td { background: rgba(122, 91, 192, .1); }
     .xp-t .g { font-family: var(--glyph); font-size: 16px; color: var(--fg); margin-right: 4px; }
     .xp-t .n { font-family: var(--font-title); color: var(--fg); }
     .xp-t .sgn { font-family: var(--glyph); color: var(--ec); margin-right: 2px; }
     .xp-t .deg { font-family: var(--font-mark); font-size: 12px; }
-    .xp-t .r { color: var(--zhu); font-family: var(--font-mark); font-size: 11px; }
+    .xp-t .r { color: var(--zhu); font-family: var(--font-mark); font-size: 12px; }
     .xp-t .dig { font-family: var(--font-title); font-size: 12px; }
     .xp-t .dig.庙, .xp-t .dig.旺 { color: var(--jin); } .xp-t .dig.陷, .xp-t .dig.弱 { color: #C99A9A; }
     .xp-asps { display: flex; flex-direction: column; gap: 3px; max-height: 360px; overflow-y: auto; }
@@ -95,7 +95,7 @@
     .xp-asps .g { font-family: var(--glyph); font-size: 14px; color: var(--fg); margin-right: 3px; }
     .xp-asps .t { font-family: var(--glyph); font-size: 15px; text-align: center; }
     .xp-asps .t.hard, .xp-tr .t.hard { color: var(--zhu); } .xp-asps .t.soft, .xp-tr .t.soft { color: var(--lv); } .xp-asps .t.conj, .xp-tr .t.conj { color: var(--jin); }
-    .xp-asps .o { font-family: var(--font-mark); font-size: 11px; color: var(--muted); }
+    .xp-asps .o { font-family: var(--font-mark); font-size: 12px; color: var(--muted); }
     .xp-dl { font-size: 13px; line-height: 1.75; color: var(--fg-2); }
     .xp-dl > div { display: grid; grid-template-columns: 4em minmax(0, 1fr); gap: 8px; padding: 4px 0; border-top: 1px dashed var(--rule); }
     .xp-dl > div:first-child { border-top: none; }
@@ -110,10 +110,10 @@
     .xp-fd .m.now { background: rgba(122, 91, 192, .14); box-shadow: inset 0 0 0 1px var(--zi-2); color: var(--fg); }
     .xp-fd .m .g { font-family: var(--glyph); font-size: 15px; color: var(--fg); }
     .xp-fd .m .n { font-family: var(--font-title); }
-    .xp-fd .m .y { font-family: var(--font-mark); font-size: 11px; color: var(--muted); }
-    .xp-fd .m i { font-style: normal; font-size: 10.5px; color: var(--jin); font-family: var(--font-title); }
+    .xp-fd .m .y { font-family: var(--font-mark); font-size: 12px; color: var(--muted); }
+    .xp-fd .m i { font-style: normal; font-size: 12px; color: var(--jin); font-family: var(--font-title); }
     .xp-fd .subs { display: flex; flex-wrap: wrap; gap: 3px; padding: 2px 8px 6px 2.4em; }
-    .xp-fd .subs span { font-size: 11.5px; padding: 1px 6px; border-radius: 3px; background: var(--bg-3); color: var(--muted); font-family: var(--font-title); }
+    .xp-fd .subs span { font-size: 12px; padding: 1px 6px; border-radius: 3px; background: var(--bg-3); color: var(--muted); font-family: var(--font-title); }
     .xp-fd .subs span.now { background: rgba(217, 174, 78, .16); color: var(--jin); }
     .xp-fd .subs .g { font-family: var(--glyph); margin-right: 2px; }
 
@@ -164,7 +164,7 @@
     .xp-top3 b { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .06em; color: var(--fg); }
     .xp-top3 b .g { font-family: var(--glyph); font-weight: 400; margin-right: 2px; }
     .xp-top3 .g.q { color: var(--qing); }
-    .xp-top3 .g.ax { font-family: var(--font-mark); font-size: 11px; font-weight: 800; }
+    .xp-top3 .g.ax { font-family: var(--font-mark); font-size: 12px; font-weight: 800; }
     .xp-top3 .meta { font-size: 12px; color: var(--muted); letter-spacing: .04em; }
     .xp-top3 p { font-size: 13.5px; color: var(--fg-2); line-height: 1.75; margin-top: 2px; }
 
@@ -175,16 +175,16 @@
     .xp-tr .row.now { box-shadow: inset 3px 0 0 var(--jin); }
     .xp-tr .g { font-family: var(--glyph); font-size: 14px; color: var(--fg); margin-right: 2px; }
     .xp-tr .g.q { color: var(--qing); }
-    .xp-tr .g.ax { font-family: var(--font-mark); font-size: 10px; font-weight: 800; }
+    .xp-tr .g.ax { font-family: var(--font-mark); font-size: 12px; font-weight: 800; }
     .xp-tr .t { font-family: var(--glyph); font-size: 14px; margin: 0 5px; }
-    .xp-tr .o { font-family: var(--font-mark); font-size: 11px; color: var(--muted); text-align: right; white-space: nowrap; }
+    .xp-tr .o { font-family: var(--font-mark); font-size: 12px; color: var(--muted); text-align: right; white-space: nowrap; }
     .xp-tr .o b { font-weight: 500; color: var(--fg-2); }
-    .xp-tr .d { display: flex; flex-wrap: wrap; gap: 3px 6px; font-family: var(--font-mark); font-size: 11.5px; color: var(--fg-2); justify-content: flex-end; }
+    .xp-tr .d { display: flex; flex-wrap: wrap; gap: 3px 6px; font-family: var(--font-mark); font-size: 12px; color: var(--fg-2); justify-content: flex-end; }
     .xp-tr .d span { white-space: nowrap; }
     .xp-tr .d .r { color: var(--zhu); }
     .xp-tr .d .past { color: var(--faint); }
-    .xp-tr em { font-style: normal; font-size: 11.5px; color: var(--muted); margin-left: 4px; }
-    .xp-tr .tag { font-size: 10.5px; color: var(--jin); font-family: var(--font-title); margin-left: 6px; white-space: nowrap; }
+    .xp-tr em { font-style: normal; font-size: 12px; color: var(--muted); margin-left: 4px; }
+    .xp-tr .tag { font-size: 12px; color: var(--jin); font-family: var(--font-title); margin-left: 6px; white-space: nowrap; }
     .xp-scroll { max-height: 420px; overflow-y: auto; }
 
     /* 逆行时间轴 */
@@ -193,7 +193,7 @@
     .xp-rt .lab { font-family: var(--font-title); font-size: 12.5px; color: var(--fg-2); white-space: nowrap; }
     .xp-rt .lab .g { font-family: var(--glyph); margin-right: 3px; color: var(--fg); }
     .xp-rt .ln.mer .lab { color: var(--fg); font-weight: 600; }
-    .xp-rt .mon { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); font-family: var(--font-mark); font-size: 10px; color: var(--faint); text-align: center; }
+    .xp-rt .mon { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); font-family: var(--font-mark); font-size: 12px; color: var(--faint); text-align: center; }
     .xp-rt .mon i { font-style: normal; }
     .xp-rt .trk { position: relative; height: 16px; border-radius: 4px; background-color: var(--bg-3);
       background-image: repeating-linear-gradient(to right, transparent 0, transparent calc(100% / 12 - 1px), var(--rule) calc(100% / 12 - 1px), var(--rule) calc(100% / 12)); }
@@ -201,7 +201,7 @@
     .xp-rt .trk i { position: absolute; top: 2px; bottom: 2px; border-radius: 3px; background: var(--zhu); opacity: .85; }
     .xp-rt .trk i.sh { background: var(--zhu); opacity: .22; }
     .xp-rt .trk b { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--jin); border-radius: 1px; }
-    .xp-rt-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+    .xp-rt-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin-top: 8px; }
     .xp-rt-key i { display: inline-block; width: 18px; height: 9px; border-radius: 2px; background: var(--zhu); opacity: .85; margin-right: 5px; vertical-align: 0; }
     .xp-rt-key i.sh { opacity: .22; } .xp-rt-key i.tdy { width: 2px; height: 12px; background: var(--jin); opacity: 1; vertical-align: -2px; }
     .xp-mer { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
@@ -209,7 +209,7 @@
     .xp-mer .p.now { border-color: var(--zhu); }
     .xp-mer .p.near { border-color: rgba(217, 174, 78, .6); }
     .xp-mer .p h4 { font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .1em; color: var(--fg); margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
-    .xp-mer .p h4 small { font-weight: 400; font-size: 11.5px; color: var(--muted); letter-spacing: .04em; }
+    .xp-mer .p h4 small { font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: .04em; }
     .xp-mer .st { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 0 8px; }
     .xp-mer .st dt { font-family: var(--font-title); font-size: 12px; color: var(--faint); }
     .xp-mer .st dd { font-family: var(--font-mark); font-size: 12px; }
@@ -222,7 +222,7 @@
     .xp-vc .v.now { background: rgba(224, 122, 98, .12); box-shadow: inset 3px 0 0 var(--zhu); color: var(--fg); }
     .xp-vc .v .day { font-family: var(--font-title); color: var(--fg); letter-spacing: .06em; white-space: nowrap; }
     .xp-vc .v .tm { font-family: var(--font-mark); font-size: 13px; color: var(--fg); white-space: nowrap; }
-    .xp-vc .v .du { font-family: var(--font-mark); font-size: 11.5px; color: var(--muted); white-space: nowrap; text-align: right; }
+    .xp-vc .v .du { font-family: var(--font-mark); font-size: 12px; color: var(--muted); white-space: nowrap; text-align: right; }
     .xp-vc .v .why { grid-column: 2 / -1; font-size: 12px; color: var(--muted); }
     .xp-vc .v .why .g { font-family: var(--glyph); color: var(--fg-2); }
 
@@ -490,7 +490,7 @@
 
 <script src="/xingpan/xingpan.js?v=2"></script>
 <script src="/fabao/cities.js?v=1"></script>
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=16"></script>
 <script>
 (function () {
 'use strict';

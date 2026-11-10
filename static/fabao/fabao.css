@@ -132,7 +132,7 @@ a { color: var(--zi-2); }
 .fb-mingbu .seg a svg { width: 15px; height: 15px; }
 .fb-mingbu .seg a:hover { color: var(--fg); }
 .fb-mingbu .seg a.on { background: var(--zi); color: #fff; }
-.fb-mingbu .seg a i { font-style: normal; font-size: 11px; line-height: 16px; padding: 0 4px; border-radius: var(--r-xs); background: rgba(224, 122, 98, .2); color: var(--zhu); letter-spacing: 0; }
+.fb-mingbu .seg a i { font-style: normal; font-size: 12px; line-height: 16px; padding: 0 4px; border-radius: var(--r-xs); background: rgba(224, 122, 98, .2); color: var(--zhu); letter-spacing: 0; }
 .fb-mingbu .seg a.on i { background: rgba(255, 255, 255, .22); color: #fff; }
 .fb-mingbu .hint { font-size: 12px; color: var(--faint); letter-spacing: .1em; }
 /* 命部「人」：存过的几个人，一点就换 */
@@ -210,7 +210,7 @@ a { color: var(--zi-2); }
   background: var(--bg-3); border-radius: var(--r-sm);
   line-height: 1.25;
 }
-.fb-pillar small { font-size: 11px; color: var(--faint); letter-spacing: .2em; }
+.fb-pillar small { font-size: 12px; color: var(--faint); letter-spacing: .2em; }
 .fb-pillar b { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .1em; color: var(--fg-2); }
 
 /* 五 通用构件 ---------------------------------------------- */
@@ -236,7 +236,7 @@ a { color: var(--zi-2); }
 .fb-seg button.on { background: var(--zi); color: #fff; }
 .fb-seg .badge {
   display: inline-block; margin-left: 4px; min-width: 18px; padding: 0 4px;
-  border-radius: var(--r-xs); background: var(--zhu); color: #fff; font-size: 11px; letter-spacing: 0; line-height: 18px;
+  border-radius: var(--r-xs); background: var(--zhu); color: #fff; font-size: 12px; letter-spacing: 0; line-height: 18px;
 }
 
 .fb-input, .fb-main input:not([type=checkbox]):not([type=radio]), .fb-main textarea, .fb-main select {

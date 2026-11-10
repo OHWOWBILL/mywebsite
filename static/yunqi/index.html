@@ -19,7 +19,7 @@
   <link rel="icon" href="/favicon-32x32.png" />
   <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
   <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     [data-wx="木"] { --wc: var(--wx-mu); }
     [data-wx="火"] { --wc: var(--wx-huo); }
@@ -73,16 +73,16 @@
     .yq-big b { font-family: var(--font-title); font-weight: 600; font-size: 26px; letter-spacing: .1em; color: var(--wc); }
     .yq-big span { font-size: 13px; color: var(--muted); letter-spacing: .08em; }
     .yq-quote { padding: 8px 14px; border-left: 2px solid var(--rule-2); font-size: 14px; line-height: 1.85; color: var(--fg-2); margin: 8px 0 14px; }
-    .yq-quote small { display: block; font-size: 11.5px; color: var(--faint); letter-spacing: .12em; }
+    .yq-quote small { display: block; font-size: 12px; color: var(--faint); letter-spacing: .12em; }
     .yq-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
     .yq-tags span { padding: 4px 10px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid var(--rule-2); font-size: 12.5px; color: var(--fg-2); }
     .yq-tags span b { font-family: var(--font-title); font-weight: 600; color: var(--zi-2); margin-right: 4px; }
     .yq-tags span.none { border-style: dashed; color: var(--muted); }
     .yq-sky { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
     .yq-sky div { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 4px 8px; border-radius: var(--r-sm); background: var(--bg-3); text-align: center; min-width: 0; }
-    .yq-sky small { font-size: 10.5px; color: var(--faint); letter-spacing: .15em; }
+    .yq-sky small { font-size: 12px; color: var(--faint); letter-spacing: .15em; }
     .yq-sky b { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: var(--wc); letter-spacing: .06em; }
-    .yq-sky em { font-style: normal; font-size: 10.5px; color: var(--muted); }
+    .yq-sky em { font-style: normal; font-size: 11.5px; color: var(--muted); }   /* 手机上一格只有九十来像素宽，「三之气 · 主上半年」到 12 就折出一个孤字 */
     .yq-sky .main { background: color-mix(in oklab, var(--wc) 14%, var(--bg-3)); }
     .yq-sky .main b { font-size: 17px; }
     .yq-sky .gap { visibility: hidden; }
@@ -95,11 +95,11 @@
     .yq-steps > div:hover { border-color: var(--rule-2); }
     .yq-steps > div.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 18%, var(--bg-3)); }
     .yq-steps h3 { font-family: var(--font-title); font-weight: 600; font-size: 14px; letter-spacing: .15em; color: var(--fg); display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
-    .yq-steps h3 em { font-style: normal; font-weight: 400; font-size: 10.5px; color: var(--jin); letter-spacing: .1em; }
-    .yq-steps .dt { font-size: 11.5px; color: var(--faint); font-family: var(--font-mark); letter-spacing: .02em; line-height: 1.5; }
+    .yq-steps h3 em { font-style: normal; font-weight: 400; font-size: 12px; color: var(--jin); letter-spacing: .1em; }
+    .yq-steps .dt { font-size: 12px; color: var(--faint); font-family: var(--font-mark); letter-spacing: .02em; line-height: 1.5; }
     .yq-steps .dt span { font-family: var(--font-title); }
     .yq-steps .q { display: flex; flex-direction: column; gap: 1px; }
-    .yq-steps .q small { font-size: 10.5px; color: var(--faint); letter-spacing: .15em; }
+    .yq-steps .q small { font-size: 12px; color: var(--faint); letter-spacing: .15em; }
     .yq-steps .q b { font-family: var(--font-title); font-weight: 600; font-size: 14.5px; color: var(--wc); letter-spacing: .04em; }
     .yq-steps .q.zhu b { font-weight: 400; font-size: 13.5px; color: var(--fg-2); }
     .yq-steps .jl { font-size: 12px; line-height: 1.5; color: var(--muted); }
@@ -114,7 +114,7 @@
     .yq-yun td:last-child { border-radius: 0 5px 5px 0; }
     .yq-yun tr.on td { background: color-mix(in oklab, var(--zi) 26%, var(--bg-3)); color: var(--fg); }
     .yq-yun .y { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: var(--wc); }
-    .yq-yun .y small { font-weight: 400; font-size: 11px; color: var(--muted); margin-left: 4px; }
+    .yq-yun .y small { font-weight: 400; font-size: 12px; color: var(--muted); margin-left: 4px; }
     .yq-yun .d { font-size: 12px; color: var(--muted); }
     .yq-yun .d i { font-style: normal; color: var(--faint); }
 
@@ -128,10 +128,10 @@
     .yq-sixty button.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 26%, var(--bg-3)); }
     .yq-sixty button.dim { opacity: .22; }
     .yq-sixty .gz { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: var(--fg); letter-spacing: .05em; }
-    .yq-sixty .yr { font-family: var(--font-mark); font-size: 9.5px; color: var(--faint); }
-    .yq-sixty .yn { font-family: var(--font-title); font-size: 11.5px; color: var(--wc); }
-    .yq-sixty .st { font-family: var(--font-title); font-size: 10.5px; color: var(--muted); line-height: 1.35; }
-    .yq-sixty .tg { font-size: 9.5px; color: var(--zi-2); min-height: 1.3em; letter-spacing: .02em; }
+    .yq-sixty .yr { font-family: var(--font-mark); font-size: 12px; color: var(--faint); }
+    .yq-sixty .yn { font-family: var(--font-title); font-size: 12px; color: var(--wc); }
+    .yq-sixty .st { font-family: var(--font-title); font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .yq-sixty .tg { font-size: 10px; color: var(--zi-2); min-height: 1.3em; letter-spacing: .02em; }
 
     .yq-notes { font-size: 13.5px; line-height: 1.95; color: var(--fg-2); }
     .yq-notes li { list-style: none; padding-left: 14px; position: relative; }
@@ -243,7 +243,7 @@
   </section>
 </main>
 
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=16"></script>
 <script src="/yunqi/yunqi.js?v=1"></script>
 <script>
 (function () {
