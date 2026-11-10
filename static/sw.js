@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-1d9568fe53bf';
+const V = 'fb-3cebc6cf5595';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -77,6 +77,7 @@ const PRE = [
   '/fabao/vendor/qrcode.js?v=1.4.4',
   '/fabao/wenti.js',
   '/favicon-32x32.png',
+  '/fonts/qj.css?v=1',
   '/hepan/hepan.js?v=1',
   '/jiuxing/jiuxing.js?v=1',
   '/kanyu/kanyu.js?v=1',
@@ -128,6 +129,8 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   if (url.origin === self.location.origin) {
     if (url.pathname === '/sw.js') return;
+    // 自托管字体切片：文件名是内容摘要，永不变，先取存档
+    if (url.pathname.startsWith('/fonts/f/')) return e.respondWith(fontFirst(req));
     e.respondWith(netFirst(req, url));
   } else if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     e.respondWith(fontFirst(req));
