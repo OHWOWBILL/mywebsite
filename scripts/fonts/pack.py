@@ -253,7 +253,9 @@ def main():
     open(f"{OUT}/qj.css", "w", encoding="utf8").write("".join(css))
 
     # 兜底：谷歌切片扣掉已打包的字；扣空的切片整片不要
-    rest, used_urls = [head] + late, set()
+    # 同一个文件的三档字重挨着写（谷歌原样是先排完 400 再排 600、900）：三段的 unicode-range 一字不差，
+    # 挨在一起 gzip 才压得掉，整份样式小一半多。各档字重内部的先后不变，取字结果不变。
+    rest, used_urls, by_url = [head] + late, set(), {}
     for b in blocks:
         k = fam_key.get(b["fam"])
         if not k or b["tag"] == "latin":
@@ -262,7 +264,10 @@ def main():
         if not left:
             continue
         used_urls.add(b["url"])
-        rest.append("@font-face {" + re.sub(r"unicode-range:\s*[^;]+", "unicode-range: " + fmt_range(left), b["body"]) + "}\n")
+        by_url.setdefault(b["url"], []).append(
+            "@font-face {" + re.sub(r"unicode-range:\s*[^;]+", "unicode-range: " + fmt_range(left), b["body"]) + "}\n")
+    for faces in by_url.values():
+        rest += faces
     open(f"{OUT}/qj-rest.css", "w", encoding="utf8").write("".join(rest))
     # 版本号＝两份样式内容的摘要；Hugo 页从 data/fonts.json 读，法宝各页（静态 HTML）由这里改写
     ver = hashlib.sha1(open(f"{OUT}/qj.css", "rb").read() + open(f"{OUT}/qj-rest.css", "rb").read()).hexdigest()[:8]
