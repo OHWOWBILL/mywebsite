@@ -3,7 +3,7 @@
        所有页面（含首页）经 extend-head.html 调用本 partial。
        整个对象先拼成 dict 再一次 jsonify：在 <script> 里逐项 jsonify 会被模板再转义一遍，
        name 成了 "\"潜蛟子\""、alternateName 成了一个字符串，搜索引擎读不出来。 */ -}}
-{{- with site.Data.identity -}}
+{{- with hugo.Data.identity -}}
 {{- $urls := slice -}}
 {{- range .profile }}{{ $urls = $urls | append .url }}{{ end -}}
 {{- $p := dict "@context" "https://schema.org" "@type" "Person" "@id" (printf "%s#person" site.BaseURL)

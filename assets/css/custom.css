@@ -185,13 +185,132 @@ h1, h2, h3, h4,
   color: var(--ge-zi);
 }
 
-.main-menu nav p,
-#menu-wrapper p {
-  font-family: var(--font-title);
-  letter-spacing: .1em;
+/* 主题 3.x 把顶栏整个重写了：导航字小一号、两侧不留白、手机上一行更高、
+   手机菜单换成整屏大字。以下几段把它们调回本站原样（位置、字号都照旧版量的）。
+   对应 layouts/partials/header/ 里覆盖的三个文件。 */
+.main-menu { padding: 2px 0 3px; gap: .75rem; }
+@media (min-width: 640px) {
+  .main-menu { padding-left: 1.5rem; padding-right: 1.5rem; }
 }
 
-.main-menu nav a p { font-size: 1.05rem; }
+.main-menu .qj-nav-t {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  letter-spacing: .1em;
+}
+.main-menu #search-button { font-size: 1rem; line-height: 1; }
+
+/* 手机顶栏：搜索、音律、菜单三个钮 */
+.mobile-header-row { height: 3rem; gap: 0; }
+.mobile-header-row #search-button-mobile { font-size: 1rem; line-height: 1; margin-right: 20px; }
+.mobile-header-row .qj-yin-toggle { margin-right: 12px; }
+
+/* 手机菜单：半透的模糊底，右上一列单字 */
+#mobile-menu-dialog {
+  padding: 0;
+  background-color: rgba(var(--color-neutral-900), .5);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+#mobile-menu-dialog > label {
+  position: absolute;
+  top: 50px;
+  right: 24px;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+#mobile-menu-dialog > nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: none;
+  margin: 0;
+  padding: 81px 24px 24px;
+}
+#mobile-menu-dialog > nav > div { margin: 0; padding: 0; }
+#mobile-menu-dialog > nav > div + div { margin-top: 12px; }
+#mobile-menu-dialog > nav a { gap: 0; color: inherit; }
+#mobile-menu-dialog > nav a > span {
+  width: auto;
+  height: auto;
+  font-family: var(--font-title);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: .1em;
+}
+#mobile-menu-dialog > nav a > span:has(svg) { line-height: 1; letter-spacing: 0; }
+
+/* 文章卡片（文末「相关文章」、各类目页）：主题 3.x 改成细边、大圆角、深底、去了投影，字也细了一档。
+   调回本站原样：两像素的边、小圆角、带投影、透底。 */
+.article-link--related,
+.article-link--card {
+  border-width: 2px;
+  border-color: rgb(var(--color-neutral-700));
+  border-radius: .25rem;
+  background: none;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25);
+}
+.article-link--related > div:has(> header),
+.article-link--card > div:has(> header) { padding: 1rem 1.5rem; }
+.article-link--related header h2,
+.article-link--card header h2 { font-family: inherit; font-weight: 700; letter-spacing: normal; }
+.article-link--related header ~ div { font-weight: 500; }
+.thumbnail_card { aspect-ratio: auto; height: 200px; }
+.thumbnail_card_related { aspect-ratio: auto; height: 150px; }
+.article-link--related .article-link__summary,
+.article-link--card .article-link__summary {
+  display: block;
+  margin-top: 0;
+  padding: .25rem 0;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}
+
+/* 文章右侧目录：主题 3.x 在右边多留了 8px，正文栏因此窄了 8px、换行处跟着变。收回去。 */
+.toc #TOCView { padding-right: 0; }
+
+/* 「返回顶部」：主题 3.x 把它钉在视窗右下角，宽屏上离正文很远。挪回正文栏的右缘（原来的位置）。 */
+#scroll-to-top { right: 1.5rem; bottom: 2.5rem; }
+@media (min-width: 640px) { #scroll-to-top { right: 3.5rem; } }
+@media (min-width: 768px) { #scroll-to-top { right: 6rem; } }
+@media (min-width: 1024px) { #scroll-to-top { right: max(8rem, calc(50vw - 32rem)); } }
+
+/* 文末「上一篇 / 下一篇」：见 layouts/partials/article-pagination.html */
+.qj-pager { display: flex; justify-content: space-between; padding-top: .75rem; }
+.qj-pager-a { display: flex; margin-right: .75rem; }
+.qj-pager-next { margin-right: 0; margin-left: .75rem; text-align: right; }
+.qj-pager-arr { margin-right: .75rem; color: rgb(var(--color-neutral)); }
+.qj-pager-next .qj-pager-arr { margin-right: 0; margin-left: .75rem; }
+.qj-pager-b { display: flex; flex-direction: column; }
+.qj-pager-t { margin-top: .1rem; line-height: 1.5rem; }
+.qj-pager-d { margin-top: .1rem; font-size: .75rem; line-height: 1rem; color: rgb(var(--color-neutral-400)); }
+.qj-pager-a:hover .qj-pager-arr { color: rgb(var(--color-primary-400)); }
+.qj-pager-a:hover .qj-pager-t {
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--color-primary-500));
+}
+
+/* 类目页（/categories/）：见 layouts/partials/term-link/text.html */
+section:has(> .qj-term) { margin: 0 -.5rem; gap: 0; }
+.qj-term { width: 100%; margin: .75rem 0; padding: 0 .5rem; overflow: hidden; }
+@media (min-width: 640px) { .qj-term { width: 50%; } }
+@media (min-width: 768px) { .qj-term { width: 33.3333%; } }
+@media (min-width: 1024px) { .qj-term { width: 25%; } }
+.qj-term h2 { display: flex; align-items: center; }
+.qj-term a { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; }
+.qj-term a:hover {
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--color-primary-500));
+  text-underline-offset: 2px;
+}
+.qj-term-dot { padding: 0 .5rem; font-size: 1rem; line-height: 1.5rem; color: rgb(var(--color-primary-500)); }
+.qj-term-n { font-size: 1rem; line-height: 1.5rem; color: rgb(var(--color-neutral-400)); }
 
 /* 页脚（layouts/partials/footer.html）：雾色小标记 + 阁主 潜蛟子 + 年份 */
 .qj-foot {

@@ -19,7 +19,7 @@
     <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
     <link>{{ .Permalink }}</link>
     <description>{{ site.Params.description }}</description>
-    <language>{{ site.LanguageCode }}</language>
+    <language>{{ site.Language.Locale }}</language>
     <copyright>© {{ now.Format "2006" }} {{ site.Params.Author.name }}</copyright>
     {{- with index $pages 0 }}
     <lastBuildDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</lastBuildDate>

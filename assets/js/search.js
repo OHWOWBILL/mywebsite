@@ -17,6 +17,7 @@ var last = output.lastChild;
 var searchVisible = false;
 var indexed = false;
 var hasResults = false;
+var previouslyFocused = null;
 var composing = false;
 var pendingTerm = null;
 
@@ -54,6 +55,25 @@ document.addEventListener("keydown", function (event) {
   // Esc to close search wrapper
   if (event.key == "Escape") {
     hideSearch();
+  }
+
+  // 随主题 3.x：开着的时候 Tab 只在问路框里转，不跑到后面的页面上去
+  if (event.key == "Tab" && searchVisible) {
+    var focusable = modal.querySelectorAll('a[href], button, input, [tabindex="0"]');
+    if (focusable.length > 0) {
+      var firstFocusable = focusable[0];
+      var lastFocusable = focusable[focusable.length - 1];
+      if (!modal.contains(document.activeElement)) {
+        event.preventDefault();
+        firstFocusable.focus();
+      } else if (event.shiftKey && document.activeElement == firstFocusable) {
+        event.preventDefault();
+        lastFocusable.focus();
+      } else if (!event.shiftKey && document.activeElement == lastFocusable) {
+        event.preventDefault();
+        firstFocusable.focus();
+      }
+    }
   }
 
   // Down arrow to move down results list
@@ -175,6 +195,7 @@ function displaySearch() {
     buildIndex();
   }
   if (!searchVisible) {
+    previouslyFocused = document.activeElement;
     document.body.style.overflow = "hidden";
     wrapper.style.visibility = "visible";
     if (!input.value.trim()) showPaths();
@@ -189,7 +210,13 @@ function hideSearch() {
     wrapper.style.visibility = "hidden";
     input.value = "";
     output.innerHTML = "";
-    document.activeElement.blur();
+    // 随主题 3.x：合上后焦点回到打开前的地方
+    if (previouslyFocused && typeof previouslyFocused.focus === "function" && document.contains(previouslyFocused)) {
+      previouslyFocused.focus();
+    } else if (document.activeElement) {
+      document.activeElement.blur();
+    }
+    previouslyFocused = null;
     searchVisible = false;
   }
 }

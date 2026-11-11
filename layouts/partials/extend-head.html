@@ -6,7 +6,7 @@
        Noto Serif SC 600/900 标题 · LXGW WenKai TC 正文与引文 · Archivo 宽体只写 ohwowbill 与日期。
        qj.css 是按本站用字打的字包（scripts/fonts/pack.py），先载；两个「通用包」顺手预载。
        qj-rest.css 是兜底的谷歌切片（包里没有的字才用得上），不挡首屏，载完再生效。 */}}
-{{- with site.Data.fonts }}
+{{- with hugo.Data.fonts }}
 {{- range .preload }}
 <link rel="preload" href="{{ . }}" as="font" type="font/woff2" crossorigin/>
 {{- end }}

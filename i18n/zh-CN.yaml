@@ -4,3 +4,10 @@ author:
 search:
   input_placeholder: "问路：输入字词，或从下面的去处择一"
   open_button_title: "问路（Ctrl K 或 /）"
+# 主题 3.x 新加的几条读屏标签，主题的 zh-CN 译文里还没有，不补会是空的
+nav:
+  main_menu: "主导航"
+  mobile_menu: "手机导航"
+  footer_menu: "页脚导航"
+  close_menu: "关闭菜单"
+  toggle_submenu: "展开子菜单"

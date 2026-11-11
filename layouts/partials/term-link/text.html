@@ -1,0 +1,11 @@
+{{- /* 覆盖主题同名 partial（Blowfish v3.9.0）：主题新版把类目页的每个类目画成一枚小圆牌，
+       本站留着原来的样子：类目名、间隔号、篇数，一行四个。样式在 custom.css 的 .qj-term。 */ -}}
+<article class="qj-term">
+  <h2>
+    <a class="not-prose" href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a>
+    {{- if site.Params.taxonomy.showTermCount | default true }}
+      <span class="qj-term-dot">&middot;</span>
+      <span class="qj-term-n">{{ .Count }}</span>
+    {{- end }}
+  </h2>
+</article>

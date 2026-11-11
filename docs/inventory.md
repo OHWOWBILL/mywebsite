@@ -8,11 +8,11 @@
 
 | 项 | 现值 |
 |---|---|
-| 主题 | Blowfish **v2.88.1**（commit `0d485fcb`, 2025-07-11） |
+| 主题 | Blowfish **v3.9.0**（commit `ebe683e9`, 2026-10-07；需 Hugo 0.164–0.167） |
 | 引入方式 | **git submodule** → `themes/blowfish`，跟踪 `main` 分支 |
 | baseURL | `https://ohwowbill.com/` |
 | 自定义域 | `static/CNAME` = `ohwowbill.com` |
-| 部署 | GitHub Actions → GitHub Pages（`.github/workflows/deploy.yml`，Hugo 0.148.1 extended） |
+| 部署 | GitHub Actions → GitHub Pages（`.github/workflows/deploy.yml`，Hugo 0.167.0 extended） |
 | 语言 | 单语 `zh-cn`，`defaultContentLanguageInSubdir = false` |
 
 **注意：** submodule 跟踪 `main` 而非固定 tag，主题上游更新可能在某次 `git submodule update` 后引入非预期变更。若求稳，应钉到 `v2.88.1` tag。

@@ -6,7 +6,7 @@
      门的定义见 data/wushu.toml；门里那盏灯由 assets/js/qj/wushu.js 现算。
      =========================================================== */ -}}
 {{- $posts := where site.RegularPages "Section" "posts" -}}
-{{- $doors := site.Data.wushu.door -}}
+{{- $doors := hugo.Data.wushu.door -}}
 
 {{- /* 先数一遍，页首要用总数 */ -}}
 {{- $nPost := slice -}}

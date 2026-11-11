@@ -32,7 +32,7 @@
     <a class="qj-rike-link" href="{{ "zeri/" | relURL }}">挑日子</a>
     <span class="qj-rike-note">卦随时辰换，日课每日换</span>
   </div>
-  <script type="application/json" id="qj-rike-data">{{ site.Data.rike | jsonify | safeJS }}</script>
+  <script type="application/json" id="qj-rike-data">{{ hugo.Data.rike | jsonify | safeJS }}</script>
 </section>
 {{- /* 宜忌摘要后的「…」链去黄历；本朝候名用浅青；候前一枚节气色（static/fabao/jieqi-se.js） */}}
 <style>

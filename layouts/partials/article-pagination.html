@@ -1,0 +1,41 @@
+{{- /* 覆盖主题同名 partial（Blowfish v3.9.0）：文末「上一篇 / 下一篇」。
+       主题新版把箭头和题目写成同一行字，手机上题目一折行，第二行就缩到箭头底下，右边的箭头还会单掉一行。
+       这里保留本站原来的排法：箭头一栏，题目和日期一栏。样式在 custom.css 的 .qj-pager。 */ -}}
+{{ if .Params.showPagination | default (.Site.Params.article.showPagination | default true) }}
+  {{ if or .NextInSection .PrevInSection }}
+    {{ $next := .NextInSection }}
+    {{ $prev := .PrevInSection }}
+    {{ if .Params.invertPagination | default (.Site.Params.article.invertPagination | default false) }}
+      {{ $next = .PrevInSection }}
+      {{ $prev = .NextInSection }}
+    {{ end }}
+    {{ $showDate := .Params.showDate | default (.Site.Params.article.showDate | default true) }}
+    <div class="pt-8">
+      <hr class="border-dotted border-neutral-300 dark:border-neutral-600">
+      <div class="qj-pager">
+        <span>
+          {{ if $prev }}
+            <a class="qj-pager-a" href="{{ $prev.RelPermalink }}">
+              <span class="qj-pager-arr">&larr;</span>
+              <span class="qj-pager-b">
+                <span class="qj-pager-t">{{ $prev.Title | emojify }}</span>
+                <span class="qj-pager-d">{{ if $showDate }}{{ partial "meta/date.html" $prev.Date }}{{ end }}</span>
+              </span>
+            </a>
+          {{ end }}
+        </span>
+        <span>
+          {{ if $next }}
+            <a class="qj-pager-a qj-pager-next" href="{{ $next.RelPermalink }}">
+              <span class="qj-pager-b">
+                <span class="qj-pager-t">{{ $next.Title | emojify }}</span>
+                <span class="qj-pager-d">{{ if $showDate }}{{ partial "meta/date.html" $next.Date }}{{ end }}</span>
+              </span>
+              <span class="qj-pager-arr">&rarr;</span>
+            </a>
+          {{ end }}
+        </span>
+      </div>
+    </div>
+  {{ end }}
+{{ end }}
