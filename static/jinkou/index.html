@@ -84,12 +84,6 @@
 .jk-set .fb-seg button{padding:5px 12px}
 .jk-bh{margin-bottom:18px}
 .jk-bh .bh-h .fb-tag{background:rgba(141,191,151,.16);color:var(--lv)}
-.jk-help{margin-top:18px;padding:16px 20px}
-.jk-help h3{font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:.2em;margin-bottom:8px}
-.jk-help ul{padding:0}
-.jk-help li{list-style:none;padding-left:14px;position:relative;font-size:13px;line-height:1.9;color:var(--fg-2)}
-.jk-help li::before{content:"";position:absolute;left:0;top:.9em;width:5px;height:5px;border-radius:50%;background:var(--zi-2)}
-.jk-help li b{font-family:var(--font-title);color:var(--fg);font-weight:600;margin-right:4px}
 
 @media (prefers-reduced-motion: no-preference){
   .jk-ke.fresh .jk-wei{animation:jkIn .5s var(--ease) both}
@@ -106,7 +100,6 @@
   .jk-wei .big{font-size:26px}
   .jk-fang{gap:4px}
   .jk-fang button b{font-size:17px}
-  .jk-help{padding:16px;margin-top:14px}
 }
 </style>
 </head>
@@ -180,10 +173,6 @@
     </section>
   </div>
 
-  <section class="fb-card jk-help" aria-label="口径">
-    <h3>口径</h3>
-    <ul id="rulesList"></ul>
-  </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
@@ -218,7 +207,7 @@ function setDate(d, now) {
 function render(fresh) {
   cur = JK.cast(date, opts());
   if (!cur) { F.toast('这一刻排不出来（超出 1900–2100）'); return; }
-  renderNow(); renderBh(); renderKe(fresh); renderFang(); renderRules(); paintSet();
+  renderNow(); renderBh(); renderKe(fresh); renderFang(); paintSet();
 }
 function weiLabel(w) {
   return w.pos === '人元' ? w.name : w.pos === '贵神' ? w.name : w.pos === '将神' ? Z[w.zhi] + ' ' + w.name : w.name + ' ' + w.fang;
@@ -285,7 +274,6 @@ $('fang').addEventListener('click', e => {
   render(true);
 });
 function rulesText() { return JK.rules(opts()).map(r => `· ${r[0]}：${r[1]}`).join('\n'); }
-function renderRules() { $('rulesList').innerHTML = JK.rules(opts()).map(r => `<li><b>${r[0]}</b>${esc(r[1])}</li>`).join(''); }
 function paintSet() {
   $('guiSel').value = view.gui;
   document.querySelectorAll('#dnSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === view.dn));

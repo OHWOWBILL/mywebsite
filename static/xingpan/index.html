@@ -147,14 +147,7 @@
     .xp-chains .ch .cyc { color: var(--zi-2); } .xp-chains .ch .cyc .g { color: var(--zi-2); }
     .xp-chains em { font-style: normal; font-family: var(--font-title); font-size: 12px; color: var(--muted); margin-left: 8px; white-space: nowrap; }
     .xp-dsp-foot { margin-top: 10px; }
-    .xp-dsp-foot button { color: var(--zi-2); text-decoration: underline; text-underline-offset: 3px; font-size: 12px; }
 
-    .xp-help { padding: 16px 20px; }
-    .xp-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
-    .xp-help ul { font-size: 13px; line-height: 1.9; color: var(--fg-2); padding-left: 0; }
-    .xp-help li { list-style: none; padding-left: 14px; position: relative; }
-    .xp-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
-    .xp-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
 
     /* 白话：盘上几句大白话，随盘重画（八字、紫微同式） */
     .bh .r em { font-style: normal; font-family: var(--font-title); font-size: 12px; color: var(--muted); letter-spacing: .08em; margin: 0 4px; }
@@ -324,7 +317,7 @@
     <button type="button" role="tab" data-v="return" aria-selected="false">回归</button>
     <button type="button" role="tab" data-v="retro" aria-selected="false">逆行</button>
     <button type="button" role="tab" data-v="void" aria-selected="false">空亡</button>
-    <button type="button" role="tab" data-v="dupan" aria-selected="false" title="读盘：排盘公开，解读加了禁制">读盘</button>
+    <button type="button" role="tab" data-v="dupan" aria-selected="false">读盘</button>
   </div>
 
   <section class="fb-now" id="nowPanel" aria-label="起盘">
@@ -384,7 +377,7 @@
         <p class="xp-key" id="dspKey"></p>
         <div class="xp-dsp-tree" id="dspTree"></div>
         <div class="xp-chains" id="dspList"></div>
-        <p class="fb-fine xp-dsp-foot">箭头指向定位星：行星所落星座的主星。追到落在自己星座里的那一颗为止，它就是这条链的最终定位星；两星各落对方的座是相互定位（互容），三颗以上兜成一圈是循环定位。天赋方向与逐星论断在 <button type="button" id="dspGo">读盘 · 六</button>（有禁制）。</p>
+        <p class="fb-fine xp-dsp-foot">箭头指向定位星：行星所落星座的主星。追到落在自己星座里的那一颗为止，它就是这条链的最终定位星；两星各落对方的座是相互定位（互容），三颗以上兜成一圈是循环定位。</p>
       </section>
       <section class="fb-card xp-card" aria-label="宫头">
         <h3>宫头<small id="houseNote"></small></h3>
@@ -527,12 +520,11 @@
 
   <div class="xp-view" id="v-dupan" hidden>
     <section class="fb-card xp-card xp-lead" aria-label="读盘">
-      <h3>读盘<small id="dpSub">三才、三柱合参、宫主飞星、大十字、相位经文、定位星链</small></h3>
+      <h3>读盘</h3>
       <p class="fb-key" id="dpKey"></p>
       <form class="dp-lock" id="dpLock" autocomplete="off" hidden>
         <div class="fb-seal" aria-hidden="true">禁</div>
-        <p class="dp-lock-t">读盘的经文与解读被阁主下了<span class="jin">禁制</span></p>
-        <p class="fb-fine">排盘照常公开；解开后才在本机解密这一段。与八字读盘同一口诀，在那边记住过的设备会自动解开。</p>
+        <p class="dp-lock-t">此段被阁主下了<span class="jin">禁制</span></p>
         <input type="password" id="dpPw" placeholder="解禁口诀" aria-label="解禁口诀">
         <label class="xp-chk"><input type="checkbox" id="dpKeep" checked> 此设备记住</label>
         <button class="fb-btn primary" id="dpGo">解 禁</button>
@@ -542,25 +534,6 @@
     <div class="dp" id="dpOut"></div>
   </div>
 
-  <section class="fb-card xp-help">
-    <h3>用法与口径</h3>
-    <ul>
-      <li><b>出生时间</b>填出生地当时的钟表时间，再选出生地（或填经纬度与时区）；当地若行夏令时，勾「夏令时」。1986–1991 年大陆夏令时期间会提示。</li>
-      <li><b>位置</b>回归黄道（当日分点）。日、月与八大行星按 Paul Schlyter 的轨道根数与摄动项计算，冥王星用其 1885–2099 年级数；已对照两百年节气、2020 年木土大合相、2024 年日全食、水金留逆等天象核对，误差约一至二角分（月亮偶至数角分）。北交点取平均交点。</li>
-      <li><b>宫制</b>默认 Placidus（纬度超过 66° 时改用波菲利）；整宫、等宫、波菲利可切换。上升、中天由格林尼治平恒星时推得。</li>
-      <li><b>相位</b>容许度：合、冲 8°，刑、拱 7°，六合 5°，日月参与再加 2°；注明入相（渐准）或出相。点任一条，盘上只亮那一条线。</li>
-      <li><b>法达</b>以太阳在地平上下分昼夜：昼生日、金、水、月、土、木、火、北交、南交；夜生月、土、木、火、北交、南交、日、金、水（亦可改用波那提序，交点殿后）。七政主运各分七个子运，依迦勒底序（土木火日金水月）自主运之星起。</li>
-      <li><b>定位星链</b>行星落在哪个星座，那个星座的主星就是它的定位星；主星自己又落在别的座，一颗接一颗追下去就是定位星链。每颗星只有一颗定位星，所以追到头只有三种收法：落在自己守护的座（入庙）、自己定位自己，是最终定位星；两颗星各落对方的座，是相互定位（按守护算的互容）；三颗以上兜成一圈，是循环定位，圈上各星并列。全盘都归到一颗星名下，才说「独一最终定位星」；几颗星入庙，名下星多的为主、少的为次。守护有两种口径：<b>现代</b>用十星，天蝎归冥王、水瓶归天王、双鱼归海王；<b>古典</b>只用七政，天蝎归火星、水瓶归土星、双鱼归木星，三王星不入链。两种口径结果常不同，可对照着看。</li>
-      <li><b>小限</b>每满一岁，上升推进一宫（整宫），该宫星座之主星为当年年主星。福点昼生取「上升 + 月 − 日」，夜生取「上升 + 日 − 月」。仅供学习参考。</li>
-      <li><b>行运</b>某一刻（默认此刻，可前后挪日、挪月）天上十星对本命十星与上升、中天的五种主要相位。容许度只看行运星：月亮 1°，日、水、金、火、木、土 2°，天、海、冥 1.5°；按紧密排，入相出相看一分钟后是否更准；「最准」为该星精确成相之日（逆行往返则有几次）。「今天最要紧的三条」按行运星分量（土天海冥最重、月亮最轻）、本命点分量（日、月、上升、中天与命主星最重）、相位（合冲刑重于拱、六合）、紧密与否打分取前三，文字是常见说法，参考。「外行星十二个月」列木、土、天、海、冥与本命各点精确成相之日。</li>
-      <li><b>次限</b>出生后第 N 日的天象对应第 N 岁（一日一年，年取回归年 365.2422 日）；推运中天用太阳弧（本命中天加推运太阳所走度数），推运上升由推运中天按出生地纬度反推。</li>
-      <li><b>太阳回归</b>求太阳回到本命黄经的时刻（同一星历，夹逼到一秒内，读回太阳黄经与本命相差不到 0.1″），再按所选地点排盘（默认出生地，可换城市），宫制随上面所选。看回归上升（并看它落本命第几宫）、太阳落回归盘第几宫、角宫（1、4、7、10 宫）有哪些星。与用 Swiss Ephemeris 的软件相比，回归时刻一般差十分钟内、偶至半小时（两边星历之差，主要是章动）。</li>
-      <li><b>逆行</b>留＝行星视速度（地心黄经日行）过零之刻；留逆至留顺为逆行。影子期以度数定：留逆之前行星头一回走到「留顺度数」起为前影，留顺之后再走回「留逆度数」止为后影。与公开星历比，水星之留差十分钟上下，金星半小时上下，木、土约一小时，天、海、冥可差数小时（留时行星几乎不动，时刻本就难定）。</li>
-      <li><b>月亮空亡</b>采现代通行定义：月亮在一座之内，与日、水、金、火、木、土、天、海、冥九星的最后一个托勒密相位（合、六合、刑、拱、冲，以精确成相为准）之后，至月亮入下一座为止；整座不成相位则自入座起即空。不计交点、小行星与次要相位，也不用古典的容许度（「光体半径」）算法，故比只看七政的古法空亡要长些。与公开空亡表比，起讫多差几分钟、偶至十分钟（月亮位置误差所致）。</li>
-      <li><b>读盘</b>是阁主自家笔记的占星读法（三才骨相、星座宫三柱合参、宫主星飞星、大十字计分、相位经文、定位星链的天赋方向与论断），不再手填：星座、度数、宫位取自本页排好的盘，宫头随所选宫制，相位按笔记口径另算（主要五种 8°、六合 4°，涉日月 10°；次要六种 2°），十曜与上升两两成相；定位星链一段的守护口径随本命页所选，状态与相位用本页的五种主要相位。经文部分加密存放，持诀者解禁后只在本机解开；与八字的读盘同一口诀。</li>
-      <li><b>时区</b>行运、逆行、空亡的时刻都按本机时区显示；回归时刻按所选地点的标准时（不计夏令时）。</li>
-    </ul>
-  </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
@@ -860,7 +833,6 @@ function setDisp(m) {
   if (C) { renderDsp(); if (tab === 'dupan') renderDupan(); writeURL(); }
 }
 $('dspSeg').addEventListener('click', e => { const b = e.target.closest('button[data-m]'); if (b) setDisp(b.dataset.m); });
-$('dspGo').onclick = () => setTab('dupan');
 $('dspTree').addEventListener('click', e => {
   const g = e.target.closest('[data-dn]'); if (!g || !dspData) return;
   const id = g.dataset.dn, n = dspData.nodes[id], b = C.bodies[id];
@@ -1039,7 +1011,7 @@ function renderTransit() {
   // 结论：最要紧的一条
   const k = D.top[0];
   $('trKey').innerHTML = k ? `${isNow ? '今天' : ymd(t)}最要紧：<span class="jin">${BODY[k.tr].n}${k.type.n}本命${PT(k.na).n}</span><small>（${k.applying ? '入相' : '出相'}，差 ${dm(k.orb)}）</small>`
-    : `${isNow ? '今天' : ymd(t)}行运星与本命没有紧的相位<small>（容许度见口径）</small>`;
+    : `${isNow ? '今天' : ymd(t)}行运星与本命没有紧的相位`;
   $('trTopTag').textContent = `${isNow ? '今天' : '这一天'}最要紧的三条`;
   $('trTop').innerHTML = D.top.map(a => `<li><div><div class="h"><b>${GL(a.tr, 'q')}${BODY[a.tr].n} ${a.type.n} ${GL(a.na)}本命${PT(a.na).n}</b><span class="meta">${a.applying ? '入相' : '出相'} · 差 ${dm(a.orb)}${a.passes.length ? ' · ' + exactTxt(a, t) : ''}</span></div>
     <p>${TR_THEME[a.tr]}碰上你的${NA_THEME[a.na]}：${ASP_ADV[a.type.a]}。</p></div></li>`).join('');
@@ -1395,7 +1367,7 @@ function writeURL() {
 }
 
 /* ================ 读盘（禁制） ================ */
-// 经文与解读脚本加密放在 dupan.json（scripts/lock/encrypt-data.mjs 写入），与八字读盘 /bazi/dupan.json 同盐同口诀：
+// 这一段的脚本加密放在 dupan.json（scripts/lock/encrypt-data.mjs 写入），与八字读盘 /bazi/dupan.json 同盐同口诀：
 // 派生出的 256 位钥匙相同，存在 lock_key_mingbu 里（沿用旧命部页的名字，记住过的设备不必重输），两边互认。
 const DP_KEY = 'lock_key_mingbu';
 let dpBox = null, dpBusy = false;

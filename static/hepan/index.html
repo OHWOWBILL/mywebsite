@@ -143,12 +143,6 @@
     .hp-more:hover { border-color: var(--zi-2); color: var(--fg); }
     .hp-none { font-size: 13px; color: var(--faint); padding: 6px 0; }
 
-    .hp-help { padding: 16px 20px; margin-top: 18px; }
-    .hp-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
-    .hp-help ul { font-size: 13px; line-height: 1.9; color: var(--fg-2); padding-left: 0; }
-    .hp-help li { list-style: none; padding-left: 14px; position: relative; }
-    .hp-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
-    .hp-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
 
     @media (max-width: 1100px) {
       .hp-grid { grid-template-columns: minmax(0, 1fr); }
@@ -180,7 +174,6 @@
       .hp-ah { padding: 0 8px 2px; }
       .hp-asp .g { margin-right: 2px; font-size: 14px; }
       .hp-signs { grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 4px 6px; font-size: 12.5px; }
-      .hp-help { padding: 14px 16px; }
     }
   </style>
 </head>
@@ -217,12 +210,6 @@
     </section>
   </div>
 
-  <section class="fb-card hp-help" aria-label="口径">
-    <h3>用法与口径</h3>
-    <ul id="rules">
-      <li><b>两人</b>本人即命部当前的人（八字、紫微、占星里起过盘就记下了，上方命部条点人名可换）；对方点一下存过的人即可，没存过就手填，时间不知可空着。⇄ 把两人互换，对方随即成为命部当前的人。</li>
-    </ul>
-  </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
@@ -593,9 +580,6 @@ function renderXing() {
   const mb = $('moreBtn');
   if (mb) mb.onclick = () => { showAll = !showAll; renderXing(); };
 }
-
-/* ================ 口径 ================ */
-$('rules').insertAdjacentHTML('beforeend', HP.RULES.map(s => { const i = s.indexOf('：'); return `<li><b>${esc(s.slice(0, i))}</b>${esc(s.slice(i + 1))}</li>`; }).join(''));
 
 loadState();
 update(true);

@@ -64,7 +64,7 @@
     .xm-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 18px; align-items: start; margin-bottom: 18px; }
     .xm-col { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
     .xm-sec { padding: 16px 20px 14px; min-width: 0; }
-    .xm-sec h3, .xm-cmp h3, .xm-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+    .xm-sec h3, .xm-cmp h3 { font-family: var(--font-title); font-weight: 600; font-size: 16px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
     .xm-sec h3 small, .xm-cmp h3 small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
     .xm-wait { font-size: 13px; color: var(--faint); padding: 6px 0; }
 
@@ -150,11 +150,6 @@
     .xm-rr.bad-row .why { color: var(--zhu); font-size: 13px; }
 
     /* —— 口径 —— */
-    .xm-help { padding: 16px 20px; margin-top: 18px; }
-    .xm-help ul { padding: 0; }
-    .xm-help li { list-style: none; padding-left: 14px; position: relative; font-size: 13px; line-height: 1.9; color: var(--fg-2); }
-    .xm-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
-    .xm-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
 
     @media (max-width: 1100px) {
       .xm-grid { grid-template-columns: minmax(0, 1fr); }
@@ -176,7 +171,6 @@
       .xm-ge .lab { font-size: 14px; letter-spacing: .06em; }
       .xm-ge .why { font-size: 13px; }
       .xm-cmp { padding: 14px 14px 14px; }
-      .xm-help { padding: 14px 16px; margin-top: 14px; }
       .xm-rh { display: none; }
       .xm-rr { grid-template-columns: 1.9em minmax(0, 1fr) auto; grid-template-areas: "rk nm sv" "rk gs gs"; gap: 4px 8px; padding: 8px 10px; }
       .xm-rr .rk { grid-area: rk; align-self: start; margin-top: 2px; }
@@ -249,10 +243,6 @@
     <div id="cmpBox"></div>
   </section>
 
-  <section class="fb-card xm-help" aria-label="口径">
-    <h3>口径</h3>
-    <ul id="rulesList"></ul>
-  </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
@@ -456,7 +446,6 @@ function renderCands() {
 }
 
 /* ================ 口径 ================ */
-$('rulesList').innerHTML = XM.RULES.map(r => `<li><b>${esc(r[0])}</b>${esc(r[1])}</li>`).join('');
 
 /* ================ 绑定 ================ */
 function setName(v, scroll) {
