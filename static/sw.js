@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-f206b4ea5c25';
+const V = 'fb-608a7ed70453';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -23,7 +23,6 @@ const PRE = [
   '/liuren/',
   '/liuyao/',
   '/meihua/',
-  '/mingbu/',
   '/qimen/',
   '/taiyi/',
   '/tizhi/',
@@ -39,6 +38,7 @@ const PRE = [
   '/android-chrome-512x512.png',
   '/apple-touch-icon.png',
   '/bazi/bazi.js?v=3',
+  '/bazi/dupan.json',
   '/bazi/qiongtong.js?v=1',
   '/dayan/dayan.js?v=1',
   '/fabao/app.webmanifest',
@@ -46,7 +46,7 @@ const PRE = [
   '/fabao/cidian.js?v=1',
   '/fabao/cities.js?v=1',
   '/fabao/fabao.css?v=10',
-  '/fabao/fabao.js?v=17',
+  '/fabao/fabao.js?v=18',
   '/fabao/jieqi-se.js?v=1',
   '/fabao/kyureki.js?v=1',
   '/fabao/lunar.js?v=1',

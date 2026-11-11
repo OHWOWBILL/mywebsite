@@ -207,6 +207,24 @@
     .bh-th p > span { min-width: 0; }
     .bh-th p.fb-fine { display: block; border-top: none; padding: 0; margin-top: 6px; font-size: 12px; color: var(--faint); }
 
+    /* —— 读盘（上锁） —— */
+    .bz-dupan { margin-top: 18px; }
+    .bz-dupan-h { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 14px; }
+    .bz-dupan-h h3 { margin-bottom: 0; }
+    .bz-dupan-h .fb-btn { padding: 5px 14px; font-size: 13px; }
+    .bz-dupan .fb-key { margin-top: 10px; font-size: 18px; }
+    .bz-dupan .fb-key small { font-size: 13px; color: var(--muted); letter-spacing: .06em; font-weight: 400; }
+    .dp-lock { max-width: 340px; margin: 14px auto 6px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+    .dp-lock .fb-seal { width: 52px; height: 52px; font-size: 30px; background: var(--zhu); transform: rotate(-8deg); }
+    .dp-lock-t { font-family: var(--font-title); font-size: 17px; letter-spacing: .12em; }
+    .dp-lock-t .jin { color: var(--jin); }
+    .dp-lock input[type=password] { width: 100%; text-align: center; font-size: 16px; letter-spacing: .3em; padding: 10px 12px; }
+    .dp-lock .fb-btn { width: 100%; }
+    .dp-msg { min-height: 1.4em; font-size: 13px; color: var(--zhu); }
+    #dpOut { margin-top: 18px; }
+    #dpOut:empty { display: none; }
+    .bz-help { margin-top: 18px; }
+
     @media (max-width: 1100px) {
       .bz-wrap { grid-template-columns: 1fr; }
       .bz-side { position: static; display: grid; grid-template-columns: 1fr 1fr; }
@@ -225,6 +243,7 @@
       .bz-pick-sum .bz-slot { flex: 1 1 0; min-width: 0; padding: 4px 2px 5px; font-size: 16px; }
       .bz-pick-reset { flex-basis: 100%; text-align: right; padding: 0 2px; }
       .bz-chips button { padding: 6px 8px 5px; }
+      .bz-dupan .fb-key { font-size: 16px; }
     }
   </style>
 </head>
@@ -318,6 +337,24 @@
     </aside>
   </div>
 
+  <section class="fb-card bz-card bz-dupan" id="dupan" aria-label="读盘">
+    <div class="bz-dupan-h">
+      <h3>读盘<small>十星心态、阴阳气含、神煞、用神线索</small></h3>
+      <button class="fb-btn" type="button" id="dpCopy" hidden title="把这一盘的读盘要点整理成 Markdown 复制，可贴回笔记">复制读盘笔记</button>
+    </div>
+    <p class="fb-key" id="dpKey" hidden></p>
+    <form class="dp-lock" id="dpLock" autocomplete="off" hidden>
+      <div class="fb-seal" aria-hidden="true">禁</div>
+      <p class="dp-lock-t">读盘的心法与判读被阁主下了<span class="jin">禁制</span></p>
+      <p class="fb-fine">排盘照常公开；解开后才在本机解密这一段。与占星读盘同一口诀，在那边记住过的设备会自动解开。</p>
+      <input type="password" id="dpPw" placeholder="解禁口诀" aria-label="解禁口诀">
+      <label class="bz-chk"><input type="checkbox" id="dpKeep" checked> 此设备记住</label>
+      <button class="fb-btn primary" id="dpGo">解 禁</button>
+      <p class="dp-msg" id="dpMsg" role="status"></p>
+    </form>
+  </section>
+  <div class="dp" id="dpOut"></div>
+
   <section class="fb-card bz-help">
     <h3>用法与口径</h3>
     <ul>
@@ -330,6 +367,7 @@
       <li><b>神煞</b>只列常用的二三十种，鼠标停在神煞上可看查法。羊刃取「禄前一位」；三合类（驿马、桃花、华盖、将星等）以年支、日支两查；天乙、太极、文昌、国印以日干、年干两查。各家口径不一，以自家所学为准。</li>
       <li><b>四柱反推</b>逐级点选：先选年干，年支只剩同阴阳的六个（下注对应的公历年）；月干由五虎遁定出，直接选月；再选日干、日支；时干由五鼠遁定出，直接选时，记不清时辰就选「时辰不详」。选齐即列出 1900–2100 年间合得上的时段，点任一条即按那一刻排盘；点上面已选的一柱可从那一柱改起。</li>
       <li><b>调候</b>取《穷通宝鉴》十干配十二月令（以节换月）所列的调候用神，按书中先后，主用在前；白话里看它们在盘中是透出天干、藏在地支还是没有，「调候细看」里有原文、书中言忌之处与附注。原文据殆知阁本与维基文库本互校，参徐乐吾《造化元钥评注》；网上常见速查表与原文先后不合处，以原文为准并注出。只是诸法之一，参考。</li>
+      <li><b>读盘</b>在页面下方，是阁主自家笔记的读法（十星强度与亲密度、阴阳气含、天月德天乙桃花驿马、日干强弱与大用神方向），四柱取自本页排好的盘，不必另填。这一段加密存放，持诀者解禁后只在本机解开；与占星的读盘同一口诀。</li>
       <li><b>口径</b>节气表与奇门手记同一张（太阳视黄经算出，与寿星万年历相差一分钟内）；农历为寿星万年历口径；人元司令依《渊海子平》分野；调候依《穷通宝鉴》。仅供学习参考。</li>
     </ul>
   </section>
@@ -341,7 +379,7 @@
 <script src="/bazi/qiongtong.js?v=1"></script>
 <script src="/bazi/bazi.js?v=3"></script>
 <script src="/fabao/cities.js?v=1"></script>
-<script src="/fabao/fabao.js?v=17"></script>
+<script src="/fabao/fabao.js?v=18"></script>
 <script>
 (function () {
 'use strict';
@@ -608,7 +646,7 @@ function render() {
         ${row('神煞', (c, i) => shaHTML(sha[i]))}
       </tbody>
     </table>`;
-  renderYun(); showOn(); renderInfo(); renderWX(); renderSS(); renderRel(cols); renderBH();
+  renderYun(); showOn(); renderInfo(); renderWX(); renderSS(); renderRel(cols); renderBH(); renderDupan();
 }
 
 $('board').addEventListener('click', e => { const s = e.target.closest('.bz-sha span[title]'); if (s) toast(s.title, 5000); });
@@ -1008,8 +1046,63 @@ $('lonIn').onchange = () => {
 };
 $('tzIn').onchange = () => { view.tz = +$('tzIn').value; saveView(); if (form.cal === 'sizhu' && STEPS.every(st => pick[st.key] !== undefined)) runPick(); cast(true); };
 
+/* ================ 读盘（禁制） ================ */
+// 心法与判读脚本加密放在 dupan.json（scripts/lock/encrypt-data.mjs 写入），与占星读盘 /xingpan/dupan.json 同盐同口诀：
+// 派生出的 256 位钥匙相同，存在 lock_key_mingbu 里（沿用旧命部页的名字，记住过的设备不必重输），两边互认。
+const DP_KEY = 'lock_key_mingbu';
+let dpBox = null, dpBusy = false, dpSig = '';
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64e = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
+const dpGet = () => { try { return localStorage.getItem(DP_KEY); } catch (e) { return null; } };
+const dpSet = v => { try { v ? localStorage.setItem(DP_KEY, v) : localStorage.removeItem(DP_KEY); } catch (e) { /* 无痕模式 */ } };
+async function dpLoad() { if (!dpBox) { const r = await fetch('/bazi/dupan.json'); if (!r.ok) throw new Error('fetch'); dpBox = await r.json(); } return dpBox; }
+async function dpOpen(raw) {
+  const X = await dpLoad();
+  const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64d(X.iv) }, key, b64d(X.data));
+  new Function(new TextDecoder().decode(plain))();     // 定义 window.BZ_DUPAN
+}
+function dpShowLock(msg) {
+  $('dpLock').hidden = false; $('dpKey').hidden = true; $('dpCopy').hidden = true; $('dpOut').innerHTML = ''; dpSig = '';
+  $('dpMsg').textContent = msg || '';
+}
+function renderDupan() {
+  if (window.BZ_DUPAN) {
+    $('dpLock').hidden = true;
+    if (!C) return;
+    const sig = C.pillars.map(p => p.name).join(' ') + '|' + C.male + '|' + (C.name || '');
+    if (sig === dpSig) return;                          // 换运换年不动四柱，不必重画
+    dpSig = sig;
+    $('dpKey').hidden = false; $('dpCopy').hidden = false;
+    $('dpKey').innerHTML = `${C.male ? '乾造' : '坤造'}${C.name ? ' <b>' + esc(C.name) + '</b>' : ''} · ${C.pillars.map(p => p.name).join(' ')} <small>日主 ${GAN[C.pillars[2].gan]}${WX[GAN_WX[C.pillars[2].gan]]}</small>`;
+    window.BZ_DUPAN.render(C, $('dpOut'), B);
+    return;
+  }
+  const saved = dpGet();
+  if (!saved || dpBusy) { if (!dpBusy) dpShowLock(); return; }
+  dpBusy = true; $('dpLock').hidden = true; $('dpOut').innerHTML = '<p class="fb-fine">解禁中…</p>';
+  dpOpen(b64d(saved).buffer).then(() => { dpBusy = false; $('dpOut').innerHTML = ''; renderDupan(); })
+    .catch(e => { dpBusy = false; if (e && e.message === 'fetch') dpShowLock('读盘没取到，联网后再试'); else { dpSet(null); dpShowLock(); } });
+}
+$('dpLock').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('dpGo'); btn.disabled = true; $('dpMsg').textContent = '';
+  try {
+    const X = await dpLoad();
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode($('dpPw').value), 'PBKDF2', false, ['deriveBits']);
+    const raw = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: b64d(X.salt), iterations: X.iter }, base, 256);
+    await dpOpen(raw);
+    dpSet($('dpKeep').checked ? b64e(raw) : null);
+    $('dpPw').value = ''; renderDupan();
+  } catch (err) {
+    $('dpMsg').textContent = err && err.message === 'fetch' ? '读盘没取到，联网后再试' : '口诀不对，禁制未动';
+  }
+  btn.disabled = false;
+});
+$('dpCopy').onclick = () => { if (C && window.BZ_DUPAN) copy(window.BZ_DUPAN.md(C, B), '读盘笔记已复制（Markdown）'); };
+
 $('lyIn').value = NOW_Y;
-syncPlaceUI(); renderLib();
+syncPlaceUI(); renderLib(); renderDupan();
 const fromURL = readURL();
 if (fromURL) apply(fromURL);
 else { $('nowBtn').click(); }
