@@ -1,7 +1,7 @@
 // 用口令把一个 HTML 页面加密成 static/<目录>/index.html，只有知道口令的人能打开。
 // 用法：node scripts/lock/encrypt.mjs <原文.html> <输出目录名> <口令>
 // 原文请放在仓库之外，不要提交。
-// 锁屏上的导航高亮与副题取自原文的 <body data-tool="…"> 和 <meta name="lock-sub" content="…">，没写就按命部。
+// 锁屏上的导航高亮与副题取自原文的 <body data-tool="…"> 和 <meta name="lock-sub" content="…">，没写就按输出目录名与通用副题。
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { webcrypto as crypto } from 'node:crypto';
 import { dirname, join } from 'node:path';
@@ -24,8 +24,8 @@ const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encryp
 const plain = readFileSync(src);
 const data = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plain);
 const text = plain.toString('utf8');
-const tool = text.match(/<body[^>]*\sdata-tool="([^"]+)"/)?.[1] ?? 'mingbu';
-const sub = text.match(/<meta name="lock-sub" content="([^"]+)"/)?.[1] ?? '命部 · 占星八字读盘 · 非持诀者不得开启';
+const tool = text.match(/<body[^>]*\sdata-tool="([^"]+)"/)?.[1] ?? dir;
+const sub = text.match(/<meta name="lock-sub" content="([^"]+)"/)?.[1] ?? '非持诀者不得开启';
 
 const box = { id: dir, iter, salt: b64(salt), iv: b64(iv), data: b64(new Uint8Array(data)) };
 const page = readFileSync(join(here, 'template.html'), 'utf8')
