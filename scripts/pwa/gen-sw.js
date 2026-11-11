@@ -9,7 +9,7 @@
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const ROOT = path.join(__dirname, '..', '..'), STATIC = path.join(ROOT, 'static'), SW = path.join(STATIC, 'sw.js');
 const EXTRA = [
-  '/tools/', '/fabao/wenti.js', '/fabao/app.webmanifest',
+  '/tools/', '/fabao/wenti.js', '/fabao/app.webmanifest', '/xingpan/glyph.woff2?v=1',
   '/fabao/share.js?v=1', '/fabao/backup.js?v=1', '/fabao/cidian.js?v=1', '/fabao/vendor/qrcode.js?v=1.4.4',
   '/android-chrome-192x192.png', '/android-chrome-512x512.png', '/apple-touch-icon.png', '/favicon-32x32.png'
 ];
