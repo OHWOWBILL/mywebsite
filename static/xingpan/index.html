@@ -21,7 +21,9 @@
   <link rel="stylesheet" href="/fonts/qj-rest.css?v=5eeb78f3" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
-    :root { --el-fire: #E07A62; --el-earth: #C9A578; --el-air: #8FB0D8; --el-water: #7FA3D6; --glyph: "Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", "Symbola", serif; }
+    /* 小行星与莉莉丝的符号（⚳⚴⚵⚶⚷⚸）很多手机字体里没有，自带六个字形（取自 DejaVu Sans） */
+    @font-face { font-family: "XP Glyph"; src: url("/xingpan/glyph.woff2?v=1") format("woff2"); unicode-range: U+26B3-26B8; font-display: swap; }
+    :root { --el-fire: #E07A62; --el-earth: #C9A578; --el-air: #8FB0D8; --el-water: #7FA3D6; --glyph: "XP Glyph", "Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", "Symbola", serif; }
     .el-0 { --ec: var(--el-fire); } .el-1 { --ec: var(--el-earth); } .el-2 { --ec: var(--el-air); } .el-3 { --ec: var(--el-water); }
     .xp-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
     .xp-form .fb-row { gap: 8px 10px; }
@@ -82,6 +84,33 @@
     .xp-t th { font-family: var(--font-title); font-weight: 400; font-size: 12px; color: var(--faint); letter-spacing: .12em; text-align: left; padding: 0 6px 6px; }
     .xp-t td { padding: 5px 6px; border-top: 1px dashed var(--rule); color: var(--fg-2); white-space: nowrap; }
     .xp-t tr.hl td { background: rgba(122, 91, 192, .1); }
+    .xp-t tr.grp td { border-top: 1px solid var(--rule-2); }
+    .xp-t .g.ax { font-family: var(--font-mark); font-weight: 800; font-size: 11px; display: inline-block; min-width: 1.6em; }
+    .xp-wheel .pg.mn { font-size: 16px; fill: var(--fg-2); }
+    .xp-wheel .pg.pa { font-family: var(--font-mark); font-weight: 800; font-size: 10px; fill: var(--fg-2); }
+    /* 相位表：三角形，左侧与底边是星，格里填相位 */
+    .xp-grid-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .xp-grid-h h3 { margin-bottom: 0; }
+    .xp-grid-wrap { margin-top: 10px; }
+    table.xp-grid { border-collapse: collapse; table-layout: fixed; width: 100%; max-width: 760px; margin: 0 auto; }
+    table.xp-grid.ten { max-width: 440px; }
+    .xp-grid td, .xp-grid th { padding: 0; text-align: center; vertical-align: middle; line-height: 1; }
+    .xp-grid th { font-weight: 400; font-family: var(--glyph); color: var(--fg); font-size: clamp(10px, 2.3vw, 16px); height: 1.9em; }
+    .xp-grid th.ax { font-family: var(--font-body); font-weight: 700; font-size: clamp(7.5px, 1.9vw, 11px); letter-spacing: -.04em; white-space: nowrap; }
+    .xp-grid.ten th { font-size: 17px; }
+    .xp-grid th.on { color: var(--jin); }
+    .xp-grid td.c { border: 1px solid var(--rule); background: var(--bg-3); cursor: pointer; aspect-ratio: 1; font-family: var(--glyph); font-size: clamp(9px, 2.2vw, 15px); position: relative; }
+    .xp-grid.ten td.c { font-size: 17px; }
+    .xp-grid td.c:hover, .xp-grid td.c.on { outline: 1.5px solid var(--zi-2); outline-offset: -1px; }
+    .xp-grid td.c.x { background: rgba(122, 91, 192, .12); }
+    .xp-grid td.c small { display: block; font-family: var(--font-mark); font-size: 9px; color: var(--muted); margin-top: 2px; }
+    .xp-grid td.hard { color: var(--zhu); } .xp-grid td.soft { color: var(--lv); } .xp-grid td.conj { color: var(--jin); }
+    .xp-grid-info { margin-top: 10px; min-height: 1.6em; font-size: 13px; color: var(--fg-2); text-align: center; }
+    .xp-grid-info .g { font-family: var(--glyph); color: var(--fg); margin: 0 3px; }
+    .xp-grid-info .g.ax { font-family: var(--font-mark); font-weight: 800; font-size: 11px; }
+    .xp-grid-info b { font-family: var(--font-title); font-weight: 600; color: var(--fg); }
+    .xp-grid-info .hard { color: var(--zhu); } .xp-grid-info .soft { color: var(--lv); } .xp-grid-info .conj { color: var(--jin); }
+    @media (max-width: 700px) { .xp-grid:not(.ten) td.c small { display: none; } }
     .xp-t .g { font-family: var(--glyph); font-size: 16px; color: var(--fg); margin-right: 4px; }
     .xp-t .n { font-family: var(--font-title); color: var(--fg); }
     .xp-t .sgn { font-family: var(--glyph); color: var(--ec); margin-right: 2px; }
@@ -268,7 +297,7 @@
       .xp-side { grid-template-columns: 1fr; }
       .xp-board { padding: 10px 6px; margin: 0 -10px; border-radius: var(--r); }
       /* 轮盘随屏缩小，字号按 viewBox 放大些，手机上才看得清 */
-      .xp-wheel .pg { font-size: 27px; }
+      .xp-wheel .pg { font-size: 27px; } .xp-wheel .pg.mn { font-size: 21px; } .xp-wheel .pg.pa { font-size: 13px; }
       .xp-wheel .pd { font-size: 13px; }
       .xp-wheel .pr { font-size: 12px; }
       .xp-wheel .sg { font-size: 24px; }
@@ -365,6 +394,17 @@
       <section class="fb-card xp-card" aria-label="行星">
         <h3>行星<small>星座 · 度数 · 宫位 · 庙旺陷弱</small></h3>
         <div style="overflow-x:auto"><table class="xp-t" id="planetT"></table></div>
+      </section>
+      <section class="fb-card xp-card" aria-label="相位表">
+        <div class="xp-grid-h">
+          <h3>相位表<small id="gridNote"></small></h3>
+          <div class="fb-seg xp-dmode" id="gridSeg" role="group" aria-label="列哪些星">
+            <button type="button" data-m="all">全部</button>
+            <button type="button" data-m="ten">十星</button>
+          </div>
+        </div>
+        <div class="xp-grid-wrap" id="gridBox"></div>
+        <p class="xp-grid-info" id="gridInfo"></p>
       </section>
       <section class="fb-card xp-card" aria-label="定位星链">
         <div class="xp-dsp-h">
@@ -537,7 +577,8 @@
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
-<script src="/xingpan/xingpan.js?v=3"></script>
+<script src="/xingpan/minor.js?v=1"></script>
+<script src="/xingpan/xingpan.js?v=4"></script>
 <script src="/fabao/cities.js?v=1"></script>
 <script src="/fabao/fabao.js?v=18"></script>
 <script>
@@ -550,11 +591,14 @@ const T = '︎';
 const pad = n => String(n).padStart(2, '0');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const BODY = {}; XP.BODIES.forEach(b => { BODY[b.id] = b; });
-BODY.snode = { id: 'snode', n: '南交点', g: '☋' };
+XP.EXTRAS.forEach(b => { BODY[b.id] = b; });
 const G = id => BODY[id].g + T;
 // 本命点（十星之外加上升、中天）：名字与符号
-const PT = id => id === 'asc' ? { n: '上升', g: 'AC' } : id === 'mc' ? { n: '中天', g: 'MC' } : BODY[id];
-const GL = (id, cls) => id === 'asc' || id === 'mc' ? `<span class="g ax">${PT(id).g}</span>` : `<span class="g${cls ? ' ' + cls : ''}">${G(id)}</span>`;
+const PT = id => BODY[id];
+const GL = (id, cls) => BODY[id].axis ? `<span class="g ax">${BODY[id].g}</span>` : `<span class="g${cls ? ' ' + cls : ''}">${G(id)}</span>`;
+// 轮盘与行星表里，十星北交之后再列的小行星与虚点
+const MINOR_ROW = ['snode', 'lilith', 'chiron', 'ceres', 'pallas', 'juno', 'vesta'];
+const AXIS_ROW = ['asc', 'dsc', 'mc', 'ic', 'vertex', 'eastpoint'];
 const DAY = 864e5;
 
 // 出生地：共用 /fabao/cities.js（[名, 东经, 北纬, 时区]），与八字同一张
@@ -567,7 +611,7 @@ const store = {
 const guessTz = -new Date().getTimezoneOffset() / 60;
 const guess = CITY_LIST.find(c => c[3] === guessTz) || CITY_LIST[0];
 let view = Object.assign({ city: guess[0], lon: guess[1], lat: guess[2], tz: guess[3], house: 'placidus', bonatti: false, disp: 'modern' }, store.get(LS_VIEW, {}));
-let C = null, hlAsp = -1, nowCast = false;   // nowCast：盘是按「此刻」起的（没填生辰），天象页就不套本命宫位
+let C = null, hlAsp = -1, gridMode = 'all', gridSel = '', nowCast = false;   // nowCast：盘是按「此刻」起的（没填生辰），天象页就不套本命宫位
 
 $('cityIn').innerHTML = CITIES.map(([g, l]) => `<optgroup label="${g}">${l.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('') + '<option value="">自定义经纬度</option>';
 $('tzIn').innerHTML = TZS.map(z => `<option value="${z}">${tzLabel(z)}</option>`).join('');
@@ -588,7 +632,7 @@ function cast() {
   if (y < 1885 || y > 2099) { toast('只排 1885–2099 年（冥王星级数适用范围）'); return; }
   C = XP.chart({ y, mo, d, h, mi, tz: +view.tz, dst: $('dstIn').checked, lat: +view.lat, lon: +view.lon, house: view.house, bonatti: view.bonatti });
   C.name = $('nameIn').value.trim();
-  hlAsp = -1; trHl = -1;
+  hlAsp = -1; gridSel = ''; trHl = -1;
   const dn = $('dstNote');
   if (+view.tz === 8 && !$('dstIn').checked && isChinaDST(y, mo, d)) {
     dn.hidden = false;
@@ -649,7 +693,9 @@ function wheelSVG(X, opt) {
     return items;
   };
   const ids = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'node'];
-  const items = spread(ids.map(id => ({ id, lon: X.bodies[id].lon })));
+  const bodyOf = id => X.bodies[id] || X.extra[id];
+  if (!outer && X.extra) MINOR_ROW.concat(['vertex', 'eastpoint']).forEach(id => { if (X.extra[id]) ids.push(id); });
+  const items = spread(ids.map(id => ({ id, lon: bodyOf(id).lon })));
   s += `<circle class="inner" cx="${CX}" cy="${CX}" r="${R4 - 6}"/>`;
   // 相位线：本命盘画盘内相位；行运盘只画行运相位（虚线）
   const cls = a => a === 0 ? 'conj' : (a === 90 || a === 180) ? 'hard' : 'soft';
@@ -669,10 +715,10 @@ function wheelSVG(X, opt) {
     outer.forEach(o => { const [x, y] = P(o.lon, R4 - 6); s += `<circle class="tdot" cx="${f1(x)}" cy="${f1(y)}" r="2.6"/>`; });
   }
   items.forEach(it => {
-    const b = X.bodies[it.id], [px, py] = P(b.lon, R3), [qx, qy] = P(b.lon, R3 - 8), [gx, gy] = P(it.pos, R3 - 26), [dx, dy] = P(it.pos, R3 - 50), [rx, ry] = P(it.pos, R3 - 63);
+    const b = bodyOf(it.id), mn = !X.bodies[it.id], [px, py] = P(b.lon, R3), [qx, qy] = P(b.lon, R3 - 8), [gx, gy] = P(it.pos, R3 - 26), [dx, dy] = P(it.pos, R3 - 50), [rx, ry] = P(it.pos, R3 - 63);
     const dd = XP.fmtDeg(b.lon);
     s += `<line class="pin" x1="${f1(px)}" y1="${f1(py)}" x2="${f1(qx)}" y2="${f1(qy)}"/><circle class="dot" cx="${f1(P(b.lon, R4 - 6)[0])}" cy="${f1(P(b.lon, R4 - 6)[1])}" r="1.8"/>`;
-    s += `<text class="pg${it.id === 'sun' || it.id === 'moon' ? ' lum' : ''}" x="${f1(gx)}" y="${f1(gy)}" data-id="${it.id}"><title>${BODY[it.id].n} ${dd.text}${b.retro ? ' 逆行' : ''}</title>${G(it.id)}</text>`;
+    s += `<text class="pg${it.id === 'sun' || it.id === 'moon' ? ' lum' : ''}${mn ? (BODY[it.id].axis ? ' pa' : ' mn') : ''}" x="${f1(gx)}" y="${f1(gy)}" data-id="${it.id}"><title>${BODY[it.id].n} ${dd.text}${b.retro ? ' 逆行' : ''}</title>${BODY[it.id].axis ? BODY[it.id].g : G(it.id)}</text>`;
     s += `<text class="pd" x="${f1(dx)}" y="${f1(dy)}">${dd.d}°${pad(dd.m)}</text>`;
     if (b.retro) s += `<text class="pr" x="${f1(rx)}" y="${f1(ry)}">℞</text>`;
   });
@@ -703,14 +749,17 @@ function render() {
   $('planetT').innerHTML = `<tr><th>天体</th><th>星座</th><th>度数</th><th>宫</th><th>庙旺</th><th>日行</th></tr>` + ids.map(id => {
     const b = C.bodies[id], dd = XP.fmtDeg(b.lon);
     return `<tr><td><span class="g">${G(id)}</span><span class="n">${BODY[id].n}</span></td><td class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span>${XP.SIGNS[dd.sign]}</td><td class="deg">${dd.d}°${pad(dd.m)}′ ${b.retro ? '<span class="r">℞</span>' : ''}</td><td>${b.house}</td><td class="dig ${b.dig}">${b.dig}</td><td class="deg">${b.speed >= 0 ? '' : '−'}${Math.abs(b.speed).toFixed(id === 'moon' ? 1 : 3)}°</td></tr>`;
-  }).join('') + ['asc', 'mc'].map(k => {
-    const l = k === 'asc' ? A.asc : A.mc, dd = XP.fmtDeg(l);
-    return `<tr><td><span class="n">${k === 'asc' ? '上升 ASC' : '中天 MC'}</span></td><td class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span>${XP.SIGNS[dd.sign]}</td><td class="deg">${dd.d}°${pad(dd.m)}′</td><td>${k === 'asc' ? 1 : 10}</td><td></td><td></td></tr>`;
-  }).join('') + (() => { const dd = XP.fmtDeg(C.fortune); return `<tr><td><span class="g">⊗</span><span class="n">福点</span></td><td class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span>${XP.SIGNS[dd.sign]}</td><td class="deg">${dd.d}°${pad(dd.m)}′</td><td>${XP.houseOf(C.fortune, C.cusps)}</td><td></td><td></td></tr>`; })();
+  }).join('') + MINOR_ROW.filter(id => C.extra[id]).map((id, k) => {
+    const b = C.extra[id], dd = XP.fmtDeg(b.lon);
+    return `<tr${k ? '' : ' class="grp"'}><td><span class="g">${G(id)}</span><span class="n">${BODY[id].n}</span></td>${signCell(b.lon)}<td class="deg">${dd.d}°${pad(dd.m)}′ ${b.retro ? '<span class="r">℞</span>' : ''}</td><td>${b.house}</td><td></td><td class="deg">${b.speed >= 0 ? '' : '−'}${Math.abs(b.speed).toFixed(3)}°</td></tr>`;
+  }).join('') + AXIS_ROW.map((id, k) => {
+    const b = C.extra[id], dd = XP.fmtDeg(b.lon);
+    return `<tr${k ? '' : ' class="grp"'}><td><span class="g ax">${BODY[id].g}</span><span class="n">${BODY[id].n}</span></td>${signCell(b.lon)}<td class="deg">${dd.d}°${pad(dd.m)}′</td><td>${b.house}</td><td></td><td></td></tr>`;
+  }).join('') + (() => { const dd = XP.fmtDeg(C.fortune); return `<tr><td><span class="g">⊗</span><span class="n">福点</span></td>${signCell(C.fortune)}<td class="deg">${dd.d}°${pad(dd.m)}′</td><td>${XP.houseOf(C.fortune, C.cusps)}</td><td></td><td></td></tr>`; })();
   $('houseNote').textContent = HOUSE_NAME[C.house] + (C.placidusFallback ? '（纬度过高，改用波菲利）' : '');
   const hrow = from => `<tr>${[0, 1, 2, 3, 4, 5].map(k => { const i = from + k, dd = XP.fmtDeg(C.cusps[i]); return `<td><span class="n">${i}</span> <span class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span></span><span class="deg">${dd.d}°${pad(dd.m)}′</span></td>`; }).join('')}</tr>`;
   $('houseT').innerHTML = hrow(1) + hrow(7);
-  renderInfo(); renderAsp(); renderDsp(); renderFd(); renderBH(); renderWho();
+  renderInfo(); renderAsp(); renderGrid(); renderDsp(); renderFd(); renderBH(); renderWho();
 }
 function ageNow() {
   const now = Date.now(), b = new Date(C.utc + (+C.input.tz) * 3600e3), n = new Date(now + (+C.input.tz) * 3600e3);
@@ -734,7 +783,50 @@ function renderAsp() {
   const tcls = a => a.type.a === 0 ? 'conj' : (a.type.a === 90 || a.type.a === 180) ? 'hard' : 'soft';
   $('aspBox').innerHTML = C.aspects.length ? C.aspects.map((a, i) => `<button data-i="${i}" class="${hlAsp === i ? 'on' : ''}"><span><span class="g">${G(a.a)}</span>${BODY[a.a].n}</span><span class="t ${tcls(a)}">${a.type.g}${T}</span><span><span class="g">${G(a.b)}</span>${BODY[a.b].n}</span><span class="o">${a.type.n} ${Math.floor(a.orb)}°${pad(Math.round((a.orb % 1) * 60) % 60)}′ ${a.applying ? '入' : '出'}</span></button>`).join('') : '<p class="fb-fine">无主要相位</p>';
 }
-$('aspBox').onclick = e => { const b = e.target.closest('button[data-i]'); if (!b) return; const i = +b.dataset.i; hlAsp = hlAsp === i ? -1 : i; wheel(); renderAsp(); };
+$('aspBox').onclick = e => { const b = e.target.closest('button[data-i]'); if (!b) return; const i = +b.dataset.i; hlAsp = hlAsp === i ? -1 : i; gridSel = ''; wheel(); renderAsp(); renderGrid(); };
+
+/* ================ 相位表 ================ */
+// 三角形：第 i 行是第 i 颗星，往右一格格对前面各星，行首与底边写星名；格里是相位符号与容许度
+let gridData = null;
+const orbTxt = o => `${Math.floor(o)}°${pad(Math.floor((o % 1) * 60))}′`;
+function renderGrid() {
+  const ids = gridMode === 'ten' ? XP.PLANETS : XP.GRID_IDS, g = gridData = XP.aspectGrid(C, ids), n = g.ids.length;
+  const tcls = a => a === 0 ? 'conj' : (a === 90 || a === 180) ? 'hard' : 'soft';
+  const [sa, sb] = gridSel ? gridSel.split('|') : [];
+  const th = id => `<th class="${BODY[id].axis ? 'ax' : ''}${id === sa || id === sb ? ' on' : ''}" title="${BODY[id].n}">${BODY[id].axis ? BODY[id].g : G(id)}</th>`;
+  let h = '';
+  for (let i = 1; i < n; i++) {
+    h += '<tr>' + th(g.ids[i]);
+    for (let j = 0; j < i; j++) {
+      const k = g.ids[j] + '|' + g.ids[i], c = g.cell[k];
+      h += `<td class="c${c ? ' ' + tcls(c.type.a) : ''}${gridSel === k ? ' on' : ''}" data-k="${k}" title="${BODY[g.ids[j]].n} ${c ? c.type.n + ' ' : '· '}${BODY[g.ids[i]].n}${c ? ' ' + orbTxt(c.orb) : ''}">${c ? c.type.g + T + `<small>${Math.floor(c.orb)}°${pad(Math.floor((c.orb % 1) * 60))}</small>` : ''}</td>`;
+    }
+    h += (i < n - 1 ? `<td colspan="${n - 1 - i}"></td>` : '') + '</tr>';
+  }
+  h += '<tr><th></th>' + g.ids.slice(0, n - 1).map(th).join('') + '</tr>';
+  $('gridBox').innerHTML = `<table class="xp-grid${gridMode === 'ten' ? ' ten' : ''}"><colgroup>${'<col>'.repeat(n)}</colgroup>${h}</table>`;
+  $('gridNote').textContent = `${n} 点 · ${g.list.length} 个相位`;
+  $('gridSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === gridMode));
+  let info = '点一格看详情';
+  if (gridSel) {
+    const c = g.cell[gridSel], A = C.bodies[sa] || C.extra[sa], B = C.bodies[sb] || C.extra[sb];
+    if (A && B) {
+      const sep = Math.abs(mod(A.lon - B.lon + 180, 360) - 180);
+      info = `${GL(sa)}<b>${BODY[sa].n}</b> ` + (c ? `<span class="${tcls(c.type.a)}"><span class="g">${c.type.g}${T}</span>${c.type.n}</span>` : '无相位') + ` ${GL(sb)}<b>${BODY[sb].n}</b> · ` +
+        (c ? `容许度 ${orbTxt(c.orb)} · ${c.applying ? '入相' : '出相'}` : `相距 ${orbTxt(sep)}`);
+    }
+  }
+  $('gridInfo').innerHTML = info;
+}
+$('gridBox').onclick = e => {
+  const td = e.target.closest('td[data-k]'); if (!td) return;
+  gridSel = gridSel === td.dataset.k ? '' : td.dataset.k;
+  // 十星之间的相位，盘上也只亮这一条
+  const c = gridSel && gridData.cell[gridSel];
+  hlAsp = c ? C.aspects.findIndex(a => a.a === c.a && a.b === c.b && a.type.a === c.type.a) : -1;
+  wheel(); renderAsp(); renderGrid();
+};
+$('gridSeg').onclick = e => { const b = e.target.closest('button[data-m]'); if (!b) return; gridMode = b.dataset.m; gridSel = ''; renderGrid(); };
 function renderFd() {
   const now = Date.now(), Y = 365.2422 * 864e5, bms = C.utc;
   const yr = t => new Date(t + (+C.input.tz) * 3600e3).getUTCFullYear();
@@ -1273,7 +1365,11 @@ function chartText() {
   ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'node'].forEach(id => {
     const b = C.bodies[id]; L.push(`${BODY[id].n} ${XP.fmtDeg(b.lon).text}${b.retro ? ' ℞' : ''} · ${b.house} 宫${b.dig ? ' · ' + b.dig : ''}`);
   });
+  MINOR_ROW.concat(AXIS_ROW.slice(1)).filter(id => C.extra[id] && id !== 'mc').forEach(id => {
+    const b = C.extra[id]; L.push(`${BODY[id].n} ${XP.fmtDeg(b.lon).text}${b.retro ? ' ℞' : ''} · ${b.house} 宫`);
+  });
   L.push('相位 ' + C.aspects.map(a => `${BODY[a.a].n}${a.type.n}${BODY[a.b].n}(${a.orb.toFixed(1)}°)`).join(' '));
+  L.push('小行星与虚点相位 ' + XP.aspectGrid(C).list.filter(a => !(XP.PLANETS.includes(a.a) && XP.PLANETS.includes(a.b))).map(a => `${BODY[a.a].n}${a.type.n}${BODY[a.b].n}(${a.orb.toFixed(1)}°)`).join(' '));
   const D = XP.dispositors(C, view.disp), lp = l => l.map(x => BODY[x].n).join('→') + '→' + BODY[l[0]].n;
   L.push(`定位星（${D.mode === 'classic' ? '古典守护，七政' : '现代守护'}） ` + D.ids.map(id => D.nodes[id].self ? `${BODY[id].n}入庙` : `${BODY[id].n}→${BODY[D.nodes[id].disp].n}`).join(' ') +
     ' · ' + [D.type === 'one' ? '独一最终定位星' + BODY[D.final].n : D.finals.length ? '定位星' + D.finals.map(f => `${BODY[f].n}(名下${D.nodes[f].under})`).join('、') : '无最终定位星',

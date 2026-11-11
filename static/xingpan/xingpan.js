@@ -9,6 +9,9 @@
    法达按昼夜分序，主运之下七分子运（迦勒底序）；小限每年一宫。
    推运（文件后半）：行运相位与精确成相之日、太阳回归、留与逆行（含影子期）、月亮空亡、次限，
    都用同一套星历求根，不另带星历表。
+   凯龙与谷神、智神、婚神、灶神不走根数：同目录 minor.js 是从瑞士星历取样的日心坐标表（1899–2101），
+   这里八点插值再换到地心；没带那张表（或出了年限）时这五颗就不出。南交、莉莉丝（平均远地点）、
+   下降、天底、宿命点、东方点都由已有的量推出。
    定位星链（文件末）：现代守护十星或古典守护七政，找最终定位星、相互定位与循环定位。
 
    浏览器里挂 window.XP；node 里 require 即得同一对象。
@@ -30,6 +33,15 @@
     { id: 'saturn', n: '土星', g: '♄' }, { id: 'uranus', n: '天王星', g: '♅' }, { id: 'neptune', n: '海王星', g: '♆' },
     { id: 'pluto', n: '冥王星', g: '♇' }, { id: 'node', n: '北交点', g: '☊' }
   ];
+
+  // 十星与北交之外的点：小行星、虚点、四轴的另两头
+  var EXTRAS = [
+    { id: 'snode', n: '南交点', g: '☋' }, { id: 'lilith', n: '莉莉丝', g: '⚸' }, { id: 'chiron', n: '凯龙星', g: '⚷' },
+    { id: 'ceres', n: '谷神星', g: '⚳' }, { id: 'pallas', n: '智神星', g: '⚴' }, { id: 'juno', n: '婚神星', g: '⚵' }, { id: 'vesta', n: '灶神星', g: '⚶' },
+    { id: 'asc', n: '上升', g: 'AC', axis: 1 }, { id: 'dsc', n: '下降', g: 'DC', axis: 1 }, { id: 'mc', n: '中天', g: 'MC', axis: 1 }, { id: 'ic', n: '天底', g: 'IC', axis: 1 },
+    { id: 'vertex', n: '宿命点', g: 'Vx', axis: 1 }, { id: 'eastpoint', n: '东方点', g: 'EP', axis: 1 }
+  ];
+  var MINOR_IDS = ['chiron', 'ceres', 'pallas', 'juno', 'vesta'];
 
   // Schlyter 日数：2000 年 1 月 0.0 日（UT）起
   function dayNum(utcMs) { return utcMs / 86400000 + 2440587.5 - 2451543.5; }
@@ -116,6 +128,56 @@
     return { lon: n360(lon), lat: lat, r: r };
   }
 
+  /* —— 凯龙与四小行星：查表 —— */
+  var MINOR = null, MINOR_TRIED = false, A64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  function minorTable() {
+    if (MINOR) return MINOR;
+    var raw = root.XP_MINOR;
+    if (!raw && !MINOR_TRIED && typeof module !== 'undefined' && module.exports) { MINOR_TRIED = true; try { raw = require('./minor.js'); } catch (e) { raw = null; } }
+    if (!raw) return null;
+    var T = { unit: raw.unit, jd0: raw.jd0, b: {} };
+    Object.keys(raw.b).forEach(function (id) {
+      var b = raw.b[id], n = b.d[0].length / 3 + 1, xyz = [];
+      for (var c = 0; c < 3; c++) {
+        var a = new Float64Array(n), v = b.first[c], str = b.d[c]; a[0] = v * raw.unit;
+        for (var k = 1; k < n; k++) {
+          var o = (k - 1) * 3;
+          v += (A64.indexOf(str[o]) << 12 | A64.indexOf(str[o + 1]) << 6 | A64.indexOf(str[o + 2])) - 131072;
+          a[k] = v * raw.unit;
+        }
+        xyz.push(a);
+      }
+      T.b[id] = { step: b.step, k0: b.k0, n: n, xyz: xyz };
+    });
+    return (MINOR = T);
+  }
+  // 日心黄道直角坐标（当日平分点）；表外给 null
+  function minorHelio(id, jd) {
+    var T = minorTable(), b = T && T.b[id];
+    if (!b) return null;
+    var u = (jd - T.jd0) / b.step - b.k0, i0 = Math.floor(u) - 3;
+    if (i0 < 0 || i0 + 7 >= b.n) return null;
+    var x = u - i0, w = [], k, j, out = [0, 0, 0];
+    for (k = 0; k < 8; k++) { var L = 1; for (j = 0; j < 8; j++) if (j !== k) L *= (x - j) / (k - j); w.push(L); }
+    for (k = 0; k < 8; k++) { out[0] += w[k] * b.xyz[0][i0 + k]; out[1] += w[k] * b.xyz[1][i0 + k]; out[2] += w[k] * b.xyz[2][i0 + k]; }
+    return { x: out[0], y: out[1], z: out[2] };
+  }
+  // 地心黄经、黄纬（计一次光行时）
+  function minorGeo(id, utcMs, S) {
+    var jd = utcMs / 86400000 + 2440587.5, h = minorHelio(id, jd);
+    if (!h) return null;
+    S = S || sunPos(dayNum(utcMs));
+    var dist = Math.sqrt((h.x + S.x) * (h.x + S.x) + (h.y + S.y) * (h.y + S.y) + h.z * h.z);
+    h = minorHelio(id, jd - dist * 0.0057755183) || h;
+    var g = sph({ x: h.x + S.x, y: h.y + S.y, z: h.z });
+    return { lon: g.lon, lat: g.lat };
+  }
+  // 莉莉丝：月亮平均远地点投到黄道上
+  function lilithLon(d) {
+    var el = elements('moon', d), u = el.w + 180;
+    return n360(el.N + atan2(sin(u) * cos(el.i), cos(u)));
+  }
+
   // 某一刻全部天体的地心黄经（度）、黄纬
   function bodies(utcMs) {
     var d = dayNum(utcMs), S = sunPos(d), out = {};
@@ -143,6 +205,17 @@
     var asc = n360(atan2(cos(ramc), -(sin(ramc) * cos(eps) + Math.tan(lat * RAD) * sin(eps))));
     return { ramc: ramc, eps: eps, mc: mc, asc: asc };
   }
+  // 宿命点：卯酉圈（过东、西点与天顶的大圆）在西边与黄道的交点，等于拿余纬、对面的恒星时再求一次上升；
+  // 东方点：赤道上的上升（纬度取零）
+  function vertexOf(A, lat) {
+    var f = lat >= 0 ? 90 - lat : -90 - lat, r = A.ramc + 180;
+    if (Math.abs(f) > 89.9999) f = f > 0 ? 89.9999 : -89.9999;
+    var v = n360(atan2(cos(r), -(sin(r) * cos(A.eps) + Math.tan(f * RAD) * sin(A.eps))));
+    // 宿命点总在中天以西的半边；回归线以内会算到对面去，翻回来
+    if (n360(v - A.mc) < 180) v = n360(v + 180);
+    return v;
+  }
+  function eastPointOf(A) { return n360(atan2(cos(A.ramc), -sin(A.ramc) * cos(A.eps))); }
   // 赤经 → 黄道上的点（黄纬为零）
   function raToEcl(ra, eps) { return n360(atan2(sin(ra), cos(ra) * cos(eps))); }
 
@@ -219,6 +292,33 @@
     return out.sort(function (x, y) { return x.orb - y.orb; });
   }
 
+  // 相位表：十星、北交、凯龙、四小行星、莉莉丝与上升、中天、宿命点、东方点两两成相
+  // （下降、天底、南交与对面那一头的相位是同一回事，不重复列）。
+  // 容许度：十星之间照旧；凡有一头不是十星也不是上升、中天，收到 3°
+  var GRID_IDS = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto',
+    'node', 'chiron', 'ceres', 'pallas', 'juno', 'vesta', 'lilith', 'asc', 'mc', 'vertex', 'eastpoint'];
+  var GRID_MINOR_ORB = 3;
+  function gridPoint(C, id) { return C.bodies[id] || (C.extra && C.extra[id]) || null; }
+  function aspectGrid(C, ids) {
+    ids = (ids || GRID_IDS).filter(function (id) { return gridPoint(C, id); });
+    var full = function (id) { return PLANETS.indexOf(id) >= 0 || id === 'asc' || id === 'mc'; };
+    var lum = function (id) { return id === 'sun' || id === 'moon'; };
+    var list = [], cell = {};
+    for (var i = 0; i < ids.length; i++) for (var j = i + 1; j < ids.length; j++) {
+      var a = gridPoint(C, ids[i]), b = gridPoint(C, ids[j]), sep = Math.abs(wrap180(a.lon - b.lon));
+      for (var k = 0; k < ASPECTS.length; k++) {
+        var as = ASPECTS[k], orb = Math.abs(sep - as.a);
+        var lim = full(ids[i]) && full(ids[j]) ? as.orb + (lum(ids[i]) || lum(ids[j]) ? 2 : 0) : Math.min(as.orb, GRID_MINOR_ORB);
+        if (orb > lim) continue;
+        var sep2 = Math.abs(wrap180(a.lon + (a.speed || 0) / 24 - b.lon - (b.speed || 0) / 24));
+        var hit = { a: ids[i], b: ids[j], type: as, orb: orb, applying: Math.abs(sep2 - as.a) < orb };
+        list.push(hit); cell[ids[i] + '|' + ids[j]] = hit;
+        break;
+      }
+    }
+    return { ids: ids, list: list, cell: cell };
+  }
+
   // 法达：昼生 ☉♀☿☽♄♃♂☊☋；夜生 ☽♄♃♂☊☋☉♀☿（交点在火星后）或 ☽♄♃♂☉♀☿☊☋（波那提）
   var FIRDAR_YEARS = { sun: 10, venus: 8, mercury: 13, moon: 9, saturn: 11, jupiter: 12, mars: 7, node: 3, snode: 2 };
   var CHALDEAN = ['saturn', 'jupiter', 'mars', 'sun', 'venus', 'mercury', 'moon'];
@@ -268,8 +368,24 @@
     var fortune = n360(day ? A.asc + P.moon.lon - P.sun.lon : A.asc + P.sun.lon - P.moon.lon);
     var ids = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
     var asp = aspects(P, ids);
+    // 十星与北交之外的点
+    var X = {}, put = function (id, lon, more) {
+      if (!isFinite(lon)) return;
+      X[id] = { lon: n360(lon), sign: Math.floor(n360(lon) / 30), house: houseOf(n360(lon), cusps) };
+      if (more) Object.keys(more).forEach(function (k) { X[id][k] = more[k]; });
+    };
+    put('snode', P.node.lon + 180, { speed: P.node.speed, retro: false });
+    put('lilith', lonOf('lilith', utc), { speed: speedOf('lilith', utc), retro: false });
+    MINOR_IDS.forEach(function (id) {
+      var g = minorGeo(id, utc);
+      if (!g) return;
+      var sp = speedOf(id, utc);
+      put(id, g.lon, { lat: g.lat, speed: sp, retro: sp < 0 });
+    });
+    put('asc', A.asc); put('dsc', A.asc + 180); put('mc', A.mc); put('ic', A.mc + 180);
+    put('vertex', vertexOf(A, inp.lat)); put('eastpoint', eastPointOf(A));
     return {
-      input: inp, utc: utc, bodies: P, angles: A, cusps: cusps, house: sys, day: day, sunAlt: alt, fortune: fortune,
+      input: inp, utc: utc, bodies: P, extra: X, angles: A, cusps: cusps, house: sys, day: day, sunAlt: alt, fortune: fortune,
       aspects: asp, firdaria: firdaria(day, utc, inp.bonatti),
       placidusFallback: sys === 'placidus' && Math.abs(inp.lat) > 66
     };
@@ -303,6 +419,9 @@
     if (id === 'sun') return S.lon;
     if (id === 'moon') return moonPos(d, S).lon;
     if (id === 'node') return n360(elements('moon', d).N);
+    if (id === 'snode') return n360(elements('moon', d).N + 180);
+    if (id === 'lilith') return lilithLon(d);
+    if (MINOR_IDS.indexOf(id) >= 0) { var mg = minorGeo(id, utcMs, S); return mg ? mg.lon : NaN; }
     var h = id === 'pluto' ? plutoHelio(d) : planetHelio(id, d), p = rect(h.lon, h.lat, h.r);
     return sph({ x: p.x + S.x, y: p.y + S.y, z: p.z }).lon;
   }
@@ -575,7 +694,8 @@
   }
 
   var api = {
-    SIGNS: SIGNS, SIGN_GLYPH: SIGN_GLYPH, ELEM: ELEM, BODIES: BODIES, RULER: RULER, ASPECTS: ASPECTS, CHALDEAN: CHALDEAN,
+    SIGNS: SIGNS, SIGN_GLYPH: SIGN_GLYPH, ELEM: ELEM, BODIES: BODIES, EXTRAS: EXTRAS, MINOR_IDS: MINOR_IDS, GRID_IDS: GRID_IDS,
+    minorGeo: minorGeo, lilithLon: lilithLon, vertexOf: vertexOf, eastPointOf: eastPointOf, aspectGrid: aspectGrid, RULER: RULER, ASPECTS: ASPECTS, CHALDEAN: CHALDEAN,
     dayNum: dayNum, bodies: bodies, sunPos: sunPos, gmst: gmst, angles: angles, houses: houses, houseOf: houseOf,
     dignity: dignity, aspects: aspects, firdaria: firdaria, profection: profection, chart: chart, fmtDeg: fmtDeg, mod: mod,
     // 推运

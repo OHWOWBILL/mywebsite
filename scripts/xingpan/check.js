@@ -241,5 +241,26 @@ for (let k = 0; k < 100; k++) {
 }
 eq(sound, true, '定位星链结构自检（一百张盘 × 两种口径）');
 
+// —— 小行星与虚点：对照瑞士星历（Swiss Ephemeris 2.10，seas_18 星历文件）算出的视黄经 ——
+// 每行：UTC、纬度、经度、凯龙、谷神、智神、婚神、灶神、莉莉丝（平均远地点）、宿命点、东方点
+const SE_REF = [["1900-03-01T00:00Z",39.9,116.4,264.055,293.759,282.933,316.887,35.229,160.942,183.403,5.166],["1945-08-15T03:00Z",35.68,139.69,182.622,216.388,193.656,154.709,211.133,210.693,94.451,240.03],["1988-06-21T12:30Z",25.03,121.56,90.011,358.285,319.317,79.754,140.575,154.29,151.457,306.592],["2000-01-01T12:00Z",51.5,-0.1,251.618,184.453,134.043,277.996,245.972,263.464,188.39,11.266],["2026-11-11T05:00Z",-33.87,151.21,27.621,113.535,4.862,304.714,13.814,276.417,199.743,7.157],["2077-02-10T20:15Z",1.35,103.82,25.927,42.512,345.982,221.318,330.462,161.051,176.68,278.382],["2099-12-31T23:00Z",40.7,-74,241.855,34.654,330.451,265.252,61.048,12.219,254.247,100.757]];
+SE_REF.forEach(r => {
+  const Cx = XP.chartAt(Date.parse(r[0]), { lat: r[1], lon: r[2], house: 'placidus' }), X = Cx.extra;
+  ['chiron', 'ceres', 'pallas', 'juno', 'vesta', 'lilith'].forEach((id, k) => near(X[id].lon, r[3 + k], 0.03, r[0].slice(0, 10) + ' ' + id));
+  near(X.vertex.lon, r[9], 0.06, r[0].slice(0, 10) + ' 宿命点'); near(X.eastpoint.lon, r[10], 0.03, r[0].slice(0, 10) + ' 东方点');
+  near(X.dsc.lon, Cx.angles.asc + 180, 1e-9, '下降对上升'); near(X.ic.lon, Cx.angles.mc + 180, 1e-9, '天底对中天'); near(X.snode.lon, Cx.bodies.node.lon + 180, 1e-9, '南交对北交');
+});
+// 表外（1899 年前、2101 年后）五颗小行星不出，其余照常
+eq(Object.keys(XP.chartAt(Date.UTC(1850, 0, 1), { lat: 30, lon: 100 }).extra).join(), 'snode,lilith,asc,dsc,mc,ic,vertex,eastpoint', '表外不出小行星');
+// 相位表：每格的容许度不出界，十星之间与本命相位一致
+{
+  const Cg = XP.chartAt(Date.parse('1988-06-21T12:30Z'), { lat: 25.03, lon: 121.56 }), g = XP.aspectGrid(Cg);
+  eq(g.ids.length, 21, '相位表二十一点');
+  const ten = g.list.filter(h => XP.PLANETS.includes(h.a) && XP.PLANETS.includes(h.b)).map(h => h.a + h.type.n + h.b).sort();
+  eq(ten, Cg.aspects.map(h => h.a + h.type.n + h.b).sort(), '相位表十星部分 = 本命相位');
+  eq(g.list.every(h => { const a = Cg.bodies[h.a] || Cg.extra[h.a], b = Cg.bodies[h.b] || Cg.extra[h.b]; return Math.abs(Math.abs(XP.mod(a.lon - b.lon + 180, 360) - 180) - h.type.a - 0) <= h.type.orb + 2 + 1e-9 && Math.abs(Math.abs(Math.abs(XP.mod(a.lon - b.lon + 180, 360) - 180) - h.type.a) - h.orb) < 1e-9; }), true, '相位表各格容许度');
+  eq(g.list.filter(h => !(XP.PLANETS.concat(['asc', 'mc']).includes(h.a) && XP.PLANETS.concat(['asc', 'mc']).includes(h.b))).every(h => h.orb <= 3), true, '小行星与虚点容许度收到三度');
+}
+
 console.log(bad ? `\n${bad} 项不合，${ok} 项相合` : `全部相合（${ok} 项）`);
 process.exit(bad ? 1 : 0);
