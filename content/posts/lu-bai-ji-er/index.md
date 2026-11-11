@@ -2,7 +2,9 @@
 title: "鲁拜集（二）"
 date: 2024-07-20
 description: "从鲁拜集学波斯语 · 原文第116，英译第42首"
-categories: ["语言", "诗词", "波斯语", "词根词缀", "语法", "佛教"]
+categories: ["语言", "诗词"]
+series: "鲁拜集"
+series_order: 2
 ---
 
 # 从鲁拜集学波斯语

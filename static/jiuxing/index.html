@@ -17,9 +17,9 @@
   <meta name="twitter:card" content="summary_large_image" />
   <!-- seo:end -->
   <link rel="icon" href="/favicon-32x32.png" />
-  <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     [data-wx="木"] { --wc: var(--wx-mu); } [data-wx="火"] { --wc: var(--wx-huo); } [data-wx="土"] { --wc: var(--wx-tu); }
     [data-wx="金"] { --wc: var(--wx-jin); } [data-wx="水"] { --wc: var(--wx-shui); }
@@ -50,12 +50,12 @@
     .jx-natal .st { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
     .jx-natal .st small { font-size: 12px; color: var(--muted); letter-spacing: .15em; }
     .jx-natal .st b { font-size: 18px; font-weight: 600; color: var(--fg); letter-spacing: .12em; }
-    .jx-natal .st b::after { content: attr(data-wx); font-size: 11px; font-weight: 400; letter-spacing: 0; margin-left: 5px; padding: 0 5px; border-radius: 3px; vertical-align: 2px; color: var(--wc); background: color-mix(in oklab, var(--wc) 16%, transparent); }
+    .jx-natal .st b::after { content: attr(data-wx); font-size: 12px; font-weight: 400; letter-spacing: 0; margin-left: 5px; padding: 0 5px; border-radius: 3px; vertical-align: 2px; color: var(--wc); background: color-mix(in oklab, var(--wc) 16%, transparent); }
     .jx-natal .edge { flex-basis: 100%; font-family: var(--font-body); font-size: 12.5px; color: var(--jin); letter-spacing: .03em; }
 
     .jx-sum { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 18px; align-items: baseline; padding-top: 12px; border-top: 1px solid var(--rule); }
     .jx-sum .lab { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; color: var(--fg); white-space: nowrap; line-height: 1.5; }
-    .jx-sum .lab small { display: block; font-weight: 400; font-size: 11.5px; letter-spacing: .04em; color: var(--muted); }
+    .jx-sum .lab small { display: block; font-weight: 400; font-size: 12px; letter-spacing: .04em; color: var(--muted); }
     .jx-sum .txt { font-family: var(--font-title); font-size: 15.5px; line-height: 1.85; color: var(--fg-2); letter-spacing: .03em; }
     .jx-sum b { font-weight: 600; white-space: nowrap; }
     .jx-sum b.ji { color: var(--lv); } .jx-sum b.best { color: var(--jin); } .jx-sum b.xiong { color: var(--zhu); } .jx-sum b.none { color: var(--muted); font-weight: 400; }
@@ -84,17 +84,17 @@
     }
     .jx-cell:hover { border-color: var(--rule-2); }
     .jx-cell .dir { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; font-family: var(--font-title); font-size: 13px; letter-spacing: .12em; color: var(--fg-2); }
-    .jx-cell .dir small { font-size: 11px; color: var(--faint); letter-spacing: 0; }
+    .jx-cell .dir small { font-size: 12px; color: var(--faint); letter-spacing: 0; }
     .jx-cell .star { margin-top: auto; text-align: center; font-family: var(--font-title); font-weight: 600; font-size: 22px; letter-spacing: .1em; color: var(--fg); line-height: 1.2; white-space: nowrap; }
-    .jx-cell .star i { font-style: normal; font-weight: 400; font-size: 11px; letter-spacing: 0; color: var(--wc); margin-left: 2px; vertical-align: 3px; }
+    .jx-cell .star i { font-style: normal; font-weight: 400; font-size: 12px; letter-spacing: 0; color: var(--wc); margin-left: 2px; vertical-align: 3px; }
     .jx-cell .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; min-height: 18px; margin-top: auto; }
-    .jx-cell .tags span { font-family: var(--font-title); font-size: 11px; line-height: 18px; padding: 0 6px; border-radius: 3px; white-space: nowrap; color: var(--tc); background: color-mix(in oklab, var(--tc) 16%, transparent); }
+    .jx-cell .tags span { font-family: var(--font-title); font-size: 12px; line-height: 18px; padding: 0 6px; border-radius: 3px; white-space: nowrap; color: var(--tc); background: color-mix(in oklab, var(--tc) 16%, transparent); }
     .jx-cell.ji { --tc: var(--lv); background: color-mix(in oklab, var(--lv) 17%, var(--bg-2)); border-color: color-mix(in oklab, var(--lv) 75%, var(--rule)); }
     .jx-cell.best { --tc: var(--jin); background: color-mix(in oklab, var(--jin) 15%, var(--bg-2)); border-color: var(--jin); }
     .jx-cell.xiong { --tc: var(--zhu); background: color-mix(in oklab, var(--zhu) 10%, var(--bg-2)); border-color: color-mix(in oklab, var(--zhu) 45%, var(--rule)); }
     .jx-cell.center { --tc: var(--zi-2); background: var(--bg); border-style: dashed; }
     .jx-cell.sel { box-shadow: 0 0 0 2px var(--fg-2); }
-    .jx-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 10px; font-size: 11.5px; color: var(--faint); }
+    .jx-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 10px; font-size: 12px; color: var(--faint); }
     .jx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 1px solid var(--tc); background: color-mix(in oklab, var(--tc) 28%, transparent); }
     .jx-legend .ji { --tc: var(--lv); } .jx-legend .best { --tc: var(--jin); } .jx-legend .xiong { --tc: var(--zhu); }
     .jx-detail { margin-top: 10px; padding: 10px 12px; border-radius: var(--r); background: var(--bg-3); font-size: 13px; line-height: 1.8; color: var(--fg-2); }
@@ -137,8 +137,8 @@
     .jx-allgrid > div { background: var(--bg-2); padding: 12px 16px 14px; }
     .jx-allgrid > div.me { background: color-mix(in oklab, var(--zi) 12%, var(--bg-2)); }
     .jx-allgrid h4 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .12em; color: var(--fg); display: flex; align-items: baseline; gap: 8px; }
-    .jx-allgrid h4 i { font-style: normal; font-weight: 400; font-size: 11px; padding: 0 5px; border-radius: 3px; color: var(--wc); background: color-mix(in oklab, var(--wc) 16%, transparent); letter-spacing: 0; }
-    .jx-allgrid h4 em { font-style: normal; font-weight: 400; font-size: 11.5px; color: var(--zi-2); letter-spacing: .1em; }
+    .jx-allgrid h4 i { font-style: normal; font-weight: 400; font-size: 12px; padding: 0 5px; border-radius: 3px; color: var(--wc); background: color-mix(in oklab, var(--wc) 16%, transparent); letter-spacing: 0; }
+    .jx-allgrid h4 em { font-style: normal; font-weight: 400; font-size: 12px; color: var(--zi-2); letter-spacing: .1em; }
     .jx-allgrid .yrs { font-size: 12px; color: var(--muted); letter-spacing: .04em; margin-top: 2px; }
     .jx-allgrid p { font-size: 13px; line-height: 1.75; color: var(--fg-2); margin-top: 4px; }
 
@@ -159,7 +159,7 @@
       .jx-cell { min-height: 92px; padding: 6px 5px 7px; }
       .jx-cell .dir { font-size: 12px; letter-spacing: .04em; }
       .jx-cell .star { font-size: 19px; letter-spacing: .06em; }
-      .jx-cell .tags span { font-size: 10.5px; line-height: 17px; padding: 0 4px; }
+      .jx-cell .tags span { font-size: 11px; line-height: 17px; padding: 0 4px; }
       .jx-sum { grid-template-columns: minmax(0, 1fr); gap: 0; }
       .jx-sum .lab { display: flex; align-items: baseline; gap: 8px; }
       .jx-sum .lab small { display: inline; }
@@ -232,7 +232,7 @@
 <script src="/fabao/tongshu.js?v=2"></script>
 <script src="/kanyu/kanyu.js?v=1"></script>
 <script src="/jiuxing/jiuxing.js?v=1"></script>
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script>
 (function () {
 'use strict';

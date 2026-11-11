@@ -17,9 +17,9 @@
   <meta name="twitter:card" content="summary_large_image" />
   <!-- seo:end -->
   <link rel="icon" href="/favicon-32x32.png" />
-  <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     .wx-0 { --wc: var(--wx-mu); } .wx-1 { --wc: var(--wx-huo); } .wx-2 { --wc: var(--wx-tu); } .wx-3 { --wc: var(--wx-jin); } .wx-4 { --wc: var(--wx-shui); }
     .ly-form { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -44,7 +44,7 @@
       color: #4A3410;
     }
     .ly-coin .f::after, .ly-coin .b::after { content: ""; position: absolute; width: 11px; height: 11px; background: var(--bg-2); box-shadow: inset 0 0 0 1.5px rgba(74, 52, 16, .6); }
-    .ly-coin .f span { position: absolute; font-size: 11px; }
+    .ly-coin .f span { position: absolute; font-size: 12px; }
     .ly-coin .f .t { top: 5px; } .ly-coin .f .bt { bottom: 5px; } .ly-coin .f .l { left: 7px; } .ly-coin .f .r { right: 7px; }
     .ly-coin .b { transform: rotateY(180deg); }
     .ly-coin .b::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; border: 1px dashed rgba(74, 52, 16, .45); }
@@ -58,7 +58,7 @@
     #shakeBtn.on::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--zi-2); animation: lyBreath 1.4s ease-in-out infinite; }
     @keyframes lyBreath { 50% { opacity: .25; transform: scale(.7); } }
     .ly-stack { display: flex; flex-direction: column-reverse; gap: 4px; min-width: 120px; }
-    .ly-stack div { display: grid; grid-template-columns: 2.6em 64px 1.4em; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); font-family: var(--font-title); }
+    .ly-stack div { display: grid; grid-template-columns: 2.6em 64px 1.4em; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); font-family: var(--font-title); }
     .ly-stack svg { width: 64px; height: 8px; }
     .ly-stack rect { fill: var(--fg-2); }
     .ly-stack .mv { color: var(--zhu); }
@@ -80,7 +80,7 @@
     .ly-heads h2 .jin { color: var(--jin); }
     .ly-heads p { font-size: 12.5px; color: var(--muted); letter-spacing: .06em; }
     .ly-heads .bn { text-align: left; }
-    .ly-tag { display: inline-block; font-family: var(--font-title); font-size: 11.5px; font-weight: 600; padding: 0 7px; margin-left: 6px; border-radius: 4px; line-height: 19px; vertical-align: 3px; letter-spacing: .08em; }
+    .ly-tag { display: inline-block; font-family: var(--font-title); font-size: 12px; font-weight: 600; padding: 0 7px; margin-left: 6px; border-radius: 4px; line-height: 19px; vertical-align: 3px; letter-spacing: .08em; }
     .ly-tag.chong { background: rgba(224, 122, 98, .14); color: var(--zhu); }
     .ly-tag.he { background: rgba(141, 191, 151, .14); color: var(--lv); }
     .ly-tag.bian { background: var(--bg-3); color: var(--fg-2); }
@@ -90,7 +90,7 @@
     .ly-xlr i { font-style: normal; color: var(--faint); }
     .ly-song { font-size: 13px; line-height: 1.9; color: var(--fg-2); }
     table.ly-t { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 640px; }
-    .ly-t th { font-family: var(--font-title); font-weight: 400; font-size: 11.5px; color: var(--faint); letter-spacing: .15em; padding: 0 4px 6px; text-align: center; }
+    .ly-t th { font-family: var(--font-title); font-weight: 400; font-size: 12px; color: var(--faint); letter-spacing: .15em; padding: 0 4px 6px; text-align: center; }
     .ly-t td { padding: 7px 4px; text-align: center; border-top: 1px dashed var(--rule); vertical-align: middle; }
     .ly-t tbody tr:first-child td { border-top: none; }
     .ly-t tr.yong td { background: rgba(217, 174, 78, .09); }
@@ -100,10 +100,10 @@
     .ly-t tr.chou td:first-child { box-shadow: inset 3px 0 0 #D9A06B; }
     .ly-shen { font-family: var(--font-title); font-size: 13px; color: var(--fg-2); letter-spacing: .08em; white-space: nowrap; }
     .ly-fu { font-size: 12px; color: var(--muted); font-family: var(--font-title); white-space: nowrap; line-height: 1.35; }
-    .ly-fu small { display: block; font-size: 10.5px; color: var(--faint); }
+    .ly-fu small { display: block; font-size: 12px; color: var(--faint); }
     .ly-qz { font-family: var(--font-title); white-space: nowrap; font-size: 14px; letter-spacing: .06em; color: var(--fg-2); }
     .ly-qz b { font-weight: 600; color: var(--wc); }
-    .ly-qz em { font-style: normal; font-size: 11px; color: var(--faint); margin-left: 2px; }
+    .ly-qz em { font-style: normal; font-size: 12px; color: var(--faint); margin-left: 2px; }
     .ly-yao svg { width: 86px; height: 12px; display: block; margin: 0 auto; }
     .ly-yao rect { fill: var(--fg-2); }
     .ly-yao.mv rect { fill: var(--zhu); }
@@ -113,13 +113,13 @@
     .ly-sy.ying { color: var(--qing); }
     .ly-mv { font-family: var(--font-title); color: var(--zhu); font-size: 14px; width: 1.4em; }
     .ly-marks { display: flex; flex-wrap: wrap; gap: 3px; justify-content: flex-start; text-align: left; }
-    .ly-marks span { font-size: 10.5px; padding: 0 5px; border-radius: 3px; font-family: var(--font-title); white-space: nowrap; background: var(--bg-3); color: var(--muted); line-height: 17px; }
+    .ly-marks span { font-size: 12px; padding: 0 5px; border-radius: 3px; font-family: var(--font-title); white-space: nowrap; background: var(--bg-3); color: var(--muted); line-height: 17px; }
     .ly-marks .ws-旺, .ly-marks .ws-相 { color: var(--lv); }
     .ly-marks .ws-休, .ly-marks .ws-囚, .ly-marks .ws-死 { color: var(--faint); }
     .ly-marks .bad { color: var(--zhu); background: rgba(224, 122, 98, .1); }
     .ly-marks .good { color: var(--lv); background: rgba(141, 191, 151, .1); }
     .ly-marks .hl { color: var(--jin); background: rgba(217, 174, 78, .1); }
-    .ly-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--faint); padding: 10px 6px 0; }
+    .ly-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--faint); padding: 10px 6px 0; }
     .ly-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 
     .ly-card { padding: 16px 18px; }
@@ -251,7 +251,7 @@
 <script src="/bazi/bazi.js?v=3"></script>
 <script src="/liuyao/liuyao.js?v=1"></script>
 <script src="/meihua/data/yao.js"></script>
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script>
 (function () {
 'use strict';
@@ -428,7 +428,7 @@ function renderBoard() {
     return `<tr class="${role}">
       <td><span class="ly-shen">${y.shen || ''}</span></td>
       <td><span class="ly-fu">${fus.map(f => `<span class="wx-${f.wx}" ${fuRole === 'yong' ? 'style="color:var(--jin)"' : ''}>${f.qin}${GAN[f.gan]}${ZHI[f.zhi]}${WX[f.wx]}</span><small>${f.rel || ''}${f.kong ? ' · 空' : ''}</small>`).join('')}</span></td>
-      <td><span class="ly-qz wx-${y.wx}">${y.qin}<b>${GAN[y.gan]}${ZHI[y.zhi]}</b><em>${WX[y.wx]}</em></span>${G.guaShen.at.includes(i + 1) ? '<em style="font-style:normal;font-size:10.5px;color:var(--jin);margin-left:3px">身</em>' : ''}</td>
+      <td><span class="ly-qz wx-${y.wx}">${y.qin}<b>${GAN[y.gan]}${ZHI[y.zhi]}</b><em>${WX[y.wx]}</em></span>${G.guaShen.at.includes(i + 1) ? '<em style="font-style:normal;font-size:12px;color:var(--jin);margin-left:3px">身</em>' : ''}</td>
       <td><span class="ly-yao${mv ? ' mv' : ''}">${yaoSVG(y.yang)}</span></td>
       <td><span class="ly-sy ${isShi ? 'shi' : isYing ? 'ying' : ''}">${isShi ? '世' : isYing ? '应' : ''}</span></td>
       <td><span class="ly-mv">${mv ? (nums[i] === 9 ? '○' : '✕') : ''}</span></td>

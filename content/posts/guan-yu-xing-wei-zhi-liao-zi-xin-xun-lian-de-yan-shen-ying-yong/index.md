@@ -2,7 +2,7 @@
 title: "关于行为治疗：自信训练的延伸应用"
 date: 2024-09-29
 description: "我心即天心 —— 把自信训练疗法对上道法与自体心理学"
-categories: ["随笔", "模型"]
+categories: ["人性"]
 ---
 
 {{< message name="茴香豆" date="2024-9-29" >}}对行为治疗的自信训练疗法有兴趣吗？{{< /message >}}

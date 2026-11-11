@@ -17,9 +17,9 @@
   <meta name="twitter:card" content="summary_large_image" />
   <!-- seo:end -->
   <link rel="icon" href="/favicon-32x32.png" />
-  <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     /* 判定程度：否 → 倾向是 / 基本是 → 是，一种紫由暗到亮（深底上已核过：单色相、亮度单调、最暗一级对卡片底 2.4:1） */
     :root { --lv0: #5E527A; --lv1: #8467C9; --lv2: #B7A3EE; }
@@ -72,10 +72,10 @@
       transition: border-color .15s, background .15s, color .15s;
     }
     .tz-opt b { font-family: var(--font-title); font-weight: 600; font-size: 17px; letter-spacing: .14em; }
-    .tz-opt small { font-size: 11.5px; color: var(--muted); letter-spacing: .06em; }
+    .tz-opt small { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
     .tz-opt .lv { width: 34px; height: 3px; border-radius: 2px; background: var(--rule-2); margin-top: 4px; overflow: hidden; }
     .tz-opt .lv::after { content: ""; display: block; height: 100%; width: calc(var(--n) * 20%); background: var(--zi-2); border-radius: 2px; }
-    .tz-opt kbd { position: absolute; top: 5px; right: 7px; font-family: var(--font-mark); font-size: 9.5px; color: var(--faint); }
+    .tz-opt kbd { position: absolute; top: 5px; right: 7px; font-family: var(--font-mark); font-size: 12px; color: var(--faint); }
     .tz-opt:active { background: color-mix(in oklab, var(--zi) 35%, var(--bg-3)); }
     .tz-opt.on { background: var(--zi); border-color: var(--zi); color: #fff; }
     .tz-opt.on small, .tz-opt.on kbd { color: rgba(255, 255, 255, .78); }
@@ -133,7 +133,7 @@
     .tz-axis, .tz-row { display: grid; grid-template-columns: 3em minmax(0, 1fr) 7.6em; align-items: center; column-gap: 10px; }
     .tz-axis { height: 16px; margin-bottom: 2px; }
     .tz-axis .trk { position: relative; height: 100%; }
-    .tz-axis .trk > span { position: absolute; top: 0; transform: translateX(-50%); font-family: var(--font-mark); font-size: 10px; color: var(--faint); font-variant-numeric: tabular-nums; }
+    .tz-axis .trk > span { position: absolute; top: 0; transform: translateX(-50%); font-family: var(--font-mark); font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
     .tz-axis .trk > span:first-child { transform: none; }
     .tz-axis .trk > span:last-child { transform: translateX(-100%); }
     .tz-row { width: 100%; padding: 4px 0; border-radius: var(--r-sm); text-align: left; transition: background .15s; }
@@ -152,8 +152,8 @@
     .tz-row .val b { font-family: var(--font-mark); font-weight: 800; font-size: 14px; color: var(--fg); min-width: 1.6em; text-align: right; font-variant-numeric: tabular-nums; }
     .tz-row .val small { font-family: var(--font-title); font-size: 12px; color: var(--fg-2); letter-spacing: .04em; }
     .tz-row[data-lv="0"] .val small { color: var(--faint); }
-    .tz-row .val em { font-style: normal; font-family: var(--font-mark); font-size: 10.5px; color: var(--muted); }
-    .tz-split { margin: 6px 0 4px; padding: 6px 4px 0; border-top: 1px solid var(--rule); font-family: var(--font-title); font-size: 11px; color: var(--faint); letter-spacing: .25em; }
+    .tz-row .val em { font-style: normal; font-family: var(--font-mark); font-size: 12px; color: var(--muted); }
+    .tz-split { margin: 6px 0 4px; padding: 6px 4px 0; border-top: 1px solid var(--rule); font-family: var(--font-title); font-size: 12px; color: var(--faint); letter-spacing: .25em; }
     .tz-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; font-size: 12px; color: var(--muted); }
     .tz-legend span { display: inline-flex; align-items: center; gap: 5px; }
     .tz-legend i { display: inline-block; width: 14px; height: 8px; border-radius: 0 2px 2px 0; }
@@ -163,10 +163,10 @@
     /* —— 历次 —— */
     .tz-trend { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 3px; margin: -3px -3px 6px; width: calc(100% + 6px); }
     .tz-trend th { font-weight: 400; }
-    .tz-trend thead th button { width: 100%; padding: 2px 0; border-radius: 4px; font-family: var(--font-mark); font-size: 10.5px; color: var(--muted); letter-spacing: 0; }
+    .tz-trend thead th button { width: 100%; padding: 2px 0; border-radius: 4px; font-family: var(--font-mark); font-size: 12px; color: var(--muted); letter-spacing: 0; }
     .tz-trend thead th button:hover { color: var(--fg); background: var(--bg-3); }
     .tz-trend thead th.cur button { color: var(--fg); font-weight: 800; }
-    .tz-trend thead th button small { display: block; font-size: 9.5px; font-weight: 500; color: var(--faint); line-height: 1.3; }
+    .tz-trend thead th button small { display: block; font-size: 12px; font-weight: 500; color: var(--faint); line-height: 1.3; }
     .tz-trend th[scope=row] { width: 2.8em; text-align: left; font-family: var(--font-title); font-size: 12.5px; color: var(--fg-2); letter-spacing: .06em; white-space: nowrap; }
     .tz-trend thead th:first-child { width: 2.8em; }
     .tz-trend td { padding: 3px 0; border-radius: 4px; text-align: center; font-family: var(--font-mark); font-size: 12px; color: var(--muted); background: var(--bg-3); font-variant-numeric: tabular-nums; }
@@ -177,7 +177,7 @@
     .tz-hlist li { display: flex; align-items: stretch; border-radius: var(--r-sm); background: var(--bg-3); }
     .tz-hlist li.on { box-shadow: inset 0 0 0 1px var(--zi-2); }
     .tz-hlist .go { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 10px; padding: 7px 4px 7px 10px; text-align: left; }
-    .tz-hlist .d { font-family: var(--font-mark); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+    .tz-hlist .d { font-family: var(--font-mark); font-size: 12px; color: var(--muted); white-space: nowrap; }
     .tz-hlist .h { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-title); font-size: 13.5px; color: var(--fg-2); }
     .tz-hlist .go:hover .h { color: var(--fg); }
     .tz-hlist .x { padding: 0 12px; color: var(--faint); font-size: 16px; }
@@ -216,7 +216,7 @@
     details.tz-type > summary h3 { font-size: 17px; }
     details.tz-type > summary .gist { font-size: 13.5px; color: var(--fg-2); margin-top: 4px; }
     details.tz-type > .body { padding: 0 20px 18px; }
-    .tz-role { font-family: var(--font-title); font-weight: 400; font-size: 11.5px; letter-spacing: .15em; padding: 1px 9px; border-radius: var(--r-xs); background: rgba(122, 91, 192, .22); color: var(--zi-2); white-space: nowrap; }
+    .tz-role { font-family: var(--font-title); font-weight: 400; font-size: 12px; letter-spacing: .15em; padding: 1px 9px; border-radius: var(--r-xs); background: rgba(122, 91, 192, .22); color: var(--zi-2); white-space: nowrap; }
     .tz-warn { padding: 10px 14px; border-radius: var(--r-sm); background: color-mix(in oklab, var(--zhu) 10%, var(--bg-3)); color: var(--fg-2); font-size: 13px; line-height: 1.8; }
     .tz-cards > .tz-warn { grid-column: 1 / -1; }
 
@@ -318,7 +318,7 @@
 
 <script src="/yunqi/yunqi.js?v=1"></script>
 <script src="/tizhi/tizhi.js?v=1"></script>
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script>
 (function () {
 'use strict';

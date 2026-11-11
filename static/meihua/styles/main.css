@@ -52,7 +52,7 @@
 /* —— 上下卦选择器 —— */
 .tri-pickers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .tri-picker { position: relative; }
-.tri-picker-label { display: block; text-align: center; margin-bottom: 5px; font-family: var(--font-title); font-size: 11px; letter-spacing: .3em; color: var(--faint); }
+.tri-picker-label { display: block; text-align: center; margin-bottom: 5px; font-family: var(--font-title); font-size: 12px; letter-spacing: .3em; color: var(--faint); }
 .tri-button {
   width: 100%; padding: 8px 12px;
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
@@ -90,7 +90,7 @@
 .tri-option .g .line.broken::after { right: 0; }
 .tri-option .nm { display: flex; flex-direction: column; line-height: 1.2; }
 .tri-option .nm .ch { font-size: 14px; font-weight: 600; color: var(--fg); }
-.tri-option .nm .sub { font-size: 10px; color: var(--faint); letter-spacing: .1em; }
+.tri-option .nm .sub { font-size: 12px; color: var(--faint); letter-spacing: .1em; }
 
 /* —— 爻线 —— */
 .yao-viz {
@@ -145,7 +145,7 @@
 .gua-meaning .tag, .yao-sub {
   display: inline-block; margin-right: 8px; padding: 0 6px;
   border: 1px solid color-mix(in oklab, var(--c) 50%, transparent); border-radius: 3px;
-  font-family: var(--font-title); font-size: 11px; letter-spacing: .15em; color: var(--c); vertical-align: 1px;
+  font-family: var(--font-title); font-size: 12px; letter-spacing: .15em; color: var(--c); vertical-align: 1px;
 }
 .gua-extra { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--rule-2); color: var(--fg-2); }
 .gua-extra-note { font-size: 12px; color: var(--faint); margin-top: 2px; }
@@ -155,7 +155,7 @@
 }
 .dong-tag {
   margin-left: 10px; padding: 1px 7px; border-radius: 999px; vertical-align: 2px;
-  background: var(--zhu); color: #fff; font-size: 11px; letter-spacing: .1em; font-weight: 400;
+  background: var(--zhu); color: #fff; font-size: 12px; letter-spacing: .1em; font-weight: 400;
 }
 .yao-yuanwen { font-family: var(--font-title); font-size: 17px; letter-spacing: .1em; line-height: 1.9; color: var(--fg); margin-bottom: 12px; }
 .yao-sub { margin-bottom: 6px; border-color: var(--rule-2); color: var(--muted); }

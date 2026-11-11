@@ -2,7 +2,10 @@
 title: "必背（二）——十总穴+天星十二穴"
 date: 2024-08-20
 description: "十總穴與天星十二穴，針灸取穴必背"
-categories: ["医", "必背", "基础"]
+categories: ["医"]
+series: "必背"
+series_order: 2
+fabao: ["/ziwu/"]
 ---
 
 讲点针灸用的，首先是十总穴。

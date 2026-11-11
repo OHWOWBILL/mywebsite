@@ -40,8 +40,8 @@ showEdit: false
 
 ### 初来者，先读这两篇
 
-- [【置顶】志追随者](/posts/zhi-zhui-sui-zhe/)
-- [【置顶】情绪本源论](/posts/qing-xu-ben-yuan-lun/)
+- [志追随者](/posts/zhi-zhui-sui-zhe/)
+- [情绪本源论](/posts/qing-xu-ben-yuan-lun/)
 
 ### 求问 · 办事
 

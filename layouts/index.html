@@ -8,6 +8,17 @@
 {{- $posts := where site.RegularPages "Section" "posts" -}}
 {{- $hero := (resources.Get "img/ge-hero.jpg").Process "webp q70" -}}
 
+{{- /* 法宝页的「延伸阅读」：把各篇 front matter 里的 fabao 反过来，写成 /fabao/wen.json
+       （{"/ziwu/": [{"t": 标题, "href": 网址}]}），static/fabao/fabao.js 读它。首页每次构建都渲染，就搭在这里发。 */ -}}
+{{- $wen := dict -}}
+{{- range $p := sort $posts "Date" "asc" -}}
+  {{- range $h := $p.Params.fabao -}}
+    {{- $wen = merge $wen (dict $h ((index $wen $h | default slice) | append (dict "t" $p.Title "href" $p.RelPermalink))) -}}
+  {{- end -}}
+{{- end -}}
+{{- $wenFile := $wen | jsonify | resources.FromString "fabao/wen.json" -}}
+{{- $wenFile.Publish -}}
+
 {{- /* 开阁动效只在本次会话第一次进首页时放；再回来直接静态呈现 */}}
 <script>try{if(sessionStorage.getItem('qj-opened'))document.documentElement.classList.add('qj-opened');sessionStorage.setItem('qj-opened','1')}catch(e){}
 {{- /* 入阁：首页打开总是文字版，点「入阁」才换全景（assets/js/qj/ge.js）。

@@ -17,9 +17,9 @@
   <meta name="twitter:card" content="summary_large_image" />
   <!-- seo:end -->
   <link rel="icon" href="/favicon-32x32.png" />
-  <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     [data-wx="木"] { --wc: var(--wx-mu); }
     [data-wx="火"] { --wc: var(--wx-huo); }
@@ -44,7 +44,7 @@
     .pt { font-family: var(--font-title); font-weight: 600; color: var(--fg); letter-spacing: .06em; text-decoration: none; white-space: nowrap; }
     a.pt { border-bottom: 1px dotted var(--zi-2); }
     a.pt:hover { color: var(--zi-2); }
-    .pt sup { font-family: var(--font-body); font-weight: 400; font-size: 10px; color: var(--zi-2); margin-left: 2px; letter-spacing: 0; vertical-align: super; line-height: 0; }
+    .pt sup { font-family: var(--font-body); font-weight: 400; font-size: 12px; color: var(--zi-2); margin-left: 2px; letter-spacing: 0; vertical-align: super; line-height: 0; }
 
     /* —— 流注钟 —— */
     .lz-clock { display: grid; place-items: center; }
@@ -104,12 +104,12 @@
     .lz-seq li { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px 6px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent; text-align: center; min-width: 0; }
     .lz-seq li.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 22%, var(--bg-3)); }
     .lz-seq .h { font-family: var(--font-title); font-size: 13px; color: var(--muted); letter-spacing: .05em; }
-    .lz-seq .h em { font-style: normal; font-size: 10px; color: var(--faint); margin-left: 2px; }
+    .lz-seq .h em { font-style: normal; font-size: 12px; color: var(--faint); margin-left: 2px; }
     .lz-seq .p { font-family: var(--font-title); font-weight: 600; font-size: 14px; color: var(--fg); line-height: 1.35; }
-    .lz-seq .p small { display: block; font-weight: 400; font-size: 11px; color: var(--fg-2); }
-    .lz-seq .s { font-size: 11px; color: var(--faint); letter-spacing: .1em; }
+    .lz-seq .p small { display: block; font-weight: 400; font-size: 12px; color: var(--fg-2); }
+    .lz-seq .s { font-size: 12px; color: var(--faint); letter-spacing: .1em; }
     .lz-ge { padding: 10px 14px; border-left: 2px solid var(--rule-2); font-family: var(--font-body); font-size: 14px; line-height: 1.9; color: var(--muted); }
-    .lz-ge .src { display: block; font-size: 11.5px; color: var(--faint); letter-spacing: .12em; margin-bottom: 2px; }
+    .lz-ge .src { display: block; font-size: 12px; color: var(--faint); letter-spacing: .12em; margin-bottom: 2px; }
     .lz-ge span.l { display: inline-block; margin-right: .9em; }
     .lz-ge span.l.on { color: var(--fg); }
     .lz-ge mark { background: none; color: var(--zi-2); font-weight: 600; }
@@ -117,7 +117,7 @@
     /* —— 灵龟 · 飞腾 —— */
     .lz-calc { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
     .lz-calc .n { display: inline-flex; flex-direction: column; align-items: center; padding: 3px 8px 4px; background: var(--bg-3); border-radius: var(--r-sm); line-height: 1.25; }
-    .lz-calc .n small { font-size: 10px; color: var(--faint); letter-spacing: .15em; }
+    .lz-calc .n small { font-size: 12px; color: var(--faint); letter-spacing: .15em; }
     .lz-calc .n b { font-family: var(--font-title); font-weight: 600; font-size: 15px; color: var(--fg-2); }
     .lz-calc .n b i { font-style: normal; color: var(--zi-2); margin-left: 4px; }
     .lz-calc .op { color: var(--faint); }
@@ -126,7 +126,7 @@
     .lz-lg .lz-pair { flex: 1 1 200px; }
     .lz-gong { display: grid; grid-template-columns: repeat(3, 62px); grid-auto-rows: 58px; gap: 4px; }
     .lz-gong div { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 5px; background: var(--bg-3); line-height: 1.25; border: 1px solid transparent; }
-    .lz-gong div small { font-size: 10px; color: var(--faint); letter-spacing: .1em; }
+    .lz-gong div small { font-size: 12px; color: var(--faint); letter-spacing: .1em; }
     .lz-gong div b { font-family: var(--font-title); font-weight: 600; font-size: 13px; color: var(--fg-2); }
     .lz-gong div.off { opacity: .35; }
     .lz-gong div.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 30%, var(--bg-3)); }
@@ -138,8 +138,8 @@
     .lz-ft { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; margin-bottom: 14px; }
     .lz-ft div { display: flex; flex-direction: column; align-items: center; padding: 6px 0 5px; border-radius: 5px; background: var(--bg-3); border: 1px solid transparent; line-height: 1.3; min-width: 0; }
     .lz-ft div b { font-family: var(--font-title); font-size: 15px; font-weight: 600; color: var(--fg-2); }
-    .lz-ft div span { font-family: var(--font-title); font-size: 11px; color: var(--muted); writing-mode: vertical-rl; letter-spacing: .1em; margin-top: 3px; min-height: 3.3em; }
-    .lz-ft div small { font-size: 10px; color: var(--faint); }
+    .lz-ft div span { font-family: var(--font-title); font-size: 12px; color: var(--muted); writing-mode: vertical-rl; letter-spacing: .1em; margin-top: 3px; min-height: 3.3em; }
+    .lz-ft div small { font-size: 12px; color: var(--faint); }
     .lz-ft div.on { border-color: var(--zi-2); background: color-mix(in oklab, var(--zi) 30%, var(--bg-3)); }
     .lz-ft div.on b, .lz-ft div.on span { color: var(--fg); }
     .lz-bm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
@@ -152,7 +152,7 @@
     .lz-day { padding: 6px; overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--rule-2) transparent; }
     .lz-day-h { padding: 12px 14px 4px; }
     .lz-tab { width: 100%; min-width: 640px; border-collapse: separate; border-spacing: 0 3px; font-size: 13.5px; }
-    .lz-tab th { font-family: var(--font-title); font-weight: 400; font-size: 12px; letter-spacing: .2em; color: var(--faint); text-align: left; padding: 6px 10px; }
+    .lz-tab th { font-family: var(--font-title); font-weight: 400; font-size: 12px; letter-spacing: .2em; color: var(--faint); text-align: left; padding: 6px 10px; white-space: nowrap; }
     .lz-tab td { padding: 8px 10px; background: var(--bg-3); color: var(--fg-2); white-space: nowrap; }
     .lz-tab td:first-child { border-radius: 5px 0 0 5px; position: sticky; left: 0; z-index: 1; }
     .lz-tab td:last-child { border-radius: 0 5px 5px 0; }
@@ -160,11 +160,11 @@
     .lz-tab tr:hover td { background: color-mix(in oklab, var(--zi) 12%, var(--bg-3)); }
     .lz-tab tr.cur td { background: color-mix(in oklab, var(--zi) 28%, var(--bg-3)); color: var(--fg); }
     .lz-tab .z { font-family: var(--font-title); font-weight: 600; font-size: 16px; color: var(--fg); }
-    .lz-tab .z small { font-family: var(--font-mark); font-weight: 500; font-size: 10px; color: var(--faint); margin-left: 6px; letter-spacing: .02em; }
+    .lz-tab .z small { font-family: var(--font-mark); font-weight: 500; font-size: 12px; color: var(--faint); margin-left: 6px; letter-spacing: .02em; }
     .lz-tab .j { color: var(--wc); font-family: var(--font-title); }
     .lz-tab .bi { color: var(--faint); }
     .lz-tab .he { color: var(--muted); }
-    .lz-tab .he em { font-style: normal; font-size: 11px; color: var(--faint); margin-left: 3px; }
+    .lz-tab .he em { font-style: normal; font-size: 12px; color: var(--faint); margin-left: 3px; }
     .lz-tab .pt { font-weight: 600; font-size: 14px; }
     .lz-tab .pair { color: var(--muted); font-size: 12px; margin-left: 4px; }
 
@@ -284,7 +284,7 @@
   </section>
 </main>
 
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script src="/ziwu/liuzhu.js?v=1"></script>
 <script>
 (function () {

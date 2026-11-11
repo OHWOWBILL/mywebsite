@@ -33,9 +33,16 @@ enableEmoji = true
 [outputs]
   home = ["HTML", "RSS", "JSON"]
 
+# 相关文章：同系列的排最前，其次同类目，再其次年月相近。
+# includeNewer 要开：默认只推「比本篇旧」的，早年的文章就永远推不到后来的同类。
 [related]
   threshold = 0
   toLower = false
+  includeNewer = true
+
+  [[related.indices]]
+    name = "series"
+    weight = 150
 
   [[related.indices]]
     name = "categories"

@@ -2,7 +2,9 @@
 title: "异闻录·其三｜吾友鹫神"
 date: 2026-05-18
 description: "山中相识，本不必多言 —— 记大麻山神社的鹫神"
-categories: ["随笔", "异闻录"]
+categories: ["异闻录"]
+series: "异闻录"
+series_order: 3
 ---
 
 两三年前，蓬莱小岛西部。

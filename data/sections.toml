@@ -5,6 +5,11 @@
 #       一篇都不命中的落入末尾的「散记」。
 #       新文章只要带上已有分类就自动归位，不需要改这个文件。
 #
+# 全站的类目只留九个（2026-11 归并）：
+#   五术门的单字   医 · 命 · 卜（山、相有文章时照用）
+#   其余六类       诗词 · 语言 · 人性 · 异闻录 · 随笔 · 过客文章
+#   成系列的文章不另立类目，用 front matter 的 series（见 layouts/partials/qj-series.html）。
+#
 # seal  = 印章上的字（一个汉字）
 # order = 组内排序，"desc" 新在前（默认）／"asc" 旧在前（适合成系列的）
 # ===========================================================
@@ -13,35 +18,35 @@
   seal = "玄"
   name = "玄学术数"
   blurb = "亲历、占断、与山中相识者"
-  categories = ["玄学", "命", "工具", "知识点做题法"]
+  categories = ["命", "卜", "相", "山"]
   order = "desc"
 
 [[group]]
   seal = "医"
   name = "医道"
   blurb = "必背、医案、逐条拆解"
-  categories = ["医", "医案", "必背"]
+  categories = ["医"]
   order = "asc"
 
 [[group]]
   seal = "文"
   name = "词章译读"
   blurb = "诗、词、与波斯语的逐字功夫"
-  categories = ["诗词", "语言", "波斯语", "词根词缀", "语法"]
+  categories = ["诗词", "语言"]
   order = "asc"
 
 [[group]]
   seal = "思"
   name = "模型与人性"
   blurb = "把人拆开看的那些尝试"
-  categories = ["模型", "人性", "问答"]
+  categories = ["人性"]
   order = "desc"
 
 [[group]]
   seal = "异"
   name = "异闻"
   blurb = "白狐、列车、说不清的事"
-  categories = ["异闻录", "相片故事"]
+  categories = ["异闻录"]
   order = "desc"
 
 [[group]]

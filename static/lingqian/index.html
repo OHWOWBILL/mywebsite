@@ -17,9 +17,9 @@
   <meta name="twitter:card" content="summary_large_image" />
   <!-- seo:end -->
   <link rel="icon" href="/favicon-32x32.png" />
-  <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     .tone-top { --tc: var(--jin); } .tone-good { --tc: var(--lv); } .tone-mid { --tc: var(--fg-2); } .tone-bad { --tc: var(--zhu); }
 
@@ -33,13 +33,13 @@
       font-family: var(--font-title); font-size: 14px; letter-spacing: .12em; color: var(--muted); white-space: nowrap;
       transition: color .2s, border-color .2s, background .2s;
     }
-    .lq-set small { font-size: 11px; color: var(--faint); letter-spacing: .04em; }
+    .lq-set small { font-size: 12px; color: var(--faint); letter-spacing: .04em; }
     .lq-set:hover { color: var(--fg); border-color: var(--zi-2); }
     .lq-set[aria-checked="true"] { color: var(--fg); border-color: var(--zi-2); background: rgba(122, 91, 192, .22); }
     .lq-set[aria-checked="true"] small { color: var(--zi-2); }
     .lq-setnote { font-size: 13px; line-height: 1.8; color: var(--muted); letter-spacing: .03em; }
     .lq-setnote b { font-family: var(--font-title); font-weight: 600; color: var(--fg-2); margin-right: 6px; letter-spacing: .1em; }
-    .lq-q .fb-label small { letter-spacing: .05em; color: var(--faint); margin-left: 6px; }
+    .lq-q .fb-label small { font-size: 12px; letter-spacing: .05em; color: var(--faint); margin-left: 6px; }
     .lq-q input { width: 100%; font-size: 15px; padding: 9px 12px; }
     .lq-ctrl { justify-content: center; }
     .lq-ctrl .fb-btn.block { letter-spacing: .4em; }
@@ -90,7 +90,7 @@
     .lq-stick::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 15px; background: var(--zhu); border-radius: 3px 3px 0 0; }
     .lq-stick span { margin-top: 20px; writing-mode: vertical-rl; text-orientation: upright; font-family: var(--font-title); font-weight: 600; font-size: 12px; line-height: 1; letter-spacing: .02em; color: #4A3410; }
     .lq-tube.hex .lq-stick { width: 12px; margin-left: -6px; top: 52px; }
-    .lq-tube.hex .lq-stick span { font-size: 10px; }
+    .lq-tube.hex .lq-stick span { font-size: 12px; }
     .lq-tube.out .lq-stick { visibility: visible; }
     .lq-tube .front { position: absolute; inset: 0; z-index: 3; }
 
@@ -134,11 +134,11 @@
     .lq-rtitle h2 { font-family: var(--font-title); font-weight: 600; font-size: 24px; letter-spacing: .2em; color: var(--fg); line-height: 1.3; }
     .lq-rtitle h2 small { font-size: 15px; font-weight: 400; color: var(--fg-2); letter-spacing: .15em; margin-left: 8px; }
     .lq-grade { display: inline-block; padding: 1px 12px; border-radius: var(--r-xs); font-family: var(--font-title); font-size: 14px; letter-spacing: .2em; color: var(--tc); border: 1px solid color-mix(in oklab, var(--tc) 60%, transparent); background: color-mix(in oklab, var(--tc) 13%, transparent); white-space: nowrap; }
-    .lq-grade small { font-size: 11px; letter-spacing: .05em; color: var(--muted); margin-left: 4px; }
+    .lq-grade small { font-size: 12px; letter-spacing: .05em; color: var(--muted); margin-left: 4px; }
     .lq-ok { font-family: var(--font-title); font-size: 12.5px; color: var(--lv); letter-spacing: .12em; white-space: nowrap; }
     .lq-ok.no { color: var(--muted); }
     .lq-scale { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0 4px; }
-    .lq-scale span { font-family: var(--font-title); font-size: 11.5px; line-height: 20px; padding: 0 7px; border-radius: 3px; background: var(--bg-3); color: var(--faint); letter-spacing: .08em; }
+    .lq-scale span { font-family: var(--font-title); font-size: 12px; line-height: 20px; padding: 0 7px; border-radius: 3px; background: var(--bg-3); color: var(--faint); letter-spacing: .08em; }
     .lq-scale span.on { color: var(--tc); background: color-mix(in oklab, var(--tc) 14%, transparent); box-shadow: inset 0 0 0 1px var(--tc); }
     .lq-dl { margin-top: 8px; }
     .lq-dl > div { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 10px; padding: 8px 0; border-top: 1px dashed var(--rule); }
@@ -205,7 +205,7 @@
       .lq-tube .tube { width: 94px; height: 176px; }
       .lq-stick { top: 37px; width: 15px; height: 108px; margin-left: -7.5px; }
       .lq-tube.hex .lq-stick { width: 10px; margin-left: -5px; top: 44px; }
-      .lq-stick span { font-size: 10.5px; margin-top: 18px; }
+      .lq-stick span { font-size: 11px; margin-top: 18px; }
       .lq-say { font-size: 14px; }
       .lq-acts .fb-btn { min-width: 0; flex: 1 1 auto; }
       .lq-result { padding: 16px 14px; margin-bottom: 14px; }
@@ -326,7 +326,7 @@
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script src="data/guanyin.js?v=1"></script>
 <script src="data/guandi.js?v=1"></script>
 <script src="data/jiazi.js?v=1"></script>

@@ -2,7 +2,9 @@
 title: "异闻录·其二｜白狐索命记"
 date: 2024-09-05
 description: "异闻录感觉能写一堆"
-categories: ["随笔", "异闻录"]
+categories: ["异闻录"]
+series: "异闻录"
+series_order: 2
 ---
 
 素闻蓬莱小岛神社遍地，初来乍到的五人亦不免俗，将初游定于一间神社。

@@ -1,0 +1,27 @@
+{{- /* ===========================================================
+     相关法宝 · 文末
+     文章 front matter 写：
+       fabao: ["/ziwu/", "/yunqi/"]   # 法宝页的网址
+     名字与一句话说明直接取各法宝页自己的 <title> 与 description（qj-fabao-pages.html）。
+     反过来，法宝页上的「延伸阅读」也从这里来：layouts/index.html 把全站的 fabao 对应
+     写成 /fabao/wen.json，static/fabao/fabao.js 读它。两头只在文章这一处写。
+     =========================================================== */ -}}
+{{- with .Params.fabao }}
+{{- $want := . -}}
+{{- $hits := slice -}}
+{{- $pages := partialCached "qj-fabao-pages.html" site -}}
+{{- range $h := $want }}{{ range $pages }}{{ if eq .href $h }}{{ $hits = $hits | append . }}{{ end }}{{ end }}{{ end -}}
+{{- with $hits }}
+<nav class="qj-block qj-fabao-links" aria-label="相关法宝">
+  <h2 class="qj-block-h"><span class="qj-seal" aria-hidden="true">器</span>相关法宝<span class="qj-pinned-note">文中所讲，可在此上手</span></h2>
+  <div class="qj-list">
+    {{- range . }}
+    <a class="qj-item" href="{{ .href }}">
+      <span class="qj-item-t">{{ replaceRE ` · 潜蛟阁.*$` "" .title }}</span>
+      {{- with .desc }}<span class="qj-item-s">{{ . | truncate 62 "…" }}</span>{{ end }}
+    </a>
+    {{- end }}
+  </div>
+</nav>
+{{- end }}
+{{- end }}

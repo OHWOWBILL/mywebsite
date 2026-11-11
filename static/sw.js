@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-d4ae3bbae51c';
+const V = 'fb-c7baa3f34f7a';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -45,8 +45,8 @@ const PRE = [
   '/fabao/backup.js?v=1',
   '/fabao/cidian.js?v=1',
   '/fabao/cities.js?v=1',
-  '/fabao/fabao.css?v=9',
-  '/fabao/fabao.js?v=15',
+  '/fabao/fabao.css?v=10',
+  '/fabao/fabao.js?v=17',
   '/fabao/jieqi-se.js?v=1',
   '/fabao/kyureki.js?v=1',
   '/fabao/lunar.js?v=1',
@@ -82,8 +82,8 @@ const PRE = [
   '/fabao/vendor/qrcode.js?v=1.4.4',
   '/fabao/wenti.js',
   '/favicon-32x32.png',
-  '/fonts/qj-rest.css?v=1c10c9e8',
-  '/fonts/qj.css?v=1c10c9e8',
+  '/fonts/qj-rest.css?v=652a41bd',
+  '/fonts/qj.css?v=652a41bd',
   '/hepan/hepan.js?v=1',
   '/jinkou/jinkou.js?v=1',
   '/jiuxing/jiuxing.js?v=1',
@@ -101,8 +101,8 @@ const PRE = [
   '/meihua/data/yao_detail.json',
   '/meihua/data/yao.js',
   '/meihua/data/yao.js?v=3',
-  '/meihua/js/app.js?v=7',
-  '/meihua/styles/main.css?v=5',
+  '/meihua/js/app.js?v=8',
+  '/meihua/styles/main.css?v=6',
   '/qimen/core.js?v=5',
   '/qimen/jieqi.js?v=1',
   '/taiyi/taiyi.js?v=1',

@@ -2,10 +2,11 @@
 title: "必背（一）——原病式"
 date: 2024-08-10
 description: "病機十九條之五行歸屬，兼及應用"
-categories: ["医", "必背", "基础"]
+categories: ["医"]
+series: "必背"
+series_order: 1
+fabao: ["/yunqi/"]
 ---
-
-# 原病式
 
 这个系列就把我该背的基础东西记下了。
 

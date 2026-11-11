@@ -17,9 +17,9 @@
   <meta name="twitter:card" content="summary_large_image" />
   <!-- seo:end -->
   <link rel="icon" href="/favicon-32x32.png" />
-  <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     .hl-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 22px; align-items: start; }
     .hl-col { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
@@ -40,7 +40,7 @@
     .d-gz b { color: var(--fg-2); font-weight: 400; font-family: var(--font-title); }
     .d-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
     .bd { display: inline-flex; align-items: baseline; gap: 6px; padding: 5px 12px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid var(--rule-2); font-family: var(--font-title); font-size: 14px; letter-spacing: .1em; color: var(--fg-2); }
-    .bd small { font-size: 11px; color: var(--faint); letter-spacing: .15em; }
+    .bd small { font-size: 12px; color: var(--faint); letter-spacing: .15em; }
     .bd.ok { border-color: rgba(141, 191, 151, .55); color: var(--lv); }
     .bd.ng { border-color: rgba(224, 122, 98, .55); color: var(--zhu); }
     .bd.me { background: rgba(224, 122, 98, .16); }
@@ -68,8 +68,8 @@
     .hrs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; margin-top: 8px; }
     .hr { border-radius: var(--r-sm); padding: 6px 2px 5px; text-align: center; background: var(--bg-3); border: 1px solid transparent; line-height: 1.35; }
     .hr b { display: block; font-family: var(--font-title); font-size: 15px; font-weight: 600; letter-spacing: .05em; }
-    .hr small { display: block; font-size: 10.5px; color: var(--faint); font-family: var(--font-mark); }
-    .hr span { display: block; font-size: 11.5px; font-family: var(--font-title); }
+    .hr small { display: block; font-size: 12px; color: var(--faint); font-family: var(--font-mark); }
+    .hr span { display: block; font-size: 12px; font-family: var(--font-title); }
     .hr.h b, .hr.h span { color: var(--lv); }
     .hr.k b, .hr.k span { color: var(--zhu); opacity: .92; }
     .hr.now { border-color: var(--jin); }
@@ -134,7 +134,7 @@
     .cal { padding: 14px 14px 16px; }
     .cal-head { display: flex; align-items: center; gap: 6px; }
     .cal-head b { font-family: var(--font-title); font-size: 18px; letter-spacing: .12em; flex: 1; text-align: center; }
-    .cal-head b small { display: block; font-size: 11.5px; color: var(--faint); letter-spacing: .15em; font-weight: 400; }
+    .cal-head b small { display: block; font-size: 12px; color: var(--faint); letter-spacing: .15em; font-weight: 400; }
     .cal-head .fb-btn { padding: 6px 12px; }
     .wk, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
     .wk { margin-top: 10px; text-align: center; font-size: 12px; color: var(--faint); font-family: var(--font-title); letter-spacing: .2em; }
@@ -144,30 +144,30 @@
     .c.blank { background: none; pointer-events: none; }
     .c .n { font-family: var(--font-mark); font-weight: 800; font-size: 16px; line-height: 1.1; color: var(--fg); }
     .c.wkend .n { color: var(--zi-2); }
-    .c .l { font-size: 11px; color: var(--muted); font-family: var(--font-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .c .l { font-size: 12px; color: var(--muted); font-family: var(--font-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .c .l.q { color: var(--jin); }
     .c .l.f { color: var(--zi-2); }
-    .c .m { margin-top: auto; display: flex; gap: 3px; align-items: center; flex-wrap: wrap; font-size: 10.5px; font-family: var(--font-title); }
+    .c .m { margin-top: auto; display: flex; gap: 3px; align-items: center; flex-wrap: wrap; font-size: 12px; font-family: var(--font-title); }
     .c .m i { font-style: normal; }
     .c .hd { width: 6px; height: 6px; border-radius: 50%; background: var(--lv); flex-shrink: 0; }
     .c .hd.k { background: var(--zhu); opacity: .7; }
     .c .jc { color: var(--faint); }
     .c .rk { color: var(--faint); }
     .c .rk.da { color: var(--lv); } .c .rk.bm { color: var(--zhu); }
-    .c .s { padding: 0 3px; border-radius: 3px; font-size: 10px; line-height: 14px; }
+    .c .s { padding: 0 3px; border-radius: 3px; font-size: 12px; line-height: 14px; }
     .c .s.g { background: rgba(141, 191, 151, .2); color: var(--lv); }
     .c .s.k { background: rgba(217, 174, 78, .25); color: var(--jin); }
     .c .s.b { background: rgba(224, 122, 98, .18); color: var(--zhu); }
     .c.today { border-color: var(--zi-2); }
     .c.sel { background: rgba(122, 91, 192, .32); border-color: var(--zi-2); }
-    .c.me::after { content: "冲"; position: absolute; top: 4px; right: 5px; font-size: 10px; color: var(--zhu); font-family: var(--font-title); }
+    .c.me::after { content: "冲"; position: absolute; top: 4px; right: 5px; font-size: 12px; color: var(--zhu); font-family: var(--font-title); }
     .grid.ev .c { opacity: .5; }
     .grid.ev .c.v-上吉, .grid.ev .c.v-吉 { opacity: 1; }
     .grid.ev .c.v-上吉 { background: rgba(217, 174, 78, .2); box-shadow: inset 0 0 0 1px rgba(217, 174, 78, .7); }
     .grid.ev .c.v-吉 { background: rgba(141, 191, 151, .16); box-shadow: inset 0 0 0 1px rgba(141, 191, 151, .5); }
     .grid.ev .c.v-平 { opacity: .8; }
     .grid.ev .c.sel { opacity: 1; }
-    .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 11.5px; color: var(--faint); }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 12px; color: var(--faint); }
     .legend span { display: inline-flex; align-items: center; gap: 5px; }
     .hl-fine { margin-top: 26px; }
 
@@ -179,8 +179,8 @@
       .hr b { font-size: 14px; }
       .c { min-height: 62px; padding: 4px 3px 3px; }
       .c .n { font-size: 14px; }
-      .c .l { font-size: 10px; }
-      .c .m { font-size: 9.5px; gap: 2px; }
+      .c .l { font-size: 11px; }
+      .c .m { font-size: 11px; gap: 2px; }
       .c .jc, .c .rk.plain { display: none; }
       .best button { grid-template-columns: 5.2em 2.6em 1fr; font-size: 13px; }
       .sky { gap: 4px 12px; }
@@ -230,7 +230,7 @@
   <p class="fb-fine hl-fine">口径：节月以「节」换，交节那天整天算新月；建除日支同月建为「建」，交节之日重复前一日；值神（黄道黑道）日按月建、时按日支起青龙；冲煞天克地冲，申子辰煞南、寅午戌煞北、巳酉丑煞东、亥卯未煞西；喜神甲己东北、乙庚西北、丙辛西南、丁壬正南、戊癸东南，财神甲乙东北、丙丁西南、戊己正北、庚辛正东、壬癸正南，阳贵阴贵按「甲戊庚牛羊」。宜忌、吉神宜趋、凶煞宜忌、胎神占方、二十八宿取《协纪辨方书》的每日表（移植自 <a href="https://github.com/6tail/lunar-javascript" rel="noopener">lunar-javascript</a>，MIT 许可，<a href="/fabao/tongshu-shensha.LICENSE.txt">许可全文</a>）：宜忌按节月干支与日干支查，「馀事勿取」即只做所列之事；另标黄道黑道、岁破、四离四绝、杨公忌。七十二候按太阳黄经每 5° 一候，入候那天整天算新候；中国候名取《逸周书·时训解》与宣明暦本，开日本历注时并列略本暦的本朝七十二候（国立天文台暦Wiki、kotobank 核过）。日出日落用 NOAA 太阳公式（太阳上缘切地平），月出月落以月心切地平、月龄为当地正午距上一次朔的天数（与国立天文台同口径），时刻为所选地点的当地时间，地点记在本机。六曜、不成就日按日本旧暦（日本时间落朔，与中国农历偶差一天）；一粒万倍日、三隣亡、受死日、十死日按节月，母倉日按季节与土用。「找吉日」的分数只是把这些加减起来排个先后，大事仍请自己斟酌；「加入日历」存成 .ics（整天事项），手机上点开即可加入日历。</p>
 </main>
 
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/fabao/kyureki.js?v=1"></script>

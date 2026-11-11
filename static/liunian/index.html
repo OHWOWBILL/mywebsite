@@ -17,9 +17,9 @@
   <meta name="twitter:card" content="summary_large_image" />
   <!-- seo:end -->
   <link rel="icon" href="/favicon-32x32.png" />
-  <link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="/fabao/fabao.css?v=9">
+  <link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
   <style>
     .yr-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
     .yr-nav .fb-btn { padding: 6px 14px; }
@@ -34,7 +34,7 @@
     .hero .big { font-family: var(--font-title); font-weight: 900; font-size: 64px; line-height: 1; letter-spacing: .05em; }
     .hero .big small { display: block; font-size: 15px; font-weight: 400; letter-spacing: .3em; color: var(--zi-2); margin-top: 10px; text-align: center; }
     .hero dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 18px; }
-    .hero dt { font-family: var(--font-title); font-size: 11.5px; color: var(--faint); letter-spacing: .2em; }
+    .hero dt { font-family: var(--font-title); font-size: 12px; color: var(--faint); letter-spacing: .2em; }
     .hero dd { font-family: var(--font-title); font-size: 15px; color: var(--fg-2); letter-spacing: .06em; }
     .hero .key { grid-column: 1 / -1; font-family: var(--font-title); font-size: 16px; line-height: 1.8; letter-spacing: .06em; }
     .hero .key b { color: var(--jin); font-weight: 600; }
@@ -42,11 +42,11 @@
     /* 九宫：南在上 */
     .board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; max-width: 460px; }
     .pal { position: relative; border-radius: var(--r-sm); background: var(--bg-3); padding: 8px 8px 7px; min-height: 92px; border: 1px solid transparent; display: flex; flex-direction: column; gap: 2px; }
-    .pal .dir { font-size: 11px; color: var(--faint); font-family: var(--font-title); letter-spacing: .15em; }
+    .pal .dir { font-size: 12px; color: var(--faint); font-family: var(--font-title); letter-spacing: .15em; }
     .pal .st { font-family: var(--font-title); font-size: 21px; font-weight: 600; line-height: 1.15; }
     .pal .st small { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 4px; }
     .pal .tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: auto; }
-    .pal .tags i { font-style: normal; font-size: 10.5px; padding: 0 5px; border-radius: 3px; font-family: var(--font-title); line-height: 16px; }
+    .pal .tags i { font-style: normal; font-size: 12px; padding: 0 5px; border-radius: 3px; font-family: var(--font-title); line-height: 16px; }
     .pal .tags .b { background: rgba(224, 122, 98, .2); color: var(--zhu); }
     .pal .tags .g { background: rgba(141, 191, 151, .18); color: var(--lv); }
     .pal .tags .q { background: rgba(122, 91, 192, .25); color: var(--zi-2); }
@@ -63,7 +63,7 @@
     .sx { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
     .sx div { text-align: center; padding: 8px 2px 6px; border-radius: var(--r-sm); background: var(--bg-3); border: 1px solid transparent; }
     .sx b { display: block; font-family: var(--font-title); font-size: 19px; }
-    .sx small { display: block; font-size: 11px; color: var(--faint); font-family: var(--font-title); letter-spacing: .05em; min-height: 1.5em; }
+    .sx small { display: block; font-size: 12px; color: var(--faint); font-family: var(--font-title); letter-spacing: .05em; min-height: 1.5em; }
     .sx .b { border-color: rgba(224, 122, 98, .55); } .sx .b small { color: var(--zhu); }
     .sx .g { border-color: rgba(141, 191, 151, .5); } .sx .g small { color: var(--lv); }
     .sx .me { box-shadow: 0 0 0 2px var(--jin); }
@@ -106,9 +106,9 @@
     .hou-t { display: grid; grid-template-columns: 3.6em repeat(3, minmax(0, 1fr)); gap: 0 10px; margin-top: 10px; font-size: 13px; }
     .hou-t > div { padding: 6px 2px; border-bottom: 1px solid var(--rule); line-height: 1.5; min-width: 0; }
     .hou-t .q { font-family: var(--font-title); color: var(--fg-2); letter-spacing: .1em; }
-    .hou-t .q small { display: block; color: var(--faint); font-family: var(--font-mark); font-size: 11.5px; letter-spacing: 0; }
+    .hou-t .q small { display: block; color: var(--faint); font-family: var(--font-mark); font-size: 12px; letter-spacing: 0; }
     .hou-t span { display: block; }
-    .hou-t .d { color: var(--faint); font-family: var(--font-mark); font-size: 11.5px; }
+    .hou-t .d { color: var(--faint); font-family: var(--font-mark); font-size: 12px; }
     .hou-t .c { color: var(--fg-2); font-family: var(--font-title); }
     .hou-t .j { color: var(--qing); font-size: 12px; }
     .hou-t .now { background: rgba(217, 174, 78, .1); }
@@ -177,7 +177,7 @@
   <p class="fb-fine" style="margin-top:26px">口径：年以立春换（立春前出生的人属上一年）；九宫飞星年盘取三元九运紫白，2026 丙午一白入中，顺飞；太岁在年支之方，岁破在其对冲，三煞：申子辰年在南、寅午戌年在北、巳酉丑年在东、亥卯未年在西；犯太岁取值、冲、刑（三刑与自刑）、害、破，三合六合为合。九星年运按本命星落年盘之宫论（坎停滞、坤准备、震萌发、巽顺遂、中宫顶点、乾充实、兑收获、艮变化、离显露），只作参照。五运六气按大寒交气（与「五运六气」法宝同一口径）。节气精确到分，时刻按本机时区。七十二候按太阳黄经每 5° 一候、入候那天整天算新候，中国候名取《逸周书·时训解》与宣明暦本，开日本历注时并列略本暦的本朝七十二候（国立天文台暦Wiki、kotobank 核过）。「节气与节日加入日历」存成 .ics（整天事项，节日随日本历注开关），手机上点开即可加入日历。</p>
 </main>
 
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/fabao/kyureki.js?v=1"></script>

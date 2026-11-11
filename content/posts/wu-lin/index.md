@@ -2,7 +2,7 @@
 title: "武林"
 date: 2026-10-26
 description: "武林风起云涌，正是你我大展身手之时 —— 大麻山神社"
-categories: ["随笔", "生活"]
+categories: ["随笔"]
 aliases: ["/posts/xiang-pian-gu-shi-zhi-wu-lin/"]
 ---
 

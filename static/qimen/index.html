@@ -19,9 +19,9 @@
 <meta name="twitter:card" content="summary_large_image" />
 <!-- seo:end -->
 <link rel="icon" href="/favicon-32x32.png">
-<link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="/fabao/fabao.css?v=9">
+<link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/fabao/fabao.css?v=10">
 <style>
 /* 奇门手记 · 盘面与表单（外框见 /fabao/fabao.css） */
 :root{ --qi:#E7C77E; }  /* 三奇：淡金，比局数那一处金轻一档 */
@@ -43,7 +43,7 @@
 .qm-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
 .qm-chart-card{padding:14px;position:sticky;top:calc(var(--top-h) + 16px)}
 .qm-key{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:center;margin-top:10px;font-size:12px;color:var(--faint);letter-spacing:.05em}
-.qm-key i{font-style:normal;display:inline-block;padding:0 4px;margin-right:4px;border-radius:2px;font-size:11px;line-height:16px}
+.qm-key i{font-style:normal;display:inline-block;padding:0 4px;margin-right:4px;border-radius:2px;font-size:12px;line-height:16px}
 .qm-key .u-zf{border-bottom:2px solid var(--zhu);border-radius:0;color:var(--fg-2)}
 .qm-key .u-zs{border-bottom:2px solid var(--qing);border-radius:0;color:var(--fg-2)}
 .qm-key .bx-h{outline:1.5px solid var(--zhu);color:var(--fg-2)}
@@ -81,7 +81,7 @@
 .qm-verdict ul{list-style:none;margin-top:4px}
 .qm-verdict li button{display:flex;gap:8px;width:100%;text-align:left;padding:5px 0;border-top:1px solid var(--rule);font-size:13px;color:var(--fg-2);line-height:1.6}
 .qm-verdict li button:hover{color:var(--fg)}
-.qm-verdict li .sc{font-family:var(--font-mark);font-size:11px;min-width:3em;text-align:right;margin-left:auto;color:var(--faint)}
+.qm-verdict li .sc{font-family:var(--font-mark);font-size:12px;min-width:3em;text-align:right;margin-left:auto;color:var(--faint)}
 .qm-verdict li .sc.p{color:var(--lv)} .qm-verdict li .sc.n{color:var(--zhu)}
 .qm-side .fb-seg button{padding:8px 0;font-size:14px}
 
@@ -98,10 +98,10 @@
 .palace.sel{outline:2px solid var(--zi-2);outline-offset:1px}
 .palace > *{position:relative;z-index:1}
 .palace .pc-top{display:flex;align-items:center;gap:5px;min-height:18px}
-.palace .hid{font-size:.72rem;color:var(--faint);font-weight:400}
-.palace .god{font-size:.74rem;color:var(--zi-2);letter-spacing:.06em}
+.palace .hid{font-size:.75rem;color:var(--faint);font-weight:400}
+.palace .god{font-size:.75rem;color:var(--zi-2);letter-spacing:.06em}
 .palace .badges{margin-left:auto;display:flex;gap:2px}
-.palace .badges i{font-style:normal;width:16px;height:16px;border-radius:50%;font-size:.58rem;display:flex;align-items:center;justify-content:center;line-height:1}
+.palace .badges i{font-style:normal;width:16px;height:16px;border-radius:50%;font-size:.75rem;display:flex;align-items:center;justify-content:center;line-height:1}
 .palace .b-ma{background:var(--zhu);color:#fff}
 .palace .b-kong.h{background:rgba(224,122,98,.22);color:var(--zhu);border:1px solid rgba(224,122,98,.7)}
 .palace .b-kong.d{color:var(--muted);border:1px dashed var(--faint)}
@@ -117,11 +117,11 @@
 .palace .stm.hs{outline:1.5px solid var(--zhu);outline-offset:0}
 .palace .stm.ds{outline:1.5px dashed var(--jin);outline-offset:0}
 .palace .stm.hs.ds{outline:1.5px solid var(--zhu);box-shadow:0 0 0 3px rgba(217,174,78,.35)}
-.palace .mk{font-size:.55rem;color:var(--zhu);font-weight:400;vertical-align:super;margin:0 1px;letter-spacing:0}
+.palace .mk{font-size:.75rem;color:var(--zhu);font-weight:400;vertical-align:super;margin:0 1px;letter-spacing:0}
 .palace .pc-door{text-align:center;font-size:1rem;line-height:1.25;letter-spacing:.03em}
 .palace .door{color:var(--qing)}
 .palace .pc-bot{display:flex;justify-content:space-between;align-items:flex-end;min-height:18px;margin-top:2px}
-.palace .dgod{font-size:.7rem;color:var(--faint)}
+.palace .dgod{font-size:.75rem;color:var(--faint)}
 .palace .earth .stm{font-size:1.05rem;color:var(--muted)}
 .palace .earth .stm.qi{color:var(--qi)}
 .palace .pnum{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:2.4rem;color:rgba(169,148,224,.07);font-weight:900;line-height:1;pointer-events:none;z-index:0}
@@ -130,12 +130,12 @@
 .palace.zhifu{border-color:var(--zhu)}
 .palace.zhishi{border-color:var(--qing);box-shadow:0 0 16px -6px rgba(143,176,216,.55)}
 .palace.yongshen{outline:1.5px dashed var(--zi-2);outline-offset:-5px}
-.palace .ys{position:absolute;left:50%;transform:translateX(-50%);bottom:5px;font-size:.58rem;line-height:1.5;color:var(--zi-2);border:1px solid var(--zi-2);padding:0 4px;border-radius:2px;background:var(--bg-3);z-index:2;white-space:nowrap;letter-spacing:.05em}
+.palace .ys{position:absolute;left:50%;transform:translateX(-50%);bottom:5px;font-size:.75rem;line-height:1.5;color:var(--zi-2);border:1px solid var(--zi-2);padding:0 4px;border-radius:2px;background:var(--bg-3);z-index:2;white-space:nowrap;letter-spacing:.05em}
 .palace.center{display:flex;flex-direction:column;justify-content:center;align-items:center;background:none;border-style:dashed}
 .palace.center .hid{position:absolute;left:8px;top:7px}
 .palace.center .earthstem .stm{font-size:1.4rem;color:var(--fg)}
 .palace.center .earthstem::before,.palace.center .earthstem::after{content:"";display:block;width:14px;height:1px;background:var(--zi-2);margin:6px auto;opacity:.5}
-.palace.center small{font-size:.62rem;color:var(--faint);letter-spacing:.15em;writing-mode:vertical-rl;position:absolute;right:8px;top:10px}
+.palace.center small{font-size:.75rem;color:var(--faint);letter-spacing:.15em;writing-mode:vertical-rl;position:absolute;right:8px;top:10px}
 .chart.no-hid .hid,.chart.no-dgod .dgod{visibility:hidden}
 /* 转盘动画：转动时让星门神可以越出本宫 */
 .chart.turning .palace{overflow:visible}
@@ -144,15 +144,15 @@
 /* 同刻梅花 */
 .qm-mh{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;max-width:520px;margin:10px auto 0;padding:9px 12px;
   background:var(--bg-3);border:1px solid var(--rule);border-radius:var(--r);font-family:var(--font-title);font-size:13px;color:var(--fg-2)}
-.qm-mh .t{font-size:11px;color:var(--faint);letter-spacing:.2em;width:100%;display:flex;justify-content:space-between;align-items:center}
+.qm-mh .t{font-size:12px;color:var(--faint);letter-spacing:.2em;width:100%;display:flex;justify-content:space-between;align-items:center}
 .qm-mh .t a{font-size:12px;letter-spacing:.08em;color:var(--zi-2);text-decoration:none;border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:1px 10px}
 .qm-mh .t a:hover{border-color:var(--zi-2);color:var(--fg)}
 .qm-mh .g{display:inline-flex;align-items:center;gap:5px}
-.qm-mh .g small{font-size:11px;color:var(--faint)}
+.qm-mh .g small{font-size:12px;color:var(--faint)}
 .qm-mh .ar{color:var(--faint)}
 .qm-mh svg{display:block;fill:var(--fg-2)}
 .qm-mh svg .dong{fill:var(--zhu)}
-.qm-mh .dg{font-size:11px;color:var(--zhu)}
+.qm-mh .dg{font-size:12px;color:var(--zhu)}
 
 /* 五行色：干、星、门、神各按五行 */
 .chart.wuxing [data-w="木"]{color:var(--wx-mu)}
@@ -164,7 +164,7 @@
 
 /* ---------- 格局 ---------- */
 .pal-detail h3{font-family:var(--font-title);font-size:16px;font-weight:600;letter-spacing:.12em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pal-detail .tag{font-size:11px;font-weight:400;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 8px;letter-spacing:.05em}
+.pal-detail .tag{font-size:12px;font-weight:400;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 8px;letter-spacing:.05em}
 .pal-detail dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin-top:10px;font-size:14px;line-height:1.65}
 .pal-detail dt{color:var(--faint);font-family:var(--font-title);font-size:12px;letter-spacing:.15em;padding-top:2px}
 .pal-detail dd{color:var(--fg-2)}
@@ -174,7 +174,7 @@
 .ge-item b{font-family:var(--font-title);font-weight:600;letter-spacing:.08em;margin-right:8px}
 .ge-item.吉 b{color:var(--lv)}
 .ge-item.凶 b{color:var(--zhu)}
-.ge-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 7px;margin-right:6px;font-family:var(--font-title)}
+.ge-item .at{font-size:12px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 7px;margin-right:6px;font-family:var(--font-title)}
 .ge-item .tx{font-size:13px;color:var(--fg-2)}
 .ge-none{font-size:13px;color:var(--faint);padding:8px 2px}
 .ys-box .ge-h:first-child{margin-top:4px}
@@ -182,7 +182,7 @@
 .ys-item:hover{background:rgba(122,91,192,.08)}
 .ys-item .lb{display:inline-block;min-width:1.6em;text-align:center;font-family:var(--font-title);font-size:12px;color:var(--bg);background:var(--zi-2);border-radius:3px;padding:0 4px;margin-right:6px}
 .ys-item b{font-family:var(--font-title);font-weight:600;letter-spacing:.06em;margin-right:6px}
-.ys-item .at{font-size:11px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 7px;margin-right:6px;font-family:var(--font-title)}
+.ys-item .at{font-size:12px;color:var(--zi-2);border:1px solid var(--rule-2);border-radius: var(--r-xs);padding:0 7px;margin-right:6px;font-family:var(--font-title)}
 .ys-item .rel{font-size:12px;color:var(--qing);margin-left:4px}
 .ys-item .br{display:block;font-size:13px;color:var(--fg-2)}
 .ys-item .fl{color:var(--zhu);margin-left:6px;font-size:12px}
@@ -195,14 +195,14 @@
 .ze-item{display:block;width:100%;text-align:left;border-top:1px solid var(--rule);padding:9px 2px;line-height:1.7}
 .ze-item:hover{background:rgba(122,91,192,.08)}
 .ze-item .when{font-family:var(--font-title);font-size:13px;color:var(--fg);letter-spacing:.05em;margin-right:8px}
-.ze-item .when small{color:var(--faint);font-size:11px;margin-left:4px}
+.ze-item .when small{color:var(--faint);font-size:12px;margin-left:4px}
 .ze-item .g{display:inline-block;font-size:12px;color:var(--lv);border:1px solid rgba(141,191,151,.45);border-radius: var(--r-xs);padding:0 8px;margin:2px 4px 2px 0;font-family:var(--font-title)}
 .ze-item .g.w{color:var(--faint);border-color:var(--rule-2)}
-.ze-item .g sup{color:var(--zhu);font-size:9px;margin-left:2px}
+.ze-item .g sup{color:var(--zhu);font-size:12px;margin-left:2px}
 .ze-item .bad{display:inline-block;font-size:12px;color:var(--zhu);margin-right:6px;font-family:var(--font-title)}
 .ge-tbl{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}
 .ge-tbl th,.ge-tbl td{padding:6px 4px;border-top:1px solid var(--rule);text-align:left}
-.ge-tbl th{font-weight:400;color:var(--faint);font-size:11px;letter-spacing:.15em}
+.ge-tbl th{font-weight:400;color:var(--faint);font-size:12px;letter-spacing:.15em}
 .ge-tbl td.n{font-family:var(--font-title);text-align:right;color:var(--fg-2)}
 .ge-tbl .bar{display:inline-block;height:6px;border-radius:3px;background:var(--lv);vertical-align:middle;margin-right:6px}
 
@@ -247,7 +247,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
 .qm-fold>summary::-webkit-details-marker{display:none}
 .qm-fold>summary::before{content:"＋";color:var(--zi-2);font-size:12px;letter-spacing:0}
 .qm-fold[open]>summary::before{content:"－"}
-.qm-fold>summary small{font-size:11px;color:var(--faint);letter-spacing:.05em}
+.qm-fold>summary small{font-size:12px;color:var(--faint);letter-spacing:.05em}
 .qm-fold .field:first-child{margin-top:2px}
 #geStats .qm-fold{margin-top:10px}
 .rowbtns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
@@ -259,7 +259,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
 .stat{flex:1;background:var(--bg-2);border:1px solid var(--rule);border-radius:var(--r);padding:10px;text-align:center}
 .stat b{display:block;font-family:var(--font-title);font-size:1.3rem;font-weight:600}
 .stat b small{font-size:.8rem;font-weight:400;color:var(--faint);margin-left:1px}
-.stat span{font-size:11px;color:var(--muted);letter-spacing:.1em}
+.stat span{font-size:12px;color:var(--muted);letter-spacing:.1em}
 .filterrow{margin-top:12px}
 
 @media (max-width:860px){
@@ -269,14 +269,14 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
   .palace{padding:5px 5px 4px}
   .palace .pc-star{font-size:.95rem;gap:2px}
   .palace .pc-door{font-size:.9rem}
-  .palace .god{font-size:.68rem;letter-spacing:0}
-  .palace .hid,.palace .dgod{font-size:.64rem}
+  .palace .god{font-size:.6875rem;letter-spacing:0}
+  .palace .hid,.palace .dgod{font-size:.6875rem}
   .palace .earth .stm{font-size:.95rem}
-  .palace .badges i{width:14px;height:14px;font-size:.52rem}
+  .palace .badges i{width:14px;height:14px;font-size:.6875rem}
   .palace .pc-top{gap:3px}
 }
 @media (max-width:380px){
-  .palace .ji{font-size:.68rem}
+  .palace .ji{font-size:.6875rem}
   .palace .pc-star{font-size:.88rem}
 }
 </style>
@@ -479,7 +479,7 @@ textarea{min-height:68px;resize:vertical;line-height:1.7}
   </div>
 </main>
 
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/qimen/core.js?v=5"></script>

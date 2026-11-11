@@ -19,9 +19,9 @@
 <meta name="twitter:card" content="summary_large_image" />
 <!-- seo:end -->
 <link rel="icon" href="/favicon-32x32.png">
-<link rel="stylesheet" href="/fonts/qj.css?v=1c10c9e8">
-  <link rel="stylesheet" href="/fonts/qj-rest.css?v=1c10c9e8" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="/fabao/fabao.css?v=9">
+<link rel="stylesheet" href="/fonts/qj.css?v=652a41bd">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=652a41bd" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/fabao/fabao.css?v=10">
 <style>
 /* 太乙神数 · 式盘与表单（外框见 /fabao/fabao.css） */
 :root{ --zhu-c:var(--qing); --ke-c:#D493AB; }   /* 主方青、客方绯；朱只用于凶格，金只留给此刻那一行 */
@@ -65,7 +65,7 @@
 .ty-c.ring{background:var(--bg-2);border:1px solid var(--rule)}
 .ty-c.ring.gong{background:color-mix(in oklab,var(--bg-3) 55%,var(--bg-2))}
 .ty-c.ring .nm{display:flex;justify-content:space-between;align-items:baseline;gap:2px;font-size:13px;letter-spacing:.06em;color:var(--fg-2);white-space:nowrap}
-.ty-c.ring .nm small{font-size:11px;color:var(--faint);letter-spacing:0}
+.ty-c.ring .nm small{font-size:12px;color:var(--faint);letter-spacing:0}
 /* 内九宫 */
 .ty-c.pal{background:var(--bg-3);border:1px solid var(--rule-2);min-height:96px}
 .ty-c.pal .hd{display:flex;justify-content:space-between;align-items:baseline;gap:2px;font-size:13px;letter-spacing:.06em;color:var(--fg-2);white-space:nowrap}
@@ -75,20 +75,20 @@
 .ty-c.pal.ty{border-color:var(--zi-2);box-shadow:0 0 0 1px var(--zi-2)}
 .ty-c.pal.mid{background:none;border-style:dashed;align-items:center;justify-content:center;text-align:center;cursor:default}
 .ty-c.pal.mid .ju{font-size:18px;font-weight:600;letter-spacing:.1em;color:var(--fg);line-height:1.25}
-.ty-c.pal.mid .ju small{display:block;font-size:11px;font-weight:400;color:var(--muted);letter-spacing:.15em}
+.ty-c.pal.mid .ju small{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:.06em}
 .ty-c.sel{box-shadow:0 0 0 2px var(--fg-2)}
 .ty-c.pal.ty.sel{box-shadow:0 0 0 2px var(--fg-2)}
 /* 标签 */
 .ty-tags{display:flex;flex-wrap:wrap;gap:2px 3px;margin-top:auto;position:relative;z-index:1}
 .ty-c.pal.mid .ty-tags{margin-top:2px;justify-content:center}
-.ty-t{display:inline-flex;align-items:baseline;font-style:normal;font-size:11px;line-height:17px;padding:0 4px;border-radius:3px;white-space:nowrap;letter-spacing:.02em;
+.ty-t{display:inline-flex;align-items:baseline;font-style:normal;font-size:12px;line-height:17px;padding:0 4px;border-radius:3px;white-space:nowrap;letter-spacing:.02em;
   color:var(--muted);border:1px solid var(--rule-2)}
 .ty-t.taiyi{background:var(--zi);border-color:var(--zi);color:#fff}
 .ty-t.zhu{color:var(--zhu-c);border-color:color-mix(in oklab,var(--zhu-c) 55%,transparent);background:color-mix(in oklab,var(--zhu-c) 12%,transparent)}
 .ty-t.ke{color:var(--ke-c);border-color:color-mix(in oklab,var(--ke-c) 55%,transparent);background:color-mix(in oklab,var(--ke-c) 12%,transparent)}
 .ty-t.mu{font-weight:600}
-.ty-t sup{font-size:9px;color:var(--zhu);margin-left:1px;vertical-align:baseline;position:relative;top:-3px}
-.ty-key{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:10px;font-size:11.5px;color:var(--faint);letter-spacing:.04em}
+.ty-t sup{font-size:12px;color:var(--zhu);margin-left:1px;vertical-align:baseline;position:relative;top:-3px}
+.ty-key{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:10px;font-size:12px;color:var(--faint);letter-spacing:.04em}
 .ty-key .ty-t{margin-right:4px}
 .ty-detail{margin-top:10px;padding:10px 12px;border-radius:var(--r);background:var(--bg-3);font-size:13px;line-height:1.8;color:var(--fg-2)}
 .ty-detail b{font-family:var(--font-title);font-weight:600;color:var(--fg);letter-spacing:.08em;margin-right:6px}
@@ -110,7 +110,7 @@
 .ty-suan .n{font-family:var(--font-title);font-size:26px;font-weight:600;line-height:1;color:var(--fg);text-align:center}
 .ty-suan .info{display:flex;flex-direction:column;gap:3px;min-width:0}
 .ty-suan .tg{display:flex;flex-wrap:wrap;gap:3px 5px}
-.ty-suan .tg span{font-size:11.5px;line-height:18px;padding:0 7px;border-radius: var(--r-xs);border:1px solid var(--rule-2);color:var(--fg-2);font-family:var(--font-title);white-space:nowrap}
+.ty-suan .tg span{font-size:12px;line-height:18px;padding:0 7px;border-radius: var(--r-xs);border:1px solid var(--rule-2);color:var(--fg-2);font-family:var(--font-title);white-space:nowrap}
 .ty-suan .tg span.he{border-color:rgba(141,191,151,.55);color:var(--lv)}
 .ty-suan .tg span.bu{border-color:var(--rule-2);color:var(--muted)}
 .ty-suan .tg span.du{border-color:rgba(224,122,98,.55);color:var(--zhu)}
@@ -130,7 +130,7 @@
 .ty-mj b.ok{color:var(--lv)} .ty-mj b.no{color:var(--zhu)}
 .ty-mj span{min-width:0}
 .ty-doors{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;margin-top:8px}
-.ty-doors span{display:flex;flex-direction:column;align-items:center;padding:4px 0;border-radius:var(--r-sm);background:var(--bg-3);font-family:var(--font-title);font-size:11px;color:var(--faint);line-height:1.4}
+.ty-doors span{display:flex;flex-direction:column;align-items:center;padding:4px 0;border-radius:var(--r-sm);background:var(--bg-3);font-family:var(--font-title);font-size:12px;color:var(--faint);line-height:1.4}
 .ty-doors span b{font-size:15px;font-weight:600;color:var(--fg-2)}
 .ty-doors span.ji b{color:var(--lv)}
 .ty-doors span.ty{box-shadow:inset 0 0 0 1px var(--zi-2)}
@@ -152,12 +152,12 @@
   .ty-c{min-height:70px;padding:4px 3px 3px;border-radius:6px;gap:2px}
   .ty-c.pal{min-height:78px}
   .ty-c.ring .nm,.ty-c.pal .hd{font-size:11.5px;letter-spacing:0}
-  .ty-c.ring .nm small,.ty-c.pal .hd .door{font-size:10px}
+  .ty-c.ring .nm small,.ty-c.pal .hd .door{font-size:11px}
   .ty-c.pal .num{font-size:24px;right:3px}
   .ty-c.pal.mid .ju{font-size:15px;letter-spacing:.04em}
-  .ty-c.pal.mid .ju small{font-size:10px;letter-spacing:.06em}
-  .ty-t{font-size:10px;line-height:15px;padding:0 2px;letter-spacing:0}
-  .ty-t sup{font-size:8px;top:-2px}
+  .ty-c.pal.mid .ju small{font-size:11px;letter-spacing:.06em}
+  .ty-t{font-size:11px;line-height:15px;padding:0 2px;letter-spacing:0}
+  .ty-t sup{font-size:11px;top:-2px}
   .ty-card{padding:12px}
   .ty-suan .row{grid-template-columns:3em 2.1em minmax(0,1fr);gap:6px 8px;padding:8px}
   .ty-suan .n{font-size:22px}
@@ -165,8 +165,8 @@
   .ty-ge .it{grid-template-columns:3.2em minmax(0,1fr)}
 }
 @media (max-width:400px){
-  .ty-c.ring .nm small{font-size:9.5px}
-  .ty-doors span{font-size:10px}
+  .ty-c.ring .nm small{font-size:11px}
+  .ty-doors span{font-size:11px}
   .ty-doors span b{font-size:13px}
 }
 </style>
@@ -260,7 +260,7 @@
 
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/taiyi/taiyi.js?v=1"></script>
-<script src="/fabao/fabao.js?v=15"></script>
+<script src="/fabao/fabao.js?v=17"></script>
 <script>
 (function () {
 'use strict';

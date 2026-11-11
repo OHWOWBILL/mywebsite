@@ -119,3 +119,5 @@
 {{- /* 入阁的人进了内页，左下角留一枚「回阁」，一点回全景 */}}
 <script>try{if(sessionStorage.getItem('qj-ge')==='1'&&location.pathname!=='/'){var a=document.createElement('a');a.className='qj-ge-back';a.href='/?ge=1';a.textContent='回阁';a.title='回潜蛟阁全景';document.body.appendChild(a)}}catch(e){}</script>
 {{ partial "qj-compass-live.html" . }}
+{{- /* 访问统计（不设 cookie），说明见 static/tj.js */}}
+<script defer src="/tj.js?v=1"></script>

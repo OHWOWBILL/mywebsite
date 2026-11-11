@@ -319,6 +319,11 @@
     }
     mountDock(curTab, isKu);
     refreshMingbuLinks();
+    if (!isKu && !locked) mountWen();
+    // 访问统计（不设 cookie），说明见 static/tj.js；法宝各页都经这里代引，不必逐页加标签
+    const tj = document.createElement('script');
+    tj.defer = true; tj.src = '/tj.js?v=1';
+    document.head.appendChild(tj);
     // 法宝一多，顶栏都用两字简称；当前这件滚进视野
     if (window.matchMedia('(max-width: 1500px)').matches) {
       top.querySelectorAll('.fb-tab .full').forEach((el, i) => { if (TOOLS[i].short) el.textContent = TOOLS[i].short; });
@@ -328,6 +333,23 @@
       const nav = on.parentElement;
       nav.scrollLeft = on.offsetLeft - (nav.clientWidth - on.offsetWidth) / 2;
     });
+  }
+
+  // —— 延伸阅读：站里讲到这件法宝的文章 ——
+  // 名单在 /fabao/wen.json（Hugo 构建时按各篇文章 front matter 的 fabao 生成，见 layouts/index.html）。
+  // 取不到（离线、本地直接开文件）就不显示。
+  function mountWen() {
+    const main = document.querySelector('.fb-main');
+    if (!main || !window.fetch) return;
+    fetch('/fabao/wen.json').then(r => r.ok ? r.json() : null).then(all => {
+      const list = all && all[location.pathname];
+      if (!list || !list.length) return;
+      const p = document.createElement('p');
+      p.className = 'fb-wen';
+      p.innerHTML = '<span>延伸阅读</span>' + list.map(w => `<a href="${escH(w.href)}">${escH(w.t)}</a>`).join('');
+      const foot = main.querySelector('.fb-foot');
+      foot ? main.insertBefore(p, foot) : main.appendChild(p);
+    }).catch(() => {});
   }
 
   let toastEl = null, toastTimer = 0;

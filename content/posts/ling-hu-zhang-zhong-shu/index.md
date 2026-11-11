@@ -2,7 +2,8 @@
 title: "靈狐掌中樹"
 date: 2024-10-06
 description: "掌中十點，順時而記 —— 起數取象小工具与口訣"
-categories: ["工具", "卜"]
+categories: ["卜"]
+fabao: ["/meihua/"]
 ---
 
 {{< linghu >}}
