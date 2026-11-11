@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-4837f56032e9';
+const V = 'fb-34c5f0cdb3b1';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -110,6 +110,7 @@ const PRE = [
   '/xingming/data/kangxi.js?v=1',
   '/xingming/data/st.js?v=1',
   '/xingming/xingming.js?v=1',
+  '/xingpan/dupan.json',
   '/xingpan/xingpan.js?v=2',
   '/yunqi/yunqi.js?v=1',
   '/zeri/zeri.js?v=2',

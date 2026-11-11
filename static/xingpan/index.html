@@ -131,6 +131,15 @@
     .xp-views { display: flex; width: 100%; max-width: 620px; margin: 0 0 16px; }
     .xp-views button { padding: 7px 8px; font-size: 14px; }
     .xp-views .badge { font-family: var(--font-title); }
+    /* 读盘禁制 */
+    .dp-lock { max-width: 340px; margin: 14px auto 6px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+    .dp-lock .fb-seal { width: 52px; height: 52px; font-size: 30px; background: var(--zhu); transform: rotate(-8deg); }
+    .dp-lock-t { font-family: var(--font-title); font-size: 17px; letter-spacing: .12em; }
+    .dp-lock-t .jin { color: var(--jin); }
+    .dp-lock input[type=password] { width: 100%; text-align: center; font-size: 16px; letter-spacing: .3em; padding: 10px 12px; }
+    .dp-lock .fb-btn { width: 100%; }
+    .dp-msg { min-height: 1.4em; font-size: 13px; color: var(--zhu); }
+    .dp { margin-top: 16px; }
     /* 非本命视图：生辰面板收成一行，要改再展开 */
     .xp-who { display: none; min-width: 0; font-size: 13.5px; color: var(--muted); letter-spacing: .04em; line-height: 1.8; }
     .xp-who b { font-family: var(--font-title); font-weight: 600; color: var(--fg); letter-spacing: .1em; }
@@ -281,6 +290,7 @@
     <button type="button" role="tab" data-v="return" aria-selected="false">回归</button>
     <button type="button" role="tab" data-v="retro" aria-selected="false">逆行</button>
     <button type="button" role="tab" data-v="void" aria-selected="false">空亡</button>
+    <button type="button" role="tab" data-v="dupan" aria-selected="false" title="命部读盘：排盘公开，解读加了禁制">读盘</button>
   </div>
 
   <section class="fb-now" id="nowPanel" aria-label="起盘">
@@ -468,6 +478,23 @@
     </section>
   </div>
 
+  <div class="xp-view" id="v-dupan" hidden>
+    <section class="fb-card xp-card xp-lead" aria-label="读盘">
+      <h3>读盘<small id="dpSub">命部 · 三才、三柱合参、宫主飞星、大十字、相位经文</small></h3>
+      <p class="fb-key" id="dpKey"></p>
+      <form class="dp-lock" id="dpLock" autocomplete="off" hidden>
+        <div class="fb-seal" aria-hidden="true">禁</div>
+        <p class="dp-lock-t">读盘的经文与解读被阁主下了<span class="jin">禁制</span></p>
+        <p class="fb-fine">排盘照常公开；解开后才在本机解密这一段。与命部同一口诀，在命部记住过的设备会自动解开。</p>
+        <input type="password" id="dpPw" placeholder="解禁口诀" aria-label="解禁口诀">
+        <label class="xp-chk"><input type="checkbox" id="dpKeep" checked> 此设备记住</label>
+        <button class="fb-btn primary" id="dpGo">解 禁</button>
+        <p class="dp-msg" id="dpMsg" role="status"></p>
+      </form>
+    </section>
+    <div class="dp" id="dpOut"></div>
+  </div>
+
   <section class="fb-card xp-help">
     <h3>用法与口径</h3>
     <ul>
@@ -482,6 +509,7 @@
       <li><b>太阳回归</b>求太阳回到本命黄经的时刻（同一星历，夹逼到一秒内，读回太阳黄经与本命相差不到 0.1″），再按所选地点排盘（默认出生地，可换城市），宫制随上面所选。看回归上升（并看它落本命第几宫）、太阳落回归盘第几宫、角宫（1、4、7、10 宫）有哪些星。与用 Swiss Ephemeris 的软件相比，回归时刻一般差十分钟内、偶至半小时（两边星历之差，主要是章动）。</li>
       <li><b>逆行</b>留＝行星视速度（地心黄经日行）过零之刻；留逆至留顺为逆行。影子期以度数定：留逆之前行星头一回走到「留顺度数」起为前影，留顺之后再走回「留逆度数」止为后影。与公开星历比，水星之留差十分钟上下，金星半小时上下，木、土约一小时，天、海、冥可差数小时（留时行星几乎不动，时刻本就难定）。</li>
       <li><b>月亮空亡</b>采现代通行定义：月亮在一座之内，与日、水、金、火、木、土、天、海、冥九星的最后一个托勒密相位（合、六合、刑、拱、冲，以精确成相为准）之后，至月亮入下一座为止；整座不成相位则自入座起即空。不计交点、小行星与次要相位，也不用古典的容许度（「光体半径」）算法，故比只看七政的古法空亡要长些。与公开空亡表比，起讫多差几分钟、偶至十分钟（月亮位置误差所致）。</li>
+      <li><b>读盘</b>即命部的占星读盘（三才骨相、星座宫三柱合参、宫主星飞星、大十字计分、相位经文），不再手填：星座、度数、宫位取自本页排好的盘，宫头随所选宫制，相位按命部口径另算（主要五种 8°、六合 4°，涉日月 10°；次要六种 2°），十曜与上升两两成相。经文部分加密存放，解禁后只在本机解开。</li>
       <li><b>时区</b>行运、逆行、空亡的时刻都按本机时区显示；回归时刻按所选地点的标准时（不计夏令时）。</li>
     </ul>
   </section>
@@ -749,8 +777,8 @@ function renderBH() {
 
 /* ================ 视图：本命 · 行运 · 回归 · 逆行 · 空亡 ================ */
 // 一个分段切换；本命以外的几页，生辰面板收成一行（要改再展开），各页最上面先给结论
-const VIEWS = ['natal', 'transit', 'return', 'retro', 'void'];
-const VIEW_NAME = { natal: '本命', transit: '行运', return: '太阳回归', retro: '逆行', void: '月亮空亡' };
+const VIEWS = ['natal', 'transit', 'return', 'retro', 'void', 'dupan'];
+const VIEW_NAME = { natal: '本命', transit: '行运', return: '太阳回归', retro: '逆行', void: '月亮空亡', dupan: '读盘' };
 let tab = 'natal', formOpen = false;
 function setTab(v, quiet) {
   if (VIEWS.indexOf(v) < 0) v = 'natal';
@@ -778,6 +806,7 @@ function renderView() {
   else if (tab === 'return') renderReturn();
   else if (tab === 'retro') renderRetro();
   else if (tab === 'void') renderVoid();
+  else if (tab === 'dupan') renderDupan();
 }
 // 分段上的小标：此刻水逆、此刻月亮空亡
 let badgeAt = 0, nowMer = null, nowVoid = null;
@@ -1211,6 +1240,51 @@ function writeURL() {
   if (tab === 'retro' && rtYear != null) q.set('ry', rtYear);
   history.replaceState(null, '', '?' + q.toString());
 }
+
+/* ================ 读盘（命部禁制） ================ */
+// 经文与解读脚本加密放在 dupan.json（scripts/lock/encrypt-data.mjs 写入），钥匙与命部 /mingbu/ 同一把：
+// 盐、迭代次数相同，口诀相同则派生出同样的 256 位钥匙，存在 lock_key_mingbu 里，两边互认。
+const DP_KEY = 'lock_key_mingbu';
+let dpBox = null, dpBusy = false;
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64e = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
+const dpGet = () => { try { return localStorage.getItem(DP_KEY); } catch (e) { return null; } };
+const dpSet = v => { try { v ? localStorage.setItem(DP_KEY, v) : localStorage.removeItem(DP_KEY); } catch (e) { /* 无痕模式 */ } };
+async function dpLoad() { if (!dpBox) { const r = await fetch('/xingpan/dupan.json'); if (!r.ok) throw new Error('fetch'); dpBox = await r.json(); } return dpBox; }
+async function dpOpen(raw) {
+  const B = await dpLoad();
+  const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64d(B.iv) }, key, b64d(B.data));
+  new Function(new TextDecoder().decode(plain))();     // 定义 window.XP_DUPAN
+}
+function dpShowLock(msg) {
+  $('dpLock').hidden = false; $('dpOut').innerHTML = '';
+  $('dpMsg').textContent = msg || '';
+}
+function renderDupan() {
+  $('dpKey').innerHTML = C ? `${nowCast ? '此刻盘' : '本命'}${C.name ? ' <b>' + esc(C.name) + '</b>' : ''} · 日${XP.SIGNS[C.bodies.sun.sign]} 月${XP.SIGNS[C.bodies.moon.sign]} 升${XP.SIGNS[Math.floor(C.angles.asc / 30)]} · ${HOUSE_NAME[C.house]}${C.placidusFallback ? '（高纬改波菲利）' : ''}` : '';
+  if (window.XP_DUPAN) { $('dpLock').hidden = true; if (C) window.XP_DUPAN.render(C, $('dpOut'), XP, HOUSE_NAME[C.placidusFallback ? 'porphyry' : C.house]); return; }
+  const saved = dpGet();
+  if (!saved || dpBusy) { if (!dpBusy) dpShowLock(); return; }
+  dpBusy = true; $('dpLock').hidden = true; $('dpOut').innerHTML = '<p class="fb-fine">解禁中…</p>';
+  dpOpen(b64d(saved).buffer).then(() => { dpBusy = false; renderDupan(); })
+    .catch(e => { dpBusy = false; if (e && e.message === 'fetch') dpShowLock('经文没取到，联网后再试'); else { dpSet(null); dpShowLock(); } });
+}
+$('dpLock').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('dpGo'); btn.disabled = true; $('dpMsg').textContent = '';
+  try {
+    const B = await dpLoad();
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode($('dpPw').value), 'PBKDF2', false, ['deriveBits']);
+    const raw = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: b64d(B.salt), iterations: B.iter }, base, 256);
+    await dpOpen(raw);
+    dpSet($('dpKeep').checked ? b64e(raw) : null);
+    $('dpPw').value = ''; renderDupan();
+  } catch (err) {
+    $('dpMsg').textContent = err && err.message === 'fetch' ? '经文没取到，联网后再试' : '口诀不对，禁制未动';
+  }
+  btn.disabled = false;
+});
 
 /* ================ 绑定 ================ */
 $('whenIn').addEventListener('change', () => { nowCast = false; cast(); });
