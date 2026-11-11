@@ -9,6 +9,7 @@
    法达按昼夜分序，主运之下七分子运（迦勒底序）；小限每年一宫。
    推运（文件后半）：行运相位与精确成相之日、太阳回归、留与逆行（含影子期）、月亮空亡、次限，
    都用同一套星历求根，不另带星历表。
+   定位星链（文件末）：现代守护十星或古典守护七政，找最终定位星、相互定位与循环定位。
 
    浏览器里挂 window.XP；node 里 require 即得同一对象。
    ========================================================= */
@@ -513,6 +514,66 @@
     return { t: t, age: age, bodies: P, arc: arc, mc: mc, asc: asc };
   }
 
+  /* =========================================================
+     定位星链
+     ---------------------------------------------------------
+     行星落在哪个星座，那个星座的主星就是它的定位星（dispositor）；主星自己又落在别的座，
+     一颗接一颗追下去，就是定位星链。每颗星只有一颗定位星，所以追到头只有三种收法：
+       · 落在自己守护的座（入庙），自己定位自己——这条链的最终定位星；
+       · 两颗星各落对方的座——相互定位（按守护算的互容）；
+       · 三颗以上兜成一圈——循环定位，圈上各星并列，没有哪一颗独大。
+     mode 'modern'：十星，蝎归冥王、瓶归天王、鱼归海王；'classic'：只用七政，蝎火、瓶土、鱼木。
+     src 可以是排好的盘（取 bodies[id].sign），也可以是 { sun: 3, moon: 0, … } 这样的星座下标表。
+     ========================================================= */
+  var RULER_MODERN = ['mars', 'venus', 'mercury', 'moon', 'sun', 'mercury', 'venus', 'pluto', 'jupiter', 'saturn', 'uranus', 'neptune'];
+  var SEVEN = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'];
+  function dispositors(src, mode) {
+    mode = mode === 'classic' ? 'classic' : 'modern';
+    var ids = mode === 'classic' ? SEVEN : PLANETS, rul = mode === 'classic' ? RULER : RULER_MODERN;
+    var B = src.bodies || src, N = {};
+    ids.forEach(function (id) {
+      var b = B[id], sign = typeof b === 'number' ? b : b.sign != null ? b.sign : Math.floor(b.lon / 30);
+      N[id] = { id: id, sign: sign, disp: rul[sign], self: rul[sign] === id, kids: [], cyc: null, depth: 0, under: 0 };
+    });
+    // 顺着定位星走，走到重复为止：重复的那颗起就是圈
+    var roots = [];
+    ids.forEach(function (id) {
+      var path = [], seen = {}, x = id;
+      while (!seen[x]) { seen[x] = true; path.push(x); x = N[x].disp; }
+      var cyc = path.slice(path.indexOf(x));
+      if (N[x].cyc == null) {
+        // 圈从星序最前的那颗写起，写法才唯一
+        var k0 = 0; cyc.forEach(function (c, i) { if (ids.indexOf(c) < ids.indexOf(cyc[k0])) k0 = i; });
+        cyc = cyc.slice(k0).concat(cyc.slice(0, k0));
+        var r = { kind: cyc.length === 1 ? 'final' : cyc.length === 2 ? 'mutual' : 'loop', members: cyc, all: cyc.slice() };
+        cyc.forEach(function (c) { N[c].cyc = r; });
+        roots.push(r);
+      }
+      var n = N[id];
+      n.root = N[x].cyc;
+      n.depth = path.indexOf(x) < 0 ? 0 : path.indexOf(x);
+      // 链：自己起，到最终定位星止；归到圈上的，把圈走完、写回头一颗重复的星
+      n.chain = path.slice();
+      if (n.root.members.length > 1) n.chain.push(x);
+      // under：挂在这颗星名下的星数（直接、间接都算）；圈上的星只数从它这里入圈的
+      if (!n.cyc) { n.root.all.push(id); N[n.disp].kids.push(id); path.slice(1, n.depth + 1).forEach(function (p) { N[p].under++; }); }
+    });
+    roots.forEach(function (r) { r.size = r.all.length; r.under = r.all.length - r.members.length; });
+    roots.sort(function (a, b) { return b.size - a.size || ids.indexOf(a.members[0]) - ids.indexOf(b.members[0]); });
+    var finals = roots.filter(function (r) { return r.kind === 'final'; }).map(function (r) { return r.members[0]; });
+    var mutuals = roots.filter(function (r) { return r.kind === 'mutual'; }).map(function (r) { return r.members; });
+    var loops = roots.filter(function (r) { return r.kind === 'loop'; }).map(function (r) { return r.members; });
+    finals.sort(function (a, b) { return N[b].under - N[a].under || ids.indexOf(a) - ids.indexOf(b); });
+    // 格局：两组以上互容 mm；一组互容带定位星 mf；只有一组互容 m；
+    // 独一颗最终定位星 one；几颗定位星分主次 many；一颗定位星之外另有循环 fl；全在循环里 loop
+    var F = finals.length, M = mutuals.length, L = loops.length;
+    var type = M >= 2 ? 'mm' : M === 1 ? (F ? 'mf' : 'm') : F === 0 ? 'loop' : F >= 2 ? 'many' : L ? 'fl' : 'one';
+    return {
+      mode: mode, ids: ids, ruler: rul, nodes: N, roots: roots, finals: finals, mutuals: mutuals, loops: loops, type: type,
+      final: type === 'one' ? finals[0] : null       // 全盘归一的那颗；没有就是 null
+    };
+  }
+
   var api = {
     SIGNS: SIGNS, SIGN_GLYPH: SIGN_GLYPH, ELEM: ELEM, BODIES: BODIES, RULER: RULER, ASPECTS: ASPECTS, CHALDEAN: CHALDEAN,
     dayNum: dayNum, bodies: bodies, sunPos: sunPos, gmst: gmst, angles: angles, houses: houses, houseOf: houseOf,
@@ -522,7 +583,9 @@
     chartAt: chartAt, lonOf: lonOf, speedOf: speedOf, search: search, crossings: crossings,
     stations: stations, retrogrades: retrogrades, solarReturn: solarReturn,
     moonIngresses: moonIngresses, moonAspects: moonAspects, voidMoon: voidMoon,
-    natalPoints: natalPoints, transits: transits, exactTimes: exactTimes, transitHits: transitHits, progressed: progressed
+    natalPoints: natalPoints, transits: transits, exactTimes: exactTimes, transitHits: transitHits, progressed: progressed,
+    // 定位星链
+    RULER_MODERN: RULER_MODERN, SEVEN: SEVEN, dispositors: dispositors
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.XP = api;

@@ -1,6 +1,7 @@
 // 星盘核心自检：node scripts/xingpan/check.js
 // 太阳对照奇门手记节气表（astronomy-engine 算出）；行星对照公认天象的时刻；宫制对照 Raphael 宫位表。
 // 推运部分：2026 年水星等星之留对照公开星历，太阳回归读回黄经，月亮空亡对照公开空亡表（出处见各段注释）。
+// 定位星链：对照几篇讲定位星的文章里举的例子，再加结构自检。
 const XP = require('../../static/xingpan/xingpan.js');
 const J = require('../../static/qimen/jieqi.js');
 let bad = 0, ok = 0;
@@ -187,6 +188,58 @@ eq(XP.transits(fake, t26).every(a => a.orb <= XP.TRANSIT_ORB[a.tr]), true, '行�
 const P30 = XP.progressed(N, N.utc + 30 * XP.TROP_YEAR * DAY);
 near(P30.bodies.sun.lon, XP.lonOf('sun', N.utc + 30 * DAY), 1e-9, '三十岁推运太阳 = 出生后第三十日的太阳');
 near(P30.mc, N.angles.mc + P30.bodies.sun.lon - N.bodies.sun.lon, 1e-9, '推运中天 = 本命中天 + 太阳弧');
+
+// —— 定位星链：用几篇讲定位星的文章里举的例子核对 ——
+// 星座下标表：没写到的星给个不碍事的位置（落在别人守护的座，挂在链上）
+const SG = n => XP.SIGNS.indexOf(n);
+const put = (o, fill) => { const r = {}; XP.PLANETS.forEach(id => { r[id] = SG(o[id] || fill[id]); }); return r; };
+const chainOf = (D, id) => D.nodes[id].chain.join('>');
+// 火双子→水射手→木狮子→日摩羯→土摩羯：土星入庙，是水、火、木、日的最终定位星（七政全归土星）
+let D = XP.dispositors(put({ mars: '双子', mercury: '射手', jupiter: '狮子', sun: '摩羯', saturn: '摩羯', moon: '摩羯', venus: '水瓶' }, {}), 'classic');
+eq([D.type, D.final, D.finals, D.nodes.saturn.under], ['one', 'saturn', ['saturn'], 6], '间接定位：土星摩羯为独一最终定位星');
+eq(chainOf(D, 'mars'), 'mars>mercury>jupiter>sun>saturn', '火星一路追到土星');
+// 循环：火处女→水天秤→金射手→木白羊→火；没有最终定位星
+D = XP.dispositors(put({ mars: '处女', mercury: '天秤', venus: '射手', jupiter: '白羊', sun: '白羊', moon: '白羊', saturn: '白羊' }, {}), 'classic');
+eq([D.type, D.final, D.finals, D.loops], ['loop', null, [], [['mercury', 'venus', 'jupiter', 'mars']]], '四星循环定位，无最终定位星');
+eq(chainOf(D, 'sun'), 'sun>mars>mercury>venus>jupiter>mars', '挂在圈外的星：链写到圈上头一颗重复的星为止');
+// 串联：火狮子、日射手、木白羊，三星成圈
+D = XP.dispositors(put({ mars: '狮子', sun: '射手', jupiter: '白羊', moon: '狮子', mercury: '射手', venus: '白羊', saturn: '狮子' }, {}), 'classic');
+eq(D.loops, [['sun', 'jupiter', 'mars']], '火狮子、日射手、木白羊：串联定位');
+// 链图之例：火→天王→日→木→月→天王，天王出现两次，日、木、月、天王同在一圈
+const rest = { sun: '射手', moon: '水瓶', mercury: '射手', venus: '射手', mars: '水瓶', jupiter: '巨蟹', saturn: '巨蟹', uranus: '狮子', neptune: '射手', pluto: '巨蟹' };
+D = XP.dispositors(put({}, rest), 'modern');
+eq([chainOf(D, 'mars'), D.loops, D.nodes.mars.depth], ['mars>uranus>sun>jupiter>moon>uranus', [['sun', 'jupiter', 'moon', 'uranus']], 1], '火星归入日木月天王之圈');
+// 现代守护：水星天蝎的定位星是冥王；天王金牛、金星水瓶相互定位。古典守护：水星天蝎归火星
+D = XP.dispositors(put({ mercury: '天蝎', uranus: '金牛', venus: '水瓶' }, rest), 'modern');
+eq([D.nodes.mercury.disp, D.mutuals.some(m => m.join() === 'venus,uranus')], ['pluto', true], '现代：水星天蝎归冥王，天王金牛与金星水瓶互容');
+eq(XP.dispositors(put({ mercury: '天蝎' }, rest), 'classic').nodes.mercury.disp, 'mars', '古典：水星天蝎归火星');
+eq(XP.dispositors(put({ uranus: '双子', mercury: '水瓶' }, rest), 'modern').mutuals.some(m => m.join() === 'mercury,uranus'), true, '现代：天王双子与水星水瓶互容');
+// 古典守护才成立的互容：金水瓶与土天秤、木白羊与火双鱼；换现代守护就不是互容
+const c7 = { sun: '双子', moon: '双子', mercury: '射手', venus: '水瓶', mars: '双鱼', jupiter: '白羊', saturn: '天秤', uranus: '双子', neptune: '双子', pluto: '双子' };
+D = XP.dispositors(put({}, c7), 'classic');
+eq([D.type, D.mutuals, D.finals], ['mm', [['mars', 'jupiter'], ['venus', 'saturn']], []], '古典：木火互容、金土互容，两组互容');
+eq(XP.dispositors(put({}, c7), 'modern').mutuals, [], '同一盘按现代守护，金归天王、火归海王，不成互容');
+// 定位星分主次：火白羊（名下多）为主，水双子（名下少）为次；入庙而不辖他星的也算一颗
+D = XP.dispositors(put({ mars: '白羊', mercury: '双子', sun: '白羊', venus: '天蝎', jupiter: '白羊', saturn: '处女', moon: '狮子' }, {}), 'classic');
+eq([D.type, D.finals, D.nodes.mars.under, D.nodes.mercury.under, D.final], ['many', ['mars', 'mercury'], 4, 1, null], '两颗定位星：火星为主、水星为次');
+D = XP.dispositors(put({ venus: '天蝎', mars: '天秤', moon: '巨蟹', jupiter: '巨蟹', sun: '巨蟹', mercury: '巨蟹', saturn: '天蝎' }, {}), 'classic');
+eq([D.type, D.mutuals, D.finals], ['mf', [['venus', 'mars']], ['moon']], '金天蝎火天秤互容，另有月亮巨蟹为定位星');
+// 结构自检：随手排一百张真盘，两种口径下——入庙之星恰是自为定位星者；每颗星恰属一组；
+// 链尾必在圈上；独一最终定位星当且仅当只有一组且那一组是入庙之星
+let sound = true;
+for (let k = 0; k < 100; k++) {
+  const Ck = XP.chartAt(Date.UTC(1930 + k, (k * 5) % 12, 1 + (k * 7) % 28, (k * 3) % 24), { lat: 30, lon: 110 });
+  ['modern', 'classic'].forEach(mode => {
+    const d = XP.dispositors(Ck, mode), ids = d.ids;
+    const dom = ids.filter(id => d.ruler[Ck.bodies[id].sign] === id);
+    if (dom.slice().sort().join() !== d.finals.slice().sort().join()) sound = false;
+    if (d.roots.reduce((a, r) => a + r.size, 0) !== ids.length) sound = false;
+    if (!ids.every(id => { const c = d.nodes[id].chain, last = c[c.length - 1]; return d.nodes[last].cyc && d.nodes[id].root.members.indexOf(last) >= 0 && d.nodes[id].disp === (c[1] || id); })) sound = false;
+    if ((d.final != null) !== (d.roots.length === 1 && d.roots[0].kind === 'final')) sound = false;
+    if (mode === 'classic' && ids.length !== 7) sound = false;
+  });
+}
+eq(sound, true, '定位星链结构自检（一百张盘 × 两种口径）');
 
 console.log(bad ? `\n${bad} 项不合，${ok} 项相合` : `全部相合（${ok} 项）`);
 process.exit(bad ? 1 : 0);

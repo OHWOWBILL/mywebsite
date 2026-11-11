@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#17131F" />
   <title>星盘 · 潜蛟阁法宝库</title>
-  <meta name="description" content="西洋占星本命盘与推运：出生地经纬度与时区，回归黄道，Placidus、整宫、等宫、波菲利宫制；行星星座宫位、逆行、庙旺陷弱，主要相位与入相出相；昼夜、福点、法达（含子运）与小限年主星。行运（今天最要紧的三条、外行星十二个月精确日期、次限）、太阳回归盘、逆行日历（含水逆影子期）与月亮空亡。" />
+  <meta name="description" content="西洋占星本命盘与推运：出生地经纬度与时区，回归黄道，Placidus、整宫、等宫、波菲利宫制；行星星座宫位、逆行、庙旺陷弱，主要相位与入相出相；定位星链（最终定位星、互容、循环，现代与古典守护）；昼夜、福点、法达（含子运）与小限年主星。行运（今天最要紧的三条、外行星十二个月精确日期、次限）、太阳回归盘、逆行日历（含水逆影子期）与月亮空亡。" />
   <!-- seo:begin 由 scripts/seo/tool-meta.js 生成，勿手改 -->
   <link rel="canonical" href="https://ohwowbill.com/xingpan/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="潜蛟阁" />
   <meta property="og:title" content="星盘 · 潜蛟阁法宝库" />
-  <meta property="og:description" content="西洋占星本命盘与推运：出生地经纬度与时区，回归黄道，Placidus、整宫、等宫、波菲利宫制；行星星座宫位、逆行、庙旺陷弱，主要相位与入相出相；昼夜、福点、法达（含子运）与小限年主星。行运（今天最要紧的三条、外行星十二个月精确日期、次限）、太阳回归盘、逆行日历（含水逆影子期）与月亮空亡。" />
+  <meta property="og:description" content="西洋占星本命盘与推运：出生地经纬度与时区，回归黄道，Placidus、整宫、等宫、波菲利宫制；行星星座宫位、逆行、庙旺陷弱，主要相位与入相出相；定位星链（最终定位星、互容、循环，现代与古典守护）；昼夜、福点、法达（含子运）与小限年主星。行运（今天最要紧的三条、外行星十二个月精确日期、次限）、太阳回归盘、逆行日历（含水逆影子期）与月亮空亡。" />
   <meta property="og:url" content="https://ohwowbill.com/xingpan/" />
   <meta property="og:image" content="https://ohwowbill.com/img/og-card.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -116,6 +116,38 @@
     .xp-fd .subs span { font-size: 12px; padding: 1px 6px; border-radius: 3px; background: var(--bg-3); color: var(--muted); font-family: var(--font-title); }
     .xp-fd .subs span.now { background: rgba(217, 174, 78, .16); color: var(--jin); }
     .xp-fd .subs .g { font-family: var(--glyph); margin-right: 2px; }
+
+    /* 定位星链：树图（箭头指向定位星）与逐星的链 */
+    .xp-dsp-h { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 10px; }
+    .xp-dsp-h h3 { margin-bottom: 0; }
+    .xp-dmode button { padding: 4px 12px; font-size: 12.5px; letter-spacing: .1em; }
+    .xp-dsp-tree { overflow-x: auto; margin: 6px 0 10px; }
+    .xp-dsp-tree svg { display: block; margin: 0 auto; }
+    .xp-dsp-tree .nd { fill: var(--bg-3); stroke: var(--rule-2); stroke-width: 1.2; }
+    .xp-dsp-tree .nd.fin { stroke: var(--jin); stroke-width: 1.6; }
+    .xp-dsp-tree .halo { fill: none; stroke: var(--jin); stroke-width: 1; opacity: .55; }
+    .xp-dsp-tree .nd.cyc { stroke: var(--zi-2); stroke-width: 1.6; }
+    .xp-dsp-tree .gl { font-family: var(--glyph); font-size: 19px; text-anchor: middle; dominant-baseline: central; fill: var(--fg); pointer-events: none; }
+    .xp-dsp-tree .gl.fin { fill: var(--jin); }
+    .xp-dsp-tree .ed { fill: none; stroke: var(--muted); stroke-width: 1.1; }
+    .xp-dsp-tree .ed.cyc { stroke: var(--zi-2); stroke-width: 1.4; }
+    .xp-dsp-tree .cap { font-family: var(--font-title); font-size: 12px; letter-spacing: .1em; text-anchor: middle; fill: var(--muted); }
+    .xp-dsp-tree .cap.fin { fill: var(--jin); }
+    .xp-dsp-tree .cap.cyc { fill: var(--zi-2); }
+    .xp-dsp-tree g[data-dn] { cursor: pointer; }
+    .xp-chains { display: flex; flex-direction: column; gap: 3px; }
+    .xp-chains .c { display: grid; grid-template-columns: 4.6em 5.6em minmax(0, 1fr); gap: 6px; align-items: baseline; padding: 4px 8px; border-radius: var(--r-sm); background: var(--bg-3); font-size: 12.5px; color: var(--fg-2); }
+    .xp-chains .g { font-family: var(--glyph); font-size: 14px; color: var(--fg); margin-right: 3px; }
+    .xp-chains .n { font-family: var(--font-title); color: var(--fg); }
+    .xp-chains .pl { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .xp-chains .ch { line-height: 1.8; }
+    .xp-chains .ch i { font-style: normal; color: var(--faint); margin: 0 4px; }
+    .xp-chains .ch span { white-space: nowrap; }
+    .xp-chains .ch .fin { color: var(--jin); } .xp-chains .ch .fin .g { color: var(--jin); }
+    .xp-chains .ch .cyc { color: var(--zi-2); } .xp-chains .ch .cyc .g { color: var(--zi-2); }
+    .xp-chains em { font-style: normal; font-family: var(--font-title); font-size: 12px; color: var(--muted); margin-left: 8px; white-space: nowrap; }
+    .xp-dsp-foot { margin-top: 10px; }
+    .xp-dsp-foot button { color: var(--zi-2); text-decoration: underline; text-underline-offset: 3px; font-size: 12px; }
 
     .xp-help { padding: 16px 20px; }
     .xp-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
@@ -267,6 +299,8 @@
       .xp-vc .v { grid-template-columns: minmax(0, 1fr) auto; }
       .xp-vc .v .tm { grid-column: 1; }
       .xp-vc .v .why { grid-column: 1 / -1; }
+      .xp-chains .c { grid-template-columns: 4.6em minmax(0, 1fr); }
+      .xp-chains .ch { grid-column: 1 / -1; }
       .xp-rt .ln { grid-template-columns: 3.6em minmax(0, 1fr); gap: 6px; }
       .xp-rt .lab .g, .xp-rt .mon i { display: none; }
       .fb-now.compact { gap: 10px; }
@@ -338,6 +372,19 @@
       <section class="fb-card xp-card" aria-label="行星">
         <h3>行星<small>星座 · 度数 · 宫位 · 庙旺陷弱</small></h3>
         <div style="overflow-x:auto"><table class="xp-t" id="planetT"></table></div>
+      </section>
+      <section class="fb-card xp-card" aria-label="定位星链">
+        <div class="xp-dsp-h">
+          <h3>定位星链<small id="dspNote"></small></h3>
+          <div class="fb-seg xp-dmode" id="dspSeg" role="group" aria-label="守护口径">
+            <button type="button" data-m="modern" title="十星：天蝎归冥王、水瓶归天王、双鱼归海王">现代</button>
+            <button type="button" data-m="classic" title="七政：天蝎归火星、水瓶归土星、双鱼归木星，三王星不入链">古典</button>
+          </div>
+        </div>
+        <p class="xp-key" id="dspKey"></p>
+        <div class="xp-dsp-tree" id="dspTree"></div>
+        <div class="xp-chains" id="dspList"></div>
+        <p class="fb-fine xp-dsp-foot">箭头指向定位星：行星所落星座的主星。追到落在自己星座里的那一颗为止，它就是这条链的最终定位星；两星各落对方的座是相互定位（互容），三颗以上兜成一圈是循环定位。天赋方向与逐星论断在 <button type="button" id="dspGo">读盘 · 六</button>（有禁制）。</p>
       </section>
       <section class="fb-card xp-card" aria-label="宫头">
         <h3>宫头<small id="houseNote"></small></h3>
@@ -480,7 +527,7 @@
 
   <div class="xp-view" id="v-dupan" hidden>
     <section class="fb-card xp-card xp-lead" aria-label="读盘">
-      <h3>读盘<small id="dpSub">命部 · 三才、三柱合参、宫主飞星、大十字、相位经文</small></h3>
+      <h3>读盘<small id="dpSub">命部 · 三才、三柱合参、宫主飞星、大十字、相位经文、定位星链</small></h3>
       <p class="fb-key" id="dpKey"></p>
       <form class="dp-lock" id="dpLock" autocomplete="off" hidden>
         <div class="fb-seal" aria-hidden="true">禁</div>
@@ -503,20 +550,21 @@
       <li><b>宫制</b>默认 Placidus（纬度超过 66° 时改用波菲利）；整宫、等宫、波菲利可切换。上升、中天由格林尼治平恒星时推得。</li>
       <li><b>相位</b>容许度：合、冲 8°，刑、拱 7°，六合 5°，日月参与再加 2°；注明入相（渐准）或出相。点任一条，盘上只亮那一条线。</li>
       <li><b>法达</b>以太阳在地平上下分昼夜：昼生日、金、水、月、土、木、火、北交、南交；夜生月、土、木、火、北交、南交、日、金、水（亦可改用波那提序，交点殿后）。七政主运各分七个子运，依迦勒底序（土木火日金水月）自主运之星起。</li>
+      <li><b>定位星链</b>行星落在哪个星座，那个星座的主星就是它的定位星；主星自己又落在别的座，一颗接一颗追下去就是定位星链。每颗星只有一颗定位星，所以追到头只有三种收法：落在自己守护的座（入庙）、自己定位自己，是最终定位星；两颗星各落对方的座，是相互定位（按守护算的互容）；三颗以上兜成一圈，是循环定位，圈上各星并列。全盘都归到一颗星名下，才说「独一最终定位星」；几颗星入庙，名下星多的为主、少的为次。守护有两种口径：<b>现代</b>用十星，天蝎归冥王、水瓶归天王、双鱼归海王；<b>古典</b>只用七政，天蝎归火星、水瓶归土星、双鱼归木星，三王星不入链。两种口径结果常不同，可对照着看。</li>
       <li><b>小限</b>每满一岁，上升推进一宫（整宫），该宫星座之主星为当年年主星。福点昼生取「上升 + 月 − 日」，夜生取「上升 + 日 − 月」。仅供学习参考。</li>
       <li><b>行运</b>某一刻（默认此刻，可前后挪日、挪月）天上十星对本命十星与上升、中天的五种主要相位。容许度只看行运星：月亮 1°，日、水、金、火、木、土 2°，天、海、冥 1.5°；按紧密排，入相出相看一分钟后是否更准；「最准」为该星精确成相之日（逆行往返则有几次）。「今天最要紧的三条」按行运星分量（土天海冥最重、月亮最轻）、本命点分量（日、月、上升、中天与命主星最重）、相位（合冲刑重于拱、六合）、紧密与否打分取前三，文字是常见说法，参考。「外行星十二个月」列木、土、天、海、冥与本命各点精确成相之日。</li>
       <li><b>次限</b>出生后第 N 日的天象对应第 N 岁（一日一年，年取回归年 365.2422 日）；推运中天用太阳弧（本命中天加推运太阳所走度数），推运上升由推运中天按出生地纬度反推。</li>
       <li><b>太阳回归</b>求太阳回到本命黄经的时刻（同一星历，夹逼到一秒内，读回太阳黄经与本命相差不到 0.1″），再按所选地点排盘（默认出生地，可换城市），宫制随上面所选。看回归上升（并看它落本命第几宫）、太阳落回归盘第几宫、角宫（1、4、7、10 宫）有哪些星。与用 Swiss Ephemeris 的软件相比，回归时刻一般差十分钟内、偶至半小时（两边星历之差，主要是章动）。</li>
       <li><b>逆行</b>留＝行星视速度（地心黄经日行）过零之刻；留逆至留顺为逆行。影子期以度数定：留逆之前行星头一回走到「留顺度数」起为前影，留顺之后再走回「留逆度数」止为后影。与公开星历比，水星之留差十分钟上下，金星半小时上下，木、土约一小时，天、海、冥可差数小时（留时行星几乎不动，时刻本就难定）。</li>
       <li><b>月亮空亡</b>采现代通行定义：月亮在一座之内，与日、水、金、火、木、土、天、海、冥九星的最后一个托勒密相位（合、六合、刑、拱、冲，以精确成相为准）之后，至月亮入下一座为止；整座不成相位则自入座起即空。不计交点、小行星与次要相位，也不用古典的容许度（「光体半径」）算法，故比只看七政的古法空亡要长些。与公开空亡表比，起讫多差几分钟、偶至十分钟（月亮位置误差所致）。</li>
-      <li><b>读盘</b>即命部的占星读盘（三才骨相、星座宫三柱合参、宫主星飞星、大十字计分、相位经文），不再手填：星座、度数、宫位取自本页排好的盘，宫头随所选宫制，相位按命部口径另算（主要五种 8°、六合 4°，涉日月 10°；次要六种 2°），十曜与上升两两成相。经文部分加密存放，解禁后只在本机解开。</li>
+      <li><b>读盘</b>即命部的占星读盘（三才骨相、星座宫三柱合参、宫主星飞星、大十字计分、相位经文、定位星链的天赋方向与论断），不再手填：星座、度数、宫位取自本页排好的盘，宫头随所选宫制，相位按命部口径另算（主要五种 8°、六合 4°，涉日月 10°；次要六种 2°），十曜与上升两两成相；定位星链一段的守护口径随本命页所选，状态与相位用本页的五种主要相位。经文部分加密存放，解禁后只在本机解开。</li>
       <li><b>时区</b>行运、逆行、空亡的时刻都按本机时区显示；回归时刻按所选地点的标准时（不计夏令时）。</li>
     </ul>
   </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
-<script src="/xingpan/xingpan.js?v=2"></script>
+<script src="/xingpan/xingpan.js?v=3"></script>
 <script src="/fabao/cities.js?v=1"></script>
 <script src="/fabao/fabao.js?v=17"></script>
 <script>
@@ -545,7 +593,7 @@ const store = {
 };
 const guessTz = -new Date().getTimezoneOffset() / 60;
 const guess = CITY_LIST.find(c => c[3] === guessTz) || CITY_LIST[0];
-let view = Object.assign({ city: guess[0], lon: guess[1], lat: guess[2], tz: guess[3], house: 'placidus', bonatti: false }, store.get(LS_VIEW, {}));
+let view = Object.assign({ city: guess[0], lon: guess[1], lat: guess[2], tz: guess[3], house: 'placidus', bonatti: false, disp: 'modern' }, store.get(LS_VIEW, {}));
 let C = null, hlAsp = -1, nowCast = false;   // nowCast：盘是按「此刻」起的（没填生辰），天象页就不套本命宫位
 
 $('cityIn').innerHTML = CITIES.map(([g, l]) => `<optgroup label="${g}">${l.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('') + '<option value="">自定义经纬度</option>';
@@ -689,7 +737,7 @@ function render() {
   $('houseNote').textContent = HOUSE_NAME[C.house] + (C.placidusFallback ? '（纬度过高，改用波菲利）' : '');
   const hrow = from => `<tr>${[0, 1, 2, 3, 4, 5].map(k => { const i = from + k, dd = XP.fmtDeg(C.cusps[i]); return `<td><span class="n">${i}</span> <span class="el-${dd.sign % 4}"><span class="sgn">${XP.SIGN_GLYPH[dd.sign]}${T}</span></span><span class="deg">${dd.d}°${pad(dd.m)}′</span></td>`; }).join('')}</tr>`;
   $('houseT').innerHTML = hrow(1) + hrow(7);
-  renderInfo(); renderAsp(); renderFd(); renderBH(); renderWho();
+  renderInfo(); renderAsp(); renderDsp(); renderFd(); renderBH(); renderWho();
 }
 function ageNow() {
   const now = Date.now(), b = new Date(C.utc + (+C.input.tz) * 3600e3), n = new Date(now + (+C.input.tz) * 3600e3);
@@ -724,6 +772,104 @@ function renderFd() {
     return `<div class="m${cur ? ' now' : ''}"><span class="g">${G(p.lord)}</span><span class="n">${BODY[p.lord].n}</span><span class="y">${a0}–${a1} 岁 · ${yr(p.from)}–${yr(p.to)}</span>${cur ? '<i>今</i>' : '<span></span>'}</div>${subs}`;
   }).join('');
 }
+
+/* ================ 定位星链 ================ */
+// 树图：最终定位星（或互容的一对、循环的一圈）在上，被定位的星一层层挂在下面，箭头从行星指向它的定位星
+const DSP_NAME = { modern: '现代守护 · 十星', classic: '古典守护 · 七政' };
+const N1 = id => BODY[id].n.slice(0, 1) === '太' ? '日' : BODY[id].n.slice(0, 1);      // 太阳→日，其余取首字
+const gn = id => `<span class="g">${G(id)}</span>${BODY[id].n}`;
+function dspSVG(D, avail) {
+  const N = D.nodes, R = 16;
+  const wOf = id => { const n = N[id]; n.w = n.kids.length ? n.kids.reduce((a, k) => a + wOf(k), 0) : 1; return n.w; };
+  let units = 0;
+  D.roots.forEach(r => r.members.forEach(m => { units += wOf(m); }));
+  units += (D.roots.length - 1) * 0.5;
+  const U = Math.max(42, Math.min(64, Math.floor((avail - 8) / units))), V = 60;
+  const hasLoop = D.loops.length > 0, top = 22 + (hasLoop ? 20 : 0) + R, padX = 4;
+  let x = 0, depth = 0;
+  const place = (id, x0, d) => { const n = N[id]; n.x = padX + (x0 + n.w / 2) * U; n.y = top + d * V; depth = Math.max(depth, d); let c = x0; n.kids.forEach(k => { place(k, c, d + 1); c += N[k].w; }); };
+  D.roots.forEach(r => { r.members.forEach(m => { place(m, x, 0); x += N[m].w; }); x += 0.5; });
+  const W = Math.max(Math.round(padX * 2 + units * U), 150), H = top + depth * V + R + 8, sh = (W - (padX * 2 + units * U)) / 2;
+  D.ids.forEach(id => { N[id].x += sh; });
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="定位星链图"><defs>
+    <marker id="dspA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9" fill="none" stroke="var(--muted)" stroke-width="1.6"/></marker>
+    <marker id="dspC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9" fill="none" stroke="var(--zi-2)" stroke-width="1.6"/></marker></defs>`;
+  // 两点之间的箭头，各缩进一个半径
+  const line = (a, b, cls, mk) => { const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+    return `<line class="ed ${cls}" x1="${f1(a.x + ux * (R + 2))}" y1="${f1(a.y + uy * (R + 2))}" x2="${f1(b.x - ux * (R + 4))}" y2="${f1(b.y - uy * (R + 4))}" marker-end="url(#${mk})"/>`; };
+  D.ids.forEach(id => { const n = N[id]; if (!n.cyc) s += line(n, N[n.disp], '', 'dspA'); });
+  D.roots.forEach(r => {
+    const M = r.members.map(m => N[m]), cx = (M[0].x + M[M.length - 1].x) / 2;
+    const cap = r.kind === 'final' ? (D.type === 'one' ? '最终定位星' : r.under ? '定位星' : '入庙') : r.kind === 'mutual' ? '互容' : '循环';
+    s += `<text class="cap ${r.kind === 'final' ? 'fin' : 'cyc'}" x="${f1(cx)}" y="14">${cap}</text>`;
+    if (r.kind === 'mutual') {
+      const a = M[0], b = M[1];
+      s += `<path class="ed cyc" d="M${f1(a.x + R + 3)} ${f1(a.y - 5)} L${f1(b.x - R - 5)} ${f1(b.y - 5)}" marker-end="url(#dspC)"/><path class="ed cyc" d="M${f1(b.x - R - 3)} ${f1(b.y + 5)} L${f1(a.x + R + 5)} ${f1(a.y + 5)}" marker-end="url(#dspC)"/>`;
+    } else if (r.kind === 'loop') {
+      for (let i = 0; i + 1 < M.length; i++) s += line(M[i], M[i + 1], 'cyc', 'dspC');
+      const a = M[M.length - 1], b = M[0], yy = a.y - R - 3, hy = yy - 16;
+      s += `<path class="ed cyc" d="M${f1(a.x)} ${f1(yy)} C${f1(a.x)} ${f1(hy)} ${f1(b.x)} ${f1(hy)} ${f1(b.x)} ${f1(yy - 2)}" marker-end="url(#dspC)"/>`;
+    }
+  });
+  D.ids.forEach(id => {
+    const n = N[id], b = C.bodies[id], k = n.self ? ' fin' : n.cyc ? ' cyc' : '';
+    s += `<g data-dn="${id}"><title>${BODY[id].n} ${XP.SIGNS[n.sign]} ${b.house} 宫${n.self ? ' · 入庙，自为定位星' : ' · 定位星 ' + BODY[n.disp].n}</title>` +
+      (n.self ? `<circle class="halo" cx="${f1(n.x)}" cy="${f1(n.y)}" r="${R + 4}"/>` : '') +
+      `<circle class="nd${k}" cx="${f1(n.x)}" cy="${f1(n.y)}" r="${R}"/><text class="gl${n.self ? ' fin' : ''}" x="${f1(n.x)}" y="${f1(n.y)}">${G(id)}</text></g>`;
+  });
+  return s + '</svg>';
+}
+// 一句话的格局：独一最终定位星、主次定位星、互容、循环
+function dspKeyHtml(D) {
+  const pl = id => `${XP.SIGNS[D.nodes[id].sign]} ${C.bodies[id].house} 宫`;
+  const big = id => `<span class="jin"><span class="g">${G(id)}</span> ${BODY[id].n}</span>`;
+  const lp = l => l.map(N1).join('→') + '→' + N1(l[0]);
+  const mu = D.mutuals.map(m => `${gn(m[0])} 与 ${gn(m[1])}`).join('、'), loops = D.loops.map(lp).join('、');
+  const fin = D.finals.map((f, i) => `${i ? gn(f) : big(f)}（${pl(f)}${D.type !== 'one' ? (D.nodes[f].under ? '，名下 ' + D.nodes[f].under + ' 星' : '，不辖他星') : ''}）`);
+  switch (D.type) {
+    case 'one': return `最终定位星 ${fin[0]}，全盘归一`;
+    case 'many': {
+      const top = D.nodes[D.finals[0]].under, main = D.finals.filter(f => top > 0 && D.nodes[f].under === top).length;
+      return (main ? `主要定位星 ${fin.slice(0, main).join('、')}${fin.length > main ? '；次要 ' + fin.slice(main).join('、') : ''}` : `定位星 ${fin.join('、')}`) + (loops ? '；另有循环 ' + loops : '');
+    }
+    case 'fl': return `定位星 ${fin[0]}；另有循环 ${loops}`;
+    case 'm': return `无最终定位星；${mu} 相互定位${loops ? '；另有循环 ' + loops : ''}`;
+    case 'mf': return `${mu} 相互定位；定位星 ${fin.join('、')}`;
+    case 'mm': return `${mu} 两组相互定位${fin.length ? '；定位星 ' + fin.join('、') : ''}`;
+    default: return `无最终定位星，群星循环：${loops}`;
+  }
+}
+let dspData = null;
+function renderDsp() {
+  const D = dspData = XP.dispositors(C, view.disp), N = D.nodes;
+  document.querySelectorAll('#dspSeg button').forEach(b => { const on = b.dataset.m === D.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  $('dspNote').textContent = DSP_NAME[D.mode] + (D.mode === 'classic' ? '（三王星不入链）' : '');
+  $('dspKey').innerHTML = dspKeyHtml(D);
+  $('dspTree').innerHTML = dspSVG(D, $('dspTree').clientWidth || 600);
+  $('dspList').innerHTML = D.ids.map(id => {
+    const n = N[id], rest = n.chain.slice(1);
+    const hop = (x, last) => { const k = N[x].self ? 'fin' : N[x].cyc ? 'cyc' : ''; return `<span class="${k}"><span class="g">${G(x)}</span>${last ? BODY[x].n : N1(x)}</span>`; };
+    const tail = n.self ? '<span class="fin">入庙，自为定位星</span>' : rest.map((x, i) => '<i>→</i>' + hop(x, i === rest.length - 1)).join('');
+    const tag = n.self ? (n.under ? `名下 ${n.under} 星` : '') : n.root.kind === 'final' ? '' : n.root.kind === 'mutual' ? '互容' : '循环';
+    return `<div class="c"><span><span class="g">${G(id)}</span><span class="n">${BODY[id].n}</span></span><span class="pl">${XP.SIGNS[n.sign]} ${C.bodies[id].house} 宫</span><span class="ch">${tail}${tag ? `<em>${tag}</em>` : ''}</span></div>`;
+  }).join('');
+}
+function setDisp(m) {
+  if (m !== 'modern' && m !== 'classic' || m === view.disp) return;
+  view.disp = m; saveView();
+  if (C) { renderDsp(); if (tab === 'dupan') renderDupan(); writeURL(); }
+}
+$('dspSeg').addEventListener('click', e => { const b = e.target.closest('button[data-m]'); if (b) setDisp(b.dataset.m); });
+$('dspGo').onclick = () => setTab('dupan');
+$('dspTree').addEventListener('click', e => {
+  const g = e.target.closest('[data-dn]'); if (!g || !dspData) return;
+  const id = g.dataset.dn, n = dspData.nodes[id], b = C.bodies[id];
+  toast(`${BODY[id].n} ${XP.SIGNS[n.sign]} ${b.house} 宫 · ${n.self ? '入庙，自为定位星' : '定位星 ' + BODY[n.disp].n}${n.under ? ' · 名下 ' + n.under + ' 星' : ''}`, 2800);
+});
+// 读盘里的口径开关（在加密的那段里画出来，点了回到这里换）
+$('dpOut').addEventListener('click', e => { const b = e.target.closest('button[data-disp]'); if (b) setDisp(b.dataset.disp); });
+let dspRz = 0;
+window.addEventListener('resize', () => { clearTimeout(dspRz); dspRz = setTimeout(() => { if (C && dspData && tab === 'natal') $('dspTree').innerHTML = dspSVG(dspData, $('dspTree').clientWidth || 600); }, 150); });
 
 /* ================ 白话 ================ */
 // 日、月、升各一句（核心自我 / 情绪需要 / 外在印象），日月五星的元素与模式分布。只作参考，随盘重画。
@@ -787,6 +933,7 @@ function setTab(v, quiet) {
   VIEWS.forEach(k => { $('v-' + k).hidden = k !== v; });
   foldPanel();
   try { sessionStorage.setItem(SS_TAB, v); } catch (e) { /* 无痕模式 */ }
+  if (C && v === 'natal' && dspData) $('dspTree').innerHTML = dspSVG(dspData, $('dspTree').clientWidth || 600);   // 藏着时量不到宽度，回到本命再画一次
   if (C) renderView();      // 起盘前（初次载入）由 cast() 来画
   if (!quiet && C) writeURL();
 }
@@ -1155,6 +1302,10 @@ function chartText() {
     const b = C.bodies[id]; L.push(`${BODY[id].n} ${XP.fmtDeg(b.lon).text}${b.retro ? ' ℞' : ''} · ${b.house} 宫${b.dig ? ' · ' + b.dig : ''}`);
   });
   L.push('相位 ' + C.aspects.map(a => `${BODY[a.a].n}${a.type.n}${BODY[a.b].n}(${a.orb.toFixed(1)}°)`).join(' '));
+  const D = XP.dispositors(C, view.disp), lp = l => l.map(x => BODY[x].n).join('→') + '→' + BODY[l[0]].n;
+  L.push(`定位星（${D.mode === 'classic' ? '古典守护，七政' : '现代守护'}） ` + D.ids.map(id => D.nodes[id].self ? `${BODY[id].n}入庙` : `${BODY[id].n}→${BODY[D.nodes[id].disp].n}`).join(' ') +
+    ' · ' + [D.type === 'one' ? '独一最终定位星' + BODY[D.final].n : D.finals.length ? '定位星' + D.finals.map(f => `${BODY[f].n}(名下${D.nodes[f].under})`).join('、') : '无最终定位星',
+      D.mutuals.length ? '互容' + D.mutuals.map(m => BODY[m[0]].n + '与' + BODY[m[1]].n).join('、') : '', D.loops.length ? '循环' + D.loops.map(lp).join('、') : ''].filter(Boolean).join('，'));
   return L.join('\n');
 }
 // 当前视图的文字（行运、回归、逆行、空亡），接在盘面之后
@@ -1221,6 +1372,7 @@ function rulesText() {
     `宫制 ${HOUSE_NAME[C.house]}${C.placidusFallback ? '（纬度超过 66°，改用波菲利）' : ''}；上升、中天由格林尼治平恒星时推得。`,
     '相位容许度：合、冲 8°，刑、拱 7°，六合 5°，日月参与再加 2°；只取这五种主要相位。',
     '庙旺陷弱只论传统七政（守护为庙、对宫为陷，旺与弱亦然），三王星不论。',
+    `定位星即行星所落星座的主星，${view.disp === 'classic' ? '用古典守护、只排七政（天蝎火星、水瓶土星、双鱼木星）' : '用现代守护（天蝎冥王、水瓶天王、双鱼海王）'}；入庙者自为定位星，全盘归于一星才称独一最终定位星，两星互落对方之座为互容，三星以上成圈为循环定位。`,
     `法达以太阳在地平上下分昼夜${C.day ? '' : C.input.bonatti ? '，夜生用波那提序（交点殿后）' : '，夜生交点排在火星之后'}；小限每满一岁上升推进一宫（整宫）；福点昼生取上升 + 月 − 日，夜生取上升 + 日 − 月。`
   ];
   if (tab === 'transit') L.push('行运容许度：月亮 1°，日水金火木土 2°，天海冥 1.5°；「要紧」按行运星分量、本命点分量、相位轻重与紧密打分排出；外行星精确成相列木土天海冥；次限一日一年，推运中天用太阳弧，推运上升由推运中天按出生地纬度反推。');
@@ -1234,6 +1386,7 @@ function writeURL() {
   const s = snap(), q = new URLSearchParams();
   q.set('d', s.when); q.set('lat', s.lat); q.set('lon', s.lon); q.set('tz', s.tz);
   if (s.dst) q.set('dst', '1'); if (s.house !== 'placidus') q.set('h', s.house); if (s.bonatti) q.set('b', '1'); if (s.name) q.set('n', s.name);
+  if (view.disp === 'classic') q.set('r', 'c');
   if (tab !== 'natal') q.set('v', tab);
   if (tab === 'transit' && trAt != null) q.set('at', toLocal(trAt));
   if (tab === 'return') { if (srYear != null) q.set('sy', srYear); if (srCity) q.set('sc', srCity); }
@@ -1263,7 +1416,7 @@ function dpShowLock(msg) {
 }
 function renderDupan() {
   $('dpKey').innerHTML = C ? `${nowCast ? '此刻盘' : '本命'}${C.name ? ' <b>' + esc(C.name) + '</b>' : ''} · 日${XP.SIGNS[C.bodies.sun.sign]} 月${XP.SIGNS[C.bodies.moon.sign]} 升${XP.SIGNS[Math.floor(C.angles.asc / 30)]} · ${HOUSE_NAME[C.house]}${C.placidusFallback ? '（高纬改波菲利）' : ''}` : '';
-  if (window.XP_DUPAN) { $('dpLock').hidden = true; if (C) window.XP_DUPAN.render(C, $('dpOut'), XP, HOUSE_NAME[C.placidusFallback ? 'porphyry' : C.house]); return; }
+  if (window.XP_DUPAN) { $('dpLock').hidden = true; if (C) window.XP_DUPAN.render(C, $('dpOut'), XP, HOUSE_NAME[C.placidusFallback ? 'porphyry' : C.house], { disp: view.disp }); return; }
   const saved = dpGet();
   if (!saved || dpBusy) { if (!dpBusy) dpShowLock(); return; }
   dpBusy = true; $('dpLock').hidden = true; $('dpOut').innerHTML = '<p class="fb-fine">解禁中…</p>';
@@ -1315,6 +1468,8 @@ const q = new URLSearchParams(location.search);
   let v = q.get('v');
   if (!v) { try { const r = document.referrer && new URL(document.referrer); if (r && r.origin === location.origin && r.pathname === location.pathname) v = sessionStorage.getItem(SS_TAB); } catch (e) { /* 无痕模式 */ } }
   if (VIEWS.indexOf(v) >= 0) tab = v;
+  if (q.get('r') === 'c') view.disp = 'classic'; else if (q.get('r') === 'm') view.disp = 'modern';
+  if (view.disp !== 'classic') view.disp = 'modern';
   const at = q.get('at'), d = at ? new Date(at) : null;
   if (d && !isNaN(d) && d.getFullYear() >= 1885 && d.getFullYear() <= 2099) trAt = d.getTime();
   if (+q.get('sy')) srYear = +q.get('sy');
