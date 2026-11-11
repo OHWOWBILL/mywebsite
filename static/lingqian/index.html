@@ -182,7 +182,6 @@
     /* —— 口径 —— */
     .lq-help { padding: 16px 20px; }
     .lq-help h3 + ul { margin-top: 8px; }
-    .lq-help ul + h3 { margin-top: 16px; }
     .lq-help ul { padding: 0; }
     .lq-help li { list-style: none; padding-left: 14px; position: relative; font-size: 13px; line-height: 1.9; color: var(--fg-2); }
     .lq-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
@@ -317,9 +316,7 @@
     <ol class="lq-hlist" id="histList"></ol>
   </section>
 
-  <section class="fb-card lq-help" aria-label="口径" data-gloss>
-    <h3>口径</h3>
-    <ul id="rulesList"></ul>
+  <section class="fb-card lq-help" aria-label="签诗出处">
     <h3>签诗出处</h3>
     <ul id="srcList"></ul>
   </section>
@@ -802,7 +799,6 @@ $('startBtn').addEventListener('click', start);
 $('skipBtn').addEventListener('click', skip);
 $('qIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); start(); } });
 
-$('rulesList').innerHTML = LQ.RULES.map(r => `<li><b>${esc(r[0])}</b>${esc(r[1])}</li>`).join('');
 const SRC = {
   guanyin: '据三份公开转录互校：<a href="https://github.com/mediapig/qiantong">mediapig/qiantong</a>（源自 yanxinyu777-beep/guanyin-lingqian-100）、<a href="https://github.com/snjor-kii/guanyinqiuqian">snjor-kii/guanyinqiuqian</a>、<a href="https://github.com/iowi/guanyin">iowi/guanyin</a>；各本无开放许可，只取古本签诗、等级与典故名。',
   guandi: '《关帝灵签》姑苏钮氏藏板清刊本（哈佛燕京图书馆藏，公有领域），用 <a href="https://github.com/lakeofsky347/dsh-wen_xiang">lakeofsky347/dsh-wen_xiang</a> 的校勘本（MIT）。',

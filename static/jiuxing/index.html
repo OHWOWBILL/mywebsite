@@ -143,16 +143,10 @@
     .jx-allgrid p { font-size: 13px; line-height: 1.75; color: var(--fg-2); margin-top: 4px; }
 
     /* —— 口径 —— */
-    .jx-help { margin-top: 18px; padding: 16px 20px; }
-    .jx-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
-    .jx-help ul { padding: 0; }
-    .jx-help li { list-style: none; padding-left: 14px; position: relative; font-size: 13px; line-height: 1.9; color: var(--fg-2); }
-    .jx-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
-    .jx-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 3px; }
 
     @media (max-width: 860px) {
       .jx-boards, .jx-cards { grid-template-columns: 1fr; gap: 14px; }
-      .jx-cards, .jx-all, .jx-help { margin-top: 14px; }
+      .jx-cards, .jx-all { margin-top: 14px; }
       .jx-board { padding: 14px 10px 12px; }
       .jx-bhead { padding: 0 4px; }
       .jx-grid { max-width: 520px; margin: 0 auto; gap: 4px; }
@@ -171,7 +165,6 @@
       .jx-allgrid { grid-template-columns: 1fr; }
       .jx-all summary { padding: 14px 64px 14px 16px; }
       .jx-all summary::after { right: 16px; }
-      .jx-help { padding: 16px; }
     }
   </style>
 </head>
@@ -219,10 +212,6 @@
     <div class="jx-allgrid" id="allGrid"></div>
   </details>
 
-  <section class="fb-card jx-help" aria-label="口径">
-    <h3>口径</h3>
-    <ul id="rulesList"></ul>
-  </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
@@ -513,7 +502,6 @@ $('todayBtn').onclick = () => { target = today(); render(); };
 window.addEventListener('storage', e => {
   if (e.key && e.key.indexOf('mingbu.') === 0) { pick = defaultPick(); renderWho(); render(); }
 });
-$('rulesList').innerHTML = RULES.map(r => `<li><b>${r[0]}</b>${r[1]}</li>`).join('');
 
 // 网址可带 ?d=出行日 &b=出生（YYYY-MM-DD 或 YYYY-MM-DDTHH:MM）
 const Q = new URLSearchParams(location.search);

@@ -76,16 +76,10 @@
 .dy-ci .t em{font-style:normal;color:var(--jin);margin-left:6px}
 .dy-ci .o{font-family:var(--font-title);font-size:17px;color:var(--fg);letter-spacing:.08em;line-height:1.7;margin:2px 0}
 .dy-ci .b{font-size:13.5px;color:var(--fg-2);line-height:1.8}
-.dy-help{margin-top:18px;padding:16px 20px}
-.dy-help h3{font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:.2em;margin-bottom:8px}
-.dy-help ul{padding:0}
-.dy-help li{list-style:none;padding-left:14px;position:relative;font-size:13px;line-height:1.9;color:var(--fg-2)}
-.dy-help li::before{content:"";position:absolute;left:0;top:.9em;width:5px;height:5px;border-radius:50%;background:var(--zi-2)}
-.dy-help li b{font-family:var(--font-title);color:var(--fg);font-weight:600;margin-right:4px}
 @media (max-width:860px){
   .dy-layout{grid-template-columns:1fr;gap:14px}
   .dy-card{padding:12px}
-  .dy-read,.dy-help{padding:16px;margin-top:14px}
+  .dy-read{padding:16px;margin-top:14px}
 }
 </style>
 </head>
@@ -150,10 +144,6 @@
 
   <section class="fb-card dy-read" id="readBox" aria-label="占辞" hidden></section>
 
-  <section class="fb-card dy-help" aria-label="口径">
-    <h3>口径</h3>
-    <ul id="rulesList"></ul>
-  </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
@@ -333,7 +323,6 @@ $('shareBtn').onclick = () => {
   F.share({ title: `大衍 · ${r.ben.name}${r.zhi ? ' 之 ' + r.zhi.name : ''}`, meta: `揲蓍 · ${vals.map(v => CN[v]).join('')}`, url: location.href,
     lines: (ask() ? [['所问', ask()]] : []).concat([['占法', r.rule]], r.items.map(it => [it.title, it.text + (it.plain ? '　' + it.plain : '')])) });
 };
-$('rulesList').innerHTML = DY.RULES.map(r => `<li><b>${r[0]}</b>${esc(r[1])}</li>`).join('');
 
 /* ================ 开页 ================ */
 gather(Array.from({ length: 49 }, (_, i) => i));

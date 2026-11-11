@@ -222,12 +222,6 @@
 
     /* —— 口径 —— */
     .tz-help { margin-top: 26px; padding: 16px 20px; }
-    .tz-help h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 8px; }
-    .tz-help ul { padding: 0; }
-    .tz-help li { list-style: none; padding-left: 14px; position: relative; font-size: 13px; line-height: 1.9; color: var(--fg-2); }
-    .tz-help li::before { content: ""; position: absolute; left: 0; top: .9em; width: 5px; height: 5px; border-radius: 50%; background: var(--zi-2); }
-    .tz-help b { font-family: var(--font-title); color: var(--fg); font-weight: 600; margin-right: 4px; }
-    .tz-help .tz-warn { margin-top: 10px; }
     .tz-help .rel { margin-top: 10px; font-size: 13px; color: var(--muted); line-height: 1.9; }
 
     @media (max-width: 860px) {
@@ -307,9 +301,7 @@
     </section>
   </div>
 
-  <section class="fb-card tz-help" aria-label="口径">
-    <h3>口径</h3>
-    <ul id="rulesList"></ul>
+  <section class="fb-card tz-help" aria-label="提示">
     <div class="tz-warn">仅供自我了解与学习参考，不是医疗诊断，不替代医嘱。身体不适、症状持续或加重，请及时就医。</div>
     <p class="rel">相关：<a href="/ziwu/">子午流注 · 按时开穴</a> · <a href="/yunqi/">五运六气 · 一年气候</a> · <a href="/wushu/#men-%E5%8C%BB">五术门庭 · 医门</a></p>
   </section>
@@ -740,10 +732,6 @@ $('resHead').addEventListener('click', e => {
 });
 
 /* ================ 开页 ================ */
-$('rulesList').innerHTML = Z.RULES.map(r => `<li><b>${r[0]}</b>${r[1]}</li>`).join('') +
-  `<li><b>条目核对</b>题干按标准附录 A 录入，与两份公开整理逐条比对过：<a href="https://github.com/chihyungchang/TCM-Body-Constitution-Test" rel="noopener">chihyungchang/TCM-Body-Constitution-Test</a>（MIT）、<a href="https://github.com/zzqsld/TCM-Constitution-Assessment" rel="noopener">zzqsld/TCM-Constitution-Assessment</a>（Apache-2.0）；三方条目、归型、逆向计分一致，个别用字（如「晦黯／晦暗」）取多数。只取标准文字，没有拷贝它们的代码。</li>
-  <li><b>新国标</b>2025 年另发布国家标准 GB/T 46939—2025《中医体质分类与判定》（2026 年 4 月 1 日起实施），条目精简到二十余条；本页仍用 2009 版 60 条全表，两者结果可能略有出入。</li>`;
-
 const saved = store.get(LS_P, null);
 if (saved && SEX[saved.x] && typeof saved.a === 'string') {
   cur = { x: saved.x, ans: Z.unpack(saved.a), i: +saved.i || 0 };

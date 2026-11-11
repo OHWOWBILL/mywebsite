@@ -153,12 +153,6 @@
 .lr-ss .s.in small{color:var(--zi-2)}
 
 /* ---------- 口径 ---------- */
-.lr-help{margin-top:18px;padding:16px 20px}
-.lr-help h3{font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:.2em;margin-bottom:8px}
-.lr-help ul{padding:0}
-.lr-help li{list-style:none;padding-left:14px;position:relative;font-size:13px;line-height:1.9;color:var(--fg-2)}
-.lr-help li::before{content:"";position:absolute;left:0;top:.9em;width:5px;height:5px;border-radius:50%;background:var(--zi-2)}
-.lr-help li b{font-family:var(--font-title);color:var(--fg);font-weight:600;margin-right:4px}
 
 @media (max-width:860px){
   .lr-ctrl{min-width:0}
@@ -184,7 +178,6 @@
   .lr-sc .row{grid-template-columns:2.8em 2.8em 1.2em 1.9em minmax(0,1fr);gap:6px;padding:7px 8px}
   .lr-sc .z{font-size:21px}
   .lr-sc .ex{font-size:13px;gap:4px}
-  .lr-help{padding:16px;margin-top:14px}
 }
 @media (max-width:380px){
   .lr-ss{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -295,10 +288,6 @@
     </div>
   </div>
 
-  <section class="fb-card lr-help" aria-label="口径">
-    <h3>口径</h3>
-    <ul id="rulesList"></ul>
-  </section>
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
 
@@ -354,7 +343,7 @@ function render() {
   cur = LR.cast(date, o);
   if (!cur) { F.toast('这一刻排不出来（超出 1900–2100）'); return; }
   paintMing(o);
-  renderNow(); renderBh(); renderPan(); renderChuan(); renderKe(); renderSha(); renderRules(); paintSet();
+  renderNow(); renderBh(); renderPan(); renderChuan(); renderKe(); renderSha(); paintSet();
 }
 const fmtMD = t => { const d = new Date(t); return `${d.getMonth() + 1}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 function renderNow() {
@@ -443,7 +432,6 @@ function renderSha() {
   }).join('') + `<div class="s" title="以日旬">旬空<b>${c.xun.kong.map(z => Z[z]).join('')}</b><small>${c.xun.name}旬</small></div>`;
 }
 function rulesText() { return LR.rules(opts()).map(r => `· ${r[0]}：${r[1]}`).join('\n'); }
-function renderRules() { $('rulesList').innerHTML = LR.rules(opts()).map(r => `<li><b>${r[0]}</b>${esc(r[1])}</li>`).join(''); }
 
 /* ================ 口径设置 ================ */
 function paintSet() {
