@@ -48,6 +48,9 @@
     .who { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; color: var(--muted); }
     .who input[type=number] { width: 6.5em; padding: 4px 8px; }
     .who select { padding: 4px 8px; }
+    .who.bride { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line, rgba(255,255,255,.12)); flex-wrap: wrap; }
+    .nm-sum { flex-basis: 100%; line-height: 1.8; }
+    .nm-sum b { font-weight: 600; color: var(--gold, #d8b46a); }
     .tg { border: 1px solid var(--rule-2); border-radius: var(--r-sm); padding: 2px 11px; font-size: 12.5px; color: var(--faint); font-family: var(--font-title); }
     .tg.on { color: var(--fg-2); border-color: var(--zi-2); }
 
@@ -131,6 +134,11 @@
           <span id="byOut"></span>
           <button type="button" class="tg" id="jpTg" title="六曜、一粒万倍日、天赦日、不成就日等">日本历注</button>
         </div>
+        <div class="who bride" id="brideBox" hidden>
+          <label>新娘出生年 <input type="number" id="bdIn" min="1900" max="2100" inputmode="numeric" placeholder="如 1996"></label>
+          <span class="fb-fine">嫁娶以女命为主，另看利月、杀翁姑、夫星天嗣、埋儿时</span>
+          <div class="nm-sum fb-fine" id="nmSum"></div>
+        </div>
       </section>
     </div>
 
@@ -152,7 +160,8 @@
 <script src="/fabao/tongshu-hou.js?v=1"></script>
 <script src="/fabao/tongshu.js?v=2"></script>
 <script src="/qimen/core.js?v=5"></script>
-<script src="/zeri/zeri.js?v=2"></script>
+<script src="/zeri/nvming.js?v=1"></script>
+<script src="/zeri/zeri.js?v=3"></script>
 <script>
 (function () {
   'use strict';
@@ -185,6 +194,7 @@
   const birth = window.Fabao && Fabao.birth.load(), by0 = birth && Fabao.birth.yearOf(birth);
   let byear = ls('zeri.by') ? +ls('zeri.by') : by0 ? by0.gzYear : null;
   const sxOf = y => y ? ((y - 4) % 12 + 12) % 12 : null;
+  let bdyear = +(q.get('bride') || ls('zeri.bride') || 0) || null;
   let showN = 10;
 
   // —— 输入区 ——
@@ -222,7 +232,17 @@
   paintJp();
 
   // —— 结果 ——
-  const opt = () => ({ ev, jp, sx: sxOf(byear), ming: byear });
+  const opt = () => ({ ev, jp, sx: sxOf(byear), ming: byear, bride: ev === '嫁娶' ? bdyear : null });
+  $('bdIn').value = bdyear || '';
+  $('bdIn').onchange = () => { const v = +$('bdIn').value; bdyear = v >= 1900 && v <= 2100 ? v : null; lss('zeri.bride', bdyear || ''); render(); };
+  const ZH = '子丑寅卯辰巳午未申酉戌亥';
+  function nmSummary() {
+    if (!bdyear) return '填了以后，排名会把这几样算进去。按立春换年；讲法出自竹林书局《尅择讲义·嫁娶碎金赋》。';
+    const B = ZR_NM.of(bdyear), mon = z => ZR_NM.MON[z].replace('月', '');
+    const li = n => B.li[n].map(mon).join('、');
+    return `${B.name}年生（${B.yang ? '阳' : '阴'}女）：大利月 <b>${li('大利')}</b>，小利月 <b>${li('小利')}</b>；翁姑月 ${li('翁姑')}、父母月 ${li('父母')} 可用；妨夫 ${li('妨夫')}、妨妇 ${li('妨妇')} 不取。` +
+      `<br>杀翁 ${ZH[B.weng]}日、杀姑 ${ZH[B.gu]}日（天德月德可解）；真夫星 ${'甲乙丙丁戊己庚辛壬癸'[B.fuxing.gan]}${ZH[B.fuxing.zhi]}、天嗣 ${'甲乙丙丁戊己庚辛壬癸'[B.tiansi.gan]}${ZH[B.tiansi.zhi]} 忌日冲；夫妻宫 ${ZH[B.fuqi]}、男女宫 ${ZH[B.nannv]} 忌日冲；埋儿时 <b>${ZH[B.maier]}时</b>（进房安床忌）。`;
+  }
   const short = t => t.replace(/：.*/, '').replace(/（[^）]*）$/, '');
   const pct = s => Math.max(3, Math.min(100, Math.round((s + 12) / 20 * 100)));
   let last = [];
@@ -235,11 +255,12 @@
     return `<article class="fb-card rk g-${e.grade}">
       <div class="rk-top"><span class="no">${i + 1}</span><span class="when">${d.getMonth() + 1}月${d.getDate()}日 周${WEEK[d.getDay()]} ${mode === 'find' ? span : hm}<small>${e.hour.name} · ${e.day.gz.name}日</small></span><span class="gr">${e.grade}</span></div>
       <div class="bar"><i style="width:${pct(e.total)}%"></i></div>
-      <div class="lay"><span>黄历 <b class="g-${e.dayGrade}">${e.dayGrade}</b></span><span>时辰 <b class="${e.hour.huang ? 'g-吉' : 'g-凶'}">${e.hour.shen}${e.hour.huang ? '黄道' : '黑道'}</b></span><span>奇门 <b class="g-${v ? v.grade : '平'}">${v ? v.grade : '—'}</b></span>${jp && e.day.rokuyo ? `<span>六曜 <b>${e.day.rokuyo}</b></span>` : ''}</div>
+      <div class="lay"><span>黄历 <b class="g-${e.dayGrade}">${e.dayGrade}</b></span><span>时辰 <b class="${e.hour.huang ? 'g-吉' : 'g-凶'}">${e.hour.shen}${e.hour.huang ? '黄道' : '黑道'}</b></span><span>奇门 <b class="g-${v ? v.grade : '平'}">${v ? v.grade : '—'}</b></span>${jp && e.day.rokuyo ? `<span>六曜 <b>${e.day.rokuyo}</b></span>` : ''}${e.nm && e.nm.length ? `<span>女命 <b class="${e.nmScore > 0 ? 'g-吉' : e.nmScore < 0 ? 'g-凶' : 'g-平'}">${e.nmScore > 0 ? '+' : ''}${e.nmScore}</b></span>` : ''}</div>
       <p class="why">${pros.length ? `<span class="p">${pros.join('，')}</span>` : ''}${cons.length ? `${pros.length ? '；' : ''}<span class="n">但${cons.join('，')}</span>` : ''}</p>
       <details><summary>细看理由</summary><dl class="dl">
         <dt>黄历</dt><dd>${e.day.jianchu}日 · ${e.day.shen} · 冲${e.day.chong.sx}${e.dayPlus.length ? '<br>' + li(e.dayPlus, 'p') : ''}${e.dayMinus.length ? '<br>' + li(e.dayMinus, 'n') : ''}</dd>
         <dt>时辰</dt><dd>${e.hourItems.map(x => `<span class="${x.v > 0 ? 'p' : 'n'}">${x.t}</span>`).join('；')}</dd>
+        ${e.nm && e.nm.length ? `<dt>女命</dt><dd>${e.nm.map(x => `<span class="${x.v > 0 ? 'p' : x.v < 0 ? 'n' : ''}">${x.t}</span>`).join('；')}</dd>` : ''}
         <dt>奇门</dt><dd>${v ? `${E.qm === '考试' ? '考试·面谈' : E.qm}题：${v.lines.map(l => l.text).join('；')}${v.items.filter(x => /吟|五不遇/.test(x.t)).length ? '；<span class="n">' + v.items.filter(x => /吟|五不遇/.test(x.t)).map(x => x.t).join('、') + '</span>' : ''}` : '—'}</dd>
       </dl></details>
       <div class="acts">
@@ -260,6 +281,8 @@
     $('cands').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { cands = cands.filter(x => x.getTime() !== +b.dataset.rm); saveC(); render(); });
     const sx = sxOf(byear);
     $('byOut').textContent = byear ? `属${TS.SX[sx]} · 计冲与年命` + (by0 && by0.gzYear === byear ? '（取自命部生辰）' : '') : '';
+    $('brideBox').hidden = ev !== '嫁娶';
+    if (ev === '嫁娶') $('nmSum').innerHTML = nmSummary();
     const E = TS.EV_BY[ev];
     let list;
     if (mode === 'cand') {
