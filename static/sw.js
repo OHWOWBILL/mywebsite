@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-dca98864c821';
+const V = 'fb-6f7893f541a0';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -84,7 +84,7 @@ const PRE = [
   '/favicon-32x32.png',
   '/fonts/qj-rest.css?v=5eeb78f3',
   '/fonts/qj.css?v=5eeb78f3',
-  '/hepan/hepan.js?v=1',
+  '/hepan/hepan.js?v=2',
   '/jinkou/jinkou.js?v=1',
   '/jiuxing/jiuxing.js?v=1',
   '/kanyu/kanyu.js?v=1',

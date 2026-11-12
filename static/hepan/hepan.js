@@ -5,7 +5,9 @@
    命卦取堪舆（/kanyu/kanyu.js），只做两盘之间的比较：
      八字合婚：年支生肖、日干、日支（夫妻宫）、年柱纳音、五行互补、东西四命；
      星盘比较：两人日月水金火木土（都有出生时刻与地点时加上升）的交叉相位，
-               日月、金火、月月、金金、日日、上升与日月几对另附白话。
+               日月、金火、月月、金金、日日、上升与日月几对另附白话；
+    宿命点：两人都有出生时刻与地点时，各自的宿命点对另一人的日月水金火木土、北交、上升
+            与宿命点，合冲 2°、刑拱六合 1° 以内才算，附白话。
    不读设备时区：时间一律按「出生地钟表时间 + 出生地时区」解读（同八字、星盘）。
 
    浏览器里挂 window.HP；node 里 require 即得同一对象。
@@ -156,6 +158,61 @@
       刑: ['bad', '情绪反应与对方的举止相冲，易觉得不被理解'], 冲: ['good', '月亮落在对方下降点，情感上自然视对方为伴'] }
   };
 
+  /* —— 宿命点（Vertex）——
+     宿命点对出生时刻极敏感（差四分钟约差一度），只取很紧的容许度：
+     合（落在宿命点上）、冲（落在反宿命点上）2°，刑拱六合 1°。
+     解读以宿命点的主人为准：「谁的宿命点被谁的星点亮」。 */
+  var VX_IDS = ['sun', 'moon', 'venus', 'mars', 'mercury', 'jupiter', 'saturn', 'node', 'asc', 'vertex'];
+  var VX_ORB = { 0: 2, 180: 2, 90: 1, 120: 1, 60: 1 };
+  BODY.vertex = { id: 'vertex', n: '宿命点', g: 'Vx' };
+  // 合：[白话, 排序]；{o} 星的主人，{v} 宿命点的主人
+  var VX_MEAN = {
+    venus: ['{o}的金星落在{v}的宿命点：最有「故事」的一种，心动来得不由分说，往往一见难忘', 1],
+    moon: ['{o}的月亮落在{v}的宿命点：初见便似曾相识，亲近得像旧识；母子、骨肉之间也常见这一条', 2],
+    sun: ['{o}的太阳落在{v}的宿命点：{v}会觉得这人是命里该遇见的，对方一出现，人生就转了个弯', 3],
+    vertex: ['两人的宿命点相合：站在同一个命运节点上，双方都觉得「注定」', 4],
+    node: ['{o}的北交点落在{v}的宿命点：缘分和各自的人生方向缠在一起，相遇多在转折关头', 5],
+    mars: ['{o}的火星落在{v}的宿命点：强烈的吸引或冲撞，被对方推着去行动，难以置身事外', 6],
+    asc: ['{o}的上升落在{v}的宿命点：对方的样子仿佛早就见过，第一面就记住了', 7],
+    saturn: ['{o}的土星落在{v}的宿命点：沉重而长久的缘分，带着责任与约束，想走也难走开', 8],
+    jupiter: ['{o}的木星落在{v}的宿命点：命里的贵人，带来机缘，像是被派来帮忙的', 9],
+    mercury: ['{o}的水星落在{v}的宿命点：一席话改变想法，常见于师生、知交、笔友', 10]
+  };
+  var VX_WORD = { venus: '爱情', moon: '情感', sun: '志向', vertex: '命途', node: '方向', mars: '欲望', asc: '初见', saturn: '责任', jupiter: '机缘', mercury: '言谈' };
+  function vxAspect(sep) {
+    for (var i = 0; i < XP.ASPECTS.length; i++) {
+      var as = XP.ASPECTS[i], orb = Math.abs(sep - as.a);
+      if (orb <= VX_ORB[as.a] + 1e-9) return { type: as, orb: orb };
+    }
+    return null;
+  }
+  function vxPoint(P, id) { return id === 'asc' ? P.asc : id === 'vertex' ? P.vertex : id === 'node' ? P.node : P.planets[id]; }
+  // 结果每条：{ vx: 'A'|'B'（宿命点的主人）, id（另一人的星点）, a, b（左 A 右 B 的点）, type, orb, nat, text, rank, strong }
+  function vxLinks(PA, PB) {
+    if (PA.vertex == null || PB.vertex == null) return [];
+    var out = [];
+    [['A', PA, PB], ['B', PB, PA]].forEach(function (d) {
+      var who = d[0], V = d[1], O = d[2];
+      VX_IDS.forEach(function (id) {
+        if (id === 'vertex' && who === 'B') return;      // 两人宿命点只比一次
+        var m = vxAspect(sepOf(V.vertex, vxPoint(O, id)));
+        if (!m) return;
+        var nat = nature(m.type.a), base = VX_MEAN[id], text;
+        var fill = function (t) { return t.replace(/\{o\}/g, O.name).replace(/\{v\}/g, V.name); };
+        if (nat === '合') text = fill(base[0]);
+        else if (nat === '冲') text = id === 'vertex' ? '两人的宿命轴首尾相对：一人的宿命点正是另一人的反宿命点，缘分感同样重'
+          : fill('{o}的' + BODY[id].n + '落在{v}的反宿命点：同一条宿命轴的另一头，' + VX_WORD[id] + '上的缘分一样重，只是多半要{v}自己去追、去完成');
+        else text = fill((id === 'vertex' ? '两人的宿命点' : '{o}的' + BODY[id].n + '与{v}的宿命点') + '相' + m.type.n + '：' + VX_WORD[id] + '上有牵连，宿命色彩不及合冲');
+        out.push({
+          vx: who, id: id, a: who === 'A' ? 'vertex' : id, b: who === 'A' ? id : 'vertex',
+          type: m.type, orb: m.orb, nat: nat, text: text, strong: nat === '合' || nat === '冲',
+          rank: (nat === '合' ? 0 : nat === '冲' ? 20 : 40) + base[1]
+        });
+      });
+    });
+    return out.sort(function (p, q) { return p.rank - q.rank || p.orb - q.orb; });
+  }
+
   function cross(PA, PB) {
     var asc = PA.asc != null && PB.asc != null;
     var ids = IDS.concat(asc ? ['asc'] : []), out = [];
@@ -195,7 +252,8 @@
     var A = BZ.analyze(C), w = weights(C, A, noTime);
     var P = XP.bodies(C.utc), planets = {};
     IDS.forEach(function (id) { planets[id] = P[id].lon; });
-    var asc = !noTime && lat !== null && lon !== null && Math.abs(lat) < 90 ? XP.angles(C.utc, lat, lon).asc : null;
+    var ANG = !noTime && lat !== null && lon !== null && Math.abs(lat) < 90 ? XP.angles(C.utc, lat, lon) : null;
+    var asc = ANG ? ANG.asc : null, vertex = ANG ? XP.vertexOf(ANG, lat) : null;
     // 时辰不详：月亮一日走十三度，列出当日可能的星座
     var moonSigns = [Math.floor(P.moon.lon / 30)];
     if (noTime) {
@@ -211,7 +269,7 @@
       yz: P0[0].zhi, dg: P0[2].gan, dz: P0[2].zhi, sx: SX[P0[0].zhi],
       nayin: BZ.nayin(P0[0].idx), nayinWx: nayinWx(P0[0].idx),
       wx: w, ext: extremes(w), gy: gy, gua: KY.mingGua(gy, male),
-      planets: planets, asc: asc, moonSigns: moonSigns,
+      planets: planets, asc: asc, vertex: vertex, node: P.node.lon, moonSigns: moonSigns,
       sunSign: Math.floor(planets.sun / 30), moonSign: Math.floor(planets.moon / 30), ascSign: asc === null ? null : Math.floor(asc / 30)
     };
   }
@@ -328,11 +386,11 @@
 
   function compare(PA, PB) {
     var rows = [rowYear(PA, PB), rowDayGan(PA, PB), rowDayZhi(PA, PB), rowNayin(PA, PB), rowWx(PA, PB), rowMing(PA, PB)];
-    var aspects = cross(PA, PB), keys = aspects.filter(function (x) { return x.key; });
+    var aspects = cross(PA, PB), keys = aspects.filter(function (x) { return x.key; }), vx = vxLinks(PA, PB);
     var t = { good: 0, bad: 0, mid: 0, bz: { good: 0, bad: 0, mid: 0 }, xp: { good: 0, bad: 0, mid: 0 } };
     rows.forEach(function (r) { t[r.tone]++; t.bz[r.tone]++; });
     keys.forEach(function (k) { t[k.tone]++; t.xp[k.tone]++; });
-    return { A: PA, B: PB, rows: rows, aspects: aspects, keys: keys, tally: t, verdict: verdict(rows, keys, t) };
+    return { A: PA, B: PB, rows: rows, aspects: aspects, keys: keys, vx: vx, tally: t, verdict: verdict(rows, keys, t, vx) };
   }
 
   function overallOf(g, b) {
@@ -343,8 +401,12 @@
     if (b - g >= 3) return '冲多合少，要多用心经营';
     return '冲略多于合';
   }
-  function verdict(rows, keys, t) {
+  function verdict(rows, keys, t, vx) {
     var bzPos = [], xpPos = [], neg = [];
+    // 宿命点被日月金星或对方宿命点紧紧合上：排在星盘一边的最前面
+    (vx || []).forEach(function (x) {
+      if (x.nat === '合' && VX_MEAN[x.id][1] <= 4) xpPos.push([0, x.id === 'vertex' ? '宿命点相合' : BODY[x.id].n + '合宿命点']);
+    });
     rows.forEach(function (r) { if (r.pos) bzPos.push(r.pos); if (r.neg) neg.push(r.neg); });
     keys.forEach(function (k) {
       var p = ASP_POS[k.key], n = ASP_NEG[k.key];
@@ -393,6 +455,12 @@
     L.push('【星盘比较】' + (R.A.asc !== null && R.B.asc !== null ? '' : '（未计上升）'));
     if (!R.aspects.length) L.push('七政之间无主要相位');
     R.aspects.forEach(function (x) { L.push(aspTxt(R, x) + (x.key ? ' —— ' + x.meaning : '')); });
+    if (R.A.vertex != null && R.B.vertex != null) {
+      L.push('');
+      L.push('【宿命点】' + R.A.name + ' ' + XP.fmtDeg(R.A.vertex).text + ' · ' + R.B.name + ' ' + XP.fmtDeg(R.B.vertex).text);
+      if (!R.vx.length) L.push('两人的宿命点没有被对方的星紧紧牵上');
+      R.vx.forEach(function (x) { L.push(R.A.name + BODY[x.a].n + ' ' + x.type.n + ' ' + R.B.name + BODY[x.b].n + ' ' + fmtOrb(x.orb) + ' —— ' + x.text); });
+    }
     return L.join('\n');
   }
 
@@ -403,6 +471,7 @@
     '五行：力量照本库八字（天干各一，地支藏干本中余气 0.6 / 0.3 / 0.1，二藏 0.7 / 0.3），时辰不详者去掉时柱；最弱为所缺，最旺为所长，对方所长正是己之所缺即为补。不论旺衰用神。',
     '命卦：三元命卦，立春换年，男五寄坤、女五寄艮；坎离震巽为东四命，乾坤艮兑为西四命，同组为吉；游年按大游年歌。',
     '星盘：回归黄道，行星按 Schlyter 算法；两人日月水金火木土交叉相位，容许度 合、冲 8°，刑、拱 7°，六合 5°（两人之间不另加日月）；两人都有出生时刻与地点才加上升。要紧几对：日月、金火、月月、金金、日日、上升与日月。时辰不详者按正午排，月亮可差六七度，不排上升。',
+    '宿命点：卯酉圈在西边与黄道的交点（与本库星盘同法），两人都有出生时刻与地点才排；看一人的宿命点被另一人的日月水金火木土、北交、上升或宿命点合上（2°）、冲到反宿命点（2°），或成刑拱六合（1°）。宿命点对出生时刻极敏感，差四分钟约差一度，时刻不准时只作参考。宿命点主「非自己挑选、必然遭遇」的缘分，金星、月亮、太阳合宿命点最要紧；这种缘分常带着非把它走完不可的劲，不论吉凶。宿命点相连不计入契合计数。',
     '契合：八字六项各计一次，星盘只计要紧几对的相位；合为相合、相生、互补与和谐相位，冲为冲刑害破、相克与刑冲相位。合多冲少只是粗看，仅供参考。'
   ];
 
@@ -410,6 +479,7 @@
     LIUHE: LIUHE, SANHE: SANHE, HAI: HAI, PO: PO, XING: XING, ZIXING: ZIXING, GAN_HE: GAN_HE, GAN_CHONG: GAN_CHONG,
     IDS: IDS, BODY: BODY, KEY_NAME: KEY_NAME, MEAN: MEAN, YOU_GLOSS: YOU_GLOSS, RULES: RULES,
     zhiRel: zhiRel, ganRel: ganRel, wxRel: wxRel, nayinWx: nayinWx, nayinRel: nayinRel, weights: weights, extremes: extremes, wxBu: wxBu,
+    VX_IDS: VX_IDS, VX_MEAN: VX_MEAN, vxLinks: vxLinks,
     mingRel: mingRel, aspectOf: aspectOf, sepOf: sepOf, keyPair: keyPair, cross: cross, person: person, compare: compare,
     verdict: verdict, toText: toText, fmtOrb: fmtOrb, signTxt: signTxt
   };
