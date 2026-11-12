@@ -177,5 +177,25 @@ process.env.TZ = 'America/New_York';
 const R3 = HP.compare(HP.person(P1.b), HP.person(P2.b));
 eq(HP.toText(R3, ['东京', '大阪']), txt, '本机时区换成纽约，合盘结果一字不差');
 
+// 宿命点：与 /xingpan/ 本命同值；对方星点落在宿命点上才连；时辰不详不排
+{
+  const XPm = require('../../static/xingpan/xingpan.js');
+  const a = HP.person({ when: '1990-05-10T08:30', tz: 8, lat: 31.23, lon: 121.47, name: '甲' });
+  const C = XPm.chart({ y: 1990, mo: 5, d: 10, h: 8, mi: 30, tz: 8, lat: 31.23, lon: 121.47 });
+  eq(Math.abs(a.vertex - C.extra.vertex.lon) < 1e-6, true, '宿命点与星盘本命同值');
+  // 找一个人，金星正落在甲的宿命点上
+  let hit = null;
+  for (let t = Date.UTC(1990, 0, 1); t < Date.UTC(1994, 0, 1) && !hit; t += 86400e3) {
+    const d = new Date(t + 8 * 3600e3).toISOString().slice(0, 16);
+    const b = HP.person({ when: d, tz: 8, lat: 39.9, lon: 116.4, male: false, name: '乙' });
+    const x = HP.vxLinks(a, b).find(x => x.vx === 'A' && x.id === 'venus' && x.nat === '合');
+    if (x) hit = { b, x };
+  }
+  eq(!!hit && hit.x.orb <= 2 && hit.x.a === 'vertex' && hit.x.b === 'venus', true, '乙金星合甲宿命点（' + (hit ? HP.fmtOrb(hit.x.orb) : '—') + '）');
+  eq(!!hit && HP.compare(a, hit.b).verdict.text.indexOf('金星合宿命点') >= 0, true, '总评带出「金星合宿命点」');
+  eq(HP.vxLinks(a, HP.person({ when: '1992-11-03T21:15', tz: 8, lat: 39.9, lon: 116.4, name: '丙' }, { noTime: true })).length, 0, '时辰不详不排宿命点');
+  eq(HP.vxLinks(a, a).filter(x => x.id === 'vertex').length, 1, '两人宿命点只比一次');
+}
+
 console.log(bad ? `\n${bad} 项不合，${ok} 项相合` : `\n全部相合（${ok} 项）`);
 process.exit(bad ? 1 : 0);

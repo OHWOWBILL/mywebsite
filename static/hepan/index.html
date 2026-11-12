@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#17131F" />
   <title>合盘 · 潜蛟阁法宝库</title>
-  <meta name="description" content="合盘：两人的生辰一齐看。八字合婚（生肖、日干、日支、纳音、五行互补、东西四命）与星盘比较（日月金火等交叉相位），一句总评、合冲计数，可复制、可问 AI。" />
+  <meta name="description" content="合盘：两人的生辰一齐看。八字合婚（生肖、日干、日支、纳音、五行互补、东西四命）与星盘比较（日月金火等交叉相位、宿命点），一句总评、合冲计数，可复制、可问 AI。" />
   <!-- seo:begin 由 scripts/seo/tool-meta.js 生成，勿手改 -->
   <link rel="canonical" href="https://ohwowbill.com/hepan/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="潜蛟阁" />
   <meta property="og:title" content="合盘 · 潜蛟阁法宝库" />
-  <meta property="og:description" content="合盘：两人的生辰一齐看。八字合婚（生肖、日干、日支、纳音、五行互补、东西四命）与星盘比较（日月金火等交叉相位），一句总评、合冲计数，可复制、可问 AI。" />
+  <meta property="og:description" content="合盘：两人的生辰一齐看。八字合婚（生肖、日干、日支、纳音、五行互补、东西四命）与星盘比较（日月金火等交叉相位、宿命点），一句总评、合冲计数，可复制、可问 AI。" />
   <meta property="og:url" content="https://ohwowbill.com/hepan/" />
   <meta property="og:image" content="https://ohwowbill.com/img/og-card.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -141,6 +141,12 @@
     .hp-asp .mean b { flex-shrink: 0; padding: 0 7px; border-radius: 4px; background: rgba(122, 91, 192, .26); color: var(--zi-2); font-family: var(--font-title); font-weight: 600; font-size: 12px; letter-spacing: .1em; }
     .hp-more { align-self: flex-start; margin-top: 4px; padding: 4px 12px; border-radius: var(--r-sm); font-family: var(--font-title); font-size: 12.5px; letter-spacing: .1em; color: var(--zi-2); border: 1px dashed var(--rule-2); }
     .hp-more:hover { border-color: var(--zi-2); color: var(--fg); }
+    .hp-vx { margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--rule-2); display: flex; flex-direction: column; gap: 4px; }
+    .hp-vx h4 { margin: 0 0 4px; font-family: var(--font-title); font-size: 14px; font-weight: 600; letter-spacing: .2em; color: var(--zi-2); display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+    .hp-vx h4 small { font-weight: 400; font-size: 12px; letter-spacing: .05em; color: var(--muted); }
+    .hp-asp.k-fate { --kc: var(--zi-2); }
+    .hp-asp.vx-soft .mean { color: var(--muted); }
+    .hp-vx .fate { font-size: 12.5px; line-height: 1.7; color: var(--fg-2); margin: 4px 0 0; }
     .hp-none { font-size: 13px; color: var(--faint); padding: 6px 0; }
 
 
@@ -207,6 +213,7 @@
       <div class="hp-signs" id="xpSigns"></div>
       <p class="hp-sign-note" id="xpNote" hidden></p>
       <div class="hp-asps" id="aspBox"></div>
+      <div class="hp-vx" id="vxBox"></div>
     </section>
   </div>
 
@@ -219,7 +226,7 @@
 <script src="/xingpan/xingpan.js?v=4"></script>
 <script src="/kanyu/kanyu.js?v=1"></script>
 <script src="/fabao/cities.js?v=1"></script>
-<script src="/hepan/hepan.js?v=1"></script>
+<script src="/hepan/hepan.js?v=2"></script>
 <script src="/fabao/fabao.js?v=18"></script>
 <script>
 (function () {
@@ -563,6 +570,7 @@ function renderXing() {
   const noAsc = PA.ascSign === null || PB.ascSign === null;
   $('xpNote').hidden = !noAsc;
   if (noAsc) $('xpNote').textContent = '上升要两人都有出生时刻与地点，这一盘没算上升。';
+  renderVx();
   const list = R.aspects;
   if (!list.length) { $('aspBox').innerHTML = '<p class="hp-none">两人七政之间没有主要相位。</p>'; return; }
   let nk = 0;
@@ -579,6 +587,24 @@ function renderXing() {
     (hidden ? `<button type="button" class="hp-more" id="moreBtn">${showAll ? '收起较松的相位' : `再看 ${hidden} 条较松的相位`}</button>` : '');
   const mb = $('moreBtn');
   if (mb) mb.onclick = () => { showAll = !showAll; renderXing(); };
+}
+
+// 宿命点：谁的宿命点被谁的星合上；左右两栏仍是 本人 / 对方
+function renderVx() {
+  const [na, nb] = labels(), box = $('vxBox');
+  const pos = P => P.vertex == null ? '不详' : esc(XP.fmtDeg(P.vertex).text);
+  const head = `<h4>宿命点<small>${esc(na)} ${pos(PA)} · ${esc(nb)} ${pos(PB)}</small></h4>`;
+  if (PA.vertex == null || PB.vertex == null) { box.innerHTML = head + '<p class="hp-none">宿命点要两人都有出生时刻与地点，这一盘没排。</p>'; return; }
+  const list = R.vx;
+  if (!list.length) { box.innerHTML = head + '<p class="hp-none">两人的宿命点没有被对方的星紧紧牵上。</p>'; return; }
+  box.innerHTML = head + list.map(x => `<div class="hp-asp ${x.strong ? 'key k-fate' : 'vx-soft'}">
+      <span><i class="g">${G(x.a)}</i>${HP.BODY[x.a].n}</span>
+      <span class="t ${natCls(x)}"><i>${x.type.g}${T}</i>${x.type.n}</span>
+      <span><i class="g">${G(x.b)}</i>${HP.BODY[x.b].n}</span>
+      <span class="o">${HP.fmtOrb(x.orb)}</span>
+      <p class="mean"><b>${x.strong ? '宿命' : '牵连'}</b><span>${esc(x.text)}</span></p>
+    </div>`).join('') +
+    (list.some(x => x.strong) ? '<p class="fate">宿命点牵上的缘分，常有一股不论代价都要把它走完的劲，理智想放下也难。</p>' : '');
 }
 
 loadState();
