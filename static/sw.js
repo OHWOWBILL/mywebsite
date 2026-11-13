@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-6f7893f541a0';
+const V = 'fb-73c0ecb64a02';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -24,6 +24,7 @@ const PRE = [
   '/liuyao/',
   '/meihua/',
   '/qimen/',
+  '/qizheng/',
   '/taiyi/',
   '/tizhi/',
   '/tools/',
@@ -46,7 +47,7 @@ const PRE = [
   '/fabao/cidian.js?v=1',
   '/fabao/cities.js?v=1',
   '/fabao/fabao.css?v=10',
-  '/fabao/fabao.js?v=18',
+  '/fabao/fabao.js?v=19',
   '/fabao/jieqi-se.js?v=1',
   '/fabao/kyureki.js?v=1',
   '/fabao/lunar.js?v=1',
@@ -62,6 +63,7 @@ const PRE = [
   '/fabao/strokes/5c71.json',
   '/fabao/strokes/5e74.json',
   '/fabao/strokes/62e9.json',
+  '/fabao/strokes/653f.json',
   '/fabao/strokes/661f.json',
   '/fabao/strokes/672f.json',
   '/fabao/strokes/6885.json',
@@ -105,6 +107,7 @@ const PRE = [
   '/meihua/styles/main.css?v=6',
   '/qimen/core.js?v=5',
   '/qimen/jieqi.js?v=1',
+  '/qizheng/qizheng.js?v=1',
   '/taiyi/taiyi.js?v=1',
   '/tizhi/tizhi.js?v=1',
   '/xingming/data/kangxi.js?v=1',
