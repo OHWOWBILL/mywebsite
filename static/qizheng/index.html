@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17131F">
+<title>七政四余 · 潜蛟阁法宝库</title>
+<meta name="description" content="七政四余（果老星宗）排盘：按出生地经纬度与时区起盘，日月五星加罗睺、计都、紫气、月孛十一曜，各曜所在宫度与二十八宿度、顺逆留、入垣；命宫命度、身宫，命主、度主、身主，十二宫宫主与所落之曜，圆盘与表格并列，可复制或问 AI。">
+<!-- seo:begin 由 scripts/seo/tool-meta.js 生成，勿手改 -->
+<link rel="canonical" href="https://ohwowbill.com/qizheng/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="潜蛟阁" />
+<meta property="og:title" content="七政四余 · 潜蛟阁法宝库" />
+<meta property="og:description" content="七政四余（果老星宗）排盘：按出生地经纬度与时区起盘，日月五星加罗睺、计都、紫气、月孛十一曜，各曜所在宫度与二十八宿度、顺逆留、入垣；命宫命度、身宫，命主、度主、身主，十二宫宫主与所落之曜，圆盘与表格并列，可复制或问 AI。" />
+<meta property="og:url" content="https://ohwowbill.com/qizheng/" />
+<meta property="og:image" content="https://ohwowbill.com/img/og-card.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<!-- seo:end -->
+<link rel="icon" href="/favicon-32x32.png">
+<link rel="stylesheet" href="/fonts/qj.css?v=5eeb78f3">
+<link rel="stylesheet" href="/fonts/qj-rest.css?v=5eeb78f3" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/fabao/fabao.css?v=10">
+<style>
+/* 七政四余 · 圆盘与表（外框见 /fabao/fabao.css） */
+[data-w="木"]{--wc:var(--wx-mu)} [data-w="火"]{--wc:var(--wx-huo)} [data-w="土"]{--wc:var(--wx-tu)} [data-w="金"]{--wc:var(--wx-jin)} [data-w="水"]{--wc:var(--wx-shui)}
+.qz-form{display:flex;flex-direction:column;gap:10px;min-width:0}
+.qz-form .fb-row{gap:8px 10px}
+.qz-form input[type=number]{width:6.2em}
+.qz-form input[type=text]{width:9em}
+.qz-chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);letter-spacing:.08em;cursor:pointer;white-space:nowrap}
+.qz-chk input{accent-color:var(--zi)}
+.qz-side{display:flex;flex-direction:column;gap:8px;max-width:340px}
+.qz-side .fb-row .fb-btn{flex:1}
+.qz-dst{font-size:12.5px;color:var(--jin);line-height:1.7;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.qz-dst .fb-btn{padding:3px 10px;font-size:12px}
+
+.qz-key{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin:0 0 14px;padding:12px 16px}
+.qz-key .it{display:flex;gap:6px;align-items:baseline;font-size:13px;color:var(--muted);letter-spacing:.06em}
+.qz-key .it b{font-family:var(--font-title);font-weight:600;font-size:16px;color:var(--fg);letter-spacing:.08em}
+.qz-key .it b.jin{color:var(--jin)}
+.qz-key .pil{display:flex;gap:6px;margin-left:auto}
+.qz-key .pil span{font-family:var(--font-title);font-size:14px;color:var(--fg-2);padding:1px 7px;border:1px solid var(--rule-2);border-radius:var(--r-xs)}
+
+.qz-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
+.qz-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.qz-card{padding:16px 18px}
+.qz-card h3{font-family:var(--font-title);font-weight:600;font-size:15px;letter-spacing:.2em;margin-bottom:10px;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px}
+.qz-card h3 small{font-size:12px;font-weight:400;color:var(--muted);letter-spacing:.08em}
+
+/* 圆盘：南上东左，午在上、卯在左 */
+.qz-wheel{width:100%;max-width:640px;margin:0 auto;aspect-ratio:1}
+.qz-wheel svg{width:100%;height:100%;display:block;overflow:visible}
+.qz-wheel .ring{fill:none;stroke:var(--rule-2);stroke-width:1}
+.qz-wheel .seg{stroke:var(--rule-2);stroke-width:1}
+.qz-wheel .xbg{opacity:.09}
+.qz-wheel .xbg.x0{fill:var(--qing)} .qz-wheel .xbg.x1{fill:var(--wx-shui)} .qz-wheel .xbg.x2{fill:var(--wx-jin)} .qz-wheel .xbg.x3{fill:var(--zhu)}
+.qz-wheel .xbg.x1{opacity:.05}
+.qz-wheel .xn{font-family:var(--font-title);font-size:15px;font-weight:600;fill:var(--fg-2);text-anchor:middle;dominant-baseline:central}
+.qz-wheel .xn.on{fill:var(--jin)}
+.qz-wheel .xl{font-family:var(--font-title);font-size:9.5px;fill:var(--faint);text-anchor:middle;dominant-baseline:central}
+.qz-wheel .gbg{fill:transparent}
+.qz-wheel .gbg.ming{fill:rgba(217,174,78,.1)}
+.qz-wheel .gbg.shen{fill:rgba(122,91,192,.12)}
+.qz-wheel .gz{font-family:var(--font-title);font-size:20px;font-weight:600;fill:var(--fg);text-anchor:middle;dominant-baseline:central}
+.qz-wheel .gc{font-family:var(--font-title);font-size:10px;fill:var(--faint);text-anchor:middle;dominant-baseline:central}
+.qz-wheel .gh{font-family:var(--font-title);font-size:11.5px;fill:var(--muted);text-anchor:middle;dominant-baseline:central;letter-spacing:.05em}
+.qz-wheel .gh.ming{fill:var(--jin);font-weight:600}
+.qz-wheel .gh.shen{fill:var(--zi-2)}
+.qz-wheel .tick{stroke:var(--muted);stroke-width:.6;opacity:.5}
+.qz-wheel .st{font-family:var(--font-title);font-size:19px;font-weight:600;text-anchor:middle;dominant-baseline:central;fill:var(--wc,var(--fg));cursor:pointer}
+.qz-wheel .st.yu{font-weight:400}
+.qz-wheel .sd{font-family:var(--font-mark);font-size:9.5px;fill:var(--muted);text-anchor:middle;dominant-baseline:central}
+.qz-wheel .sr{font-family:var(--font-title);font-size:9.5px;fill:var(--zhu);text-anchor:middle;dominant-baseline:central}
+.qz-wheel .pin{stroke:var(--muted);stroke-width:.8}
+.qz-wheel .asc{stroke:var(--jin);stroke-width:1.6}
+.qz-wheel .ascl{font-family:var(--font-title);font-size:11px;fill:var(--jin);text-anchor:middle;dominant-baseline:central;letter-spacing:.1em}
+.qz-wheel .inner{fill:var(--bg);stroke:var(--rule-2)}
+.qz-wheel .c1{font-family:var(--font-title);font-size:13px;fill:var(--faint);text-anchor:middle;letter-spacing:.2em}
+.qz-wheel .c2{font-family:var(--font-title);font-size:22px;font-weight:600;fill:var(--jin);text-anchor:middle;letter-spacing:.1em}
+.qz-wheel .c3{font-family:var(--font-title);font-size:13px;fill:var(--fg-2);text-anchor:middle;letter-spacing:.08em}
+.qz-cap{text-align:center;font-size:12px;color:var(--faint);letter-spacing:.08em;margin-top:6px}
+
+table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
+.qz-t th{font-family:var(--font-title);font-weight:400;font-size:12px;color:var(--faint);letter-spacing:.12em;text-align:left;padding:0 6px 6px}
+.qz-t td{padding:5px 6px;border-top:1px dashed var(--rule);color:var(--fg-2);white-space:nowrap}
+.qz-t tr.grp td{border-top:1px solid var(--rule-2)}
+.qz-t tr.hl td{background:rgba(217,174,78,.08)}
+.qz-t .n{font-family:var(--font-title);color:var(--wc,var(--fg));font-weight:600}
+.qz-t .deg{font-family:var(--font-mark);font-size:12px}
+.qz-t .xd{font-family:var(--font-title)}
+.qz-t .tg{font-family:var(--font-title);font-size:12px;padding:0 5px;border-radius:var(--r-xs);border:1px solid var(--rule-2);color:var(--muted);margin-right:3px}
+.qz-t .tg.r{border-color:var(--zhu);color:var(--zhu)}
+.qz-t .tg.y{border-color:var(--jin);color:var(--jin)}
+
+.qz-gong{display:flex;flex-direction:column;gap:4px}
+.qz-gong .g{display:grid;grid-template-columns:3.2em 3.6em 2.2em minmax(0,1fr);gap:8px;align-items:center;padding:6px 10px;border-radius:var(--r-sm);background:var(--bg-3);border:1px solid transparent;font-size:13px;color:var(--fg-2)}
+.qz-gong .g.ming{border-color:var(--jin)}
+.qz-gong .g.shen{border-color:var(--zi-2)}
+.qz-gong .h{font-family:var(--font-title);font-weight:600;color:var(--fg);letter-spacing:.08em}
+.qz-gong .g.ming .h{color:var(--jin)}
+.qz-gong .z{font-family:var(--font-title);color:var(--fg-2)}
+.qz-gong .z small{color:var(--faint);font-size:12px;margin-left:3px}
+.qz-gong .l{font-family:var(--font-title);font-size:12px;color:var(--muted)}
+.qz-gong .s{display:flex;flex-wrap:wrap;gap:3px 8px}
+.qz-gong .s b{font-family:var(--font-title);font-weight:600;color:var(--wc,var(--fg))}
+.qz-gong .s i{font-style:normal;color:var(--faint);font-size:12px}
+
+.qz-xiu{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.qz-xiu div{background:var(--bg-3);border:1px solid transparent;border-radius:var(--r-sm);padding:5px 2px;text-align:center;line-height:1.35}
+.qz-xiu b{display:block;font-family:var(--font-title);font-weight:600;font-size:15px;color:var(--fg)}
+.qz-xiu small{display:block;font-size:12px;color:var(--faint);font-family:var(--font-mark)}
+.qz-xiu i{font-style:normal;display:block;font-size:12px;color:var(--muted);font-family:var(--font-title)}
+.qz-xiu div.on{border-color:var(--jin)} .qz-xiu div.on b{color:var(--jin)}
+.qz-xiu .xh{grid-column:1/-1;background:none;padding:6px 0 0;text-align:left;font-family:var(--font-title);font-size:12px;color:var(--faint);letter-spacing:.2em}
+.qz-xiu .xh:first-child{padding-top:0}
+.qz-set{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.qz-set select{flex:1;min-width:0}
+
+@media (max-width:900px){
+  .qz-layout{grid-template-columns:1fr;gap:14px}
+  .qz-card{padding:12px}
+  .qz-key .pil{margin-left:0}
+  .qz-xiu b{font-size:14px}
+}
+</style>
+</head>
+<body data-tool="qizheng">
+
+<main class="fb-main">
+  <header class="fb-head">
+    <div class="fb-seal" aria-hidden="true">政</div>
+    <div>
+      <h1 class="fb-title">七政四余</h1>
+      <p class="fb-sub">果老星宗 · 十一曜宫度宿度 · 命度身宫</p>
+    </div>
+  </header>
+
+  <section class="fb-now" aria-label="起盘">
+    <div class="qz-form">
+      <div class="fb-row">
+        <input type="datetime-local" id="whenIn" min="1885-01-01T00:00" max="2099-12-31T23:59" aria-label="出生时间（出生地钟表时间）">
+        <button class="fb-btn" id="nowBtn" type="button">此刻</button>
+        <input type="text" id="nameIn" placeholder="姓名或备注" maxlength="24" aria-label="姓名或备注">
+      </div>
+      <div class="fb-row">
+        <select id="cityIn" aria-label="出生地"></select>
+        <label class="qz-chk">纬 <input type="number" id="latIn" step="0.01" min="-89.9" max="89.9" inputmode="decimal" aria-label="北纬（南纬为负）"></label>
+        <label class="qz-chk">经 <input type="number" id="lonIn" step="0.01" min="-180" max="180" inputmode="decimal" aria-label="东经（西经为负）"></label>
+        <select id="tzIn" aria-label="出生地时区"></select>
+        <label class="qz-chk" title="出生时当地正行夏令时，钟表比标准时快一小时"><input type="checkbox" id="dstIn">夏令时</label>
+      </div>
+      <div class="qz-dst" id="dstNote" hidden></div>
+    </div>
+    <div class="fb-now-ctrl qz-side">
+      <div class="fb-row">
+        <button class="fb-btn primary" id="copyBtn" type="button">复制</button>
+        <button class="fb-btn" id="aiBtn" type="button" title="把盘连同本站口径包成一段提示词复制，贴给任意 AI">问 AI</button>
+        <button class="fb-btn" id="linkBtn" type="button">此盘链接</button>
+        <button class="fb-btn" id="shareBtn" type="button" title="把这一盘画成一张图，可存可分享">分享图</button>
+      </div>
+      <div class="qz-set">
+        <select id="ljIn" aria-label="罗睺计都">
+          <option value="qing">罗睺升交 · 计都降交</option>
+          <option value="ming">罗睺降交 · 计都升交</option>
+        </select>
+      </div>
+      <p class="fb-fine">宫按回归黄道（中气分宫），宿按恒星距星。排盘全在本机计算，不上传。</p>
+    </div>
+  </section>
+
+  <section class="fb-card qz-key" id="keyBox" aria-label="命宫身宫"></section>
+
+  <div class="qz-layout">
+    <div class="qz-col">
+      <section class="fb-card qz-card" aria-label="七政盘">
+        <h3 id="title">七政盘<small id="subtitle"></small></h3>
+        <div class="qz-wheel" id="wheel"></div>
+        <p class="qz-cap">南上东左 · 外圈二十八宿 · 金线为命度</p>
+      </section>
+      <section class="fb-card qz-card" aria-label="十一曜">
+        <h3>十一曜<small>宫度 · 宿度 · 顺逆 · 所落之宫</small></h3>
+        <div style="overflow-x:auto"><table class="qz-t" id="starT"></table></div>
+      </section>
+    </div>
+    <div class="qz-col">
+      <section class="fb-card qz-card" aria-label="十二宫">
+        <h3>十二宫<small>自命宫逆布 · 宫主 · 所落之曜</small></h3>
+        <div class="qz-gong" id="gongBox"></div>
+      </section>
+      <section class="fb-card qz-card" aria-label="二十八宿">
+        <h3>二十八宿<small>宿主 · 今宿宽</small></h3>
+        <div class="qz-xiu" id="xiuBox"></div>
+      </section>
+    </div>
+  </div>
+
+  <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
+</main>
+
+<script src="/qimen/jieqi.js?v=1"></script>
+<script src="/fabao/lunar.js?v=1"></script>
+<script src="/bazi/bazi.js?v=3"></script>
+<script src="/xingpan/xingpan.js?v=4"></script>
+<script src="/qizheng/qizheng.js?v=1"></script>
+<script src="/fabao/cities.js?v=1"></script>
+<script src="/fabao/fabao.js?v=19"></script>
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const F = window.Fabao, QZ = window.QZ, BZ = window.BZ, ST = QZ.STAR, Z = QZ.ZHI;
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const mod = (a, n) => ((a % n) + n) % n;
+const CITIES = window.QJ_CITIES.GROUPS, CITY_LIST = window.QJ_CITIES.LIST, TZS = window.QJ_CITIES.TZS, tzLabel = window.QJ_CITIES.tzLabel;
+const LS_VIEW = 'qizheng.view.v1';
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
+};
+const guessTz = -new Date().getTimezoneOffset() / 60;
+const guess = CITY_LIST.find(c => c[3] === guessTz) || CITY_LIST[0];
+const view = Object.assign({ city: guess[0], lon: guess[1], lat: guess[2], tz: guess[3], luoji: 'qing' }, store.get(LS_VIEW, {}));
+const saveView = () => store.set(LS_VIEW, view);
+let C = null, P = null;
+
+$('cityIn').innerHTML = CITIES.map(([g, l]) => `<optgroup label="${g}">${l.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('') + '<option value="">自定义经纬度</option>';
+$('tzIn').innerHTML = TZS.map(z => `<option value="${z}">${tzLabel(z)}</option>`).join('');
+function syncUI() {
+  $('cityIn').value = CITY_LIST.some(c => c[0] === view.city) ? view.city : '';
+  $('latIn').value = view.lat; $('lonIn').value = view.lon; $('tzIn').value = String(view.tz); $('ljIn').value = view.luoji;
+}
+
+/* ================ 起盘 ================ */
+function cast() {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec($('whenIn').value);
+  if (!m) { F.toast('日期不对'); return; }
+  const [y, mo, d, h, mi] = m.slice(1).map(Number);
+  if (y < 1885 || y > 2099) { F.toast('只排 1885–2099 年'); return; }
+  const dst = $('dstIn').checked;
+  C = QZ.chart({ y, mo, d, h, mi, tz: +view.tz, dst, lat: +view.lat, lon: +view.lon, luoji: view.luoji });
+  C.name = $('nameIn').value.trim();
+  P = BZ.chart({ y, mo, d, h, mi, tz: +view.tz, dst, lon: +view.lon, male: true });
+  const dn = $('dstNote');
+  if (+view.tz === 8 && !dst && BZ.isChinaDST(y, mo, d)) {
+    dn.hidden = false;
+    dn.innerHTML = `此日在大陆夏令时期间（${y} 年），当时钟表比北京标准时快一小时。若所报为当时钟表读数，应勾「夏令时」。<button class="fb-btn" type="button" id="dstBtn">勾上夏令时</button>`;
+    $('dstBtn').onclick = () => { $('dstIn').checked = true; cast(); F.toast('已按夏令时减一小时'); };
+  } else dn.hidden = true;
+  render(); writeURL();
+  F.birth.save({ when: $('whenIn').value, name: C.name, tz: +view.tz, lon: +view.lon, lat: +view.lat, dst, city: view.city || '' });
+}
+
+const xd = (i, deg) => `${QZ.XIU[i].n}${QZ.cnNum(Math.floor(deg))}度`;
+function render() {
+  const inp = C.input, M = C.ming;
+  $('title').innerHTML = `${C.name ? esc(C.name) + ' · ' : ''}七政盘<small>${inp.y}-${pad(inp.mo)}-${pad(inp.d)} ${pad(inp.h)}:${pad(inp.mi)}${inp.dst ? '（夏令时）' : ''} ${tzLabel(+inp.tz)} · ${Math.abs(inp.lat).toFixed(2)}°${inp.lat >= 0 ? 'N' : 'S'} ${Math.abs(inp.lon).toFixed(2)}°${inp.lon >= 0 ? 'E' : 'W'}</small>`;
+  $('keyBox').innerHTML = `
+    <span class="it">命宫<b class="jin">${Z[M.zhi]}宫${QZ.CI[M.zhi]}</b></span>
+    <span class="it">命度<b class="jin">${xd(M.xiu, M.xdeg)}</b></span>
+    <span class="it">命主<b>${ST[C.mingZhu].n}</b></span>
+    <span class="it">度主<b>${ST[C.duZhu].n}</b></span>
+    <span class="it">身宫<b>${Z[C.shen.zhi]}宫${QZ.CI[C.shen.zhi]}</b></span>
+    <span class="it">身主<b>${ST[C.shenZhu].n}</b></span>
+    <span class="it">${C.day ? '昼生' : '夜生'}</span>
+    ${P ? `<span class="pil" title="四柱（真太阳时）">${P.pillars.map(p => `<span>${p.name}</span>`).join('')}</span>` : ''}`;
+  $('wheel').innerHTML = wheelSVG(C);
+  renderStars(); renderGong(); renderXiu();
+}
+
+/* ================ 圆盘 ================ */
+const CX = 300, f1 = x => x.toFixed(1);
+// 黄经 → 盘上角度：宝瓶（子宫）居下、狮子（午宫）居上，黄经增则逆时针
+const ang = lon => (270 + lon - 315) * Math.PI / 180;
+const PT = (lon, r) => [CX + r * Math.cos(ang(lon)), CX - r * Math.sin(ang(lon))];
+function arc(a0, a1, r1, r2) {
+  const [x0, y0] = PT(a0, r1), [x1, y1] = PT(a1, r1), [x2, y2] = PT(a1, r2), [x3, y3] = PT(a0, r2), big = mod(a1 - a0, 360) > 180 ? 1 : 0;
+  return `M${f1(x0)} ${f1(y0)} A${r1} ${r1} 0 ${big} 0 ${f1(x1)} ${f1(y1)} L${f1(x2)} ${f1(y2)} A${r2} ${r2} 0 ${big} 1 ${f1(x3)} ${f1(y3)}Z`;
+}
+function wheelSVG(X) {
+  const R1 = 294, R2 = 252, R3 = 198, R4 = 118;
+  let s = '<svg viewBox="0 0 600 600" role="img" aria-label="七政四余圆盘">';
+  // 二十八宿
+  X.xiu.forEach((x, i) => {
+    const a0 = x.start, a1 = x.start + x.width, on = i === X.ming.xiu;
+    s += `<path class="xbg x${Math.floor(i / 7)}" d="${arc(a0, a1, R1, R2)}"/>`;
+    const [lx, ly] = PT(a0, R1), [mx, my] = PT(a0, R2);
+    s += `<line class="seg" x1="${f1(lx)}" y1="${f1(ly)}" x2="${f1(mx)}" y2="${f1(my)}"/>`;
+    const mid = a0 + x.width / 2, narrow = x.width < 3;
+    const [nx, ny] = PT(mid, narrow ? R1 + 12 : (R1 + R2) / 2 + 6), [qx, qy] = PT(mid, (R1 + R2) / 2 - 10);
+    s += `<text class="xn${on ? ' on' : ''}" x="${f1(nx)}" y="${f1(ny)}"><title>${x.full}宿 · 距星 ${x.star} · 宽 ${x.width.toFixed(1)}°</title>${x.n}</text>`;
+    if (!narrow && x.width >= 6) s += `<text class="xl" x="${f1(qx)}" y="${f1(qy)}">${ST[x.lord].s}</text>`;
+  });
+  s += `<circle class="ring" cx="${CX}" cy="${CX}" r="${R1}"/><circle class="ring" cx="${CX}" cy="${CX}" r="${R2}"/>`;
+  for (let d = 0; d < 360; d += 1) {
+    const len = d % 10 === 0 ? 7 : d % 5 === 0 ? 4.5 : 2.2, [ax, ay] = PT(d, R2), [bx, by] = PT(d, R2 - len);
+    s += `<line class="tick" x1="${f1(ax)}" y1="${f1(ay)}" x2="${f1(bx)}" y2="${f1(by)}"/>`;
+  }
+  // 十二宫
+  for (let k = 0; k < 12; k++) {
+    const a0 = k * 30, zhi = mod(10 - k, 12), g = X.gongs[zhi], ming = zhi === X.ming.zhi, shen = zhi === X.shen.zhi;
+    s += `<path class="gbg${ming ? ' ming' : shen ? ' shen' : ''}" d="${arc(a0, a0 + 30, R2 - 8, R3)}"/>`;
+    const [lx, ly] = PT(a0, R2), [mx, my] = PT(a0, R4);
+    s += `<line class="seg" x1="${f1(lx)}" y1="${f1(ly)}" x2="${f1(mx)}" y2="${f1(my)}"/>`;
+    const [zx, zy] = PT(a0 + 15, R2 - 21), [cx, cy] = PT(a0 + 6, R2 - 21), [hx, hy] = PT(a0 + 15, R3 + 12);
+    s += `<text class="gz" x="${f1(zx)}" y="${f1(zy)}"><title>${Z[zhi]}宫${QZ.CI[zhi]} · ${ST[g.lord].n}主</title>${Z[zhi]}</text><text class="gc" x="${f1(cx)}" y="${f1(cy)}">${ST[g.lord].s}</text>`;
+    s += `<text class="gh${ming ? ' ming' : shen ? ' shen' : ''}" x="${f1(hx)}" y="${f1(hy)}">${g.house}${shen ? '·身' : ''}</text>`;
+  }
+  s += `<circle class="ring" cx="${CX}" cy="${CX}" r="${R3}"/>`;
+  // 十一曜：按黄经排开，挤在一起的往旁边让
+  const items = X.stars.map(st => ({ st, pos: st.lon })).sort((a, b) => a.pos - b.pos);
+  for (let pass = 0; pass < 8; pass++) {
+    for (let k = 0; k < items.length; k++) {
+      const a = items[k], b = items[(k + 1) % items.length], gap = mod(b.pos - a.pos, 360);
+      if (gap < 8.5) { a.pos = mod(a.pos - (8.5 - gap) / 2, 360); b.pos = mod(b.pos + (8.5 - gap) / 2, 360); }
+    }
+  }
+  s += `<circle class="inner" cx="${CX}" cy="${CX}" r="${R4}"/>`;
+  items.forEach(({ st, pos }) => {
+    const [px, py] = PT(st.lon, R3), [qx, qy] = PT(st.lon, R3 - 7), [gx, gy] = PT(pos, R3 - 24), [dx, dy] = PT(pos, R3 - 45), [rx, ry] = PT(pos, R3 - 60);
+    s += `<line class="pin" x1="${f1(px)}" y1="${f1(py)}" x2="${f1(qx)}" y2="${f1(qy)}"/>`;
+    s += `<text class="st${st.yu ? ' yu' : ''}" data-w="${st.wx}" data-id="${st.id}" x="${f1(gx)}" y="${f1(gy)}"><title>${st.n} ${xd(st.xiu, st.xdeg)}${st.retro ? ' 逆' : ''}</title>${st.s}</text>`;
+    s += `<text class="sd" x="${f1(dx)}" y="${f1(dy)}">${QZ.XIU[st.xiu].n}${Math.floor(st.xdeg)}</text>`;
+    if (st.retro || st.still) s += `<text class="sr" x="${f1(rx)}" y="${f1(ry)}">${st.still ? '留' : '逆'}</text>`;
+  });
+  // 命度（上升点）
+  const [ax, ay] = PT(X.asc, R1), [bx, by] = PT(X.asc, R4), [tx, ty] = PT(X.asc, R1 + 14);
+  s += `<line class="asc" x1="${f1(ax)}" y1="${f1(ay)}" x2="${f1(bx)}" y2="${f1(by)}"/><text class="ascl" x="${f1(tx)}" y="${f1(ty)}">命</text>`;
+  s += `<text class="c1" x="${CX}" y="${CX - 30}">命度</text><text class="c2" x="${CX}" y="${CX + 2}">${xd(X.ming.xiu, X.ming.xdeg)}</text>`;
+  s += `<text class="c3" x="${CX}" y="${CX + 30}">命主${ST[X.mingZhu].s} · 度主${ST[X.duZhu].s}</text>`;
+  return s + '</svg>';
+}
+
+/* ================ 表 ================ */
+function renderStars() {
+  $('starT').innerHTML = '<tr><th>曜</th><th>宫</th><th>宫度</th><th>宿度</th><th></th><th>落</th></tr>' + C.stars.map((s, k) => {
+    const tags = (s.still ? '<span class="tg r">留</span>' : s.retro ? '<span class="tg r">逆</span>' : '') + (s.yuan ? '<span class="tg y">垣</span>' : '');
+    return `<tr data-w="${s.wx}"${k === 7 ? ' class="grp"' : ''}><td><span class="n">${s.n}</span></td><td>${Z[s.zhi]}宫${QZ.CI[s.zhi]}</td><td class="deg">${QZ.dm(s.gdeg)}</td><td><span class="xd">${xd(s.xiu, s.xdeg)}</span> <span class="deg">${QZ.dm(s.xdeg)}</span></td><td>${tags}</td><td>${C.gongs[s.zhi].house}</td></tr>`;
+  }).join('') + `<tr class="grp hl"><td><span class="n">命度</span></td><td>${Z[C.ming.zhi]}宫${QZ.CI[C.ming.zhi]}</td><td class="deg">${QZ.dm(C.ming.gdeg)}</td><td><span class="xd">${xd(C.ming.xiu, C.ming.xdeg)}</span> <span class="deg">${QZ.dm(C.ming.xdeg)}</span></td><td></td><td>命宫</td></tr>`
+    + `<tr><td><span class="n">天顶</span></td><td>${Z[C.mcPt.zhi]}宫${QZ.CI[C.mcPt.zhi]}</td><td class="deg">${QZ.dm(C.mcPt.gdeg)}</td><td><span class="xd">${xd(C.mcPt.xiu, C.mcPt.xdeg)}</span> <span class="deg">${QZ.dm(C.mcPt.xdeg)}</span></td><td></td><td>${C.gongs[C.mcPt.zhi].house}</td></tr>`;
+}
+function renderGong() {
+  $('gongBox').innerHTML = C.houses.map(h => {
+    const g = C.gongs[h.zhi], ming = h.k === 0, shen = h.zhi === C.shen.zhi;
+    const stars = g.stars.map(id => { const s = C.byId[id]; return `<span data-w="${s.wx}"><b>${s.n}</b> <i>${xd(s.xiu, s.xdeg)}${s.retro ? '逆' : ''}</i></span>`; }).join('');
+    return `<div class="g${ming ? ' ming' : ''}${shen ? ' shen' : ''}"><span class="h">${h.n}${shen ? '<small style="color:var(--zi-2);font-weight:400"> 身</small>' : ''}</span><span class="z">${Z[h.zhi]}<small>${QZ.CI[h.zhi]}</small></span><span class="l">${ST[g.lord].s}主</span><span class="s">${stars || '<i>空宫</i>'}</span></div>`;
+  }).join('');
+}
+function renderXiu() {
+  const head = ['东方青龙', '北方玄武', '西方白虎', '南方朱雀'];
+  $('xiuBox').innerHTML = C.xiu.map((x, i) => `${i % 7 === 0 ? `<span class="xh">${head[i / 7]}</span>` : ''}<div class="${i === C.ming.xiu ? 'on' : ''}" title="${x.full} · 距星 ${x.star}"><b>${x.n}</b><i>${ST[x.lord].s}</i><small>${x.width.toFixed(1)}°</small></div>`).join('');
+}
+
+/* ================ 复制、问 AI、链接、分享 ================ */
+const head = () => {
+  const inp = C.input;
+  return `${C.name ? C.name + ' · ' : ''}${inp.y}-${pad(inp.mo)}-${pad(inp.d)} ${pad(inp.h)}:${pad(inp.mi)}${inp.dst ? '（夏令时）' : ''} ${tzLabel(+inp.tz)} · 北纬${inp.lat} 东经${inp.lon}${P ? ' · 四柱 ' + P.pillars.map(p => p.name).join(' ') : ''}`;
+};
+function linkUrl() {
+  const u = new URL(location.href); u.search = ''; u.hash = '';
+  u.searchParams.set('d', $('whenIn').value); u.searchParams.set('lat', view.lat); u.searchParams.set('lon', view.lon); u.searchParams.set('tz', view.tz);
+  if ($('dstIn').checked) u.searchParams.set('dst', '1');
+  if (view.luoji === 'ming') u.searchParams.set('lj', 'ming');
+  if (C && C.name) u.searchParams.set('n', C.name);
+  return u.toString();
+}
+function writeURL() { history.replaceState(null, '', linkUrl().replace(location.origin, '')); }
+$('copyBtn').onclick = () => { if (C) F.copy(QZ.text(C, { head: head() }), '盘已复制'); };
+$('aiBtn').onclick = () => { if (C) F.askAI('七政四余（果老星宗）', QZ.text(C, { head: head() }), QZ.rules(C).map(r => '· ' + r).join('\n')); };
+$('linkBtn').onclick = () => F.copy(linkUrl(), '此盘链接已复制');
+$('shareBtn').onclick = () => {
+  if (!C) return;
+  F.share({ title: `七政四余 · ${C.name || '命盘'}`, meta: head(), url: linkUrl(),
+    lines: [['命宫', `${Z[C.ming.zhi]}宫${QZ.CI[C.ming.zhi]} · 命度${xd(C.ming.xiu, C.ming.xdeg)}`], ['命主', `${ST[C.mingZhu].n} · 度主${ST[C.duZhu].n}`], ['身宫', `${Z[C.shen.zhi]}宫 · 身主${ST[C.shenZhu].n}`]]
+      .concat(C.stars.map(s => [s.n, `${Z[s.zhi]}宫 ${xd(s.xiu, s.xdeg)}${s.retro ? ' 逆' : ''} · ${C.gongs[s.zhi].house}`])) });
+};
+$('wheel').addEventListener('click', e => {
+  const t = e.target.closest('[data-id]');
+  if (!t || !C) return;
+  const s = C.byId[t.dataset.id];
+  F.toast(`${s.n} ${Z[s.zhi]}宫 ${QZ.dm(s.gdeg)} · ${xd(s.xiu, s.xdeg)}${s.retro ? ' · 逆' : ''} · ${C.gongs[s.zhi].house}`, 2600);
+});
+
+/* ================ 表单 ================ */
+$('nowBtn').onclick = () => { const t = new Date(Date.now() + (+view.tz) * 3600e3); $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`; cast(); };
+$('whenIn').onchange = cast;
+$('nameIn').onchange = cast;
+$('cityIn').onchange = () => { const c = CITY_LIST.find(x => x[0] === $('cityIn').value); if (c) { Object.assign(view, { city: c[0], lon: c[1], lat: c[2], tz: c[3] }); saveView(); syncUI(); cast(); } else { view.city = ''; $('latIn').focus(); } };
+$('latIn').onchange = () => { const v = parseFloat($('latIn').value); if (isFinite(v) && Math.abs(v) < 90) { view.lat = v; view.city = ''; saveView(); syncUI(); cast(); } else F.toast('纬度应在 −90 到 90 之间'); };
+$('lonIn').onchange = () => { const v = parseFloat($('lonIn').value); if (isFinite(v) && Math.abs(v) <= 180) { view.lon = v; view.city = ''; saveView(); syncUI(); cast(); } else F.toast('经度应在 −180 到 180 之间'); };
+$('tzIn').onchange = () => { view.tz = +$('tzIn').value; saveView(); cast(); };
+$('dstIn').onchange = cast;
+$('ljIn').onchange = () => { view.luoji = $('ljIn').value; saveView(); cast(); };
+
+syncUI();
+const q = new URLSearchParams(location.search);
+if (q.get('lj') === 'ming' || q.get('lj') === 'qing') view.luoji = q.get('lj');
+if (q.get('d')) {
+  const lat = q.get('lat') != null ? +q.get('lat') : view.lat, lon = q.get('lon') != null ? +q.get('lon') : view.lon;
+  const c = CITY_LIST.find(x => Math.abs(x[2] - lat) < 0.005 && Math.abs(x[1] - lon) < 0.005);
+  Object.assign(view, { lat, lon, tz: q.get('tz') != null ? +q.get('tz') : view.tz, city: c ? c[0] : '' });
+  syncUI();
+  $('whenIn').value = q.get('d'); $('nameIn').value = q.get('n') || ''; $('dstIn').checked = q.get('dst') === '1';
+  cast();
+} else $('nowBtn').click();
+})();
+</script>
+</body>
+</html>
