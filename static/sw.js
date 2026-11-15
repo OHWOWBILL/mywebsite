@@ -8,7 +8,7 @@
 // =========================================================
 'use strict';
 /* gen-sw:begin */
-const V = 'fb-73c0ecb64a02';
+const V = 'fb-07e90c30ddb4';
 const PRE = [
   '/bazi/',
   '/changsheng/',
@@ -107,7 +107,7 @@ const PRE = [
   '/meihua/styles/main.css?v=6',
   '/qimen/core.js?v=5',
   '/qimen/jieqi.js?v=1',
-  '/qizheng/qizheng.js?v=1',
+  '/qizheng/qizheng.js?v=2',
   '/taiyi/taiyi.js?v=1',
   '/tizhi/tizhi.js?v=1',
   '/xingming/data/kangxi.js?v=1',
