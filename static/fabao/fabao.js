@@ -50,7 +50,7 @@
     { id: 'dayan', name: '大衍筮法', short: '大衍', href: '/dayan/', men: '卜', desc: '四十九策揲蓍，十八变成卦' },
     { id: 'sanshi', name: '三式', href: '/qimen/', men: '卜', desc: '奇门、六壬、太乙、金口诀' },  // 奇门、六壬、太乙、金口诀四件在三式里切换
     { id: 'lingqian', name: '灵签', href: '/lingqian/', men: '卜', desc: '掷筊求签，签诗白话' },
-    { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字、紫微、占星、合盘、姓名' },  // 星命同参：八字、紫微、占星、合盘、姓名（八字、占星页内各有一段上锁的读盘）
+    { id: 'mingbu', name: '命部', href: '/bazi/', men: '命', desc: '八字、紫微、七政、占星、合盘、姓名' },  // 星命同参：八字、紫微、七政、占星、合盘、姓名（八字、占星页内各有一段上锁的读盘）
     { id: 'changsheng', name: '十二长生', short: '长生', href: '/changsheng/', men: '命', desc: '干支旺衰速查' },
     { id: 'kanyu', name: '堪舆', href: '/kanyu/', men: '山', desc: '玄空飞星、八宅、九星气学' },     // 玄空八宅、九星气学
     { id: 'yibu', name: '医部', href: '/ziwu/', men: '医', desc: '子午流注、五运六气、体质辨识' },   // 流注、运气、体质
@@ -60,7 +60,7 @@
   const OLD_TAB = { qimen: 'sanshi', ziwu: 'yibu', yunqi: 'yibu' };
 
   // —— 一家：顶栏一个标签，进来后在家族条里切换 ——
-  // 命部：八字、紫微、占星、合盘、姓名都公开；读盘不再单独成页，锁在八字、占星两页里（各自的 dupan.json）。
+  // 命部：八字、紫微、七政、占星、合盘、姓名都公开；读盘不再单独成页，锁在八字、占星两页里（各自的 dupan.json）。
   const FAMILIES = {
     tongshu: {
       name: '通书', sub: '选择', hint: '黄历看日子，择日排时辰，流年看一年', lsLast: 'tongshu.last',
@@ -84,6 +84,7 @@
       items: [
         { id: 'bazi', name: '八字', href: '/bazi/' },
         { id: 'ziwei', name: '紫微', href: '/ziwei/' },
+        { id: 'qizheng', name: '七政', href: '/qizheng/' },
         { id: 'xingpan', name: '占星', href: '/xingpan/' },
         { id: 'hepan', name: '合盘', href: '/hepan/' },
         { id: 'xingming', name: '姓名', href: '/xingming/' }
@@ -170,7 +171,7 @@
       q.set('d', b.dst ? minusHour(b.when) : b.when);       // 紫微不认夏令时，先扣回标准时
       q.set('g', b.male === false ? '女' : '男');
       if (b.sun && b.lon != null) { q.set('lon', b.lon); q.set('tz', b.tz != null ? b.tz : 8); }
-    } else if (id === 'xingpan') {
+    } else if (id === 'xingpan' || id === 'qizheng') {
       q.set('d', b.when);
       if (b.lat != null) q.set('lat', b.lat);
       if (b.lon != null) q.set('lon', b.lon);
