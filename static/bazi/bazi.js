@@ -210,13 +210,18 @@
   var GUOYIN = [10, 11, 1, 2, 1, 2, 4, 5, 7, 8];
   var LU = [2, 3, 5, 6, 5, 6, 8, 9, 11, 0];
   var HONGYAN = [6, 8, 2, 7, 4, 4, 10, 9, 0, 8];
+  var YANGREN = [3, 2, 6, 5, 6, 5, 9, 8, 0, 11];        // 阳干禄前一位，阴干禄后一位（阴刃逆行）
+  var FUXING = [[2, 0], [3, 1], [2, 0], [11], [8], [7], [6], [5], [4], [3, 1]];
+  var TIANCHU = [5, 6, 5, 6, 8, 9, 11, 0, 2, 3];          // 食神之禄
   var SHA_GAN = [   // 以日干（部分兼年干）查地支
     { name: '天乙贵人', how: '甲戊庚牛羊，乙己鼠猴乡，丙丁猪鸡位，壬癸兔蛇藏，六辛逢马虎；以日干、年干查', also: true, f: function (g) { return TIANYI[g]; } },
     { name: '太极贵人', how: '甲乙子午，丙丁卯酉，戊己辰戌丑未，庚辛寅亥，壬癸巳申；以日干、年干查', also: true, f: function (g) { return TAIJI[g]; } },
     { name: '文昌贵人', how: '甲乙巳午报君知，丙戊申宫丁己鸡，庚猪辛鼠壬逢虎，癸人见卯；以日干、年干查', also: true, f: function (g) { return [WENCHANG[g]]; } },
     { name: '国印贵人', how: '甲戌乙亥丙丑丁寅，戊丑己寅庚辰辛巳，壬未癸申；以日干、年干查', also: true, f: function (g) { return [GUOYIN[g]]; } },
+    { name: '福星贵人', how: '甲丙相邀入虎乡，更游鼠穴最高强，戊猴己未丁宜亥，乙癸逢牛卯禄昌，庚赶马头辛到巳，壬骑龙背喜非常；以日干、年干查', also: true, f: function (g) { return FUXING[g]; } },
+    { name: '天厨贵人', how: '食神之禄：甲丙巳，乙丁午，戊申己酉，庚亥辛子，壬寅癸卯；以日干、年干查', also: true, f: function (g) { return [TIANCHU[g]]; } },
     { name: '禄神', how: '甲禄寅，乙禄卯，丙戊禄巳，丁己禄午，庚禄申，辛禄酉，壬禄亥，癸禄子；以日干查', f: function (g) { return [LU[g]]; } },
-    { name: '羊刃', how: '禄前一位：甲卯乙辰，丙戊午丁己未，庚酉辛戌，壬子癸丑；以日干查', f: function (g) { return [mod(LU[g] + 1, 12)]; } },
+    { name: '羊刃', how: '阳干禄前一位，阴干禄后一位：甲卯乙寅，丙戊午，丁己巳，庚酉辛申，壬子癸亥；以日干查', f: function (g) { return [YANGREN[g]]; } },
     { name: '金舆', how: '禄前二位：甲辰乙巳，丙戊未丁己申，庚戌辛亥，壬丑癸寅；以日干查', f: function (g) { return [mod(LU[g] + 2, 12)]; } },
     { name: '红艳煞', how: '甲午乙申，丙寅丁未，戊己辰，庚戌辛酉，壬子癸申；以日干查', f: function (g) { return [HONGYAN[g]]; } }
   ];
@@ -237,14 +242,26 @@
     { name: '孤辰', how: '亥子丑见寅，寅卯辰见巳，巳午未见申，申酉戌见亥；以年支查', f: function (yz) { return [2, 5, 8, 11][Math.floor(mod(yz + 1, 12) / 3)]; } },
     { name: '寡宿', how: '亥子丑见戌，寅卯辰见丑，巳午未见辰，申酉戌见未；以年支查', f: function (yz) { return [10, 1, 4, 7][Math.floor(mod(yz + 1, 12) / 3)]; } },
     { name: '红鸾', how: '子年卯，丑年寅，逆行十二支；以年支查', f: function (yz) { return mod(3 - yz, 12); } },
+    { name: '丧门', how: '年支前二位：子年寅，丑年卯……；以年支查', f: function (yz) { return mod(yz + 2, 12); } },
+    { name: '吊客', how: '年支后二位：子年戌，丑年亥……；以年支查', f: function (yz) { return mod(yz - 2, 12); } },
     { name: '天喜', how: '红鸾对冲：子年酉，丑年申……；以年支查', f: function (yz) { return mod(9 - yz, 12); } }
   ];
   var DAY_SPECIAL = [
     { name: '魁罡', how: '日柱庚辰、庚戌、壬辰、戊戌', list: ['庚辰', '庚戌', '壬辰', '戊戌'] },
     { name: '十恶大败', how: '日柱甲辰、乙巳、丙申、丁亥、戊戌、己丑、庚辰、辛巳、壬申、癸亥', list: ['甲辰', '乙巳', '丙申', '丁亥', '戊戌', '己丑', '庚辰', '辛巳', '壬申', '癸亥'] },
     { name: '阴差阳错', how: '日柱丙子、丁丑、戊寅、辛卯、壬辰、癸巳、丙午、丁未、戊申、辛酉、壬戌、癸亥', list: ['丙子', '丁丑', '戊寅', '辛卯', '壬辰', '癸巳', '丙午', '丁未', '戊申', '辛酉', '壬戌', '癸亥'] },
+    { name: '九丑日', how: '日柱丁酉、戊子、戊午、己卯、己酉、辛卯、辛酉、壬子、壬午', list: ['丁酉', '戊子', '戊午', '己卯', '己酉', '辛卯', '辛酉', '壬子', '壬午'] },
+    { name: '八专日', how: '日柱甲寅、乙卯、丁未、戊戌、己未、庚申、辛酉、癸丑', list: ['甲寅', '乙卯', '丁未', '戊戌', '己未', '庚申', '辛酉', '癸丑'] },
     { name: '孤鸾煞', how: '日柱乙巳、丁巳、辛亥、戊申、甲寅、丙午、戊午、壬子', list: ['乙巳', '丁巳', '辛亥', '戊申', '甲寅', '丙午', '戊午', '壬子'] }
   ];
+  // 德秀贵人：以月支三合局定德、秀之干，四柱天干见之（SANHE_GROUP 顺序：申子辰 · 寅午戌 · 巳酉丑 · 亥卯未）
+  var DEXIU_DE = [[8, 9, 4, 5], [2, 3], [6, 7], [0, 1]];
+  var DEXIU_XIU = [[2, 7, 0, 5], [4, 9], [1, 6], [3, 8]];
+  var DEXIU_HOW = '寅午戌月丙丁为德、戊癸为秀；申子辰月壬癸戊己为德、丙辛甲己为秀；巳酉丑月庚辛为德、乙庚为秀；亥卯未月甲乙为德、丁壬为秀；以月支查天干';
+  // 童子煞：日支、时支见之。季以月支定，五行以年柱纳音定
+  var TONGZI_SEASON = [[3, 7, 4], [3, 7, 4], [2, 0], [2, 0], [2, 0], [3, 7, 4], [3, 7, 4], [3, 7, 4], [2, 0], [2, 0], [2, 0], [3, 7, 4]];  // 子起：冬夏卯未辰，春秋寅子
+  var TONGZI_WX = { '金': [6, 3], '木': [6, 3], '水': [9, 10], '火': [9, 10], '土': [4, 5] };
+  var TONGZI_HOW = '春秋寅子，冬夏卯未辰；金木午卯，水火酉戌，土命辰巳；以月令定季、年柱纳音定五行，查日支、时支';
   var TIANSHE = ['甲子', '甲子', '戊寅', '戊寅', '戊寅', '甲午', '甲午', '甲午', '戊申', '戊申', '戊申', '甲子'];  // 以月支（子起）定季
 
   // cols: [{ gan, zhi, idx, role }]，前四个必须是年月日时；之后可接大运、流年等
@@ -257,15 +274,18 @@
         if (s.f(dg).indexOf(c.zhi) >= 0) push(i, s, '日干' + GAN[dg]);
         else if (s.also && s.f(yg).indexOf(c.zhi) >= 0) push(i, s, '年干' + GAN[yg]);
       });
-      SHA_SANHE.forEach(function (s) {
-        if (s.f(yz) === c.zhi) push(i, s, '年支' + ZHI[yz]);
-        else if (s.f(dz) === c.zhi) push(i, s, '日支' + ZHI[dz]);
+      SHA_SANHE.forEach(function (s) {   // 不以本柱查本柱
+        if (i !== 0 && s.f(yz) === c.zhi) push(i, s, '年支' + ZHI[yz]);
+        else if (i !== 2 && s.f(dz) === c.zhi) push(i, s, '日支' + ZHI[dz]);
       });
       SHA_MONTH.forEach(function (s) {
         var r = s.f(mz);
         if ((r.t === 'g' && r.i === c.gan) || (r.t === 'z' && r.i === c.zhi)) push(i, s, '月支' + ZHI[mz]);
       });
-      SHA_YEAR.forEach(function (s) { if (s.f(yz) === c.zhi) push(i, s, '年支' + ZHI[yz]); });
+      SHA_YEAR.forEach(function (s) { if (i !== 0 && s.f(yz) === c.zhi) push(i, s, '年支' + ZHI[yz]); });
+      var grp = SANHE_GROUP[mz];
+      if (DEXIU_DE[grp].indexOf(c.gan) >= 0 || DEXIU_XIU[grp].indexOf(c.gan) >= 0) push(i, { name: '德秀贵人', how: DEXIU_HOW }, '月支' + ZHI[mz]);
+      if ((i === 2 || i === 3) && (TONGZI_SEASON[mz].indexOf(c.zhi) >= 0 || (TONGZI_WX[nayin(cols[0].idx).slice(-1)] || []).indexOf(c.zhi) >= 0)) push(i, { name: '童子煞', how: TONGZI_HOW }, i === 2 ? '日支' : '时支');
     });
     var dname = cols[2].name || gzName(cols[2].idx);
     DAY_SPECIAL.forEach(function (s) { if (s.list.indexOf(dname) >= 0) push(2, s, '日柱'); });
