@@ -201,7 +201,7 @@ table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/bazi/bazi.js?v=3"></script>
 <script src="/xingpan/xingpan.js?v=4"></script>
-<script src="/qizheng/qizheng.js?v=2"></script>
+<script src="/qizheng/qizheng.js?v=3"></script>
 <script src="/fabao/cities.js?v=1"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
@@ -334,7 +334,7 @@ function wheelSVG(X) {
 /* ================ 表 ================ */
 function renderStars() {
   $('starT').innerHTML = '<tr><th>曜</th><th>宫</th><th>宫度</th><th>宿度</th><th></th><th>落</th></tr>' + C.stars.map((s, k) => {
-    const tags = (s.still ? '<span class="tg r">留</span>' : s.retro ? '<span class="tg r">逆</span>' : '') + (s.yuan ? '<span class="tg y">垣</span>' : '');
+    const tags = (s.still ? '<span class="tg r">留</span>' : s.retro ? '<span class="tg r">逆</span>' : '') + (s.yuan ? '<span class="tg y">垣</span>' : '') + (s.id === 'qi' ? '<span class="tg" title="紫气历元古书不载，起点为本站约定">约</span>' : '');
     return `<tr data-w="${s.wx}"${k === 7 ? ' class="grp"' : ''}><td><span class="n">${s.n}</span></td><td>${Z[s.zhi]}宫${QZ.CI[s.zhi]}</td><td class="deg">${QZ.dm(s.gdeg)}</td><td><span class="xd">${xd(s.xiu, s.xdeg)}</span> <span class="deg">${QZ.dm(s.xdeg)}</span></td><td>${tags}</td><td>${C.gongs[s.zhi].house}</td></tr>`;
   }).join('') + `<tr class="grp hl"><td><span class="n">命度</span></td><td>${Z[C.ming.zhi]}宫${QZ.CI[C.ming.zhi]}</td><td class="deg">${QZ.dm(C.ming.gdeg)}</td><td><span class="xd">${xd(C.ming.xiu, C.ming.xdeg)}</span> <span class="deg">${QZ.dm(C.ming.xdeg)}</span></td><td></td><td>命宫</td></tr>`
     + `<tr><td><span class="n">天顶</span></td><td>${Z[C.mcPt.zhi]}宫${QZ.CI[C.mcPt.zhi]}</td><td class="deg">${QZ.dm(C.mcPt.gdeg)}</td><td><span class="xd">${xd(C.mcPt.xiu, C.mcPt.xdeg)}</span> <span class="deg">${QZ.dm(C.mcPt.xdeg)}</span></td><td></td><td>${C.gongs[C.mcPt.zhi].house}</td></tr>`;

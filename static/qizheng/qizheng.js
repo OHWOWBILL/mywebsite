@@ -162,7 +162,7 @@
     L.push('身宫：' + gz(C.shen.zhi) + '，身主' + STAR[C.shenZhu].n + '；' + (C.day ? '昼生' : '夜生'));
     L.push('');
     C.stars.forEach(function (s) {
-      L.push(s.n + '：' + gz(s.zhi) + ' ' + dm(s.gdeg) + '，' + xiuText(s.xiu, s.xdeg) + '（' + dm(s.xdeg) + '）' + (s.retro ? '，逆' : '') + (s.still ? '，留' : '') + (s.yuan ? '，入垣' : '') + '，落' + C.gongs[s.zhi].house);
+      L.push(s.n + '：' + gz(s.zhi) + ' ' + dm(s.gdeg) + '，' + xiuText(s.xiu, s.xdeg) + '（' + dm(s.xdeg) + '）' + (s.retro ? '，逆' : '') + (s.still ? '，留' : '') + (s.yuan ? '，入垣' : '') + (s.id === 'qi' ? '（起点为本站约定）' : '') + '，落' + C.gongs[s.zhi].house);
     });
     L.push('');
     C.houses.forEach(function (h) {
