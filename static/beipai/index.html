@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17131F" />
+  <title>背牌 · 潜蛟阁法宝库</title>
+  <meta name="description" content="背牌练习：00–99 数字编码抽认卡、看牌出图计时、整副扑克按顺序记忆与回想。编码可用自己的一套。" />
+  <!-- seo:begin 由 scripts/seo/tool-meta.js 生成，勿手改 -->
+  <link rel="canonical" href="https://ohwowbill.com/beipai/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="潜蛟阁" />
+  <meta property="og:title" content="背牌 · 潜蛟阁法宝库" />
+  <meta property="og:description" content="背牌练习：00–99 数字编码抽认卡、看牌出图计时、整副扑克按顺序记忆与回想。编码可用自己的一套。" />
+  <meta property="og:url" content="https://ohwowbill.com/beipai/" />
+  <meta property="og:image" content="https://ohwowbill.com/img/og-card.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <!-- seo:end -->
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="stylesheet" href="/fonts/qj.css?v=5eeb78f3">
+  <link rel="stylesheet" href="/fonts/qj-rest.css?v=5eeb78f3" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="/fabao/fabao.css?v=10">
+<style>
+/* 背牌：单栏窄版（手机上练）。颜色全走法宝库的令牌，这里只起别名 */
+:root{
+  --surface:var(--bg-2); --ink:var(--fg); --line:var(--rule-2); --accent:var(--zi-2);
+  --gold:var(--jin); --gold-soft:rgba(217,174,78,.16); --good:var(--lv); --bad:var(--zhu);
+  --display:var(--font-title); --body:var(--font-body);
+}
+.bp{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.bp #app{display:flex;flex-direction:column;gap:16px}
+.gate{padding:20px;display:flex;flex-direction:column;gap:12px}
+.gate form{display:flex;flex-direction:column;gap:8px}
+.gate .keep{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer}
+.gate .keep input{accent-color:var(--zi)}
+.gate textarea{width:100%;margin:8px 0}
+.gate .grow{flex:1;min-width:0}
+.bp h2{font-family:var(--display);font-size:16px;margin:0;font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;color:var(--muted);font:inherit;font-size:14px;padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg);font-weight:500}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);width:0}
+.stat{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:12px;
+  padding:24px 20px;min-height:300px;display:flex;flex-direction:column;gap:12px;cursor:pointer}
+.front{font-family:var(--display);font-weight:700;text-align:center;margin:auto 0;line-height:1.2}
+.front.num{font-size:96px;font-variant-numeric:tabular-nums;color:var(--accent)}
+.front.name{font-size:34px;color:var(--accent);overflow-wrap:anywhere}
+.hint{text-align:center;color:var(--muted);font-size:13px}
+.ans{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.ans .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.ans .n{font-family:var(--display);font-size:30px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.ans .nm{font-family:var(--display);font-size:24px;font-weight:700;flex:1;min-width:0}
+.ans .cb{color:var(--muted);font-size:14px}
+.lab{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.08em}
+.ans p{margin:0;font-size:15px}
+.mine{background:var(--gold-soft);border-radius:8px;padding:8px 10px}
+textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:64px;resize:vertical}
+.btn{font:inherit;font-size:15px;border-radius:8px;padding:10px 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.small{font-size:13px;padding:5px 10px}
+.btn.good{border-color:var(--good);color:var(--good);font-weight:700}
+.btn.bad{border-color:var(--bad);color:var(--bad);font-weight:700}
+.btn.main{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts.one{grid-template-columns:1fr}
+.board{display:grid;grid-template-columns:20px repeat(10,1fr);gap:3px;font-variant-numeric:tabular-nums}
+.board .h{font-size:11px;color:var(--muted);text-align:center;align-self:center}
+.cell{border:1px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;font-size:11px;border-radius:4px;padding:5px 0;cursor:pointer;text-align:center}
+.cell.s1{border-color:var(--bad);color:var(--bad)}
+.cell.s2{background:var(--gold-soft);color:var(--ink);border-color:var(--gold)}
+.cell.s3{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.cell.cur{outline:2px solid var(--accent);outline-offset:1px}
+.legend{font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+.note{font-size:12px;color:var(--muted);margin:0}
+.key{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.key div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 4px;text-align:center;line-height:1.3}
+.key b{display:block;font-family:var(--display);font-size:18px;color:var(--gold);font-variant-numeric:tabular-nums}
+.key span{display:block;font-size:13px}
+.key small{display:block;font-size:11px;color:var(--muted)}
+.sel{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:6px}
+select{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.parts{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;font-size:14px}
+.parts .p{background:var(--bg);border-radius:8px;padding:8px;text-align:center}
+.parts .p b{font-family:var(--display);font-size:20px;color:var(--accent);display:block}
+.parts .v{color:var(--gold);font-weight:700;text-align:center}
+details{font-size:14px;color:var(--muted)}
+details summary{cursor:pointer}
+details p{margin:6px 0 0}
+.view{display:flex;flex-direction:column;gap:16px}
+.tabs{align-self:flex-start}
+.tabs button{padding:8px 18px;font-size:15px}
+.suitkey{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.suitkey div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5;font-variant-numeric:tabular-nums}
+.suitkey b{font-size:15px}
+.red{color:var(--bad)}
+.opt{display:flex;flex-direction:column;gap:4px}
+.opt>span{font-size:13px;color:var(--muted)}
+.table{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.tc{display:flex;flex-direction:column;align-items:center;gap:6px;width:150px;max-width:44%}
+.tc .cue{font-size:13px;text-align:center;color:var(--muted);min-height:2.6em}
+.tc .cue b{color:var(--gold);font-family:var(--display);font-size:16px;margin-right:4px;font-variant-numeric:tabular-nums}
+.table.small .tc{width:96px;max-width:30%}.table.small .pc.big{font-size:30px;border-radius:8px}
+.table.tiny{gap:8px}.table.tiny .tc{width:64px;max-width:22%}.table.tiny .pc.big{font-size:20px;border-radius:6px}.table.tiny .cue,.table.small .cue{font-size:11px}
+.num{display:flex;gap:6px;align-items:center}
+.num input{width:84px;text-align:center;font:inherit;font-size:18px;font-family:var(--display);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 4px;font-variant-numeric:tabular-nums}
+.num input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.num .btn{min-width:44px;font-size:18px;padding:8px 0}
+.opt label{font-size:13px;color:var(--muted)}
+.pc{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;font-family:var(--display);line-height:1.1;color:var(--ink)}
+.pc b{font-weight:700}.pc i{font-style:normal}
+.pc.red{color:var(--bad)}
+.pc.big{width:100%;aspect-ratio:5/7;border-radius:12px;border-top:3px solid var(--gold);font-size:44px}
+.pc.sm{width:34px;height:46px;font-size:14px}
+.slots{display:flex;flex-wrap:wrap;gap:4px;min-height:50px;padding:6px;border:1px dashed var(--line);border-radius:8px}
+.pick{display:flex;flex-direction:column;gap:4px}
+.prow{display:grid;grid-template-columns:18px repeat(13,1fr);gap:2px;align-items:center}
+.prow .sl{font-size:15px;text-align:center}
+.pk{font:inherit;font-family:var(--display);font-size:13px;font-weight:700;padding:8px 0;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);cursor:pointer}
+.pk.red{color:var(--bad)}
+.pk:disabled{opacity:.25;cursor:default}
+.score{font-family:var(--display);font-size:34px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.res{display:flex;flex-direction:column;gap:4px}
+.rr{display:grid;grid-template-columns:22px 34px 34px 1fr;gap:8px;align-items:center;font-size:13px;padding:4px 6px;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
+.rr.bad{border-color:var(--bad)}
+.rr .ix{color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.rr .cue b{color:var(--gold);margin-right:4px;font-variant-numeric:tabular-nums}
+.ghost{width:34px;height:46px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+.ok{color:var(--good);font-weight:700}.ng{color:var(--bad);font-weight:700}
+.one-card{display:flex;flex-direction:column;align-items:center;gap:10px}
+.one-card .pc.big{width:170px}
+.one-card .cue{font-size:18px;text-align:center;min-height:2.4em}
+.one-card .cue b{color:var(--gold);font-family:var(--display);font-size:22px;margin-right:6px;font-variant-numeric:tabular-nums}
+.secs{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rr.three{grid-template-columns:34px 1fr auto}
+[hidden]{display:none!important}
+</style>
+</head>
+<body data-tool="beipai">
+
+<main class="fb-main">
+  <div class="fb-head">
+    <div class="fb-seal">牌</div>
+    <div>
+      <h1 class="fb-title">背牌</h1>
+      <div class="fb-sub">数字编码 · 看牌出图 · 整副顺序</div>
+    </div>
+  </div>
+
+  <div class="bp">
+  <section id="gate" class="fb-card gate" hidden>
+    <h2>先放进一套编码</h2>
+    <p class="note">这件法宝要一套 00–99 的图像编码才转得起来。阁主自己那套下了禁制：知道口诀的念口诀，不知道的贴上你自己的一套，一样能练。</p>
+    <form id="gateLock" autocomplete="off">
+      <label class="lab" for="gatePw">解禁口诀</label>
+      <div class="row"><input type="password" id="gatePw" class="grow" aria-label="解禁口诀"><button class="btn main" id="gateGo">解禁</button></div>
+      <label class="keep"><input type="checkbox" id="gateKeep" checked> 此设备记住</label>
+      <p class="note" id="gateMsg"></p>
+    </form>
+    <details>
+      <summary>用我自己的编码</summary>
+      <p class="note">一行一个，从 00 排到 99，正好一百行。只存在这台设备的浏览器里，不会传到任何地方。</p>
+      <textarea id="ownText" rows="8" aria-label="自己的编码，一行一个"></textarea>
+      <div class="row"><button class="btn" id="ownSave" type="button">用这一套</button><span class="note" id="ownMsg"></span></div>
+    </details>
+  </section>
+
+  <div id="app" hidden>
+  <section class="key" id="key" aria-label="十干读音表"></section>
+
+  <nav class="seg tabs" aria-label="分页">
+    <button id="tab-flash" data-view="flash">抽认卡</button>
+    <button id="tab-drill" data-view="drill">刷牌</button>
+    <button id="tab-cards" data-view="cards">背牌</button>
+  </nav>
+
+  <div id="view-flash" class="view">
+
+  <div class="row">
+    <div class="seg" role="group" aria-label="出题方式">
+      <button id="m-num" data-mode="num">看数字想图像</button>
+      <button id="m-name" data-mode="name">看图像答数字</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="seg" role="group" aria-label="范围">
+      <button id="f-all" data-filter="all">全部</button>
+      <button id="f-weak" data-filter="weak">待加强</button>
+    </div>
+    <label class="sel" for="tens">十位
+      <select id="tens"><option value="">全部</option></select>
+    </label>
+    <div class="seg" role="group" aria-label="顺序">
+      <button id="o-rand" data-order="rand">随机</button>
+      <button id="o-seq" data-order="seq">顺序</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="stat"><span id="pos"></span><span id="mast"></span></div>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+
+  <section class="card" id="card" tabindex="0" role="button" aria-label="点一下翻面">
+    <div class="front" id="front"></div>
+    <div class="hint" id="hint">点卡片或按空白键翻面</div>
+    <div class="ans" id="ans" hidden>
+      <div class="head"><span class="n" id="a-n"></span><span class="nm" id="a-nm"></span></div>
+      <div class="parts" id="a-parts"></div>
+      <details id="kebox"><summary>克应备注</summary><p id="a-ke"></p><p id="a-or" class="note"></p></details>
+    </div>
+  </section>
+
+  <div class="acts one" id="acts-front"><button class="btn main" id="flip">翻面</button></div>
+  <div class="acts" id="acts-back" hidden>
+    <button class="btn bad" id="again">再练</button>
+    <button class="btn good" id="ok">记得</button>
+  </div>
+  <p class="note" id="empty" hidden>这个范围目前没有牌。「待加强」只收你按过「再练」、之后还没按「记得」的牌。</p>
+
+  <section style="display:flex;flex-direction:column;gap:8px">
+    <h2>盘面总览</h2>
+    <div class="legend"><span>列：十位</span><span>栏：个位</span><span>红框：待加强</span><span>浅金：记得一两次</span><span>实金：熟了</span></div>
+    <div class="board" id="board"></div>
+    <p class="note">点格子可以直接跳到那张牌。练习进度只存在这台装置的这个浏览器里。</p>
+    <div class="row"><button class="btn small" id="reset">清空练习进度</button><span class="note" id="resetmsg"></span></div>
+  </section>
+  </div>
+
+  <div id="view-drill" class="view" hidden></div>
+  <div id="view-cards" class="view" hidden></div>
+  <div class="row"><button class="btn small" id="regate" type="button">换一套编码</button></div>
+  </div>
+  </div>
+</main>
+<script src="/fabao/fabao.js?v=19"></script>
+
+<script>
+const STEM=["癸","甲","乙","丙","丁","戊","己","庚","辛","壬"];
+const J="传统无此格：甲遁在六仪之下，不单独入盘。";
+const D=[
+["天网四张","癸为天网，天盘地盘两重网叠在一起，四面张开，无路可走。","天上地下两张大网合拢，把中间罩死。"],
+["",J,"一张大网罩住披风元帅。"],
+["华盖逢星","癸为华盖，乙奇在格名里称「星」，华盖之下遇奇星。与 20 同名，靠上下方向区分。","华盖伞在上，伞下托著一轮小太阳。"],
+["华盖悖师","丙火性烈称「悖」，被癸水华盖压在下面，水火相犯。与 30 同名。","华盖伞压住一团烈火，蒸汽乱冒。"],
+["螣蛇夭矫","癸水阴柔取蛇象（螣蛇），丁火为朱雀；水在上克火，蛇自上扑雀。「夭矫」是屈伸腾跃的样子。","一条蛇在空中扭身腾跃，扑向下方的朱雀。"],
+["天乙会合","戊癸相合；戊代甲为天乙贵人，与癸会合。","网里的蛇与青龙缠成一体，不分彼此。"],
+["华盖地户","癸为华盖，己为地户，两个称号直接并列。","华盖伞盖住一扇地门，黄狗蹲在门口。"],
+["太白入网","庚为太白金星，落入癸的天网。","白发金星老者连人带斧被网兜住。"],
+["网盖天牢","辛有牢狱之象，上面再罩癸网，牢上加网。","关著白虎的牢笼外面又罩一层网。"],
+["复见螣蛇","壬癸都是水，都取蛇象，蛇上又见蛇。","一条蛇叠在另一条蛇上。"],
+["","传统无此格。","元帅撑起华盖伞。"],
+["","传统无此格；可借「伏吟」之意。","两位元帅对坐不动。"],
+["","传统无此格。","元帅单手托起太阳。"],
+["","《神机赋》原文是「甲加丙兮龙回首」，但实盘上甲即戊，已归 53，这里要另造。","元帅举起月亮当盾牌。"],
+["","传统无此格。","元帅提一盏灯夜行。"],
+["","传统无此格；戊本是甲的替身。","元帅骑上青龙。"],
+["","传统无此格。","元帅牵著黄狗走进地门。"],
+["","传统无此格；甲最畏庚，所以才要「遁甲」。","元帅被金星老者举斧追砍。"],
+["","传统无此格。","元帅徒手按住白虎。"],
+["","传统无此格。","元帅一脚踩住黑蛇。"],
+["华盖逢星","乙奇称「星」，落在癸的华盖上。与 02 同名，靠上下方向区分。","小太阳在上，落到华盖伞顶。"],
+["","传统无此格。","太阳从元帅头顶照下来，披风发亮。"],
+["日奇伏吟","乙为日奇；天地盘同干叫伏吟，伏而不动。","两个太阳叠在一起趴在地上不动。"],
+["奇仪顺遂","乙木生丙火，相生而顺。","青藤当柴添进火堆，火烧得顺顺当当。"],
+["奇仪相佐","乙木生丁火，日奇辅佐星奇。","青藤托起一盏灯。"],
+["利阴害阳","乙是阴木，戊是阳土，阴木克阳土，阴得利而阳受害（一作「阴害阳门」）。","藤蔓缠住青龙，把牠勒得动弹不得。"],
+["日奇入墓","己为地户、为墓，日奇落进土里（一作「日奇入雾」）。","太阳沉进坟土。"],
+["日奇被刑","庚金克乙木，日奇受刑。","金星老者一斧砍在太阳上。"],
+["青龙逃走","乙木属东方青龙，下临辛金白虎，金克木，龙见虎而逃。","青色小龙被下面的白虎吓得往天上逃。"],
+["日奇入地","壬水在下，又有地罗之象，日奇沉下去。","太阳沉入黑色大海。"],
+["华盖悖师","丙称「悖」，落在癸华盖之上，水火相犯。与 03 同名。","一团烈火从上面烧穿华盖伞。"],
+["","《神机赋》原文是「丙加甲兮鸟跌穴」，实盘已归 35，这里要另造。","一只火鸟落在元帅肩头。"],
+["日月并行","丙为月奇，乙为日奇，日月同宫。","月亮和太阳并排在天上走。"],
+["月奇悖师","丙称「悖」，两丙相叠，火气过旺。","两团烈火对撞。"],
+["星奇朱雀","丁为星奇、为朱雀，月奇照著星奇。","月光下朱雀起舞。"],
+["飞鸟跌穴","丙火为飞鸟，戊即甲木；木生火，甲是丙之母，鸟落回母巢。「跌穴」是不费力就落进窝里。","火鸟直直跌进青龙盘成的窝里。"],
+["火悖入刑","丙为悖，落入己土的牢狱受刑。","火球被押进地门里上刑。"],
+["荧入太白","丙为荧惑（火星），庚为太白（金星），火星进了金星的位置；火克金，古断「贼必去」。","红色火星撞向金星老者，老者后退。"],
+["谋事能成","丙辛相合，合则事成，格名直接取自断语。","月亮和白虎击掌成交。"],
+["火入天罗","壬有天罗之象，丙火落入罗网。","火球掉进水做的网里，嗤的一声熄灭。"],
+["朱雀投江","丁为朱雀，癸水为江，火入水中。","朱雀一头扎进江里。"],
+["","传统无此格。","玉女为元帅掌灯。"],
+["人遁吉格","「人遁」本指丁奇合休门、太阴，这里借名，取丁乙相生之吉。","玉女提灯隐入青藤花丛。"],
+["星随月转","丁为星奇，丙为月奇，星跟著月转。","一颗星绕著月亮旋转。"],
+["奇入太阴","两丁相叠，阴火重重，故言入太阴；也叫星奇伏吟。","暗夜里两盏灯叠在一起。"],
+["青龙转光","戊为青龙，得丁火自上照耀而生光。","灯从上方照下，青龙鳞片流转金光。"],
+["火入勾陈","己土为勾陈，丁火落入其中。","朱雀飞进地门，被黄狗一口叼住。"],
+["文书阻隔","丁主文书，庚为阻隔之神，文书遇阻。","一封信被斧子钉在门上送不出去。"],
+["朱雀入狱","辛为狱，朱雀落入。","朱雀被关进白虎看守的铁笼。"],
+["五神互合","丁壬相合；「五神」的解释各家不一。","朱雀与黑蛇缠成一个结。"],
+["青龙华盖","戊为青龙，癸为华盖，戊癸又相合。","青龙落在华盖伞顶上盘住。"],
+["","传统无此格。","青龙俯身把元帅驮起来。"],
+["青龙合灵","戊为青龙，与乙奇相会（一作「青龙合会」）。","青龙衔起太阳。"],
+["青龙返首","戊即甲，甲木为青龙；下临丙火，木生火，丙是甲之子，龙回头顾子。","青龙回头望向身下的月亮。"],
+["青龙耀明","青龙下临丁火，被火光映亮。与 45 是镜像。","青龙盘在灯上，灯光从下往上照亮龙身。"],
+["伏吟","天地盘同干，伏而不动。","两条青龙叠卧打鼾。"],
+["贵人入狱","戊代甲为贵人，己为地户、为狱。","青龙戴著枷走进地门。"],
+["值符飞宫","戊代甲为值符，下临庚金克甲木，值符被逼飞离本宫；《神机赋》「值符临庚，飞宫格」。","青龙被斧子惊起，飞出宫殿。"],
+["青龙折足","辛金在下克甲木，龙足被伤。","白虎从下面咬断青龙的腿。"],
+["青龙入天牢","壬为天牢，青龙落入。","青龙困在黑水牢里。"],
+["地刑玄武","己土克癸水，癸为玄武。","地门压住一只龟蛇。"],
+["","传统无此格。","黄狗扑上去迎接元帅。"],
+["墓神不明","己为墓，盖在日奇之上，光不能明（一作「地户逢星」）。与 26 是镜像。","坟土从上面盖住太阳，一片昏暗。"],
+["火悖地户","丙为悖，己为地户，两个称号并列。","地门下面烈火往上烧。"],
+["朱雀入墓","丁为朱雀，被己墓盖住。","朱雀被黄土埋住，只露尾羽。"],
+["犬遇青龙","己是甲戌旬之仪，戌属犬；戊为青龙。","黄狗骑到青龙背上。"],
+["地户逢鬼","两己相叠，阴土重阴，墓中见鬼。","地门打开，里面又是一扇门，走出一个鬼。"],
+["刑格返名","庚加己是刑格（76），这是它的颠倒，所以叫「返名」。","黄狗反过来咬住金星老者的斧柄。"],
+["游魂入墓","己为墓；辛在此取游魂之象，由来说法不一。","一道白影飘进坟里。"],
+["地网高张","壬有地罗之象，己为地，地面上张网。","地门口高高张起一张黑网。"],
+["大格","庚为「格」（阻隔）；庚是甲申，癸是甲寅，寅申相冲，阻隔最重。《神机赋》「大格庚临六癸」。","一道巨大铁闸横在江上。"],
+["","传统无此格；庚克甲是遁甲的根本矛盾。","斧子从上方劈向元帅披风。"],
+["太白逢星","庚为太白，乙奇称「星」；乙庚又相合。","金星老者弯腰拾起一轮小太阳。"],
+["太白入荧","庚为太白（金星），丙为荧惑（火星），金星进了火星的位置；古断「贼必来」。","金星老者举斧跳进红色火星。"],
+["亭亭之格","由来不确：「亭亭」本是古式占里的神煞名，各家解释不一。","金星老者独立在一座亮灯的亭子顶上。"],
+["太白伏宫","庚临值符（戊代甲），《神机赋》「庚临值符，伏宫格」。","金星老者埋伏在龙宫屋顶。"],
+["刑格","庚主刑杀，落在己（地户、狱）上，主官司刑罚；《神机赋》「刑格庚临六己」。","金星老者把斧钺架在地门上行刑。"],
+["太白同宫","两个太白同宫，两金相斗，又称战格。","两个金星老者持斧对砍。"],
+["白虎干格","辛为白虎，庚为格，虎被阻隔。","斧子横在路上拦住白虎。"],
+["小格","相对大格而言；又称移荡格、上格。","一道小木栅拦在水沟上，黑蛇钻不过去。"],
+["天牢华盖","辛为天牢，癸为华盖，并列。与 08 是镜像。","牢笼压在华盖伞上，伞被压弯。"],
+["","传统无此格。","白虎从高处扑向元帅。"],
+["白虎猖狂","辛金白虎在上，克下面的乙木，虎逞凶。","白虎踩著青藤仰天咆哮。"],
+["干合悖师","丙辛天干相合，丙又为悖。","白虎抱住火球，毛被烧焦。"],
+["狱神得奇","辛为狱神，得到丁奇。","白虎狱卒拾到一盏宝灯。"],
+["困龙被伤","辛金在上克甲木（戊），龙受困受伤。与 58 是镜像。","白虎骑在青龙背上撕咬。"],
+["入狱自刑","辛是甲午，午午自刑；又落入己狱。","白虎跳进地门，在里面咬自己的尾巴。"],
+["白虎出力","辛为白虎，与庚金同类相助，刀兵相见。","白虎叼起大斧往前冲。"],
+["伏吟天庭","辛称天庭，同干伏吟。","两只白虎趴在天庭台阶上不动。"],
+["凶蛇入狱","壬为蛇，辛为狱。","牢笼从上面扣下，罩住黑蛇。"],
+["幼女奸淫","壬癸皆水，阴水泛滥，古人以水主淫，故有此名。格名不雅，记忆时可换成自己的叫法。","建议改用「两水泛滥」：黑蛇带著洪水冲垮大网。"],
+["","传统无此格。","黑蛇缠上元帅的披风。"],
+["小蛇得势","壬为小蛇，壬水生乙木，得相生之势。","小蛇盘在太阳上昂起头。"],
+["水蛇入火","壬水之蛇冲入丙火，水火相战。","黑蛇一头扎进火堆。"],
+["干合蛇刑","丁壬天干相合，蛇又受刑。与 49 是镜像。","黑蛇缠住灯，被烫得缩起来。"],
+["小蛇化龙","壬为小蛇，遇戊青龙，蛇化为龙。","小蛇蜕皮长角，变成青龙。"],
+["反吟蛇刑","壬是甲辰，己是甲戌，辰戌相冲为反吟，蛇受刑。","黑蛇扑向黄狗，反被狗咬住。"],
+["太白擒蛇","庚为太白，擒住壬蛇。","金星老者举手掐住落下来的黑蛇七寸。"],
+["腾蛇相缠","壬蛇缠住辛。","黑蛇从上方缠住白虎。"],
+["蛇入地罗","壬为蛇，又为地罗，蛇落进罗网。","黑蛇钻进网兜，缠成一团。"]
+];
+const ROLE=["guǐ","jiǎ","yǐ","bǐng","dīng","wù","jǐ","gēng","xīn","rén"];
+let ATOM=null;   // 编码不写在页面里：解禁后从密文取，或用访客自己贴的那套
+const pad=n=>String(n).padStart(2,"0");
+const combo=n=>STEM[Math.floor(n/10)]+"加"+STEM[n%10];
+const scene=n=>ATOM?ATOM[n]:"";
+const KEY="beipai.v1";
+let st={s:{},img:{},mode:"num",filter:"all",order:"rand",tens:"",cards:{total:10,per:1,hint:true,ordered:true}};
+try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&typeof r==="object")st=Object.assign(st,r);}catch(e){}
+if(st.filter!=="all"&&st.filter!=="weak")st.filter="all";
+if(!/^[0-9]?$/.test(String(st.tens)))st.tens="";
+if(!st.cards||typeof st.cards!=="object")st.cards={};
+st.cards=Object.assign({total:10,per:1,hint:true,ordered:true},st.cards);
+st.cards.ordered=true;
+st.cards.total=Math.min(52,Math.max(1,Math.round(Number(st.cards.total))||10));
+st.cards.per=Math.min(st.cards.total,Math.max(1,Math.round(Number(st.cards.per))||1));
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+const $=id=>document.getElementById(id);
+let deck=[],pos=0,flipped=false,editing=false;
+
+function inFilter(n){
+  if(st.tens!==""&&Math.floor(n/10)!==Number(st.tens))return false;
+  if(st.filter==="weak")return st.s[n]===1;
+  return true;
+}
+function buildDeck(keep){
+  const cur=deck[pos];
+  deck=[];for(let n=0;n<100;n++)if(inFilter(n))deck.push(n);
+  if(st.order==="rand")for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  pos=0;
+  if(keep&&cur!==undefined){const k=deck.indexOf(cur);if(k>=0)pos=k;}
+  flipped=false;editing=false;render();
+}
+function render(){
+  document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===st.mode));
+  document.querySelectorAll("[data-filter]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.filter===st.filter));
+  document.querySelectorAll("[data-order]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.order===st.order));
+  const mastered=Object.values(st.s).filter(v=>v>=2).length;
+  $("mast").textContent="已记得 "+mastered+" / 100";
+  $("barfill").style.width=mastered+"%";
+  drawBoard();
+  const has=deck.length>0;
+  $("card").hidden=!has;$("empty").hidden=has;
+  $("acts-front").hidden=!has||flipped;$("acts-back").hidden=!has||!flipped;
+  if(!has){$("pos").textContent="0 张";return;}
+  const n=deck[pos],d=D[n],t=Math.floor(n/10),u=n%10;
+  $("pos").textContent="第 "+(pos+1)+" / "+deck.length+" 张";
+  const f=$("front");
+  if(st.mode==="num"){f.className="front num";f.textContent=pad(n);}
+  else{f.className="front name";f.textContent=scene(n);}
+  $("hint").hidden=flipped;$("ans").hidden=!flipped;
+  if(flipped){
+    $("a-n").textContent=pad(n);$("a-nm").textContent=scene(n);
+    const P=$("a-parts");P.textContent="";
+    const mk=(cls,html)=>{const e=document.createElement("div");e.className=cls;return e;};
+    const p1=mk("p");const b1=document.createElement("b");b1.textContent=t+" "+STEM[t];p1.appendChild(b1);p1.appendChild(document.createTextNode(ROLE[t]));
+    const v=mk("v");v.textContent="＋";
+    const p2=mk("p");const b2=document.createElement("b");b2.textContent=u+" "+STEM[u];p2.appendChild(b2);p2.appendChild(document.createTextNode(ROLE[u]));
+    P.appendChild(p1);P.appendChild(v);P.appendChild(p2);
+    $("a-ke").textContent=combo(n)+"："+(d[0]||"传统无现成格名");
+    $("a-or").textContent=d[1];
+  }
+}
+function drawBoard(){
+  const b=$("board");b.textContent="";
+  const corner=document.createElement("span");corner.className="h";b.appendChild(corner);
+  for(let u=0;u<10;u++){const h=document.createElement("span");h.className="h";h.textContent=u;b.appendChild(h);}
+  for(let t=0;t<10;t++){
+    const h=document.createElement("span");h.className="h";h.textContent=t;b.appendChild(h);
+    for(let u=0;u<10;u++){
+      const n=t*10+u,c=document.createElement("button");
+      const v=st.s[n]||0;
+      c.className="cell"+(v===1?" s1":v===2?" s2":v>=3?" s3":"")+(deck[pos]===n?" cur":"");
+      c.textContent=pad(n);c.setAttribute("aria-label",pad(n)+" "+scene(n));
+      c.addEventListener("click",()=>jump(n));b.appendChild(c);
+    }
+  }
+}
+function jump(n){
+  let k=deck.indexOf(n);
+  if(k<0){st.filter="all";st.tens="";$("tens").value="";persist();deck=[];for(let i=0;i<100;i++)deck.push(i);if(st.order==="rand"){deck.sort(()=>Math.random()-.5);}k=deck.indexOf(n);}
+  pos=k;flipped=true;editing=false;render();
+  $("card").scrollIntoView({block:"center",behavior:"auto"});
+}
+function flip(){if(!deck.length||editing)return;flipped=!flipped;render();}
+function rate(good){
+  if(!deck.length)return;
+  const n=deck[pos],v=st.s[n]||0;
+  st.s[n]=good?Math.min(3,Math.max(2,v+1)):1;
+  if(good&&v===1)st.s[n]=2;
+  persist();
+  if(st.filter==="weak"){buildDeck(false);return;}
+  pos++;if(pos>=deck.length){buildDeck(false);return;}
+  flipped=false;editing=false;render();
+}
+$("card").addEventListener("click",e=>{if(e.target.closest("button,textarea"))return;flip();});
+$("card").addEventListener("keydown",e=>{if(e.target!==$("card"))return;if(e.key===" "||e.key==="Enter"){e.preventDefault();flip();}});
+$("flip").addEventListener("click",flip);
+$("ok").addEventListener("click",()=>rate(true));
+$("again").addEventListener("click",()=>rate(false));
+document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>{st.mode=b.dataset.mode;persist();flipped=false;editing=false;render();}));
+document.querySelectorAll("[data-filter]").forEach(b=>b.addEventListener("click",()=>{st.filter=b.dataset.filter;persist();buildDeck(false);}));
+document.querySelectorAll("[data-order]").forEach(b=>b.addEventListener("click",()=>{st.order=b.dataset.order;persist();buildDeck(true);}));
+let armed=false;
+$("reset").addEventListener("click",()=>{
+  if(!armed){armed=true;$("resetmsg").textContent="再按一次确定清空";return;}
+  armed=false;st.s={};persist();$("resetmsg").textContent="已清空";buildDeck(false);
+});
+document.addEventListener("keydown",e=>{
+  if(view!=="flash")return;
+  if(e.target.closest("textarea,button,select"))return;
+  if(e.key===" "&&e.target!==$("card")){e.preventDefault();flip();}
+  if(flipped&&!editing){if(e.key==="ArrowRight")rate(true);if(e.key==="ArrowLeft")rate(false);}
+});
+
+/* ---------- 背牌 ---------- */
+// 花色定数字：黑桃1 红心2 梅花3 方块4。数牌十位是花色；人头牌十位是 J5 Q6 K7，个位是花色
+const SUITS=[
+ {s:"♠",nm:"黑桃",d:1,red:false},
+ {s:"♥",nm:"红心",d:2,red:true},
+ {s:"♣",nm:"梅花",d:3,red:false},
+ {s:"♦",nm:"方块",d:4,red:true}];
+const RANKS=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+function cardNum(c){const su=SUITS[Math.floor(c/13)],r=c%13;return r<10?su.d*10+(r+1)%10:(r-5)*10+su.d;}
+const esc=t=>String(t).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+function cardHTML(c,cls){const su=SUITS[Math.floor(c/13)];return '<span class="pc '+cls+(su.red?" red":"")+'" aria-label="'+su.nm+RANKS[c%13]+'"><b>'+RANKS[c%13]+'</b><i>'+su.s+'</i></span>';}
+function cueHTML(c){const n=cardNum(c);return '<b>'+pad(n)+'</b>'+esc(scene(n));}
+const mmss=ms=>{const t=Math.round(ms/1000);return Math.floor(t/60)+":"+String(t%60).padStart(2,"0");};
+let view="flash";
+const G={phase:"setup",seq:[],gi:0,picks:[],t0:0,memMs:0,timer:null,res:null};
+function stopTimer(){if(G.timer){clearInterval(G.timer);G.timer=null;}}
+function segHTML(name,opts,cur){return '<div class="seg" role="group">'+opts.map(o=>'<button data-act="set" data-k="'+name+'" data-v="'+o[0]+'" aria-pressed="'+(String(cur)===String(o[0]))+'">'+o[1]+'</button>').join("")+'</div>';}
+function numHTML(k,v,min,max){return '<div class="num"><button class="btn" data-act="step" data-k="'+k+'" data-d="-1" aria-label="减一">−</button><input id="c-'+k+'" type="number" inputmode="numeric" min="'+min+'" max="'+max+'" value="'+v+'" data-k="'+k+'"><button class="btn" data-act="step" data-k="'+k+'" data-d="1" aria-label="加一">＋</button></div>';}
+function setNum(k,v){const c=st.cards;v=Math.round(Number(v));if(!isFinite(v))v=c[k];
+  if(k==="total"){c.total=Math.min(52,Math.max(1,v));c.per=Math.min(c.per,c.total);}
+  else c.per=Math.min(c.total,Math.max(1,v));
+  persist();}
+function renderCards(){
+  const V=$("view-cards"),c=st.cards;let h="";
+  if(G.phase==="setup"){
+    h+='<h2>背牌练习</h2><p class="note">黑桃 1、红心 2、梅花 3、方块 4。A 到 10：十位是花色，个位是点数（10 记作 0）。J Q K：十位是 5 6 7，个位是花色。</p>';
+    h+='<div class="suitkey">'+SUITS.map(su=>'<div><b class="'+(su.red?"red":"")+'">'+su.s+' '+su.nm+'</b>＝'+su.d+'<br>A–10 → '+pad(su.d*10+1)+'–'+pad(su.d*10+9)+'、'+pad(su.d*10)+'<br>J Q K → '+(50+su.d)+' '+(60+su.d)+' '+(70+su.d)+'</div>').join("")+'</div>';
+    h+='<div class="opt"><label for="c-total">这一轮几张（1–52）</label>'+numHTML("total",c.total,1,52)+'</div>';
+    h+='<div class="opt"><label for="c-per">一次翻几张（1–'+c.total+'）</label>'+numHTML("per",c.per,1,c.total)+'</div>';
+    h+='<div class="opt"><span>牌下面的编码提示</span>'+segHTML("hint",[["true","显示"],["false","不显示"]],c.hint)+'</div>';
+    h+='<div class="acts one"><button class="btn main" data-act="start">开始</button></div>';
+  }else if(G.phase==="mem"){
+    const groups=Math.ceil(G.seq.length/c.per),grp=G.seq.slice(G.gi*c.per,(G.gi+1)*c.per),last=G.gi>=groups-1;
+    h+='<div><div class="stat"><span>第 '+(G.gi+1)+' / '+groups+' 组</span><span id="ctimer">'+mmss(Date.now()-G.t0)+'</span></div><div class="bar"><i style="width:'+Math.round(G.gi/groups*100)+'%"></i></div></div>';
+    h+='<div class="table'+(c.per>6?" tiny":c.per>3?" small":"")+'">'+grp.map(x=>'<div class="tc">'+cardHTML(x,"big")+(c.hint?'<div class="cue">'+cueHTML(x)+'</div>':'')+'</div>').join("")+'</div>';
+    h+='<div class="acts one"><button class="btn main" data-act="next">'+(last?"看完了，盖牌回想":"下一组")+'</button></div>';
+    h+='<div class="row"><button class="btn small" data-act="quit">放弃这一轮</button></div>';
+  }else if(G.phase==="recall"){
+    const used=new Set(G.picks);
+    h+='<div class="stat"><span>'+(c.ordered?"按出现的顺序点牌":"点出刚才出现过的牌")+'</span><span>已选 '+G.picks.length+' / '+G.seq.length+'</span></div>';
+    h+='<div class="slots">'+G.picks.map(x=>cardHTML(x,"sm")).join("")+'</div>';
+    h+='<div class="pick">'+SUITS.map((su,si)=>'<div class="prow"><span class="sl '+(su.red?"red":"")+'">'+su.s+'</span>'+RANKS.map((r,ri)=>{const x=si*13+ri;return '<button class="pk'+(su.red?" red":"")+'" data-act="pick" data-c="'+x+'" aria-label="'+su.nm+r+'"'+((used.has(x)||G.picks.length>=G.seq.length)?" disabled":"")+'>'+r+'</button>';}).join("")+'</div>').join("")+'</div>';
+    h+='<div class="acts"><button class="btn" data-act="undo">退一张</button><button class="btn main" data-act="submit">交卷</button></div>';
+  }else{
+    const R=G.res;
+    h+='<div><div class="score">'+R.right+' / '+G.seq.length+'</div><p class="note">记牌用时 '+mmss(G.memMs)+'，'+(c.ordered?"按顺序计分":"不计顺序")+'。'+(R.wrongNums.length?'没记住的 '+R.wrongNums.length+' 个编码已加进抽认卡的「待加强」。':'全对。')+'</p></div>';
+    h+='<div class="res">'+G.seq.map((x,i)=>{const ok=R.ok[i],mine=c.ordered?G.picks[i]:undefined;
+      return '<div class="rr'+(ok?"":" bad")+'"><span class="ix">'+(i+1)+'</span>'+cardHTML(x,"sm")+(ok?'<span class="ghost ok">✓</span>':(mine!==undefined?cardHTML(mine,"sm"):'<span class="ghost ng">✗</span>'))+'<span class="cue">'+cueHTML(x)+'</span></div>';}).join("")+'</div>';
+    if(R.extra.length)h+='<div><p class="note">多点的牌（刚才没出现）</p><div class="slots">'+R.extra.map(x=>cardHTML(x,"sm")).join("")+'</div></div>';
+    if(c.ordered)h+='<p class="note">每列依序是：正确的牌、你点的牌（答对显示 ✓）、它的编码和画面。</p>';
+    h+='<div class="acts"><button class="btn" data-act="setup">改设定</button><button class="btn main" data-act="start">再来一轮</button></div>';
+  }
+  V.innerHTML=h;
+}
+function grade(){
+  const c=st.cards,ok=[],extra=[],wrong=new Set();
+  if(c.ordered){G.seq.forEach((x,i)=>ok.push(G.picks[i]===x));}
+  else{const P=new Set(G.picks),S=new Set(G.seq);G.seq.forEach(x=>ok.push(P.has(x)));G.picks.forEach(x=>{if(!S.has(x))extra.push(x);});}
+  G.seq.forEach((x,i)=>{if(!ok[i])wrong.add(cardNum(x));});
+  wrong.forEach(n=>{st.s[n]=1;});persist();
+  G.res={ok:ok,extra:extra,right:ok.filter(Boolean).length,wrongNums:[...wrong]};
+}
+function startRound(){
+  const all=[];for(let i=0;i<52;i++)all.push(i);
+  for(let i=51;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]];}
+  G.seq=all.slice(0,st.cards.total);G.gi=0;G.picks=[];G.res=null;G.t0=Date.now();G.phase="mem";
+  stopTimer();G.timer=setInterval(()=>{const e=document.getElementById("ctimer");if(e)e.textContent=mmss(Date.now()-G.t0);},1000);
+  renderCards();
+}
+$("view-cards").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act,c=st.cards;
+  if(a==="step"){setNum(b.dataset.k,st.cards[b.dataset.k]+Number(b.dataset.d));}
+  else if(a==="set"){const k=b.dataset.k,v=b.dataset.v;c[k]=(k==="hint"||k==="ordered")?v==="true":Number(v);persist();}
+  else if(a==="start"){startRound();return;}
+  else if(a==="next"){const groups=Math.ceil(G.seq.length/c.per);if(G.gi<groups-1)G.gi++;else{G.memMs=Date.now()-G.t0;stopTimer();G.phase="recall";}}
+  else if(a==="quit"||a==="setup"){stopTimer();G.phase="setup";}
+  else if(a==="pick"){const x=Number(b.dataset.c);if(G.picks.length<G.seq.length&&!G.picks.includes(x))G.picks.push(x);}
+  else if(a==="undo"){G.picks.pop();}
+  else if(a==="submit"){grade();G.phase="result";}
+  renderCards();
+  if(a==="next"||a==="submit")$("view-cards").scrollIntoView({block:"start",behavior:"auto"});
+});
+$("view-cards").addEventListener("change",e=>{const i=e.target.closest("input[data-k]");if(!i)return;setNum(i.dataset.k,i.value);renderCards();});
+
+/* ---------- 刷牌：看牌出图 ---------- */
+if(!Array.isArray(st.drillSuits)||st.drillSuits.length!==4)st.drillSuits=[true,false,false,false];
+const DR={phase:"setup",queue:[],cur:null,t0:0,dt:0,shown:false,log:{},total:0};
+function renderDrill(){
+  const V=$("view-drill");let h="";
+  if(DR.phase==="setup"){
+    h+='<h2>刷牌：看牌出图</h2><p class="note">出一张牌，心里出现图像就点「想到了」，再对答案。卡住超过三秒就直接点开看，别硬想。没想出来的牌会排到后面再出一次。</p>';
+    h+='<div class="opt"><span>练哪些花色（建议一次一个，熟了再加）</span><div class="seg" role="group">'+SUITS.map((su,i)=>'<button data-act="suit" data-i="'+i+'" aria-pressed="'+st.drillSuits[i]+'"><span class="'+(su.red?"red":"")+'">'+su.s+'</span> '+su.nm+'</button>').join("")+'</div></div>';
+    h+='<div class="acts one"><button class="btn main" data-act="go"'+(st.drillSuits.some(Boolean)?'':' disabled')+'>开始</button></div>';
+  }else if(DR.phase==="run"){
+    const c=DR.cur;
+    h+='<div><div class="stat"><span>还剩 '+(DR.queue.length+1)+' 张</span><span>共 '+DR.total+' 张</span></div></div>';
+    h+='<div class="one-card">'+cardHTML(c,"big")+'<div class="cue">'+(DR.shown?cueHTML(c):'')+'</div>'+(DR.shown?'<div class="secs">这张用了 '+(DR.dt/1000).toFixed(1)+' 秒</div>':'')+'</div>';
+    if(!DR.shown)h+='<div class="acts one"><button class="btn main" data-act="show">想到了，看答案</button></div>';
+    else h+='<div class="acts"><button class="btn bad" data-act="miss">没想出来</button><button class="btn good" data-act="hit">想对了</button></div>';
+    h+='<div class="row"><button class="btn small" data-act="stop">结束这一轮</button></div>';
+  }else{
+    const ids=Object.keys(DR.log).map(Number),n=ids.length;
+    const avg=n?ids.reduce((a,c)=>a+DR.log[c].t,0)/n/1000:0,hit=ids.filter(c=>!DR.log[c].miss).length;
+    h+='<div><div class="score">平均 '+avg.toFixed(1)+' 秒</div><p class="note">'+n+' 张里第一次就想对 '+hit+' 张。目标是每张两秒以内。'+(n-hit?'没想出来的已加进抽认卡的「待加强」。':'')+'</p></div>';
+    const slow=ids.slice().sort((a,b)=>(DR.log[b].miss-DR.log[a].miss)||(DR.log[b].t-DR.log[a].t)).slice(0,8);
+    if(slow.length)h+='<div><p class="note">最慢的几张</p><div class="res">'+slow.map(c=>'<div class="rr three'+(DR.log[c].miss?" bad":"")+'">'+cardHTML(c,"sm")+'<span class="cue">'+cueHTML(c)+'</span><span class="secs">'+(DR.log[c].miss?"没想出来":(DR.log[c].t/1000).toFixed(1)+" 秒")+'</span></div>').join("")+'</div></div>';
+    h+='<div class="acts"><button class="btn" data-act="stop">改花色</button><button class="btn main" data-act="go">再刷一次</button></div>';
+  }
+  V.innerHTML=h;
+}
+function drillNext(){
+  if(!DR.queue.length){DR.phase="result";DR.cur=null;return;}
+  DR.cur=DR.queue.shift();DR.shown=false;DR.t0=Date.now();
+}
+$("view-drill").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+  if(a==="suit"){const i=Number(b.dataset.i);st.drillSuits[i]=!st.drillSuits[i];persist();}
+  else if(a==="go"){
+    const q=[];for(let c=0;c<52;c++)if(st.drillSuits[Math.floor(c/13)])q.push(c);
+    if(!q.length)return;
+    for(let i=q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[q[i],q[j]]=[q[j],q[i]];}
+    DR.queue=q;DR.total=q.length;DR.log={};DR.phase="run";drillNext();
+  }
+  else if(a==="show"){DR.dt=Date.now()-DR.t0;DR.shown=true;}
+  else if(a==="hit"||a==="miss"){
+    const c=DR.cur;if(!DR.log[c])DR.log[c]={t:DR.dt,miss:a==="miss"};
+    if(a==="miss"){DR.log[c].miss=true;st.s[cardNum(c)]=1;persist();DR.queue.push(c);}
+    drillNext();
+  }
+  else if(a==="stop"){DR.phase=(DR.phase==="run"&&Object.keys(DR.log).length)?"result":"setup";DR.cur=null;}
+  renderDrill();
+});
+function showView(){
+  view=location.hash==="#cards"?"cards":location.hash==="#drill"?"drill":"flash";
+  $("view-flash").hidden=view!=="flash";$("view-cards").hidden=view!=="cards";$("view-drill").hidden=view!=="drill";
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.view===view));
+  if(view==="cards")renderCards();else if(view==="drill")renderDrill();else render();
+}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{location.hash=b.dataset.view;showView();}));
+window.addEventListener("hashchange",showView);
+(function(){
+  const k=$("key"),sel=$("tens");
+  for(const i of [1,2,3,4,5,6,7,8,9,0]){
+    const d=document.createElement("div"),b=document.createElement("b"),sp=document.createElement("span");
+    b.textContent=i+" "+STEM[i];sp.textContent=ROLE[i];d.appendChild(b);d.appendChild(sp);k.appendChild(d);
+    const o=document.createElement("option");o.value=String(i);o.textContent=i+" "+STEM[i];sel.appendChild(o);
+  }
+  sel.value=String(st.tens);
+  sel.addEventListener("change",()=>{st.tens=sel.value;persist();buildDeck(false);});
+})();
+
+/* ---------- 编码从哪来（禁制 / 自带） ---------- */
+// 阁主的一百个图像加密放在 bianma.json（scripts/lock/encrypt-data.mjs 写入），与八字、占星读盘同盐同口诀，
+// 钥匙同存 lock_key_mingbu：在读盘「此设备记住」过的设备，这里直接开。密文另存一份在本机，断网也能练。
+const BOX_URL="/beipai/bianma.json",DP_KEY="lock_key_mingbu",OWN="beipai.own",BOXC="beipai.box";
+const b64d=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+const b64e=buf=>btoa(String.fromCharCode.apply(null,new Uint8Array(buf)));
+const lsGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
+const lsSet=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v);}catch(e){}};
+let box=null;
+async function boxLoad(){
+  if(box)return box;
+  try{const r=await fetch(BOX_URL,{cache:"no-cache"});if(!r.ok)throw 0;box=await r.json();lsSet(BOXC,JSON.stringify(box));}
+  catch(e){const c=lsGet(BOXC);if(!c)throw new Error("fetch");box=JSON.parse(c);}
+  return box;
+}
+function useCodes(a){
+  if(!Array.isArray(a)||a.length!==100||!a.every(x=>typeof x==="string"&&x.trim()))throw new Error("shape");
+  ATOM=a.map(x=>x.trim());$("gate").hidden=true;$("app").hidden=false;buildDeck(false);showView();
+}
+async function boxOpen(raw){
+  const B=await boxLoad();
+  const key=await crypto.subtle.importKey("raw",raw,"AES-GCM",false,["decrypt"]);
+  const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64d(B.iv)},key,b64d(B.data));
+  useCodes(JSON.parse(new TextDecoder().decode(plain)));
+}
+function showGate(msg){ATOM=null;$("app").hidden=true;$("gate").hidden=false;$("gateMsg").textContent=msg||"";}
+async function gateInit(){
+  const own=lsGet(OWN);
+  if(own){try{useCodes(JSON.parse(own));return;}catch(e){lsSet(OWN,null);}}
+  const saved=lsGet(DP_KEY);
+  if(saved){try{await boxOpen(b64d(saved).buffer);return;}catch(e){/* 钥匙是几件法宝共用的，这里打不开也不动它 */}}
+  showGate();
+}
+$("gateLock").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const btn=$("gateGo");btn.disabled=true;$("gateMsg").textContent="";
+  try{
+    const B=await boxLoad();
+    const base=await crypto.subtle.importKey("raw",new TextEncoder().encode($("gatePw").value),"PBKDF2",false,["deriveBits"]);
+    const raw=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:b64d(B.salt),iterations:B.iter},base,256);
+    await boxOpen(raw);
+    if($("gateKeep").checked)lsSet(DP_KEY,b64e(raw));
+    $("gatePw").value="";
+  }catch(err){
+    $("gateMsg").textContent=err&&err.message==="fetch"?"编码还没放上来，或者没连上网；也可以先用自己的一套":"口诀不对，禁制未动";
+  }
+  btn.disabled=false;
+});
+$("ownSave").addEventListener("click",()=>{
+  const lines=$("ownText").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(lines.length!==100){$("ownMsg").textContent="现在是 "+lines.length+" 行，要正好一百行";return;}
+  lsSet(OWN,JSON.stringify(lines));$("ownMsg").textContent="";useCodes(lines);
+});
+$("regate").addEventListener("click",()=>{
+  const own=lsGet(OWN);if(own){try{$("ownText").value=JSON.parse(own).join("\n");}catch(e){}}
+  lsSet(OWN,null);stopTimer();showGate();
+});
+gateInit();
+</script>
+</body>
+</html>
