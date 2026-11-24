@@ -205,7 +205,7 @@ table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
   <!-- 校时 · 两盘参看 -->
   <div id="v-jiaoshi" hidden>
     <section class="fb-card qz-card" aria-label="校时">
-      <h3>校时<small>出生那天，这段钟点里命宫、命度在哪几分换段</small></h3>
+      <h3>校时<small>勾候选时辰或自加几段钟点，看命宫、命度在哪几分换段</small></h3>
       <div id="jsRange"></div>
       <p class="fb-key" id="jsKey" style="margin-top:10px"></p>
       <div id="jsBar"></div>
@@ -240,7 +240,7 @@ table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
 <script src="/xingpan/xingpan.js?v=4"></script>
 <script src="/qizheng/qizheng.js?v=4"></script>
 <script src="/fabao/cities.js?v=2"></script>
-<script src="/fabao/jiaoshi.js?v=1"></script>
+<script src="/fabao/jiaoshi.js?v=2"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -425,7 +425,7 @@ $('wheel').addEventListener('click', e => {
 /* ================ 校时 · 两盘参看 ================ */
 // 出生分记不准时：出生那天一段钟点逐分排盘，看命宫、命度、身宫在哪几分换段；两段并排比；事件那天十一曜入哪一段的命宫与此事之宫
 const JS = window.QJ_JS;
-let tab = 'pan', jsData = null, jsRange = null, jsAB = null;
+let tab = 'pan', jsData = null, jsAB = null;
 function setTab(v, quiet) {
   tab = v === 'jiaoshi' ? 'jiaoshi' : 'pan';
   document.querySelectorAll('#viewSeg button').forEach(b => { const on = b.dataset.v === tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
@@ -436,35 +436,37 @@ function setTab(v, quiet) {
 $('viewSeg').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (b && b.dataset.v !== tab) setTab(b.dataset.v); });
 const segName = X => `命${Z[X.ming.zhi]}·${QZ.XIU[X.ming.xiu].n}宿`;
 function jsBase() { const i = C.input; return { y: i.y, mo: i.mo, d: i.d, tz: +i.tz, dst: !!i.dst, lat: +i.lat, lon: +i.lon, luoji: view.luoji }; }
+const jsKeyOf = () => JS.keyOf(C.input.y, C.input.mo, C.input.d, C.name);
+const jsChartAt = m => { const D = jsData, k = D.idx[m]; return k != null ? D.charts[k] : QZ.chart(Object.assign({}, D.base, { h: 0, mi: m })); };
 function renderJiaoshi() {
   if (!C) return;
-  const base = jsBase(), bm = C.input.h * 60 + C.input.mi, hourSig = [base.y, base.mo, base.d, C.input.h].join('-');
-  if (!jsRange || jsRange.sig !== hourSig) { jsRange = { sig: hourSig, m0: C.input.h * 60, m1: C.input.h * 60 + 59 }; jsAB = null; }
-  const sig = JSON.stringify(base) + jsRange.m0 + '-' + jsRange.m1;
+  const base = jsBase(), bm = C.input.h * 60 + C.input.mi;
+  const R = JS.mountCand($('jsRange'), jsKeyOf(), [[C.input.h * 60, C.input.h * 60 + 59]], () => { jsAB = null; renderJiaoshi(); });
+  const mins = JS.minsOf(R);
+  if (!mins.length) { jsData = null; ['jsKey', 'jsBar', 'jsChg', 'jsCmp', 'jsHits', 'jsWA', 'jsWB', 'jsCapA', 'jsCapB'].forEach(id => { $(id).innerHTML = ''; }); $('jsKey').textContent = '先勾候选时辰，或自加一段钟点。'; JS.mountEvents($('jsEv'), jsKeyOf(), () => {}); return; }
+  const sig = JSON.stringify(base) + JSON.stringify(R);
   if (!jsData || jsData.sig !== sig) {
-    const charts = JS.qzCharts(QZ, base, jsRange.m0, jsRange.m1);
-    jsData = { sig, base, m0: jsRange.m0, m1: jsRange.m1, charts, scan: JS.qzScan(QZ, charts, jsRange.m0) };
+    const charts = JS.qzCharts(QZ, base, mins), idx = {};
+    mins.forEach((m, k) => { idx[m] = k; });
+    jsData = { sig, base, mins, idx, charts, scan: JS.qzScan(QZ, charts, mins) };
   }
-  const D = jsData, segs = D.scan.segs, at = m => D.charts[m - D.m0];
-  JS.mountRange($('jsRange'), D.m0, D.m1, (a, b) => { jsRange = { sig: hourSig, m0: a, m1: b }; jsAB = null; renderJiaoshi(); });
+  const D = jsData, segs = D.scan.segs;
   if (!jsAB) {
-    const a = bm >= D.m0 && bm <= D.m1 ? bm : segs[0].from + Math.floor((segs[0].to - segs[0].from) / 2);
+    const a = D.idx[bm] != null ? bm : segs[0].from + Math.floor((segs[0].to - segs[0].from) / 2);
     const other = segs.find(s => a < s.from || a > s.to) || segs[segs.length - 1];
-    jsAB = { a, b: segs.length > 1 ? other.from + Math.floor((other.to - other.from) / 2) : D.m1 };
+    jsAB = { a, b: segs.length > 1 ? other.from + Math.floor((other.to - other.from) / 2) : D.mins[D.mins.length - 1] };
   }
   const segOf = m => segs.findIndex(s => m >= s.from && m <= s.to);
-  $('jsKey').innerHTML = segs.length === 1 ? `${JS.fmt(D.m0)}–${JS.fmt(D.m1)} 都是<strong>${segName(at(segs[0].from))}</strong>` :
-    `${JS.fmt(D.m0)}–${JS.fmt(D.m1)} 分 <strong>${segs.length}</strong> 段：` + segs.map(s => `${segName(at(s.from))}<span class="sep">${JS.fmt(s.from)}–${JS.fmt(s.to)}</span>`).join(' · ');
-  $('jsBar').innerHTML = JS.barHTML(segs, s => segName(at(s.from)) + ' · 度主' + ST[at(s.from).duZhu].s, segOf(jsAB.b));
+  $('jsKey').innerHTML = `候选 <strong>${D.mins.length}</strong> 分，分 <strong>${segs.length}</strong> 段` + (segs.length <= 4 ? '：' + segs.map(s => `${segName(D.charts[s.i0])}<span class="sep">${JS.fmt(s.from)}–${JS.fmt(s.to)}</span>`).join(' · ') : '');
+  $('jsBar').innerHTML = JS.barHTML(segs, s => segName(D.charts[s.i0]) + ' · 度主' + ST[D.charts[s.i0].duZhu].s, segOf(jsAB.b));
   $('jsBar').querySelectorAll('.js-seg').forEach(b => { b.onclick = () => { const s = segs[+b.dataset.i]; jsAB.b = s.from + Math.floor((s.to - s.from) / 2); renderJiaoshi(); }; });
-  $('jsChg').innerHTML = D.scan.changes.map(c => `<li><time>${JS.fmt(c.m)}</time><span>${esc(c.t)}</span></li>`).join('') || '<li class="fb-fine">这段钟点里命宫、命度、身宫都没换。</li>';
+  const chg = D.scan.changes, chgLi = c => `<li><time>${JS.fmt(c.m)}</time><span>${esc(c.t)}</span></li>`;
+  $('jsChg').innerHTML = (chg.length > 20 ? chg.slice(0, 12).map(chgLi).join('') + `<li><details><summary class="fb-fine">其余 ${chg.length - 12} 处</summary><ul class="js-chg">${chg.slice(12).map(chgLi).join('')}</ul></details></li>` : chg.map(chgLi).join('')) || '<li class="fb-fine">候选钟点里命宫、命度、身宫都没换。</li>';
   renderJsCompare(); renderJsEvents();
 }
 function renderJsCompare() {
-  const D = jsData, at = m => D.charts[Math.max(0, Math.min(D.charts.length - 1, m - D.m0))];
-  jsAB.a = Math.max(D.m0, Math.min(D.m1, jsAB.a)); jsAB.b = Math.max(D.m0, Math.min(D.m1, jsAB.b));
+  const A = jsChartAt(jsAB.a), B = jsChartAt(jsAB.b);
   $('jsA').value = JS.fmt(jsAB.a); $('jsB').value = JS.fmt(jsAB.b);
-  const A = at(jsAB.a), B = at(jsAB.b);
   $('jsCapA').textContent = `甲 ${JS.fmt(jsAB.a)} · ${segName(A)} · 命度${xd(A.ming.xiu, A.ming.xdeg)}`;
   $('jsCapB').textContent = `乙 ${JS.fmt(jsAB.b)} · ${segName(B)} · 命度${xd(B.ming.xiu, B.ming.xdeg)}`;
   $('jsWA').innerHTML = wheelSVG(A); $('jsWB').innerHTML = wheelSVG(B);
@@ -476,7 +478,6 @@ function renderJsCompare() {
     row('身宫', `${Z[A.shen.zhi]}宫 · ${ST[A.shenZhu].n}主`, `${Z[B.shen.zhi]}宫 · ${ST[B.shenZhu].n}主`),
     row('天顶', `${Z[A.mcPt.zhi]}宫 · ${xd(A.mcPt.xiu, A.mcPt.xdeg)}`, `${Z[B.mcPt.zhi]}宫 · ${xd(B.mcPt.xiu, B.mcPt.xdeg)}`)
   ];
-  // 十二宫：同一地支，两盘各叫什么宫、宫里有哪些曜（曜不随出生分变，宫名随命宫变）
   for (let k = 0; k < 12; k++) {
     const z = mod(A.ming.zhi - k, 12), stars = A.gongs[z].stars.map(id => ST[id].s).join('') || '—';
     rows.push(row(`${Z[z]}宫 <small style="color:var(--faint)">${stars}</small>`, A.gongs[z].house, B.gongs[z].house));
@@ -484,23 +485,32 @@ function renderJsCompare() {
   $('jsCmp').innerHTML = `<tr><th></th><th>甲 ${JS.fmt(jsAB.a)}</th><th>乙 ${JS.fmt(jsAB.b)}</th></tr>` + rows.join('');
 }
 function renderJsEvents() {
-  const D = jsData, inp = C.input, key = JS.keyOf(inp.y, inp.mo, inp.d, C.name);
+  const D = jsData;
   const sl = ids => ids.length ? ids.map(id => `<b>${ST[id].n}</b>`).join(' ') : '<span class="no">无</span>';
   const draw = evs => {
-    D.evs = evs; D.res = evs.map(ev => ({ ev, r: JS.qzEvent(QZ, D.charts, D.m0, D.scan.segs, D.base, ev) }));
-    $('jsHits').innerHTML = D.res.map(({ ev, r }) => `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JS.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}</small></h4>` +
-      `<p class="fb-fine">当日十一曜：${r.E.stars.map(x => `${x.s}${Z[x.zhi]}`).join(' ')}</p>` +
-      `<div class="js-segrow">${r.rows.map(w => `<time>${JS.fmt(w.seg.from)}–${JS.fmt(w.seg.to)}</time><span class="${w.mingStars.length || w.kindStars.length ? 'hit' : 'no'}">命宫${Z[w.ming]}：${sl(w.mingStars)}${w.kind ? `　${w.kind}${Z[w.kindZhi]}：${sl(w.kindStars)}` : ''}</span>`).join('')}</div>` +
-      (r.hits.length ? `<ul class="js-hits">${r.hits.map(h => `<li class="${h.cls === 's' ? 'slow' : ''}"><time>${JS.fmt(h.m)}${h.unc != null && h.unc >= 0.5 ? ' ±' + Math.round(h.unc) + '′' : ''}</time><span>${esc(h.t)}</span></li>`).join('')}</ul>` : '') + '</div>').join('');
+    D.evs = evs; D.res = evs.map(ev => ({ ev, r: JS.qzEvent(QZ, D.charts, D.mins, D.scan.segs, D.base, ev) }));
+    $('jsHits').innerHTML = D.res.map(({ ev, r }) => {
+      // 段多（全天）时按命宫合并成十二行
+      let rows = r.rows;
+      if (rows.length > 8) {
+        const by = {};
+        rows.forEach(w => { const k = w.ming; if (!by[k]) by[k] = Object.assign({}, w, { spans: [] }); by[k].spans.push(w.seg); });
+        rows = Object.values(by).map(w => Object.assign(w, { label: w.spans.map(s => `${JS.fmt(s.from)}–${JS.fmt(s.to)}`).join('、') }));
+      }
+      return `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JS.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}</small></h4>` +
+        `<p class="fb-fine">当日十一曜：${r.E.stars.map(x => `${x.s}${Z[x.zhi]}`).join(' ')}</p>` +
+        `<div class="js-segrow">${rows.map(w => `<time>${w.label || `${JS.fmt(w.seg.from)}–${JS.fmt(w.seg.to)}`}</time><span class="${w.mingStars.length || w.kindStars.length ? 'hit' : 'no'}">命宫${Z[w.ming]}：${sl(w.mingStars)}${w.kind ? `　${w.kind}${Z[w.kindZhi]}：${sl(w.kindStars)}` : ''}</span>`).join('')}</div>` +
+        (r.hits.length ? `<ul class="js-hits">${r.hits.map(h => `<li class="${h.cls === 's' ? 'slow' : ''}"><time>${JS.fmt(h.m)}${h.unc != null && h.unc >= 0.5 ? ' ±' + Math.round(h.unc) + '′' : ''}</time><span>${esc(h.t)}</span></li>`).join('')}</ul>` : '') + '</div>';
+    }).join('');
   };
-  draw(JS.mountEvents($('jsEv'), key, draw));
+  draw(JS.mountEvents($('jsEv'), jsKeyOf(), draw));
 }
-$('jsA').onchange = () => { const m = JS.parse($('jsA').value); if (m != null && jsData) { jsAB.a = m < jsData.m0 ? m + 1440 : m; renderJsCompare(); } };
-$('jsB').onchange = () => { const m = JS.parse($('jsB').value); if (m != null && jsData) { jsAB.b = m < jsData.m0 ? m + 1440 : m; renderJiaoshi(); } };
+$('jsA').onchange = () => { const m = JS.parse($('jsA').value); if (m != null && jsData) { jsAB.a = m; renderJsCompare(); } };
+$('jsB').onchange = () => { const m = JS.parse($('jsB').value); if (m != null && jsData) { jsAB.b = m; renderJiaoshi(); } };
 $('jsUseB').onclick = () => {
   if (!jsData) return;
-  const m = jsAB.b, i = C.input, t = new Date(Date.UTC(i.y, i.mo - 1, i.d, 0, m));
-  $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`;
+  const m = jsAB.b, i = C.input;
+  $('whenIn').value = `${i.y}-${pad(i.mo)}-${pad(i.d)}T${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
   cast(); F.toast('已按 ' + JS.fmt(m) + ' 起盘');
 };
 
