@@ -156,6 +156,13 @@
 
     /* 右栏 */
     .zw-side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: calc(var(--top-h) + 14px); }
+    .dp-lock { max-width: 340px; margin: 14px auto 6px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+    .dp-lock .fb-seal { width: 52px; height: 52px; font-size: 30px; background: var(--zhu); transform: rotate(-8deg); }
+    .dp-lock-t { font-family: var(--font-title); font-size: 17px; letter-spacing: .12em; }
+    .dp-lock-t .jin { color: var(--jin); }
+    .dp-lock input[type=password] { width: 100%; text-align: center; font-size: 16px; letter-spacing: .3em; padding: 10px 12px; }
+    .dp-lock .fb-btn { width: 100%; }
+    .dp-msg { min-height: 1.4em; font-size: 13px; color: var(--zhu); }
     .zw-card { padding: 16px 18px; }
     .zw-card h3 { font-family: var(--font-title); font-weight: 600; font-size: 15px; letter-spacing: .2em; margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
     .zw-card h3 small { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
@@ -302,7 +309,7 @@
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/ziwei/ziwei.js?v=2"></script>
 <script src="/fabao/cities.js?v=2"></script>
-<script src="/fabao/jiaoshi.js?v=1"></script>
+<script src="/fabao/jiaoshi.js?v=2"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -666,44 +673,78 @@ function setTaiji(br) {
 function renderAll() { renderBoard(); renderYun(); renderDetail(); renderFly(); renderBH(); renderTwo(); }
 
 /* ================ 两盘参看 · 校时 ================ */
-// 出生时辰拿不准时：本盘（甲）与另一个时辰（乙）并排比宫名、主星、局；记下的事件看大限、流年、流月、流日在两盘各落何宫
+// 出生时辰拿不准时：勾候选钟点（时辰、自加几段、全天），各候选时辰按记下的事件排名；本盘（甲）与任一时辰（乙）并排比；
+// 末尾「以事定时」下了禁制，与八字、占星读盘同一口诀
 const JSK = window.QJ_JS;
 let twoT = null;
+const twoKey = () => { const rd = C.form.raw, m = rd ? null : /^(\d+)-(\d+)-(\d+)/.exec(C.info.solar || ''); return rd ? JSK.keyOf(rd.getFullYear(), rd.getMonth() + 1, rd.getDate(), C.name) : m ? JSK.keyOf(+m[1], +m[2], +m[3], C.name) : 'zw'; };
+const chartT = t => { try { return Z.chart(Object.assign({}, C.form.inp, { t })); } catch (e) { return null; } };
+function zwScore(c, evs) { return evs.map(ev => { try { return JSK.zwEvent(Z, c, ev).reduce((s, l) => s + l.score, 0); } catch (e) { return 0; } }); }
 function renderTwo() {
   const card = $('twoCard');
   card.hidden = !view.two;
   if (!view.two || !C) return;
-  const tA = C.form.inp.t;
+  const tA = C.form.inp.t, key = twoKey(), rd = C.form.raw;
+  const defR = rd ? [[rd.getHours() * 60, rd.getHours() * 60 + 59]] : [[0, 1439]];
+  $('twoBody').innerHTML = `<div id="twoCand"></div><div id="twoEdge"></div><div id="twoRank"></div><div id="twoPair"></div>` +
+    `<h3 style="margin-top:16px">事件对照<small>大限、流年、流月、流日的命宫与此事之宫落本命何宫；鸾喜、禄忌落到要紧宫的标金</small></h3><div id="twoEv"></div><div id="twoHits"></div>` +
+    `<h3 style="margin-top:18px">以事定时</h3><div id="dsBox"></div>`;
+  let R = JSK.mountCand($('twoCand'), key, defR, () => { twoT = null; renderTwo(); });
+  // 候选时辰：公历按钟点（开真太阳时按换点）折成时辰；农历只能按时辰格
+  let cands;
+  if (form.cal === 'solar' && rd) cands = JSK.zwCandShi(Z, R, rd.getFullYear(), rd.getMonth() + 1, rd.getDate(), +view.lon, +view.tz, !!view.sun);
+  else { const set = {}; JSK.SHI.forEach((x, i) => { const n = JSK.minsOf(R).filter(m => m >= x[1] && m <= x[2]).length; if (n) set[i] = n; }); cands = Object.keys(set).map(Number).map(t => ({ t, mins: set[t] })); }
+  // 出生那天钟表几点几分换时辰
+  if (form.cal === 'solar' && rd) {
+    const ch = JSK.zwShiChanges(Z, rd.getFullYear(), rd.getMonth() + 1, rd.getDate(), +view.lon, +view.tz, !!view.sun);
+    const m = rd.getHours() * 60 + rd.getMinutes(), k = ch.reduce((a, x, i) => x.m <= m ? i : a, 0), prev = ch[k], next = ch[k + 1];
+    $('twoEdge').innerHTML = `<p class="fb-key" style="font-size:16px;margin-top:10px">本盘钟点 ${JSK.fmt(m)} 在<strong>${Z.TIMES[prev.t]}时</strong>：${JSK.fmt(prev.m)} 起${next ? `，${JSK.fmt(next.m)} 入${Z.TIMES[next.t]}时` : ''}${view.sun ? '（真太阳时）' : ''}</p>`;
+  }
+  const evs = JSK.list(key);
+  // 候选时辰排名
+  const rows = cands.map(x => { const c = chartT(x.t); return c && { t: x.t, mins: x.mins, c, sc: zwScore(c, evs) }; }).filter(Boolean);
+  rows.forEach(r => { r.total = r.sc.reduce((a, b) => a + b, 0); });
+  const top = Math.max.apply(null, rows.map(r => r.total).concat([0]));
   if (twoT == null || twoT === tA) {
-    // 乙默认取邻近的时辰：钟点在本时辰前半取前一个，后半取后一个
-    const ck = C.form.clock, half = ck ? ((ck.getHours() + 1) % 2) * 60 + ck.getMinutes() < 60 : true;
-    twoT = tA === 0 ? 1 : tA === 12 ? 11 : half ? tA - 1 : tA + 1;
+    const others = rows.filter(r => r.t !== tA).sort((a, b) => b.total - a.total);
+    twoT = others.length ? others[0].t : tA === 0 ? 1 : tA - 1;
   }
-  let B;
-  try { B = Z.chart(Object.assign({}, C.form.inp, { t: twoT })); } catch (e) { $('twoBody').innerHTML = '<p class="fb-fine">这个时辰排不出盘。</p>'; return; }
-  // 出生那天钟表几点几分换时辰（开了真太阳时才不在整点）
-  let edge = '';
-  if (form.cal === 'solar' && C.form.raw) {
-    const d = C.form.raw, ch = JSK.zwShiChanges(Z, d.getFullYear(), d.getMonth() + 1, d.getDate(), +view.lon, +view.tz, !!view.sun);
-    const m = d.getHours() * 60 + d.getMinutes(), k = ch.reduce((a, x, i) => x.m <= m ? i : a, 0);
-    const prev = ch[k], next = ch[k + 1];
-    edge = `<p class="fb-key" style="font-size:16px">出生钟点 ${JSK.fmt(m)} 在<strong>${Z.TIMES[prev.t]}时</strong>：${JSK.fmt(prev.m)} 起${next ? `，${JSK.fmt(next.m)} 入${Z.TIMES[next.t]}时` : ''}${view.sun ? '（真太阳时）' : ''}</p>`;
-  }
-  const A = C, row = (n, a, b) => `<tr class="${a !== b ? 'diff' : 'same'}"><th>${n}</th><td${a !== b ? ' class="ch"' : ''}>${a}</td><td${a !== b ? ' class="ch"' : ''}>${b}</td></tr>`;
+  $('twoRank').innerHTML = rows.length ? `<div style="overflow-x:auto;margin-top:10px"><table class="js-cmp"><tr><th>时辰</th><th>命宫</th><th>局</th>${evs.map(e => `<th title="${esc(e.n || '')}">${esc(e.d.slice(2))}</th>`).join('')}<th>合计</th><th></th></tr>` +
+    rows.map(r => `<tr class="${r.t === tA ? 'diff' : 'same'}"><th>${Z.TIMES[r.t]}时${r.t === tA ? ' · 本盘' : ''}</th><td>${ZHI[r.c.ming]} ${r.c.palaces[r.c.ming].major.map(s => s.name).join('') || '空宫'}</td><td>${r.c.info.ju}</td>${r.sc.map(v => `<td>${v}</td>`).join('')}<td${evs.length && r.total === top && top > 0 ? ' class="ch"' : ''}><b>${evs.length ? r.total : '—'}</b></td><td>${r.t !== tA ? `<button class="fb-btn ghost" type="button" data-t="${r.t}">作乙</button>` : ''}</td></tr>`).join('') +
+    `</table></div>${evs.length ? '' : '<p class="fb-fine">记下事件后，各时辰按命中处数排名。</p>'}` : '<p class="fb-fine">先勾候选时辰，或自加一段钟点。</p>';
+  $('twoRank').querySelectorAll('button[data-t]').forEach(b => { b.onclick = () => { twoT = +b.dataset.t; renderTwo(); }; });
+  const B = chartT(twoT);
+  if (B) renderPair(C, B, tA);
+  const one = L => {
+    const parts = [`命宫落${L.mingNat}`].concat(L.kind.filter(k => k.br >= 0).map(k => `${k.n}落${k.nat}`));
+    const luan = L.luan.map(x => x.hit ? `<b>${x.name}·${x.nat}</b>` : `${x.name}·${x.nat}`);
+    const hua = L.hua.filter(x => x.hit && (x.h === '禄' || x.h === '忌')).map(x => `<b>${x.star}化${x.h}·${x.nat}</b>`);
+    return `<span class="${L.score ? 'hit' : 'no'}">${parts.join('，')}${luan.length ? '；' + luan.join(' ') : ''}${hua.length ? '；' + hua.join(' ') : ''}${L.tao.length ? `；命宫见<b>${L.tao.join('、')}</b>` : ''}</span>`;
+  };
+  const draw = list => {
+    if (JSON.stringify(list) !== JSON.stringify(evs)) { renderTwo(); return; }     // 事件增删后连排名一起重算
+    $('twoHits').innerHTML = !B ? '' : list.map(ev => {
+      let ra, rb;
+      try { ra = JSK.zwEvent(Z, C, ev); rb = JSK.zwEvent(Z, B, ev); } catch (e) { return ''; }
+      const sa = ra.reduce((s, l) => s + l.score, 0), sb = rb.reduce((s, l) => s + l.score, 0);
+      return `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JSK.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}　甲 ${sa} 处 · 乙 ${sb} 处</small></h4>` +
+        ra.map((l, i) => `<div class="js-segrow"><time>${l.label} ${l.gz}</time><span>甲 ${one(l)}<br>乙 ${one(rb[i])}</span></div>`).join('') + '</div>';
+    }).join('');
+  };
+  JSK.mountEvents($('twoEv'), key, draw); draw(evs);
+  renderDingshi(rows, R);
+}
+function renderPair(A, B, tA) {
+  const row = (n, a, b) => `<tr class="${a !== b ? 'diff' : 'same'}"><th>${n}</th><td${a !== b ? ' class="ch"' : ''}>${a}</td><td${a !== b ? ' class="ch"' : ''}>${b}</td></tr>`;
   const majors = p => p.major.map(s => s.name + (s.hua ? '<i class="hua h-' + s.hua + '">' + s.hua + '</i>' : '')).join(' ') || '<span style="color:var(--faint)">空宫</span>';
   const rows = [
     row('时柱', A.info.gz[3], B.info.gz[3]), row('命宫', ZHI[A.ming] + '宫', ZHI[B.ming] + '宫'), row('身宫', ZHI[A.shen] + '宫 · ' + A.palaces[A.shen].name, ZHI[B.shen] + '宫 · ' + B.palaces[B.shen].name),
     row('五行局', A.info.ju, B.info.ju), row('命主 · 身主', A.info.soul + ' · ' + A.info.body, B.info.soul + ' · ' + B.info.body)
   ];
-  for (let br = 0; br < 12; br++) {
-    const pa = A.palaces[br], pb = B.palaces[br];
-    rows.push(row(ZHI[br], `${pa.name}　${majors(pa)}`, `${pb.name}　${majors(pb)}`));
-  }
+  for (let br = 0; br < 12; br++) { const pa = A.palaces[br], pb = B.palaces[br]; rows.push(row(ZHI[br], `${pa.name}　${majors(pa)}`, `${pb.name}　${majors(pb)}`)); }
   const sel = Z.TIMES.map((t, i) => `<option value="${i}"${i === twoT ? ' selected' : ''}${i === tA ? ' disabled' : ''}>${t}时 ${Z.TIME_RANGE[i]}</option>`).join('');
-  $('twoBody').innerHTML = edge +
-    `<div class="js-pick"><span class="js-rg">甲 本盘 ${Z.TIMES[tA]}时</span><label class="js-rg">乙 <select id="twoSel" aria-label="乙盘时辰">${sel}</select></label><button class="fb-btn" type="button" id="twoUse">按乙盘起盘</button></div>` +
-    `<div style="overflow-x:auto"><table class="js-cmp"><tr><th></th><th>甲 ${Z.TIMES[tA]}时</th><th>乙 ${Z.TIMES[twoT]}时</th></tr>${rows.join('')}</table></div>` +
-    `<h3 style="margin-top:16px">事件对照<small>大限、流年、流月、流日的命宫与此事之宫落本命何宫；鸾喜、四化落到要紧宫的标金</small></h3><div id="twoEv"></div><div id="twoHits"></div>`;
+  $('twoPair').innerHTML = `<div class="js-pick" style="margin-top:14px"><span class="js-rg">甲 本盘 ${Z.TIMES[tA]}时</span><label class="js-rg">乙 <select id="twoSel" aria-label="乙盘时辰">${sel}</select></label><button class="fb-btn" type="button" id="twoUse">按乙盘起盘</button></div>` +
+    `<div style="overflow-x:auto"><table class="js-cmp"><tr><th></th><th>甲 ${Z.TIMES[tA]}时</th><th>乙 ${Z.TIMES[twoT]}时</th></tr>${rows.join('')}</table></div>`;
   $('twoSel').onchange = () => { twoT = +$('twoSel').value; renderTwo(); };
   $('twoUse').onclick = () => {
     if (form.cal === 'lunar') { $('ltIn').value = String(twoT); cast(); return; }
@@ -712,24 +753,52 @@ function renderTwo() {
     const shift = C.form.sun ? C.form.sun.shift : 0, x = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, Math.round(mid - shift));
     $('whenIn').value = toLocalInput(x); twoT = null; cast(); toast('已按 ' + toLocalInput(x).replace('T', ' ') + ' 起盘');
   };
-  const rd = C.form.raw, inp = rd ? null : /^(\d+)-(\d+)-(\d+)/.exec(C.info.solar || '');
-  const key = rd ? JSK.keyOf(rd.getFullYear(), rd.getMonth() + 1, rd.getDate(), C.name) : inp ? JSK.keyOf(+inp[1], +inp[2], +inp[3], C.name) : 'zw';
-  const one = (L) => {
-    const parts = [`命宫落${L.mingNat}`].concat(L.kind.filter(k => k.br >= 0).map(k => `${k.n}落${k.nat}`));
-    const luan = L.luan.map(x => x.hit ? `<b>${x.name}·${x.nat}</b>` : `${x.name}·${x.nat}`);
-    const hua = L.hua.filter(x => x.hit && (x.h === '禄' || x.h === '忌')).map(x => `<b>${x.star}化${x.h}·${x.nat}</b>`);
-    return `<span class="${L.score ? 'hit' : 'no'}">${parts.join('，')}${luan.length ? '；' + luan.join(' ') : ''}${hua.length ? '；' + hua.join(' ') : ''}${L.tao.length ? `；命宫见<b>${L.tao.join('、')}</b>` : ''}</span>`;
-  };
-  const draw = evs => {
-    $('twoHits').innerHTML = evs.map(ev => {
-      let ra, rb;
-      try { ra = JSK.zwEvent(Z, A, ev); rb = JSK.zwEvent(Z, B, ev); } catch (e) { return ''; }
-      const sa = ra.reduce((s, l) => s + l.score, 0), sb = rb.reduce((s, l) => s + l.score, 0);
-      return `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JSK.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}　甲 ${sa} 处 · 乙 ${sb} 处</small></h4>` +
-        ra.map((l, i) => `<div class="js-segrow"><time>${l.label} ${l.gz}</time><span>甲 ${one(l)}<br>乙 ${one(rb[i])}</span></div>`).join('') + '</div>';
-    }).join('');
-  };
-  draw(JSK.mountEvents($('twoEv'), key, draw));
+}
+
+/* ---------- 以事定时（禁制） ---------- */
+// 脚本加密放在 /ziwei/dingshi.json（scripts/lock/encrypt-data.mjs 写入），与八字、占星读盘同盐同口诀，钥匙存 lock_key_mingbu
+const DS_KEY = 'lock_key_mingbu';
+let dsBox = null, dsBusy = false, dsCtx = null;
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64e = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
+const dsGet = () => { try { return localStorage.getItem(DS_KEY); } catch (e) { return null; } };
+const dsSet = v => { try { v ? localStorage.setItem(DS_KEY, v) : localStorage.removeItem(DS_KEY); } catch (e) { /* 无痕模式 */ } };
+async function dsLoad() { if (!dsBox) { const r = await fetch('/ziwei/dingshi.json'); if (!r.ok) throw new Error('fetch'); dsBox = await r.json(); } return dsBox; }
+async function dsOpen(raw) {
+  const B = await dsLoad();
+  const k = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64d(B.iv) }, k, b64d(B.data));
+  new Function(new TextDecoder().decode(plain))();     // 定义 window.ZW_DINGSHI
+}
+function dsLockHTML(msg) {
+  return `<form class="dp-lock" id="dsLock" autocomplete="off"><div class="fb-seal" aria-hidden="true">禁</div><p class="dp-lock-t">此段被阁主下了<span class="jin">禁制</span></p>` +
+    `<input type="password" id="dsPw" placeholder="解禁口诀" aria-label="解禁口诀"><label class="zw-chk"><input type="checkbox" id="dsKeep" checked> 此设备记住</label>` +
+    `<button class="fb-btn primary" id="dsGo">解 禁</button><p class="dp-msg" role="status">${esc(msg || '')}</p></form>`;
+}
+function renderDingshi(rows, R) {
+  dsCtx = { Z, C, rows, ranges: R, male: form.g === '男', key: twoKey(), JSK, chartT, esc };
+  const box = $('dsBox');
+  if (window.ZW_DINGSHI) { window.ZW_DINGSHI.render(box, dsCtx); return; }
+  const saved = dsGet();
+  if (!saved || dsBusy) { if (!dsBusy) { box.innerHTML = dsLockHTML(); bindDsLock(); } return; }
+  dsBusy = true; box.innerHTML = '<p class="fb-fine">解禁中…</p>';
+  dsOpen(b64d(saved).buffer).then(() => { dsBusy = false; window.ZW_DINGSHI.render($('dsBox'), dsCtx); })
+    .catch(e => { dsBusy = false; if (!(e && e.message === 'fetch')) dsSet(null); $('dsBox').innerHTML = dsLockHTML(e && e.message === 'fetch' ? '经文没取到，联网后再试' : ''); bindDsLock(); });
+}
+function bindDsLock() {
+  const f = $('dsLock'); if (!f) return;
+  f.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = $('dsGo'), msg = f.querySelector('.dp-msg'); btn.disabled = true; msg.textContent = '';
+    try {
+      const B = await dsLoad();
+      const base = await crypto.subtle.importKey('raw', new TextEncoder().encode($('dsPw').value), 'PBKDF2', false, ['deriveBits']);
+      const raw = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: b64d(B.salt), iterations: B.iter }, base, 256);
+      await dsOpen(raw);
+      dsSet($('dsKeep').checked ? b64e(raw) : null);
+      window.ZW_DINGSHI.render($('dsBox'), dsCtx);
+    } catch (err) { msg.textContent = err && err.message === 'fetch' ? '经文没取到，联网后再试' : '口诀不对，禁制未动'; btn.disabled = false; }
+  });
 }
 
 /* ================ 白话 ================ */

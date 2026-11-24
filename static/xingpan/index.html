@@ -563,10 +563,10 @@
   <div class="xp-view" id="v-jiaoshi" hidden>
     <section class="fb-card xp-card xp-lead" aria-label="校时">
       <div class="xp-lead-h">
-        <h3>校时<small>出生那天，这段钟点里盘面在哪几分换段</small></h3>
-        <div class="xp-ctl" id="jsRange"></div>
+        <h3>校时<small>勾候选时辰或自加几段钟点，看盘面在哪几分换段</small></h3>
       </div>
-      <p class="fb-key" id="jsKey"></p>
+      <div id="jsRange"></div>
+      <p class="fb-key" id="jsKey" style="margin-top:10px"></p>
       <div id="jsBar"></div>
       <ul class="js-chg" id="jsChg"></ul>
     </section>
@@ -613,7 +613,7 @@
 <script src="/xingpan/minor.js?v=1"></script>
 <script src="/xingpan/xingpan.js?v=4"></script>
 <script src="/fabao/cities.js?v=2"></script>
-<script src="/fabao/jiaoshi.js?v=1"></script>
+<script src="/fabao/jiaoshi.js?v=2"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -1500,87 +1500,101 @@ function writeURL() {
 }
 
 /* ================ 校时 · 两盘参看 ================ */
-// 出生分记不准时：把出生那天一段钟点逐分排盘，看换段之处；两分并排比；记下的事件逐条求「哪一分出生恰好应上」
+// 出生分记不准时：候选钟点（勾时辰、自加几段、全天都行）逐分排盘，看换段之处；两分并排比；记下的事件逐条求「哪一分出生恰好应上」
 const JS = window.QJ_JS;
-let jsData = null, jsRange = null, jsAB = null;
+let jsData = null, jsAB = null, jsFilter = 'all';
 function jsBase() { const i = C.input; return { y: i.y, mo: i.mo, d: i.d, tz: +i.tz, dst: !!i.dst, lat: +i.lat, lon: +i.lon, house: C.house }; }
+const jsKeyOf = () => JS.keyOf(C.input.y, C.input.mo, C.input.d, C.name);
+const jsChartAt = m => { const D = jsData, k = D.idx[m]; return k != null ? D.charts[k] : XP.chart(Object.assign({}, D.base, { h: 0, mi: m })); };
 function renderJiaoshi() {
   if (!C) return;
-  const base = jsBase(), bm = C.input.h * 60 + C.input.mi, hourSig = [base.y, base.mo, base.d, C.input.h].join('-');
-  if (!jsRange || jsRange.sig !== hourSig) { jsRange = { sig: hourSig, m0: C.input.h * 60, m1: C.input.h * 60 + 59 }; jsAB = null; }
-  const sig = JSON.stringify(base) + jsRange.m0 + '-' + jsRange.m1;
+  const base = jsBase(), bm = C.input.h * 60 + C.input.mi, key = jsKeyOf();
+  const R = JS.mountCand($('jsRange'), key, [[C.input.h * 60, C.input.h * 60 + 59]], () => { jsAB = null; renderJiaoshi(); });
+  const mins = JS.minsOf(R);
+  if (!mins.length) { jsData = null; ['jsKey', 'jsBar', 'jsChg', 'jsCmp', 'jsSum', 'jsHits', 'jsWA', 'jsWB', 'jsCapA', 'jsCapB'].forEach(id => { $(id).innerHTML = ''; }); $('jsKey').textContent = '先勾候选时辰，或自加一段钟点。'; renderJsEventsOnly(); return; }
+  const sig = JSON.stringify(base) + JSON.stringify(R);
   if (!jsData || jsData.sig !== sig) {
-    const charts = JS.astroCharts(XP, base, jsRange.m0, jsRange.m1);
-    jsData = { sig, base, m0: jsRange.m0, m1: jsRange.m1, charts, scan: JS.astroScan(XP, charts, jsRange.m0) };
+    const charts = JS.astroCharts(XP, base, mins), idx = {};
+    mins.forEach((m, k) => { idx[m] = k; });
+    jsData = { sig, base, mins, idx, charts, scan: JS.astroScan(XP, charts, mins) };
   }
   const D = jsData, segs = D.scan.segs, S = XP.SIGNS;
-  JS.mountRange($('jsRange'), D.m0, D.m1, (a, b) => { jsRange = { sig: hourSig, m0: a, m1: b }; jsAB = null; renderJiaoshi(); });
-  // 甲默认取本盘那一分（在时段内的话），乙取另一段的中点
   if (!jsAB) {
-    const inR = bm >= D.m0 && bm <= D.m1, a = inR ? bm : segs[0].from + Math.floor((segs[0].to - segs[0].from) / 2);
+    const a = D.idx[bm] != null ? bm : segs[0].from + Math.floor((segs[0].to - segs[0].from) / 2);
     const other = segs.find(s => a < s.from || a > s.to) || segs[segs.length - 1];
-    jsAB = { a, b: segs.length > 1 ? other.from + Math.floor((other.to - other.from) / 2) : D.m1 };
+    jsAB = { a, b: segs.length > 1 ? other.from + Math.floor((other.to - other.from) / 2) : D.mins[D.mins.length - 1] };
   }
   const segOf = m => segs.findIndex(s => m >= s.from && m <= s.to);
-  $('jsKey').innerHTML = segs.length === 1 ? `${JS.fmt(D.m0)}–${JS.fmt(D.m1)} 上升都在<strong>${S[segs[0].at.asc]}</strong>` :
-    `${JS.fmt(D.m0)}–${JS.fmt(D.m1)} 上升换了 <strong>${segs.length - 1}</strong> 次：` + segs.map(s => `${S[s.at.asc]}<span class="sep">${JS.fmt(s.from)}–${JS.fmt(s.to)}</span>`).join(' · ');
+  const nAsc = new Set(segs.map(s => s.at.asc)).size;
+  $('jsKey').innerHTML = `候选 <strong>${D.mins.length}</strong> 分，` + (nAsc === 1 ? `上升都在<strong>${S[segs[0].at.asc]}</strong>` : `上升落 <strong>${nAsc}</strong> 个星座`) +
+    (segs.length <= 4 ? '：' + segs.map(s => `${S[s.at.asc]}<span class="sep">${JS.fmt(s.from)}–${JS.fmt(s.to)}</span>`).join(' · ') : '');
   $('jsBar').innerHTML = JS.barHTML(segs, s => '升' + S[s.at.asc], segOf(jsAB.b));
   $('jsBar').querySelectorAll('.js-seg').forEach(b => { b.onclick = () => { const s = segs[+b.dataset.i]; jsAB.b = s.from + Math.floor((s.to - s.from) / 2); renderJiaoshi(); }; });
-  $('jsChg').innerHTML = D.scan.changes.map(c => `<li><time>${JS.fmt(c.m)}</time><span>${esc(c.t)}</span></li>`).join('') || '<li class="fb-fine">这段钟点里四轴、宫头、行星宫位都没换。</li>';
+  const chg = D.scan.changes.filter(c => D.mins.length <= 180 || /上升|中天|宿命点/.test(c.t));
+  const chgLi = c => `<li><time>${JS.fmt(c.m)}</time><span>${esc(c.t)}</span></li>`;
+  $('jsChg').innerHTML = (chg.length > 20 ? chg.slice(0, 12).map(chgLi).join('') + `<li><details><summary class="fb-fine">其余 ${chg.length - 12} 处</summary><ul class="js-chg">${chg.slice(12).map(chgLi).join('')}</ul></details></li>` : chg.map(chgLi).join(''))
+    + (chg.length < D.scan.changes.length ? `<li class="fb-fine">候选钟点长，只列上升、中天、宿命点换座；宫头、行星换宫另有 ${D.scan.changes.length - chg.length} 处。</li>` : '') || '<li class="fb-fine">候选钟点里四轴、宫头、行星宫位都没换。</li>';
   renderJsCompare();
   renderJsEvents();
 }
 function renderJsCompare() {
-  const D = jsData, at = m => D.charts[Math.max(0, Math.min(D.charts.length - 1, m - D.m0))];
-  jsAB.a = Math.max(D.m0, Math.min(D.m1, jsAB.a)); jsAB.b = Math.max(D.m0, Math.min(D.m1, jsAB.b));
+  const A = jsChartAt(jsAB.a), B = jsChartAt(jsAB.b), S = XP.SIGNS;
   $('jsA').value = JS.fmt(jsAB.a); $('jsB').value = JS.fmt(jsAB.b);
-  const A = at(jsAB.a), B = at(jsAB.b), S = XP.SIGNS;
-  const cap = (X, m) => `${JS.fmt(m)} · 升${S[Math.floor(X.angles.asc / 30)]} ${degTxt(X.angles.asc)} · 中天${S[Math.floor(X.angles.mc / 30)]}`;
+  const cap = (X, m) => `${JS.fmt(m)} · 升${S[Math.floor(X.angles.asc / 30)]} ${degTxt(X.angles.asc)} · 宿命点${X.extra.vertex ? S[X.extra.vertex.sign] + ' ' + degTxt(X.extra.vertex.lon) : '—'}`;
   $('jsCapA').textContent = '甲 ' + cap(A, jsAB.a); $('jsCapB').textContent = '乙 ' + cap(B, jsAB.b);
   $('jsWA').innerHTML = wheelSVG(A); $('jsWB').innerHTML = wheelSVG(B);
   const sd = l => { const dd = XP.fmtDeg(mod(l, 360)); return `${S[dd.sign]} ${dd.d}°${pad(dd.m)}′`; };
-  const rows = [['上升', A.angles.asc, B.angles.asc], ['中天', A.angles.mc, B.angles.mc]]
-    .concat([2, 3, 5, 6, 8, 9, 11, 12].map(i => [`第${i}宫头`, A.cusps[i], B.cusps[i]]))
-    .map(([n, a, b]) => { const df = Math.floor(mod(a, 360) / 30) !== Math.floor(mod(b, 360) / 30); return `<tr class="${df ? 'diff' : 'same'}"><th>${n}</th><td${df ? ' class="ch"' : ''}>${sd(a)}</td><td${df ? ' class="ch"' : ''}>${sd(b)}</td></tr>`; });
+  const deg = (n, a, b) => { const df = Math.floor(mod(a, 360) / 30) !== Math.floor(mod(b, 360) / 30); return `<tr class="${df ? 'diff' : 'same'}"><th>${n}</th><td${df ? ' class="ch"' : ''}>${sd(a)}</td><td${df ? ' class="ch"' : ''}>${sd(b)}</td></tr>`; };
+  const rows = [deg('上升', A.angles.asc, B.angles.asc), deg('中天', A.angles.mc, B.angles.mc)];
+  if (A.extra.vertex && B.extra.vertex) rows.push(deg('宿命点', A.extra.vertex.lon, B.extra.vertex.lon));
+  [2, 3, 5, 6, 8, 9, 11, 12].forEach(i => rows.push(deg(`第${i}宫头`, A.cusps[i], B.cusps[i])));
   const hs = (n, a, b) => `<tr class="${a !== b ? 'diff' : 'same'}"><th>${n}</th><td${a !== b ? ' class="ch"' : ''}>${a}</td><td${a !== b ? ' class="ch"' : ''}>${b}</td></tr>`;
   XP.PLANETS.forEach(id => rows.push(hs(BODY[id].n + '落宫', `第 ${A.bodies[id].house} 宫`, `第 ${B.bodies[id].house} 宫`)));
-  if (A.extra.vertex && B.extra.vertex) rows.push(hs('宿命点', `${S[A.extra.vertex.sign]} · 第 ${A.extra.vertex.house} 宫`, `${S[B.extra.vertex.sign]} · 第 ${B.extra.vertex.house} 宫`));
+  if (A.extra.vertex && B.extra.vertex) rows.push(hs('宿命点落宫', `第 ${A.extra.vertex.house} 宫`, `第 ${B.extra.vertex.house} 宫`));
   rows.push(hs('福点', `${S[Math.floor(A.fortune / 30)]} · 第 ${XP.houseOf(A.fortune, A.cusps)} 宫`, `${S[Math.floor(B.fortune / 30)]} · 第 ${XP.houseOf(B.fortune, B.cusps)} 宫`));
   const now = new Date(), ev = { d: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}` };
-  const lordOf = X => { const L = JS.astroLords(XP, [X], 0, [{ from: 0, to: 0 }], jsData.base, ev)[0]; return `${S[L.sign]} · ${BODY[L.lord].n}`; };
+  const lordOf = X => { const L = JS.astroLords(XP, [X], [{ i0: 0 }], jsData.base, ev)[0]; return `${S[L.sign]} · ${BODY[L.lord].n}`; };
   rows.push(hs('今年小限', lordOf(A), lordOf(B)));
   rows.push(hs('昼夜', A.day ? '昼生' : '夜生', B.day ? '昼生' : '夜生'));
   $('jsCmp').innerHTML = `<tr><th></th><th>甲 ${JS.fmt(jsAB.a)}</th><th>乙 ${JS.fmt(jsAB.b)}</th></tr>` + rows.join('');
 }
-const JS_SP = { f: ['快星', 'f'], m: ['木土', ''], s: ['慢星', ''], p: ['次限', 'p'] };
+const JS_SP = { f: ['快星', 'f'], m: ['木土', ''], s: ['慢星', ''], p: ['推运', 'p'] };
+function renderJsEventsOnly() { JS.mountEvents($('jsEv'), jsKeyOf(), () => {}); }
 function renderJsEvents() {
-  const D = jsData, inp = C.input, key = JS.keyOf(inp.y, inp.mo, inp.d, C.name);
+  const D = jsData;
   const draw = evs => {
-    D.evs = evs; D.hits = evs.map(ev => ({ ev, hits: JS.astroHits(XP, D.charts, D.m0, D.base, ev), lords: JS.astroLords(XP, D.charts, D.m0, D.scan.segs, D.base, ev) }));
-    const allHits = [].concat.apply([], D.hits.map(x => x.hits));
+    D.evs = evs; D.hits = evs.map(ev => ({ ev, hits: JS.astroHits(XP, D.charts, D.mins, D.base, ev), lords: JS.astroLords(XP, D.charts, D.scan.segs, D.base, ev) }));
     if (!evs.length) { $('jsSum').innerHTML = ''; $('jsHits').innerHTML = ''; return; }
-    const hg = JS.histHTML(D.m0, D.m1, allHits, (D.m1 - D.m0) > 90 ? 10 : 5);
+    const keep = h => jsFilter === 'all' || (jsFilter === 'vx' ? h.vx : h.cls === 'f' || h.cls === 'p');
+    const allHits = [].concat.apply([], D.hits.map(x => x.hits)).filter(keep);
+    const n = D.mins.length, bin = n > 600 ? 30 : n > 180 ? 15 : n > 90 ? 10 : 5;
+    const hg = JS.histHTML(D.mins, allHits, bin);
     D.best = hg.best;
-    $('jsSum').innerHTML = `<p class="xp-note">${hg.best ? `命中最密：<b class="jin">${JS.fmt(hg.best.from)}–${JS.fmt(hg.best.to)}</b>（快星、次限记二分，木土一分，天海冥半分）` : '这段钟点里没有精确命中。'}</p>` + hg.html;
-    $('jsHits').innerHTML = D.hits.map(({ ev, hits, lords }) => `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JS.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}</small></h4>` +
-      `<div class="js-segrow"><time>小限年主</time><span>${lords.map(l => `${JS.fmt(l.seg.from)}–${JS.fmt(l.seg.to)} ${XP.SIGNS[l.sign]} · <b>${BODY[l.lord].n}</b>`).join('　')}</span></div>` +
-      (hits.length ? `<ul class="js-hits">${hits.map(h => `<li class="${h.cls === 's' ? 'slow' : ''}"><time>${JS.fmt(h.m)}${h.unc != null && h.unc >= 0.5 ? ' ±' + Math.round(h.unc) + '′' : ''}</time><span class="sp ${JS_SP[h.cls][1]}">${JS_SP[h.cls][0]}</span><span>${esc(h.t)}</span></li>`).join('')}</ul>` : '<p class="fb-fine">这段钟点里没有精确命中。</p>') + '</div>').join('');
+    $('jsSum').innerHTML = `<div class="xp-lead-h" style="margin-top:12px"><p class="xp-note" style="margin:0">${hg.best ? `命中最密：<b class="jin">${JS.fmt(hg.best.from)}–${JS.fmt(hg.best.to)}</b>（快星、推运记二分，木土一分，天海冥半分）` : '候选钟点里没有精确命中。'}</p>` +
+      `<div class="fb-seg xp-dmode" id="jsFlt" role="group" aria-label="列哪些命中">${[['all', '全部'], ['vx', '宿命点'], ['fp', '快星推运']].map(([v, t]) => `<button type="button" data-f="${v}" class="${jsFilter === v ? 'on' : ''}">${t}</button>`).join('')}</div></div>` + hg.html;
+    $('jsFlt').onclick = e => { const b = e.target.closest('button[data-f]'); if (b) { jsFilter = b.dataset.f; draw(JS.list(jsKeyOf())); } };
+    $('jsHits').innerHTML = D.hits.map(({ ev, hits, lords }) => {
+      const H = hits.filter(keep);
+      return `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JS.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}</small></h4>` +
+        (lords.length <= 6 ? `<div class="js-segrow"><time>小限年主</time><span>${lords.map(l => `${JS.fmt(l.seg.from)}–${JS.fmt(l.seg.to)} ${XP.SIGNS[l.sign]} · <b>${BODY[l.lord].n}</b>`).join('　')}</span></div>` : '') +
+        (H.length ? (H.length > 30 ? `<details><summary class="fb-fine">共 ${H.length} 条命中，候选钟点越长越多，点开看全部</summary>` : '') + `<ul class="js-hits">${H.map(h => `<li class="${h.cls === 's' ? 'slow' : ''}"><time>${JS.fmt(h.m)}${h.unc != null && h.unc >= 0.5 ? ' ±' + Math.round(h.unc) + '′' : ''}</time><span class="sp ${JS_SP[h.cls][1]}">${JS_SP[h.cls][0]}</span><span>${esc(h.t)}</span></li>`).join('')}</ul>` + (H.length > 30 ? '</details>' : '') : '<p class="fb-fine">候选钟点里没有精确命中。</p>') + '</div>';
+    }).join('');
   };
-  draw(JS.mountEvents($('jsEv'), key, draw));
+  draw(JS.mountEvents($('jsEv'), jsKeyOf(), draw));
 }
 function jsText() {
-  const D = jsData, S = XP.SIGNS, L = [`【校时】${JS.fmt(D.m0)}–${JS.fmt(D.m1)} · ` + D.scan.segs.map(s => `${JS.fmt(s.from)}–${JS.fmt(s.to)} 升${S[s.at.asc]}`).join(' · ')];
+  const D = jsData, S = XP.SIGNS, L = [`【校时】候选 ${D.mins.length} 分 · ` + D.scan.segs.map(s => `${JS.fmt(s.from)}–${JS.fmt(s.to)} 升${S[s.at.asc]}`).join(' · ')];
   D.scan.changes.forEach(c => L.push(`${JS.fmt(c.m)} ${c.t}`));
   (D.hits || []).forEach(({ ev, hits }) => L.push(`事件 ${ev.d} ${JS.KIND_N[ev.k] || ''} ${ev.n || ''}：` + (hits.map(h => `${JS.fmt(h.m)}${h.unc != null && h.unc >= 0.5 ? '±' + Math.round(h.unc) : ''} ${h.t}`).join('；') || '无精确命中')));
   if (D.best) L.push(`命中最密 ${JS.fmt(D.best.from)}–${JS.fmt(D.best.to)}`);
   return L.join('\n');
 }
-$('jsA').onchange = () => { const m = JS.parse($('jsA').value); if (m != null && jsData) { jsAB.a = m < jsData.m0 ? m + 1440 : m; renderJsCompare(); } };
-$('jsB').onchange = () => { const m = JS.parse($('jsB').value); if (m != null && jsData) { jsAB.b = m < jsData.m0 ? m + 1440 : m; renderJiaoshi(); } };
+$('jsA').onchange = () => { const m = JS.parse($('jsA').value); if (m != null && jsData) { jsAB.a = m; renderJsCompare(); } };
+$('jsB').onchange = () => { const m = JS.parse($('jsB').value); if (m != null && jsData) { jsAB.b = m; renderJiaoshi(); } };
 $('jsUseB').onclick = () => {
   if (!jsData) return;
-  const m = jsAB.b, i = C.input, t = new Date(Date.UTC(i.y, i.mo - 1, i.d, 0, m));
-  $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`;
+  const m = jsAB.b, i = C.input;
+  $('whenIn').value = `${i.y}-${pad(i.mo)}-${pad(i.d)}T${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
   nowCast = false; cast(); toast('已按 ' + JS.fmt(m) + ' 起盘');
 };
 
