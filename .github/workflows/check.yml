@@ -43,6 +43,7 @@ jobs:
         run: |
           node scripts/pwa/gen-sw.js --check
           node scripts/cities/check.js
+          node scripts/jiaoshi/check.js
           node scripts/seo/tool-meta.js --check
 
       - name: Install Hugo CLI

@@ -336,7 +336,7 @@
     <div class="fb-seal" aria-hidden="true">星</div>
     <div>
       <h1 class="fb-title">星盘</h1>
-      <p class="fb-sub">本命 · 行运 · 太阳回归 · 逆行 · 月亮空亡</p>
+      <p class="fb-sub">本命 · 行运 · 太阳回归 · 逆行 · 月亮空亡 · 校时</p>
     </div>
   </header>
 
@@ -346,6 +346,7 @@
     <button type="button" role="tab" data-v="return" aria-selected="false">回归</button>
     <button type="button" role="tab" data-v="retro" aria-selected="false">逆行</button>
     <button type="button" role="tab" data-v="void" aria-selected="false">空亡</button>
+    <button type="button" role="tab" data-v="jiaoshi" aria-selected="false">校时</button>
     <button type="button" role="tab" data-v="dupan" aria-selected="false">读盘</button>
   </div>
 
@@ -558,6 +559,38 @@
     </section>
   </div>
 
+  <!-- 校时 · 两盘参看 -->
+  <div class="xp-view" id="v-jiaoshi" hidden>
+    <section class="fb-card xp-card xp-lead" aria-label="校时">
+      <div class="xp-lead-h">
+        <h3>校时<small>出生那天，这段钟点里盘面在哪几分换段</small></h3>
+        <div class="xp-ctl" id="jsRange"></div>
+      </div>
+      <p class="fb-key" id="jsKey"></p>
+      <div id="jsBar"></div>
+      <ul class="js-chg" id="jsChg"></ul>
+    </section>
+    <section class="fb-card xp-card" aria-label="两盘参看">
+      <h3>两盘参看<small>亮的是两盘不同处</small></h3>
+      <div class="js-pick">
+        <label class="js-rg">甲 <input type="time" id="jsA" step="60" aria-label="甲盘出生钟点"></label>
+        <label class="js-rg">乙 <input type="time" id="jsB" step="60" aria-label="乙盘出生钟点"></label>
+        <button class="fb-btn" type="button" id="jsUseB">按乙盘起盘</button>
+      </div>
+      <div class="js-two">
+        <div><p class="fb-fine" id="jsCapA"></p><div class="xp-wheel" id="jsWA"></div></div>
+        <div><p class="fb-fine" id="jsCapB"></p><div class="xp-wheel" id="jsWB"></div></div>
+      </div>
+      <div style="overflow-x:auto;margin-top:12px"><table class="js-cmp" id="jsCmp"></table></div>
+    </section>
+    <section class="fb-card xp-card" aria-label="事件对照">
+      <h3>事件对照<small>记下有日期的事，看哪一分出生的盘恰好应上</small></h3>
+      <div id="jsEv"></div>
+      <div id="jsSum"></div>
+      <div id="jsHits"></div>
+    </section>
+  </div>
+
   <div class="xp-view" id="v-dupan" hidden>
     <section class="fb-card xp-card xp-lead" aria-label="读盘">
       <h3>读盘</h3>
@@ -580,6 +613,7 @@
 <script src="/xingpan/minor.js?v=1"></script>
 <script src="/xingpan/xingpan.js?v=4"></script>
 <script src="/fabao/cities.js?v=2"></script>
+<script src="/fabao/jiaoshi.js?v=1"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -986,8 +1020,8 @@ function renderBH() {
 
 /* ================ 视图：本命 · 行运 · 回归 · 逆行 · 空亡 ================ */
 // 一个分段切换；本命以外的几页，生辰面板收成一行（要改再展开），各页最上面先给结论
-const VIEWS = ['natal', 'transit', 'return', 'retro', 'void', 'dupan'];
-const VIEW_NAME = { natal: '本命', transit: '行运', return: '太阳回归', retro: '逆行', void: '月亮空亡', dupan: '读盘' };
+const VIEWS = ['natal', 'transit', 'return', 'retro', 'void', 'jiaoshi', 'dupan'];
+const VIEW_NAME = { natal: '本命', transit: '行运', return: '太阳回归', retro: '逆行', void: '月亮空亡', jiaoshi: '校时', dupan: '读盘' };
 let tab = 'natal', formOpen = false;
 function setTab(v, quiet) {
   if (VIEWS.indexOf(v) < 0) v = 'natal';
@@ -1016,6 +1050,7 @@ function renderView() {
   else if (tab === 'return') renderReturn();
   else if (tab === 'retro') renderRetro();
   else if (tab === 'void') renderVoid();
+  else if (tab === 'jiaoshi') renderJiaoshi();
   else if (tab === 'dupan') renderDupan();
 }
 // 分段上的小标：此刻水逆、此刻月亮空亡
@@ -1403,7 +1438,7 @@ function viewText() {
   } else if (tab === 'void' && vcData) {
     L.push(`【月亮空亡 · 未来七天】时刻为 ${tzOf(Date.now())}`);
     vcData.list.forEach(p => L.push(`${md(p.start)} ${hm(p.start)} → ${md(p.end)} ${hm(p.end)}（${dur(p.end - p.start)}）${p.last ? '末相月亮' + p.last.type.n + BODY[p.last.id].n : '整座无相'}，入${S[p.sign]}`));
-  }
+  } else if (tab === 'jiaoshi' && jsData) L.push(jsText());
   return L.join('\n');
 }
 // 分享图：本命取白话卡；行运、回归、逆行、空亡取该视图的要紧一句与几行。二维码只带视图，不带生辰
@@ -1415,10 +1450,10 @@ $('shareBtn').onclick = () => {
   const title = {
     natal: C ? `太阳${S[C.bodies.sun.sign]} · 月亮${S[C.bodies.moon.sign]} · 上升${S[Math.floor(C.angles.asc / 30)]}` : '星盘',
     transit: '行运 · ' + (trData ? ymd(trData.t) : ''), 'return': '太阳回归 · ' + (srData ? srData.Y : ''),
-    retro: '逆行日历 · ' + (rtData ? rtData.Y : ''), void: '月亮空亡 · 未来七天'
+    retro: '逆行日历 · ' + (rtData ? rtData.Y : ''), void: '月亮空亡 · 未来七天', jiaoshi: '校时 · 两盘参看'
   }[tab];
   Fabao.share(Object.assign({ title, url: u, qrLabel: self ? '扫码看这一页' : '扫码也排一盘' },
-    tab === 'natal' ? {} : { key: key({ transit: 'trKey', 'return': 'srKey', retro: 'rtKey', void: 'vcKey' }[tab]), lines }));
+    tab === 'natal' ? {} : { key: key({ transit: 'trKey', 'return': 'srKey', retro: 'rtKey', void: 'vcKey', jiaoshi: 'jsKey' }[tab]), lines }));
 };
 $('copyBtn').onclick = () => { if (C) { const v = tab === 'natal' ? '' : viewText(); copy(chartText() + (v ? '\n\n' + v : ''), (tab === 'natal' ? '星盘' : VIEW_NAME[tab]) + '已复制'); } };
 // 问 AI：盘面文字再补元素模式分布、命主星、今年的小限与法达，连同本页口径一并复制
@@ -1463,6 +1498,91 @@ function writeURL() {
   if (tab === 'retro' && rtYear != null) q.set('ry', rtYear);
   history.replaceState(null, '', '?' + q.toString());
 }
+
+/* ================ 校时 · 两盘参看 ================ */
+// 出生分记不准时：把出生那天一段钟点逐分排盘，看换段之处；两分并排比；记下的事件逐条求「哪一分出生恰好应上」
+const JS = window.QJ_JS;
+let jsData = null, jsRange = null, jsAB = null;
+function jsBase() { const i = C.input; return { y: i.y, mo: i.mo, d: i.d, tz: +i.tz, dst: !!i.dst, lat: +i.lat, lon: +i.lon, house: C.house }; }
+function renderJiaoshi() {
+  if (!C) return;
+  const base = jsBase(), bm = C.input.h * 60 + C.input.mi, hourSig = [base.y, base.mo, base.d, C.input.h].join('-');
+  if (!jsRange || jsRange.sig !== hourSig) { jsRange = { sig: hourSig, m0: C.input.h * 60, m1: C.input.h * 60 + 59 }; jsAB = null; }
+  const sig = JSON.stringify(base) + jsRange.m0 + '-' + jsRange.m1;
+  if (!jsData || jsData.sig !== sig) {
+    const charts = JS.astroCharts(XP, base, jsRange.m0, jsRange.m1);
+    jsData = { sig, base, m0: jsRange.m0, m1: jsRange.m1, charts, scan: JS.astroScan(XP, charts, jsRange.m0) };
+  }
+  const D = jsData, segs = D.scan.segs, S = XP.SIGNS;
+  JS.mountRange($('jsRange'), D.m0, D.m1, (a, b) => { jsRange = { sig: hourSig, m0: a, m1: b }; jsAB = null; renderJiaoshi(); });
+  // 甲默认取本盘那一分（在时段内的话），乙取另一段的中点
+  if (!jsAB) {
+    const inR = bm >= D.m0 && bm <= D.m1, a = inR ? bm : segs[0].from + Math.floor((segs[0].to - segs[0].from) / 2);
+    const other = segs.find(s => a < s.from || a > s.to) || segs[segs.length - 1];
+    jsAB = { a, b: segs.length > 1 ? other.from + Math.floor((other.to - other.from) / 2) : D.m1 };
+  }
+  const segOf = m => segs.findIndex(s => m >= s.from && m <= s.to);
+  $('jsKey').innerHTML = segs.length === 1 ? `${JS.fmt(D.m0)}–${JS.fmt(D.m1)} 上升都在<strong>${S[segs[0].at.asc]}</strong>` :
+    `${JS.fmt(D.m0)}–${JS.fmt(D.m1)} 上升换了 <strong>${segs.length - 1}</strong> 次：` + segs.map(s => `${S[s.at.asc]}<span class="sep">${JS.fmt(s.from)}–${JS.fmt(s.to)}</span>`).join(' · ');
+  $('jsBar').innerHTML = JS.barHTML(segs, s => '升' + S[s.at.asc], segOf(jsAB.b));
+  $('jsBar').querySelectorAll('.js-seg').forEach(b => { b.onclick = () => { const s = segs[+b.dataset.i]; jsAB.b = s.from + Math.floor((s.to - s.from) / 2); renderJiaoshi(); }; });
+  $('jsChg').innerHTML = D.scan.changes.map(c => `<li><time>${JS.fmt(c.m)}</time><span>${esc(c.t)}</span></li>`).join('') || '<li class="fb-fine">这段钟点里四轴、宫头、行星宫位都没换。</li>';
+  renderJsCompare();
+  renderJsEvents();
+}
+function renderJsCompare() {
+  const D = jsData, at = m => D.charts[Math.max(0, Math.min(D.charts.length - 1, m - D.m0))];
+  jsAB.a = Math.max(D.m0, Math.min(D.m1, jsAB.a)); jsAB.b = Math.max(D.m0, Math.min(D.m1, jsAB.b));
+  $('jsA').value = JS.fmt(jsAB.a); $('jsB').value = JS.fmt(jsAB.b);
+  const A = at(jsAB.a), B = at(jsAB.b), S = XP.SIGNS;
+  const cap = (X, m) => `${JS.fmt(m)} · 升${S[Math.floor(X.angles.asc / 30)]} ${degTxt(X.angles.asc)} · 中天${S[Math.floor(X.angles.mc / 30)]}`;
+  $('jsCapA').textContent = '甲 ' + cap(A, jsAB.a); $('jsCapB').textContent = '乙 ' + cap(B, jsAB.b);
+  $('jsWA').innerHTML = wheelSVG(A); $('jsWB').innerHTML = wheelSVG(B);
+  const sd = l => { const dd = XP.fmtDeg(mod(l, 360)); return `${S[dd.sign]} ${dd.d}°${pad(dd.m)}′`; };
+  const rows = [['上升', A.angles.asc, B.angles.asc], ['中天', A.angles.mc, B.angles.mc]]
+    .concat([2, 3, 5, 6, 8, 9, 11, 12].map(i => [`第${i}宫头`, A.cusps[i], B.cusps[i]]))
+    .map(([n, a, b]) => { const df = Math.floor(mod(a, 360) / 30) !== Math.floor(mod(b, 360) / 30); return `<tr class="${df ? 'diff' : 'same'}"><th>${n}</th><td${df ? ' class="ch"' : ''}>${sd(a)}</td><td${df ? ' class="ch"' : ''}>${sd(b)}</td></tr>`; });
+  const hs = (n, a, b) => `<tr class="${a !== b ? 'diff' : 'same'}"><th>${n}</th><td${a !== b ? ' class="ch"' : ''}>${a}</td><td${a !== b ? ' class="ch"' : ''}>${b}</td></tr>`;
+  XP.PLANETS.forEach(id => rows.push(hs(BODY[id].n + '落宫', `第 ${A.bodies[id].house} 宫`, `第 ${B.bodies[id].house} 宫`)));
+  if (A.extra.vertex && B.extra.vertex) rows.push(hs('宿命点', `${S[A.extra.vertex.sign]} · 第 ${A.extra.vertex.house} 宫`, `${S[B.extra.vertex.sign]} · 第 ${B.extra.vertex.house} 宫`));
+  rows.push(hs('福点', `${S[Math.floor(A.fortune / 30)]} · 第 ${XP.houseOf(A.fortune, A.cusps)} 宫`, `${S[Math.floor(B.fortune / 30)]} · 第 ${XP.houseOf(B.fortune, B.cusps)} 宫`));
+  const now = new Date(), ev = { d: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}` };
+  const lordOf = X => { const L = JS.astroLords(XP, [X], 0, [{ from: 0, to: 0 }], jsData.base, ev)[0]; return `${S[L.sign]} · ${BODY[L.lord].n}`; };
+  rows.push(hs('今年小限', lordOf(A), lordOf(B)));
+  rows.push(hs('昼夜', A.day ? '昼生' : '夜生', B.day ? '昼生' : '夜生'));
+  $('jsCmp').innerHTML = `<tr><th></th><th>甲 ${JS.fmt(jsAB.a)}</th><th>乙 ${JS.fmt(jsAB.b)}</th></tr>` + rows.join('');
+}
+const JS_SP = { f: ['快星', 'f'], m: ['木土', ''], s: ['慢星', ''], p: ['次限', 'p'] };
+function renderJsEvents() {
+  const D = jsData, inp = C.input, key = JS.keyOf(inp.y, inp.mo, inp.d, C.name);
+  const draw = evs => {
+    D.evs = evs; D.hits = evs.map(ev => ({ ev, hits: JS.astroHits(XP, D.charts, D.m0, D.base, ev), lords: JS.astroLords(XP, D.charts, D.m0, D.scan.segs, D.base, ev) }));
+    const allHits = [].concat.apply([], D.hits.map(x => x.hits));
+    if (!evs.length) { $('jsSum').innerHTML = ''; $('jsHits').innerHTML = ''; return; }
+    const hg = JS.histHTML(D.m0, D.m1, allHits, (D.m1 - D.m0) > 90 ? 10 : 5);
+    D.best = hg.best;
+    $('jsSum').innerHTML = `<p class="xp-note">${hg.best ? `命中最密：<b class="jin">${JS.fmt(hg.best.from)}–${JS.fmt(hg.best.to)}</b>（快星、次限记二分，木土一分，天海冥半分）` : '这段钟点里没有精确命中。'}</p>` + hg.html;
+    $('jsHits').innerHTML = D.hits.map(({ ev, hits, lords }) => `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JS.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}</small></h4>` +
+      `<div class="js-segrow"><time>小限年主</time><span>${lords.map(l => `${JS.fmt(l.seg.from)}–${JS.fmt(l.seg.to)} ${XP.SIGNS[l.sign]} · <b>${BODY[l.lord].n}</b>`).join('　')}</span></div>` +
+      (hits.length ? `<ul class="js-hits">${hits.map(h => `<li class="${h.cls === 's' ? 'slow' : ''}"><time>${JS.fmt(h.m)}${h.unc != null && h.unc >= 0.5 ? ' ±' + Math.round(h.unc) + '′' : ''}</time><span class="sp ${JS_SP[h.cls][1]}">${JS_SP[h.cls][0]}</span><span>${esc(h.t)}</span></li>`).join('')}</ul>` : '<p class="fb-fine">这段钟点里没有精确命中。</p>') + '</div>').join('');
+  };
+  draw(JS.mountEvents($('jsEv'), key, draw));
+}
+function jsText() {
+  const D = jsData, S = XP.SIGNS, L = [`【校时】${JS.fmt(D.m0)}–${JS.fmt(D.m1)} · ` + D.scan.segs.map(s => `${JS.fmt(s.from)}–${JS.fmt(s.to)} 升${S[s.at.asc]}`).join(' · ')];
+  D.scan.changes.forEach(c => L.push(`${JS.fmt(c.m)} ${c.t}`));
+  (D.hits || []).forEach(({ ev, hits }) => L.push(`事件 ${ev.d} ${JS.KIND_N[ev.k] || ''} ${ev.n || ''}：` + (hits.map(h => `${JS.fmt(h.m)}${h.unc != null && h.unc >= 0.5 ? '±' + Math.round(h.unc) : ''} ${h.t}`).join('；') || '无精确命中')));
+  if (D.best) L.push(`命中最密 ${JS.fmt(D.best.from)}–${JS.fmt(D.best.to)}`);
+  return L.join('\n');
+}
+$('jsA').onchange = () => { const m = JS.parse($('jsA').value); if (m != null && jsData) { jsAB.a = m < jsData.m0 ? m + 1440 : m; renderJsCompare(); } };
+$('jsB').onchange = () => { const m = JS.parse($('jsB').value); if (m != null && jsData) { jsAB.b = m < jsData.m0 ? m + 1440 : m; renderJiaoshi(); } };
+$('jsUseB').onclick = () => {
+  if (!jsData) return;
+  const m = jsAB.b, i = C.input, t = new Date(Date.UTC(i.y, i.mo - 1, i.d, 0, m));
+  $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`;
+  nowCast = false; cast(); toast('已按 ' + JS.fmt(m) + ' 起盘');
+};
 
 /* ================ 读盘（禁制） ================ */
 // 这一段的脚本加密放在 dupan.json（scripts/lock/encrypt-data.mjs 写入），与八字读盘 /bazi/dupan.json 同盐同口诀：
