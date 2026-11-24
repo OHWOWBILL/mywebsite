@@ -202,7 +202,7 @@ table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
 <script src="/bazi/bazi.js?v=4"></script>
 <script src="/xingpan/xingpan.js?v=4"></script>
 <script src="/qizheng/qizheng.js?v=4"></script>
-<script src="/fabao/cities.js?v=1"></script>
+<script src="/fabao/cities.js?v=2"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -218,13 +218,12 @@ const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
 };
-const guessTz = -new Date().getTimezoneOffset() / 60;
-const guess = CITY_LIST.find(c => c[3] === guessTz) || CITY_LIST[0];
+const guess = window.QJ_CITIES.guess();
 const view = Object.assign({ city: guess[0], lon: guess[1], lat: guess[2], tz: guess[3], luoji: 'qing' }, store.get(LS_VIEW, {}));
 const saveView = () => store.set(LS_VIEW, view);
 let C = null, P = null;
 
-$('cityIn').innerHTML = CITIES.map(([g, l]) => `<optgroup label="${g}">${l.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('') + '<option value="">自定义经纬度</option>';
+window.QJ_CITIES.mount($('cityIn'), { custom: '自定义经纬度' });
 $('tzIn').innerHTML = TZS.map(z => `<option value="${z}">${tzLabel(z)}</option>`).join('');
 function syncUI() {
   $('cityIn').value = CITY_LIST.some(c => c[0] === view.city) ? view.city : '';
@@ -242,10 +241,12 @@ function cast() {
   C.name = $('nameIn').value.trim();
   P = BZ.chart({ y, mo, d, h, mi, tz: +view.tz, dst, lon: +view.lon, male: true });
   const dn = $('dstNote');
-  if (+view.tz === 8 && !dst && BZ.isChinaDST(y, mo, d)) {
+  // 出生地当年当时钟表实际用的时区（台湾日治 UTC+9、历年日光节约时间、大陆 1986–1991 夏令时……），与所选不合就提一句
+  const zc = window.QJ_CITIES.zoneCheck({ city: view.city, tz: +view.tz, dst, y, mo, d, h, mi });
+  if (zc) {
     dn.hidden = false;
-    dn.innerHTML = `此日在大陆夏令时期间（${y} 年），当时钟表比北京标准时快一小时。若所报为当时钟表读数，应勾「夏令时」。<button class="fb-btn" type="button" id="dstBtn">勾上夏令时</button>`;
-    $('dstBtn').onclick = () => { $('dstIn').checked = true; cast(); F.toast('已按夏令时减一小时'); };
+    dn.innerHTML = `${esc(zc.text)}<button class="fb-btn" type="button" id="dstBtn">${esc(zc.btn)}</button>`;
+    $('dstBtn').onclick = () => { view.tz = zc.fix.tz; $('dstIn').checked = zc.fix.dst; saveView(); syncUI(); cast(); F.toast('已' + zc.btn); };
   } else dn.hidden = true;
   render(); writeURL();
   F.birth.save({ when: $('whenIn').value, name: C.name, tz: +view.tz, lon: +view.lon, lat: +view.lat, dst, city: view.city || '' });

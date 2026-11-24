@@ -93,7 +93,8 @@ console.log('  国立天文台东京 2026-11：日出、日落、月出、月落
 const t4 = SKY.day(2026, 11, 4, tokyo);
 eq([SKY.hm(t4.sunrise, tokyo), SKY.hm(t4.sunset, tokyo), SKY.hm(t4.moonrise, tokyo), SKY.hm(t4.moonset, tokyo), t4.age], ['06:05', '16:43', '00:47', '13:52', 24.5], '2026-11-04 东京（国立天文台）');
 const bj = SKY.place('北京'), ny = SKY.place('纽约');
-ok(bj && bj.tz === 8 && !bj.iana && ny.iana === 'America/New_York', '城市表与时区');
+ok(bj && bj.tz === 8 && bj.iana === 'Asia/Shanghai' && ny.iana === 'America/New_York', '城市表与时区');
+eq([SKY.offsetMin(bj, Date.UTC(1988, 6, 1)), SKY.offsetMin(bj, Date.UTC(2026, 6, 1))], [540, 480], '北京 1988 夏令时、今无');
 eq([SKY.offsetMin(ny, Date.UTC(2026, 6, 1)), SKY.offsetMin(ny, Date.UTC(2026, 11, 1))], [-240, -300], '纽约夏令时');
 
 /* —— 日历文件 —— */

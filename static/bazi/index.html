@@ -354,7 +354,7 @@
 <script src="/fabao/lunar.js?v=1"></script>
 <script src="/bazi/qiongtong.js?v=1"></script>
 <script src="/bazi/bazi.js?v=4"></script>
-<script src="/fabao/cities.js?v=1"></script>
+<script src="/fabao/cities.js?v=2"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -374,8 +374,7 @@ const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
 };
-const guessTz = -new Date().getTimezoneOffset() / 60;
-const guessCity = CITY_LIST.find(c => c[3] === guessTz) || CITY_LIST[0];
+const guessCity = window.QJ_CITIES.guess();
 let view = Object.assign({ city: guessCity[0], lon: guessCity[1], lat: guessCity[2], tz: guessCity[3], sun: false, zi: 'next' }, store.get(LS_VIEW, {}));
 if (view.lat == null) { const c0 = CITY_LIST.find(c => c[0] === view.city); view.lat = c0 ? c0[2] : null; }
 let form = { cal: 'solar', male: true, name: '' };
@@ -388,7 +387,7 @@ function seg(el, val, on) {
   el.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === String(val)));
   el.onclick = e => { const b = e.target.closest('button'); if (!b) return; seg(el, b.dataset.v, on); on(b.dataset.v); };
 }
-$('cityIn').innerHTML = CITIES.map(([g, list]) => `<optgroup label="${g}">${list.map(([n]) => `<option value="${n}">${n}</option>`).join('')}</optgroup>`).join('') + '<option value="">自定义经度</option>';
+window.QJ_CITIES.mount($('cityIn'), { custom: '自定义经度' });
 $('tzIn').innerHTML = TZS.map(z => `<option value="${z}">${tzLabel(z)}</option>`).join('');
 // —— 四柱反推：年干 → 年支（只剩同阴阳的六个）→ 月（五虎遁定月干）→ 日干 → 日支 → 时（五鼠遁定时干） ——
 const MONTH_LAB = { 2: '正月 立春', 3: '二月 惊蛰', 4: '三月 清明', 5: '四月 立夏', 6: '五月 芒种', 7: '六月 小暑', 8: '七月 立秋', 9: '八月 白露', 10: '九月 寒露', 11: '十月 立冬', 0: '冬月 大雪', 1: '腊月 小寒' };
@@ -557,10 +556,12 @@ function updateNotes(inp) {
   const sg = x => Math.abs(x) < 0.05 ? '0.0' : (x > 0 ? '+' : '−') + Math.abs(x).toFixed(1);
   $('sunNote').textContent = C.solar ? `真太阳时：经度时差 ${sg(C.solar.lonFix)} 分，均时差 ${sg(C.solar.eot)} 分` : '';
   const dn = $('dstNote');
-  if (+view.tz === 8 && !inp.dst && B.isChinaDST(inp.y, inp.mo, inp.d)) {
+  // 出生地当年当时钟表实际用的时区（台湾日治 UTC+9、历年日光节约时间、大陆 1986–1991 夏令时……），与所选不合就提一句
+  const zc = window.QJ_CITIES.zoneCheck({ city: view.city, tz: +view.tz, dst: inp.dst, y: inp.y, mo: inp.mo, d: inp.d, h: inp.h, mi: inp.mi });
+  if (zc) {
     dn.hidden = false;
-    dn.innerHTML = `此日在大陆夏令时期间（${inp.y} 年），当时钟表比北京标准时快一小时。若所报为当时钟表读数，应勾「夏令时」。<button class="fb-btn" type="button" id="dstBtn">勾上夏令时</button>`;
-    $('dstBtn').onclick = () => { $('dstIn').checked = true; cast(true); toast('已按夏令时减一小时'); };
+    dn.innerHTML = `${esc(zc.text)}<button class="fb-btn" type="button" id="dstBtn">${esc(zc.btn)}</button>`;
+    $('dstBtn').onclick = () => { view.tz = zc.fix.tz; $('dstIn').checked = zc.fix.dst; saveView(); syncPlaceUI(); cast(true); toast('已' + zc.btn); };
   } else dn.hidden = true;
 }
 
@@ -986,7 +987,7 @@ function readURL() {
   if (!q.get('d') && !q.get('l')) return null;
   const s = { male: q.get('g') !== '0', name: q.get('n') || '', tz: q.get('tz') != null ? +q.get('tz') : 8, zi: q.get('zi') === 'same' ? 'same' : 'next', dst: q.get('dst') === '1' };
   if (q.get('lon')) { s.sun = true; s.lon = +q.get('lon'); const c = CITY_LIST.find(x => Math.abs(x[1] - s.lon) < 0.005 && x[3] === s.tz); s.city = c ? c[0] : ''; s.lat = c ? c[2] : null; }
-  else { const c = CITY_LIST.find(x => x[3] === s.tz); s.sun = false; s.lon = c ? c[1] : s.tz * 15; s.city = c ? c[0] : ''; s.lat = c ? c[2] : null; }
+  else { const c = guessCity[3] === s.tz ? guessCity : CITY_LIST.find(x => x[3] === s.tz); s.sun = false; s.lon = c ? c[1] : s.tz * 15; s.city = c ? c[0] : ''; s.lat = c ? c[2] : null; }
   if (q.get('l')) { const [y, m, d] = q.get('l').split('-'); Object.assign(s, { cal: 'lunar', ly: +y, lm: m, ld: +d, lt: q.get('t') || '12:00' }); }
   else Object.assign(s, { cal: 'solar', when: q.get('d') });
   return s;

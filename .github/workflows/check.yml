@@ -42,6 +42,7 @@ jobs:
       - name: 离线清单、法宝页头信息是否最新
         run: |
           node scripts/pwa/gen-sw.js --check
+          node scripts/cities/check.js
           node scripts/seo/tool-meta.js --check
 
       - name: Install Hugo CLI

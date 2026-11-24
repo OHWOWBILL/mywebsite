@@ -236,9 +236,9 @@
 <script src="/fabao/tongshu-hou.js?v=1"></script>
 <script src="/fabao/tongshu.js?v=2"></script>
 <script src="/fabao/jieqi-se.js?v=1"></script>
-<script src="/fabao/cities.js?v=1"></script>
+<script src="/fabao/cities.js?v=2"></script>
 <script src="/xingpan/xingpan.js?v=4"></script>
-<script src="/fabao/tongshu-sky.js?v=1"></script>
+<script src="/fabao/tongshu-sky.js?v=2"></script>
 <script>
 (function () {
   'use strict';
@@ -261,7 +261,7 @@
   const birth = window.Fabao && Fabao.birth.load(), by = birth && Fabao.birth.yearOf(birth);
   let sx = ls('huangli.sx'); sx = sx == null ? (by ? by.sx : null) : sx === '' ? null : +sx;
   const opt = () => ({ jp: jp, sx: sx });
-  const CITY0 = isJpTz ? '东京' : '北京';
+  const CITY0 = window.QJ_CITIES ? QJ_CITIES.guess()[0] : isJpTz ? '东京' : '北京';   // 按设备所在时区猜：台湾给台北，日本给东京……
   let city = ls('tongshu.city') || CITY0;
   if (SKY && !SKY.place(city)) city = CITY0;
   const open = {};                                   // 收起的长单哪几张打开了

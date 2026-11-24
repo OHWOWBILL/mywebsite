@@ -9,8 +9,8 @@
      与国立天文台「月の出入り」同口径（月の中心が地平線に一致する時刻）。当地一日里每二十分钟取一点，
      变号处二分求根，精到十秒以内。
    月龄：上一次朔（日月黄经相合）到当地正午的天数，与国立天文台「月齢は正午の値」同。
-   地点用 /fabao/cities.js 的 QJ_CITIES（[名, 东经, 北纬, 时区]）；欧美澳几城另记 IANA 时区，
-   浏览器 Intl 换算夏令时，其余按城市表的固定时区。时刻一律回 UTC 毫秒，hm() 换成当地「时:分」。
+   地点用 /fabao/cities.js 的 QJ_CITIES（[名, 东经, 北纬, 时区, IANA]），各地照 IANA 时区由
+   浏览器 Intl 换算历年时区与夏令时；浏览器不认的才按城市表的固定时区。时刻一律回 UTC 毫秒，hm() 换成当地「时:分」。
    对照：国立天文台暦計算室「各地のこよみ」东京 2026 年 11 月（scripts/tongshu/check.js 有逐日核对）。
    浏览器里挂 window.TS_SKY（月亮要先载 /xingpan/xingpan.js）；node 里 require 即得同一对象。
    ========================================================= */
@@ -31,7 +31,7 @@
   function place(name) {
     var C = CITIES(), c = C && C.byName(name);
     if (!c) return null;
-    return { name: c[0], lon: c[1], lat: c[2], tz: c[3], iana: IANA[c[0]] || null };
+    return { name: c[0], lon: c[1], lat: c[2], tz: c[3], iana: c[4] || IANA[c[0]] || null };
   }
   var fmtCache = {};
   // 某一时刻在该地的时区偏移（分钟）
