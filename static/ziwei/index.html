@@ -35,7 +35,7 @@
     .zw-chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); letter-spacing: .08em; cursor: pointer; white-space: nowrap; }
     .zw-chk input { accent-color: var(--zi); }
     .zw-sun { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .zw-sun[aria-disabled=true] > :not(.zw-chk):not(#tzIn):not(.fb-fine) { opacity: .4; pointer-events: none; }
+    .zw-sun[aria-disabled=true] > :not(.zw-chk):not(#tzIn):not(.fb-fine):not(.qj-cq):not(#cityIn) { opacity: .4; pointer-events: none; }
     .zw-dst { font-size: 12.5px; color: var(--jin); line-height: 1.7; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
     .zw-dst .fb-btn { padding: 3px 10px; font-size: 12px; letter-spacing: .08em; }
     .zw-side-ctrl { display: flex; flex-direction: column; gap: 8px; }
@@ -296,6 +296,7 @@
 <script src="/ziwei/iztro.min.js?v=2.6.3"></script>
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/ziwei/ziwei.js?v=2"></script>
+<script src="/fabao/cities.js?v=2"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -309,18 +310,16 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&am
 
 // 盘格：地支 → [行, 列]（1 起）
 const POS = { 5: [1, 1], 6: [1, 2], 7: [1, 3], 8: [1, 4], 4: [2, 1], 9: [2, 4], 3: [3, 1], 10: [3, 4], 2: [4, 1], 1: [4, 2], 0: [4, 3], 11: [4, 4] };
-const CITIES = [['北京', 116.40, 8], ['上海', 121.47, 8], ['广州', 113.26, 8], ['深圳', 114.06, 8], ['香港', 114.17, 8], ['台北', 121.56, 8],
-  ['天津', 117.20, 8], ['重庆', 106.55, 8], ['成都', 104.07, 8], ['武汉', 114.31, 8], ['西安', 108.94, 8], ['南京', 118.80, 8], ['杭州', 120.16, 8],
-  ['长沙', 112.94, 8], ['郑州', 113.63, 8], ['济南', 117.00, 8], ['沈阳', 123.43, 8], ['哈尔滨', 126.64, 8], ['昆明', 102.71, 8], ['福州', 119.30, 8],
-  ['厦门', 118.09, 8], ['南宁', 108.37, 8], ['兰州', 103.83, 8], ['乌鲁木齐', 87.62, 8], ['拉萨', 91.13, 8],
-  ['东京', 139.69, 9], ['大阪', 135.50, 9], ['首尔', 126.98, 9], ['新加坡', 103.82, 8], ['吉隆坡', 101.69, 8]];
+// 出生地：共用 /fabao/cities.js（[名, 东经, 北纬, 时区, IANA]），与八字、占星同一张
+const QC = window.QJ_CITIES, GUESS = QC.guess();
 const LS_LIB = 'zwds.lib.v1', LS_VIEW = 'zwds.view.v1';
 const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 无痕模式 */ } }
 };
 
-let view = Object.assign({ adj: !window.matchMedia('(max-width: 860px)').matches, sf: true, fly: true, sun: false, lon: 116.40, tz: 8 }, store.get(LS_VIEW, {}));
+let view = Object.assign({ adj: !window.matchMedia('(max-width: 860px)').matches, sf: true, fly: true, sun: false, city: GUESS[0], lon: GUESS[1], tz: GUESS[3] }, store.get(LS_VIEW, {}));
+if (view.city == null) { const c0 = QC.find(+view.lon, null, +view.tz); view.city = c0 ? c0[0] : ''; }   // 旧存的只有经度
 let form = { cal: 'solar', g: '男', name: '' };
 let C = null;                 // 当前命盘
 let sel = 0;                  // 选中宫（地支）
@@ -339,15 +338,14 @@ const CN_D = d => d <= 10 ? '初' + '一二三四五六七八九十'[d - 1] : d 
 $('lmIn').innerHTML = CN_M.map((m, i) => `<option value="${i + 1}">${m}月</option>`).join('');
 $('ldIn').innerHTML = Array.from({ length: 30 }, (_, i) => `<option value="${i + 1}">${CN_D(i + 1)}</option>`).join('');
 $('ltIn').innerHTML = Z.TIMES.map((t, i) => `<option value="${i}">${t}时 ${Z.TIME_RANGE[i]}</option>`).join('');
-$('cityIn').innerHTML = CITIES.map(([n, l]) => `<option value="${l}">${n}</option>`).join('') + '<option value="">自定义经度</option>';
-$('tzIn').innerHTML = Array.from({ length: 27 }, (_, i) => i - 12).map(z => `<option value="${z}">UTC${z >= 0 ? '+' : '−'}${Math.abs(z)}</option>`).join('');
+QC.mount($('cityIn'), { custom: '自定义经度' });
+$('tzIn').innerHTML = QC.TZS.map(z => `<option value="${z}">${QC.tzLabel(z)}</option>`).join('');
 
 function syncSunUI() {
   $('sunIn').checked = view.sun;
   $('lonIn').value = view.lon;
   $('tzIn').value = String(view.tz);
-  const hit = CITIES.find(([, l]) => Math.abs(l - view.lon) < 0.005);
-  $('cityIn').value = hit ? String(hit[1]) : '';
+  $('cityIn').value = QC.byName(view.city) ? view.city : '';
   $('sunRow').setAttribute('aria-disabled', String(!view.sun));
 }
 function saveView() { store.set(LS_VIEW, view); }
@@ -385,10 +383,18 @@ function updateNotes(r) {
   const sg = x => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(1);
   $('sunNote').textContent = r.sun ? `经度${sg(r.sun.lonFix)} 均时差${sg(r.sun.eot)} 分` : '';
   const d = r.raw;
-  if (Z.isChinaDST(d.getFullYear(), d.getMonth() + 1, d.getDate())) {
+  // 出生地当年当时钟表实际用的时区（台湾日治 UTC+9、历年日光节约时间、大陆 1986–1991 夏令时……）；
+  // 没开真太阳时就按设备所在地猜（时区相合才算）。紫微不认夏令时：要么减一小时，要么改时区
+  const c = view.sun ? QC.byName(view.city) : GUESS[3] === +view.tz ? GUESS : null;
+  const zc = c && QC.zoneCheck({ city: c, tz: +view.tz, dst: false, y: d.getFullYear(), mo: d.getMonth() + 1, d: d.getDate(), h: d.getHours(), mi: d.getMinutes() });
+  if (zc && zc.kind === 'dst') {
     dn.hidden = false;
-    dn.innerHTML = `此日在大陆夏令时期间（${d.getFullYear()} 年），钟表比标准时快一小时。若所报为当时钟表读数，应减一小时。<button class="fb-btn" type="button" id="dstBtn">减一小时</button>`;
+    dn.innerHTML = `${esc(zc.text.replace(/应勾「夏令时」。$/, '应减一小时。'))}<button class="fb-btn" type="button" id="dstBtn">减一小时</button>`;
     $('dstBtn').onclick = () => { const x = new Date(d.getTime() - 3600000); $('whenIn').value = toLocalInput(x); cast(); toast('已改为 ' + toLocalInput(x).replace('T', ' ')); };
+  } else if (zc && zc.kind === 'tz') {
+    dn.hidden = false;
+    dn.innerHTML = `${esc(zc.text)}<button class="fb-btn" type="button" id="dstBtn">${esc(zc.btn)}</button>`;
+    $('dstBtn').onclick = () => { view.tz = zc.fix.tz; saveView(); syncSunUI(); cast(true); toast('已' + zc.btn); };
   } else dn.hidden = true;
 }
 
@@ -721,7 +727,7 @@ function applySnapshot(s) {
   $('nameIn').value = s.name || '';
   if (s.cal === 'solar') {
     $('whenIn').value = s.when;
-    if (s.sun) { view.sun = true; view.lon = s.sun.lon; view.tz = s.sun.tz; } else view.sun = false;
+    if (s.sun) { const c = QC.find(+s.sun.lon, null, +s.sun.tz); view.sun = true; view.lon = s.sun.lon; view.tz = s.sun.tz; view.city = c ? c[0] : ''; } else view.sun = false;
     syncSunUI();
   } else {
     $('lyIn').value = s.y; $('lmIn').value = s.m; $('ldIn').value = s.d; $('leapIn').checked = !!s.leap; $('ltIn').value = s.t;
@@ -786,7 +792,7 @@ function rulesText() {
   return [
     '安星引擎为开源的 iztro；以正月初一换年；闰月以十五为界，前半归本月、后半归下月；晚子时（23 点后）作次日子时。',
     '四化：庚干取「阳武阴同」（太阳禄、武曲权、太阴科、天同忌）；星曜庙旺依《斗数全书》。',
-    `中宫四柱为八字口径：年以立春、月以节的交节时刻换。${C.form && C.form.sun ? '时辰已按出生地真太阳时定。' : ''}1986–1991 年大陆夏令时只提示，不自动扣。`,
+    `中宫四柱为八字口径：年以立春、月以节的交节时刻换。${C.form && C.form.sun ? '时辰已按出生地真太阳时定。' : ''}出生地当年的夏令时（台湾日光节约时间、大陆 1986–1991 等）只提示，不自动扣。`,
     '十二宫自命宫起逆行；「(身)」为身宫，「自化」为本宫宫干化本宫之星；各宫后为宫干支与大限岁数。'
   ].join('\n');
 }
@@ -825,8 +831,8 @@ $('nowBtn').onclick = () => { const d = new Date(); d.setSeconds(0, 0); $('whenI
 $('nameIn').addEventListener('change', () => { if (C) { C.name = $('nameIn').value.trim(); form.name = C.name; renderBoard(); writeURL(); } });
 $('castBtn').onclick = () => cast();
 $('sunIn').onchange = () => { view.sun = $('sunIn').checked; saveView(); syncSunUI(); cast(true); };
-$('cityIn').onchange = () => { const v = $('cityIn').value; if (v) { view.lon = +v; const c = CITIES.find(([, l]) => String(l) === v); if (c) view.tz = c[2]; view.sun = true; saveView(); syncSunUI(); cast(true); } else $('lonIn').focus(); };
-$('lonIn').onchange = () => { const v = parseFloat($('lonIn').value); if (isFinite(v) && v >= -180 && v <= 180) { view.lon = Math.round(v * 100) / 100; saveView(); syncSunUI(); cast(true); } else toast('经度应在 −180 到 180 之间'); };
+$('cityIn').onchange = () => { const c = QC.byName($('cityIn').value); if (c) { view.city = c[0]; view.lon = c[1]; view.tz = c[3]; view.sun = true; saveView(); syncSunUI(); cast(true); } else { view.city = ''; saveView(); $('lonIn').focus(); } };
+$('lonIn').onchange = () => { const v = parseFloat($('lonIn').value); if (isFinite(v) && v >= -180 && v <= 180) { view.lon = Math.round(v * 100) / 100; view.city = ''; saveView(); syncSunUI(); cast(true); } else toast('经度应在 −180 到 180 之间'); };
 $('tzIn').onchange = () => { view.tz = +$('tzIn').value; saveView(); cast(true); };
 ['adjIn', 'sfIn', 'flyIn'].forEach(id => $(id).onchange = () => { view.adj = $('adjIn').checked; view.sf = $('sfIn').checked; view.fly = $('flyIn').checked; saveView(); renderBoard(); });
 $('adjIn').checked = view.adj; $('sfIn').checked = view.sf; $('flyIn').checked = view.fly;

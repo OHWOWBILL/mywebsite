@@ -225,7 +225,7 @@
 <script src="/bazi/bazi.js?v=4"></script>
 <script src="/xingpan/xingpan.js?v=4"></script>
 <script src="/kanyu/kanyu.js?v=1"></script>
-<script src="/fabao/cities.js?v=1"></script>
+<script src="/fabao/cities.js?v=2"></script>
 <script src="/hepan/hepan.js?v=2"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
@@ -270,10 +270,10 @@ function norm(b) {
 function defaultCity(role) {
   const p = role === 'B' && A ? placeOf(A) : null;
   if (p) return p.name;
-  const tz = role === 'B' && A && A.tz != null ? +A.tz : -new Date().getTimezoneOffset() / 60;
-  return (QC.LIST.find(c => c[3] === tz) || QC.LIST[0])[0];
+  const g = QC.guess(), tz = role === 'B' && A && A.tz != null ? +A.tz : g[3];
+  return (g[3] === tz ? g : QC.LIST.find(c => c[3] === tz) || g)[0];
 }
-const cityOptions = sel => QC.GROUPS.map(([g, list]) => `<optgroup label="${g}">${list.map(([n]) => `<option value="${n}"${n === sel ? ' selected' : ''}>${n}</option>`).join('')}</optgroup>`).join('');
+const cityOptions = sel => QC.optionsHTML('', sel);
 
 /* ================ 状态 ================ */
 let A = null, B = null, PA = null, PB = null, R = null;
@@ -380,7 +380,7 @@ function renderSlot(role) {
   else body = `<p class="hp-wait">点上面一个人，一点就合；<br>没存过的，点「＋ 手填」。</p>`;
   el.innerHTML = `<div class="hp-p-head">${headHTML(role)}</div>${body}` +
     (role === 'A' && !A ? '<p class="fb-fine">在八字、紫微、占星里起过盘，会自动记作本人。</p>' : '');
-  if (edit) { renderPreview(role); syncDst(el.querySelector('form')); }
+  if (edit) { const f = el.querySelector('form'); QC.mount(f.city); renderPreview(role); syncDst(f); }
 }
 // 只换页头（人名一排），不动正在填的表单
 function renderChips() { ['A', 'B'].forEach(r => { const h = $('slot' + r).querySelector('.hp-p-head'); if (h) h.innerHTML = headHTML(r); }); }
@@ -392,13 +392,19 @@ function renderPreview(role) {
   if (P.error) { el.textContent = P.error; return; }
   el.innerHTML = `四柱 <b>${P.pillars.map((p, i) => i === 3 && P.noTime ? '时辰不详' : p.name).join(' ')}</b> · 属${P.sx} · ${SIGN(P.sunSign)}座`;
 }
-// 大陆 1986–1991 夏令时：日期落在其间而没勾，提醒一句
+// 出生地当年当时钟表实际用的时区：该勾夏令时而没勾（台湾日光节约时间、大陆 1986–1991 等）提一句；
+// 当时标准时与今不同（台湾日治后期 UTC+9 之类）这里没有时区可选，就直接照当时的算，并说一声
+function zoneOf(f) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(f.d.value), c = QC.byName(f.city.value);
+  if (!m || !c) return null;
+  const t = /^(\d{2}):(\d{2})/.exec(f.t.value) || [0, 12, 0];
+  return QC.zoneCheck({ city: c, tz: c[3], dst: f.dst.checked, y: +m[1], mo: +m[2], d: +m[3], h: +t[1], mi: +t[2] });
+}
 function syncDst(f) {
   if (!f) return;
-  const note = f.querySelector('.hp-dst'), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(f.d.value), c = QC.byName(f.city.value);
-  const hit = m && c && c[3] === 8 && !f.dst.checked && BZ.isChinaDST(+m[1], +m[2], +m[3]);
-  note.hidden = !hit;
-  if (hit) note.textContent = `此日在大陆夏令时期间（${m[1]} 年），钟表比北京标准时快一小时；若填的是当时钟表时间，请勾「夏令时」。`;
+  const note = f.querySelector('.hp-dst'), zc = zoneOf(f);
+  note.hidden = !zc;
+  if (zc) note.textContent = zc.kind === 'tz' ? zc.text.replace(/若所报为.*$/, '这里已照 ' + QC.tzLabel(zc.fix.tz) + ' 折算。') : zc.text;
 }
 function readForm(f) {
   const d = f.d.value, t = f.t.value;
@@ -406,8 +412,8 @@ function readForm(f) {
   const y = +d.slice(0, 4);
   if (y < 1900 || y > 2100) return { err: '只合 1900–2100 年' };
   const c = QC.byName(f.city.value) || QC.LIST[0];
-  const on = f.querySelector('.fb-seg .on');
-  return { noTime: !t, b: { when: d + 'T' + (t || '12:00'), male: !on || on.dataset.v === '1', name: f.n.value.trim(), tz: c[3], lon: c[1], lat: c[2], city: c[0], sun: false, dst: f.dst.checked } };
+  const on = f.querySelector('.fb-seg .on'), zc = zoneOf(f), tz = zc && zc.kind === 'tz' ? zc.fix.tz : c[3];
+  return { noTime: !t, b: { when: d + 'T' + (t || '12:00'), male: !on || on.dataset.v === '1', name: f.n.value.trim(), tz, lon: c[1], lat: c[2], city: c[0], sun: false, dst: tz === c[3] && f.dst.checked } };
 }
 function onForm(f) {
   syncDst(f);
@@ -501,8 +507,8 @@ function saveB() {
     else if (a === 'doneB' || a === 'editB') { editB = a === 'editB'; formNew = false; update(true); }
     else if (a === 'saveB') saveB();
   });
-  el.addEventListener('change', e => { const f = e.target.closest('form'); if (f) onForm(f); });
-  el.addEventListener('input', e => { const f = e.target.closest('form'); if (f && e.target.name !== 'd') onForm(f); });
+  el.addEventListener('change', e => { const f = e.target.closest('form'); if (f && e.target.name) onForm(f); });
+  el.addEventListener('input', e => { const f = e.target.closest('form'); if (f && e.target.name && e.target.name !== 'd') onForm(f); });
   el.addEventListener('submit', e => e.preventDefault());
 });
 $('swapBtn').onclick = swap;
