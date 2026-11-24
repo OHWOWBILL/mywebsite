@@ -225,7 +225,7 @@
     <div class="fb-seal" aria-hidden="true">紫</div>
     <div>
       <h1 class="fb-title">紫微斗数</h1>
-      <p class="fb-sub">十二宫安星 · 三方四正 · 宫干飞化 · 转宫 · 大限流年</p>
+      <p class="fb-sub">十二宫安星 · 三方四正 · 宫干飞化 · 转宫 · 大限流年 · 两盘</p>
     </div>
   </header>
 
@@ -270,6 +270,7 @@
         <label class="zw-chk"><input type="checkbox" id="adjIn" checked>杂曜</label>
         <label class="zw-chk"><input type="checkbox" id="sfIn" checked>三方四正线</label>
         <label class="zw-chk"><input type="checkbox" id="flyIn" checked>飞化箭头</label>
+        <label class="zw-chk" title="本盘与另一个时辰并排比，出生时辰拿不准时用"><input type="checkbox" id="twoIn">两盘</label>
       </div>
     </div>
   </section>
@@ -282,6 +283,10 @@
         <div class="zw-yrow"><small>大限</small><div class="zw-ybtns" id="dxRow"></div></div>
         <div class="zw-yrow"><small>流年</small><div class="zw-ybtns" id="lnRow"></div></div>
         <div class="zw-yrow"><small>流月</small><div class="zw-ybtns" id="lyRow"></div></div>
+      </section>
+      <section class="fb-card zw-card" id="twoCard" aria-label="两盘参看" hidden style="margin-top:14px">
+        <h3>两盘参看<small>亮的是两盘不同处</small></h3>
+        <div id="twoBody"></div>
       </section>
     </div>
     <aside class="zw-side">
@@ -297,6 +302,7 @@
 <script src="/qimen/jieqi.js?v=1"></script>
 <script src="/ziwei/ziwei.js?v=2"></script>
 <script src="/fabao/cities.js?v=2"></script>
+<script src="/fabao/jiaoshi.js?v=1"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -657,7 +663,74 @@ function setTaiji(br) {
   renderAll();
 }
 
-function renderAll() { renderBoard(); renderYun(); renderDetail(); renderFly(); renderBH(); }
+function renderAll() { renderBoard(); renderYun(); renderDetail(); renderFly(); renderBH(); renderTwo(); }
+
+/* ================ 两盘参看 · 校时 ================ */
+// 出生时辰拿不准时：本盘（甲）与另一个时辰（乙）并排比宫名、主星、局；记下的事件看大限、流年、流月、流日在两盘各落何宫
+const JSK = window.QJ_JS;
+let twoT = null;
+function renderTwo() {
+  const card = $('twoCard');
+  card.hidden = !view.two;
+  if (!view.two || !C) return;
+  const tA = C.form.inp.t;
+  if (twoT == null || twoT === tA) {
+    // 乙默认取邻近的时辰：钟点在本时辰前半取前一个，后半取后一个
+    const ck = C.form.clock, half = ck ? ((ck.getHours() + 1) % 2) * 60 + ck.getMinutes() < 60 : true;
+    twoT = tA === 0 ? 1 : tA === 12 ? 11 : half ? tA - 1 : tA + 1;
+  }
+  let B;
+  try { B = Z.chart(Object.assign({}, C.form.inp, { t: twoT })); } catch (e) { $('twoBody').innerHTML = '<p class="fb-fine">这个时辰排不出盘。</p>'; return; }
+  // 出生那天钟表几点几分换时辰（开了真太阳时才不在整点）
+  let edge = '';
+  if (form.cal === 'solar' && C.form.raw) {
+    const d = C.form.raw, ch = JSK.zwShiChanges(Z, d.getFullYear(), d.getMonth() + 1, d.getDate(), +view.lon, +view.tz, !!view.sun);
+    const m = d.getHours() * 60 + d.getMinutes(), k = ch.reduce((a, x, i) => x.m <= m ? i : a, 0);
+    const prev = ch[k], next = ch[k + 1];
+    edge = `<p class="fb-key" style="font-size:16px">出生钟点 ${JSK.fmt(m)} 在<strong>${Z.TIMES[prev.t]}时</strong>：${JSK.fmt(prev.m)} 起${next ? `，${JSK.fmt(next.m)} 入${Z.TIMES[next.t]}时` : ''}${view.sun ? '（真太阳时）' : ''}</p>`;
+  }
+  const A = C, row = (n, a, b) => `<tr class="${a !== b ? 'diff' : 'same'}"><th>${n}</th><td${a !== b ? ' class="ch"' : ''}>${a}</td><td${a !== b ? ' class="ch"' : ''}>${b}</td></tr>`;
+  const majors = p => p.major.map(s => s.name + (s.hua ? '<i class="hua h-' + s.hua + '">' + s.hua + '</i>' : '')).join(' ') || '<span style="color:var(--faint)">空宫</span>';
+  const rows = [
+    row('时柱', A.info.gz[3], B.info.gz[3]), row('命宫', ZHI[A.ming] + '宫', ZHI[B.ming] + '宫'), row('身宫', ZHI[A.shen] + '宫 · ' + A.palaces[A.shen].name, ZHI[B.shen] + '宫 · ' + B.palaces[B.shen].name),
+    row('五行局', A.info.ju, B.info.ju), row('命主 · 身主', A.info.soul + ' · ' + A.info.body, B.info.soul + ' · ' + B.info.body)
+  ];
+  for (let br = 0; br < 12; br++) {
+    const pa = A.palaces[br], pb = B.palaces[br];
+    rows.push(row(ZHI[br], `${pa.name}　${majors(pa)}`, `${pb.name}　${majors(pb)}`));
+  }
+  const sel = Z.TIMES.map((t, i) => `<option value="${i}"${i === twoT ? ' selected' : ''}${i === tA ? ' disabled' : ''}>${t}时 ${Z.TIME_RANGE[i]}</option>`).join('');
+  $('twoBody').innerHTML = edge +
+    `<div class="js-pick"><span class="js-rg">甲 本盘 ${Z.TIMES[tA]}时</span><label class="js-rg">乙 <select id="twoSel" aria-label="乙盘时辰">${sel}</select></label><button class="fb-btn" type="button" id="twoUse">按乙盘起盘</button></div>` +
+    `<div style="overflow-x:auto"><table class="js-cmp"><tr><th></th><th>甲 ${Z.TIMES[tA]}时</th><th>乙 ${Z.TIMES[twoT]}时</th></tr>${rows.join('')}</table></div>` +
+    `<h3 style="margin-top:16px">事件对照<small>大限、流年、流月、流日的命宫与此事之宫落本命何宫；鸾喜、四化落到要紧宫的标金</small></h3><div id="twoEv"></div><div id="twoHits"></div>`;
+  $('twoSel').onchange = () => { twoT = +$('twoSel').value; renderTwo(); };
+  $('twoUse').onclick = () => {
+    if (form.cal === 'lunar') { $('ltIn').value = String(twoT); cast(); return; }
+    // 公历：把钟表时间挪到乙时辰的中点（开真太阳时则扣回时差）
+    const d = new Date(C.form.raw), mid = twoT === 0 ? 30 : twoT === 12 ? 23 * 60 + 30 : twoT * 120;
+    const shift = C.form.sun ? C.form.sun.shift : 0, x = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, Math.round(mid - shift));
+    $('whenIn').value = toLocalInput(x); twoT = null; cast(); toast('已按 ' + toLocalInput(x).replace('T', ' ') + ' 起盘');
+  };
+  const rd = C.form.raw, inp = rd ? null : /^(\d+)-(\d+)-(\d+)/.exec(C.info.solar || '');
+  const key = rd ? JSK.keyOf(rd.getFullYear(), rd.getMonth() + 1, rd.getDate(), C.name) : inp ? JSK.keyOf(+inp[1], +inp[2], +inp[3], C.name) : 'zw';
+  const one = (L) => {
+    const parts = [`命宫落${L.mingNat}`].concat(L.kind.filter(k => k.br >= 0).map(k => `${k.n}落${k.nat}`));
+    const luan = L.luan.map(x => x.hit ? `<b>${x.name}·${x.nat}</b>` : `${x.name}·${x.nat}`);
+    const hua = L.hua.filter(x => x.hit && (x.h === '禄' || x.h === '忌')).map(x => `<b>${x.star}化${x.h}·${x.nat}</b>`);
+    return `<span class="${L.score ? 'hit' : 'no'}">${parts.join('，')}${luan.length ? '；' + luan.join(' ') : ''}${hua.length ? '；' + hua.join(' ') : ''}${L.tao.length ? `；命宫见<b>${L.tao.join('、')}</b>` : ''}</span>`;
+  };
+  const draw = evs => {
+    $('twoHits').innerHTML = evs.map(ev => {
+      let ra, rb;
+      try { ra = JSK.zwEvent(Z, A, ev); rb = JSK.zwEvent(Z, B, ev); } catch (e) { return ''; }
+      const sa = ra.reduce((s, l) => s + l.score, 0), sb = rb.reduce((s, l) => s + l.score, 0);
+      return `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JSK.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}　甲 ${sa} 处 · 乙 ${sb} 处</small></h4>` +
+        ra.map((l, i) => `<div class="js-segrow"><time>${l.label} ${l.gz}</time><span>甲 ${one(l)}<br>乙 ${one(rb[i])}</span></div>`).join('') + '</div>';
+    }).join('');
+  };
+  draw(JSK.mountEvents($('twoEv'), key, draw));
+}
 
 /* ================ 白话 ================ */
 // 命宫主星（亮度、生年四化）的常见性情，空宫借对宫；身宫落处；五行局。只作参考，随盘重画。
@@ -836,6 +909,8 @@ $('lonIn').onchange = () => { const v = parseFloat($('lonIn').value); if (isFini
 $('tzIn').onchange = () => { view.tz = +$('tzIn').value; saveView(); cast(true); };
 ['adjIn', 'sfIn', 'flyIn'].forEach(id => $(id).onchange = () => { view.adj = $('adjIn').checked; view.sf = $('sfIn').checked; view.fly = $('flyIn').checked; saveView(); renderBoard(); });
 $('adjIn').checked = view.adj; $('sfIn').checked = view.sf; $('flyIn').checked = view.fly;
+$('twoIn').checked = !!view.two;
+$('twoIn').onchange = () => { view.two = $('twoIn').checked; saveView(); twoT = null; renderTwo(); if (view.two) $('twoCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
 
 // 农历框默认填今年
 $('lyIn').value = new Date().getFullYear();

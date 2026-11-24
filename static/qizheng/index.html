@@ -41,6 +41,7 @@
 .qz-key .pil{display:flex;gap:6px;margin-left:auto}
 .qz-key .pil span{font-family:var(--font-title);font-size:14px;color:var(--fg-2);padding:1px 7px;border:1px solid var(--rule-2);border-radius:var(--r-xs)}
 
+.qz-views{display:flex;width:100%;max-width:300px;margin:0 0 16px}.qz-views button{padding:7px 8px;font-size:14px}
 .qz-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
 .qz-col{display:flex;flex-direction:column;gap:14px;min-width:0}
 .qz-card{padding:16px 18px}
@@ -131,7 +132,7 @@ table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
     <div class="fb-seal" aria-hidden="true">政</div>
     <div>
       <h1 class="fb-title">七政四余</h1>
-      <p class="fb-sub">果老星宗 · 十一曜宫度宿度 · 命度身宫</p>
+      <p class="fb-sub">果老星宗 · 十一曜宫度宿度 · 命度身宫 · 校时</p>
     </div>
   </header>
 
@@ -168,7 +169,13 @@ table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
     </div>
   </section>
 
+  <div class="fb-seg qz-views" id="viewSeg" role="tablist" aria-label="看什么">
+    <button type="button" role="tab" data-v="pan" class="on" aria-selected="true">本盘</button>
+    <button type="button" role="tab" data-v="jiaoshi" aria-selected="false">校时</button>
+  </div>
+
   <section class="fb-card qz-key" id="keyBox" aria-label="命宫身宫"></section>
+  <div id="v-pan">
 
   <div class="qz-layout">
     <div class="qz-col">
@@ -193,6 +200,36 @@ table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
       </section>
     </div>
   </div>
+  </div>
+
+  <!-- 校时 · 两盘参看 -->
+  <div id="v-jiaoshi" hidden>
+    <section class="fb-card qz-card" aria-label="校时">
+      <h3>校时<small>出生那天，这段钟点里命宫、命度在哪几分换段</small></h3>
+      <div id="jsRange"></div>
+      <p class="fb-key" id="jsKey" style="margin-top:10px"></p>
+      <div id="jsBar"></div>
+      <ul class="js-chg" id="jsChg"></ul>
+    </section>
+    <section class="fb-card qz-card" aria-label="两盘参看">
+      <h3>两盘参看<small>亮的是两盘不同处</small></h3>
+      <div class="js-pick">
+        <label class="js-rg">甲 <input type="time" id="jsA" step="60" aria-label="甲盘出生钟点"></label>
+        <label class="js-rg">乙 <input type="time" id="jsB" step="60" aria-label="乙盘出生钟点"></label>
+        <button class="fb-btn" type="button" id="jsUseB">按乙盘起盘</button>
+      </div>
+      <div class="js-two">
+        <div><p class="fb-fine" id="jsCapA"></p><div class="qz-wheel" id="jsWA"></div></div>
+        <div><p class="fb-fine" id="jsCapB"></p><div class="qz-wheel" id="jsWB"></div></div>
+      </div>
+      <div style="overflow-x:auto;margin-top:12px"><table class="js-cmp" id="jsCmp"></table></div>
+    </section>
+    <section class="fb-card qz-card" aria-label="事件对照">
+      <h3>事件对照<small>事发那天十一曜入哪一段盘的命宫与此事之宫</small></h3>
+      <div id="jsEv"></div>
+      <div id="jsHits"></div>
+    </section>
+  </div>
 
   <p class="fb-foot">潜蛟阁 · 法宝库 · 仅供学习参考</p>
 </main>
@@ -203,6 +240,7 @@ table.qz-t{width:100%;border-collapse:collapse;font-size:13px}
 <script src="/xingpan/xingpan.js?v=4"></script>
 <script src="/qizheng/qizheng.js?v=4"></script>
 <script src="/fabao/cities.js?v=2"></script>
+<script src="/fabao/jiaoshi.js?v=1"></script>
 <script src="/fabao/fabao.js?v=19"></script>
 <script>
 (function () {
@@ -267,6 +305,7 @@ function render() {
     ${P ? `<span class="pil" title="四柱（真太阳时）">${P.pillars.map(p => `<span>${p.name}</span>`).join('')}</span>` : ''}`;
   $('wheel').innerHTML = wheelSVG(C);
   renderStars(); renderGong(); renderXiu();
+  if (tab === 'jiaoshi') renderJiaoshi();
 }
 
 /* ================ 圆盘 ================ */
@@ -363,6 +402,7 @@ function linkUrl() {
   if ($('dstIn').checked) u.searchParams.set('dst', '1');
   if (view.luoji === 'ming') u.searchParams.set('lj', 'ming');
   if (C && C.name) u.searchParams.set('n', C.name);
+  if (tab === 'jiaoshi') u.searchParams.set('v', 'jiaoshi');
   return u.toString();
 }
 function writeURL() { history.replaceState(null, '', linkUrl().replace(location.origin, '')); }
@@ -382,6 +422,88 @@ $('wheel').addEventListener('click', e => {
   F.toast(`${s.n} ${Z[s.zhi]}宫 ${QZ.dm(s.gdeg)} · ${xd(s.xiu, s.xdeg)}${s.retro ? ' · 逆' : ''} · ${C.gongs[s.zhi].house}`, 2600);
 });
 
+/* ================ 校时 · 两盘参看 ================ */
+// 出生分记不准时：出生那天一段钟点逐分排盘，看命宫、命度、身宫在哪几分换段；两段并排比；事件那天十一曜入哪一段的命宫与此事之宫
+const JS = window.QJ_JS;
+let tab = 'pan', jsData = null, jsRange = null, jsAB = null;
+function setTab(v, quiet) {
+  tab = v === 'jiaoshi' ? 'jiaoshi' : 'pan';
+  document.querySelectorAll('#viewSeg button').forEach(b => { const on = b.dataset.v === tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+  $('v-pan').hidden = tab !== 'pan'; $('v-jiaoshi').hidden = tab !== 'jiaoshi';
+  if (C && tab === 'jiaoshi') renderJiaoshi();
+  if (C && !quiet) writeURL();
+}
+$('viewSeg').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (b && b.dataset.v !== tab) setTab(b.dataset.v); });
+const segName = X => `命${Z[X.ming.zhi]}·${QZ.XIU[X.ming.xiu].n}宿`;
+function jsBase() { const i = C.input; return { y: i.y, mo: i.mo, d: i.d, tz: +i.tz, dst: !!i.dst, lat: +i.lat, lon: +i.lon, luoji: view.luoji }; }
+function renderJiaoshi() {
+  if (!C) return;
+  const base = jsBase(), bm = C.input.h * 60 + C.input.mi, hourSig = [base.y, base.mo, base.d, C.input.h].join('-');
+  if (!jsRange || jsRange.sig !== hourSig) { jsRange = { sig: hourSig, m0: C.input.h * 60, m1: C.input.h * 60 + 59 }; jsAB = null; }
+  const sig = JSON.stringify(base) + jsRange.m0 + '-' + jsRange.m1;
+  if (!jsData || jsData.sig !== sig) {
+    const charts = JS.qzCharts(QZ, base, jsRange.m0, jsRange.m1);
+    jsData = { sig, base, m0: jsRange.m0, m1: jsRange.m1, charts, scan: JS.qzScan(QZ, charts, jsRange.m0) };
+  }
+  const D = jsData, segs = D.scan.segs, at = m => D.charts[m - D.m0];
+  JS.mountRange($('jsRange'), D.m0, D.m1, (a, b) => { jsRange = { sig: hourSig, m0: a, m1: b }; jsAB = null; renderJiaoshi(); });
+  if (!jsAB) {
+    const a = bm >= D.m0 && bm <= D.m1 ? bm : segs[0].from + Math.floor((segs[0].to - segs[0].from) / 2);
+    const other = segs.find(s => a < s.from || a > s.to) || segs[segs.length - 1];
+    jsAB = { a, b: segs.length > 1 ? other.from + Math.floor((other.to - other.from) / 2) : D.m1 };
+  }
+  const segOf = m => segs.findIndex(s => m >= s.from && m <= s.to);
+  $('jsKey').innerHTML = segs.length === 1 ? `${JS.fmt(D.m0)}–${JS.fmt(D.m1)} 都是<strong>${segName(at(segs[0].from))}</strong>` :
+    `${JS.fmt(D.m0)}–${JS.fmt(D.m1)} 分 <strong>${segs.length}</strong> 段：` + segs.map(s => `${segName(at(s.from))}<span class="sep">${JS.fmt(s.from)}–${JS.fmt(s.to)}</span>`).join(' · ');
+  $('jsBar').innerHTML = JS.barHTML(segs, s => segName(at(s.from)) + ' · 度主' + ST[at(s.from).duZhu].s, segOf(jsAB.b));
+  $('jsBar').querySelectorAll('.js-seg').forEach(b => { b.onclick = () => { const s = segs[+b.dataset.i]; jsAB.b = s.from + Math.floor((s.to - s.from) / 2); renderJiaoshi(); }; });
+  $('jsChg').innerHTML = D.scan.changes.map(c => `<li><time>${JS.fmt(c.m)}</time><span>${esc(c.t)}</span></li>`).join('') || '<li class="fb-fine">这段钟点里命宫、命度、身宫都没换。</li>';
+  renderJsCompare(); renderJsEvents();
+}
+function renderJsCompare() {
+  const D = jsData, at = m => D.charts[Math.max(0, Math.min(D.charts.length - 1, m - D.m0))];
+  jsAB.a = Math.max(D.m0, Math.min(D.m1, jsAB.a)); jsAB.b = Math.max(D.m0, Math.min(D.m1, jsAB.b));
+  $('jsA').value = JS.fmt(jsAB.a); $('jsB').value = JS.fmt(jsAB.b);
+  const A = at(jsAB.a), B = at(jsAB.b);
+  $('jsCapA').textContent = `甲 ${JS.fmt(jsAB.a)} · ${segName(A)} · 命度${xd(A.ming.xiu, A.ming.xdeg)}`;
+  $('jsCapB').textContent = `乙 ${JS.fmt(jsAB.b)} · ${segName(B)} · 命度${xd(B.ming.xiu, B.ming.xdeg)}`;
+  $('jsWA').innerHTML = wheelSVG(A); $('jsWB').innerHTML = wheelSVG(B);
+  const row = (n, a, b) => `<tr class="${a !== b ? 'diff' : 'same'}"><th>${n}</th><td${a !== b ? ' class="ch"' : ''}>${a}</td><td${a !== b ? ' class="ch"' : ''}>${b}</td></tr>`;
+  const rows = [
+    row('命宫', `${Z[A.ming.zhi]}宫${QZ.CI[A.ming.zhi]}`, `${Z[B.ming.zhi]}宫${QZ.CI[B.ming.zhi]}`),
+    row('命度', xd(A.ming.xiu, A.ming.xdeg), xd(B.ming.xiu, B.ming.xdeg)),
+    row('命主', ST[A.mingZhu].n, ST[B.mingZhu].n), row('度主', ST[A.duZhu].n, ST[B.duZhu].n),
+    row('身宫', `${Z[A.shen.zhi]}宫 · ${ST[A.shenZhu].n}主`, `${Z[B.shen.zhi]}宫 · ${ST[B.shenZhu].n}主`),
+    row('天顶', `${Z[A.mcPt.zhi]}宫 · ${xd(A.mcPt.xiu, A.mcPt.xdeg)}`, `${Z[B.mcPt.zhi]}宫 · ${xd(B.mcPt.xiu, B.mcPt.xdeg)}`)
+  ];
+  // 十二宫：同一地支，两盘各叫什么宫、宫里有哪些曜（曜不随出生分变，宫名随命宫变）
+  for (let k = 0; k < 12; k++) {
+    const z = mod(A.ming.zhi - k, 12), stars = A.gongs[z].stars.map(id => ST[id].s).join('') || '—';
+    rows.push(row(`${Z[z]}宫 <small style="color:var(--faint)">${stars}</small>`, A.gongs[z].house, B.gongs[z].house));
+  }
+  $('jsCmp').innerHTML = `<tr><th></th><th>甲 ${JS.fmt(jsAB.a)}</th><th>乙 ${JS.fmt(jsAB.b)}</th></tr>` + rows.join('');
+}
+function renderJsEvents() {
+  const D = jsData, inp = C.input, key = JS.keyOf(inp.y, inp.mo, inp.d, C.name);
+  const sl = ids => ids.length ? ids.map(id => `<b>${ST[id].n}</b>`).join(' ') : '<span class="no">无</span>';
+  const draw = evs => {
+    D.evs = evs; D.res = evs.map(ev => ({ ev, r: JS.qzEvent(QZ, D.charts, D.m0, D.scan.segs, D.base, ev) }));
+    $('jsHits').innerHTML = D.res.map(({ ev, r }) => `<div class="js-ev"><h4>${esc(ev.d)} · ${esc(JS.KIND_N[ev.k] || '其他')}<small>${esc(ev.n || '')}</small></h4>` +
+      `<p class="fb-fine">当日十一曜：${r.E.stars.map(x => `${x.s}${Z[x.zhi]}`).join(' ')}</p>` +
+      `<div class="js-segrow">${r.rows.map(w => `<time>${JS.fmt(w.seg.from)}–${JS.fmt(w.seg.to)}</time><span class="${w.mingStars.length || w.kindStars.length ? 'hit' : 'no'}">命宫${Z[w.ming]}：${sl(w.mingStars)}${w.kind ? `　${w.kind}${Z[w.kindZhi]}：${sl(w.kindStars)}` : ''}</span>`).join('')}</div>` +
+      (r.hits.length ? `<ul class="js-hits">${r.hits.map(h => `<li class="${h.cls === 's' ? 'slow' : ''}"><time>${JS.fmt(h.m)}${h.unc != null && h.unc >= 0.5 ? ' ±' + Math.round(h.unc) + '′' : ''}</time><span>${esc(h.t)}</span></li>`).join('')}</ul>` : '') + '</div>').join('');
+  };
+  draw(JS.mountEvents($('jsEv'), key, draw));
+}
+$('jsA').onchange = () => { const m = JS.parse($('jsA').value); if (m != null && jsData) { jsAB.a = m < jsData.m0 ? m + 1440 : m; renderJsCompare(); } };
+$('jsB').onchange = () => { const m = JS.parse($('jsB').value); if (m != null && jsData) { jsAB.b = m < jsData.m0 ? m + 1440 : m; renderJiaoshi(); } };
+$('jsUseB').onclick = () => {
+  if (!jsData) return;
+  const m = jsAB.b, i = C.input, t = new Date(Date.UTC(i.y, i.mo - 1, i.d, 0, m));
+  $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`;
+  cast(); F.toast('已按 ' + JS.fmt(m) + ' 起盘');
+};
+
 /* ================ 表单 ================ */
 $('nowBtn').onclick = () => { const t = new Date(Date.now() + (+view.tz) * 3600e3); $('whenIn').value = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`; cast(); };
 $('whenIn').onchange = cast;
@@ -396,6 +518,7 @@ $('ljIn').onchange = () => { view.luoji = $('ljIn').value; saveView(); cast(); }
 syncUI();
 const q = new URLSearchParams(location.search);
 if (q.get('lj') === 'ming' || q.get('lj') === 'qing') view.luoji = q.get('lj');
+setTab(q.get('v') === 'jiaoshi' ? 'jiaoshi' : 'pan', true);
 if (q.get('d')) {
   const lat = q.get('lat') != null ? +q.get('lat') : view.lat, lon = q.get('lon') != null ? +q.get('lon') : view.lon;
   const c = CITY_LIST.find(x => Math.abs(x[2] - lat) < 0.005 && Math.abs(x[1] - lon) < 0.005);
